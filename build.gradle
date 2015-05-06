@@ -1,8 +1,5 @@
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-version = '1.0'
-
 buildscript {
     repositories {
         mavenCentral()
@@ -10,10 +7,6 @@ buildscript {
         maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
-        }
-        maven {
-            name 'Sponge maven repo'
-            url 'http://repo.spongepowered.org/maven'
         }
         maven {
             name = 'sonatype-snapshots'
@@ -26,14 +19,26 @@ buildscript {
     }
 }
 
-apply plugin: 'forge'
-
-dependencies {
-    compile "org.spongepowered:spongeapi:2.+"
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        name 'Sponge maven repo'
+        url 'http://repo.spongepowered.org/maven'
+    }
 }
 
+dependencies {
+    compile "org.spongepowered:spongeapi:2.0"
+}
+
+apply plugin: 'forge'
 
 minecraft {
     ext.forgeVersion = "11.14.1.1402"
     version = "1.8-$forgeVersion"
 }
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+version = '1.0'
