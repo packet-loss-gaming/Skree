@@ -14,7 +14,6 @@ import com.skelril.skree.service.internal.shutdown.ShutdownServiceImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
@@ -44,8 +43,13 @@ public class ShutdownSystem {
        return CommandSpec.builder()
                .setDescription(Texts.of("Shut the server off"))
                .setPermission("skree.shutdown")
-               .setArguments(flags().flag("f").buildWith(seq(onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
-                               optional(remainingJoinedStrings(Texts.of("message")))))
+               .setArguments(
+                       flags().flag("f").buildWith(
+                               seq(
+                                       onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
+                                       optional(remainingJoinedStrings(Texts.of("message")))
+                               )
+                       )
                ).setExecutor(new ShutdownCommand(service)).build();
     }
 }
