@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone;
+package com.skelril.skree.service.internal.zone;
 
 import com.skelril.skree.util.Clause;
 import org.spongepowered.api.entity.player.Player;

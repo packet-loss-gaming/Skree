@@ -4,16 +4,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone.global.anexample;
+package com.skelril.skree.content.zone.group.example;
 
 import com.skelril.skree.util.Clause;
-import com.skelril.skree.zone.Zone;
-import com.skelril.skree.zone.ZoneStatus;
+import com.skelril.skree.service.internal.zone.Zone;
+import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.entity.player.Player;
 
 import java.util.Collection;
 
-public class AnExampleInstance implements Zone {
+public class ExampleInstance implements Zone {
     @Override
     public boolean init() {
         return false;

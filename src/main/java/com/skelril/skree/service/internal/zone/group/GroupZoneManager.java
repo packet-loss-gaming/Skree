@@ -4,10 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone.group;
+package com.skelril.skree.service.internal.zone.group;
 
-import com.skelril.skree.zone.Zone;
-import com.skelril.skree.zone.ZoneManager;
+import com.skelril.skree.service.internal.zone.Zone;
+import com.skelril.skree.service.internal.zone.ZoneManager;
 
 import java.util.ArrayList;
 import java.util.Collection;

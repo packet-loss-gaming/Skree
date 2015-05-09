@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone.group.example;
+package com.skelril.skree.content.zone.group.example;
 
 import com.google.inject.Singleton;
-import com.skelril.skree.zone.ZoneSpaceAllocator;
-import com.skelril.skree.zone.group.GroupZoneManager;
+import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
+import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 
 @Singleton
 public class ExampleManager extends GroupZoneManager<ExampleInstance> {

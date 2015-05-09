@@ -4,8 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone;
+package com.skelril.skree.service.internal.zone;
 
-public interface ZoneSpaceAllocator {
-    float getLoad();
+public enum ZoneStatus {
+    ADDED,
+    REMOVED,
+
+    REF_LOST,
+
+    CREATION_FAILED,
+    EXIST_AND_ACTIVE,
+    DESPAWNED
 }

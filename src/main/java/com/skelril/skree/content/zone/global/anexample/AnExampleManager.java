@@ -4,10 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.zone.global.anexample;
+package com.skelril.skree.content.zone.global.anexample;
 
-import com.skelril.skree.zone.ZoneSpaceAllocator;
-import com.skelril.skree.zone.global.GlobalZoneManager;
+import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
+import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
 
 public class AnExampleManager extends GlobalZoneManager<AnExampleInstance> {
     @Override
