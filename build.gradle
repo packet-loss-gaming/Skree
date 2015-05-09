@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:2.0"
+    compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
 }
 
 apply plugin: 'forge'
