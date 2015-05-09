@@ -7,7 +7,7 @@
 package com.skelril.skree.service.internal.shutdown;
 
 import com.google.common.base.Optional;
-import com.skelril.skree.service.api.ShutdownService;
+import com.skelril.skree.service.api.shutdown.ShutdownService;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;

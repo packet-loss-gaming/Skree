@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.api;
+package com.skelril.skree.service.api.zone;
 
 import com.skelril.skree.service.internal.zone.ZoneManager;
 import com.skelril.skree.service.internal.zone.ZoneStatus;

@@ -8,7 +8,7 @@ package com.skelril.skree.service.internal.shutdown;
 
 import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.service.api.ShutdownService;
+import com.skelril.skree.service.api.shutdown.ShutdownService;
 import com.skelril.skree.util.PrettyText;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
