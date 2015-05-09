@@ -23,7 +23,12 @@ public class PrettyText {
         builder.append(" at ");
         builder.append(calendar.get(Calendar.HOUR));
         builder.append(":");
-        builder.append(calendar.get(Calendar.MINUTE));
+        int minute = calendar.get(Calendar.MINUTE);
+        if (minute < 10) {
+            builder.append("0").append(minute);
+        } else {
+            builder.append(minute);
+        }
         builder.append(calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM");
         return builder.toString();
     }
