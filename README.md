@@ -9,4 +9,4 @@ General Project Structure
   - Service
     * Packages which define services, services should have one Interface, and have their internal contents packaged inside a subpackage of service called 'internal.<service name>'
   - System
-    * The initializition system, this is the part which initializes services, and uses them to create content from the content package
+    * The initialization system, this is the part which initializes services, and uses them to create content from the content package
