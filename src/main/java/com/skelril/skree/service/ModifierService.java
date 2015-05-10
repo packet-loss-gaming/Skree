@@ -10,10 +10,17 @@ import java.util.Map;
 
 public interface ModifierService {
     void setExpiry(String modifier, long time);
+
+    default void extend(String modifier, long time) {
+        setExpiry(modifier, System.currentTimeMillis() + statusOf(modifier) + time);
+    }
+
     long expiryOf(String modifier);
+
     default long statusOf(String modifier) {
         return Math.max(expiryOf(modifier) - System.currentTimeMillis(), 0);
     }
+
     default boolean isActive(String modifier) {
         return statusOf(modifier) != 0;
     }
