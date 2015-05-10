@@ -6,9 +6,7 @@
 
 package com.skelril.skree.service;
 
-import com.skelril.nitro.Clause;
-
-import java.util.Collection;
+import java.util.Map;
 
 public interface ModifierService {
     void setExpiry(String modifier, long time);
@@ -20,5 +18,5 @@ public interface ModifierService {
         return statusOf(modifier) != 0;
     }
 
-    Collection<Clause<String, Long>> getActiveModifiers();
+    Map<String, Long> getActiveModifiers();
 }
