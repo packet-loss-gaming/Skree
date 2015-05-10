@@ -6,9 +6,13 @@
 
 package com.skelril.skree.content.world.wilderness;
 
+import com.google.common.base.*;
+import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemFountain;
+import com.skelril.skree.content.modifier.Modifiers;
+import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.nitro.probability.Probability;
@@ -62,7 +66,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         BlockType type = event.getBlock().getType();
         if (orePoolTypes.contains(type)) {
             // TODO add fortune & silk touch support
-            addPool(event.getBlock(), 0, false);
+            // addPool(event.getBlock(), 0, false);
         }
     }
 
@@ -79,9 +83,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
 
     public int getOreMod(int level) {
         double modifier = Math.max(1, (level * 3));
-//        if (getModifierManager().isActive(ModifierType.DOUBLE_WILD_ORES)) {
-//            modifier *= 2;
-//        }
+
+        Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+        if (optService.isPresent()) {
+            ModifierService service = optService.get();
+            if (service.isActive(Modifiers.DOUBLE_WILD_ORES)) {
+                modifier *= 2;
+            }
+        }
+
         return (int) modifier;
     }
 
