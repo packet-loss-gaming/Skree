@@ -7,12 +7,16 @@
 package com.skelril.skree.service.internal.world;
 
 import com.skelril.skree.service.api.world.WorldEffectWrapper;
+import com.skelril.skree.extractor.WorldFromExtent;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class WorldEffectWrapperImpl implements WorldEffectWrapper {
+
+    protected static WorldFromExtent toWorld = new WorldFromExtent();
 
     protected String name;
     protected Collection<World> worlds;
@@ -23,7 +27,7 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     public WorldEffectWrapperImpl(String name, Collection<World> worlds) {
         this.name = name;
-        this.worlds = worlds;
+        this.worlds = new ArrayList<>(worlds);
     }
 
     @Override
@@ -32,7 +36,22 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
     }
 
     @Override
-    public Collection<World> getInstances() {
+    public boolean isApplicable(Extent extent) {
+        return isApplicable(toWorld.from(extent));
+    }
+
+    @Override
+    public boolean isApplicable(World world) {
+        return worlds.contains(world);
+    }
+
+    @Override
+    public void addWorld(World world) {
+        worlds.add(world);
+    }
+
+    @Override
+    public Collection<World> getWorlds() {
         return worlds;
     }
 

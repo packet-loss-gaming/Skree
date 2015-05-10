@@ -7,10 +7,17 @@
 package com.skelril.skree.service.api.world;
 
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
 
 public interface WorldEffectWrapper {
     String getName();
-    Collection<World> getInstances();
+
+    boolean isApplicable(Extent extent);
+    boolean isApplicable(World world);
+
+    void addWorld(World world);
+
+    Collection<World> getWorlds();
 }
