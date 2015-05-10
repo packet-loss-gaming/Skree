@@ -6,8 +6,8 @@
 
 package com.skelril.skree.service.internal.zone;
 
-import com.skelril.skree.service.api.zone.ZoneService;
-import com.skelril.skree.util.Clause;
+import com.skelril.skree.service.ZoneService;
+import com.skelril.nitro.Clause;
 import org.spongepowered.api.entity.player.Player;
 
 import java.lang.ref.WeakReference;

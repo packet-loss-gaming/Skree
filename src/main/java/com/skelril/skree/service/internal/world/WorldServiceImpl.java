@@ -6,8 +6,7 @@
 
 package com.skelril.skree.service.internal.world;
 
-import com.skelril.skree.service.api.world.WorldService;
-import com.skelril.skree.service.api.world.WorldEffectWrapper;
+import com.skelril.skree.service.WorldService;
 
 import java.util.Collection;
 import java.util.HashMap;

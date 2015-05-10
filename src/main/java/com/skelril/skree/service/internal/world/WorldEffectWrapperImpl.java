@@ -6,8 +6,7 @@
 
 package com.skelril.skree.service.internal.world;
 
-import com.skelril.skree.service.api.world.WorldEffectWrapper;
-import com.skelril.skree.extractor.WorldFromExtent;
+import com.skelril.nitro.extractor.WorldFromExtent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 

@@ -6,13 +6,12 @@
 
 package com.skelril.skree.content.world.wilderness;
 
-import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.generator.FixedIntGenerator;
-import com.skelril.skree.item.ItemFountain;
+import com.skelril.nitro.generator.FixedIntGenerator;
+import com.skelril.nitro.item.ItemFountain;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import com.skelril.skree.time.TimedRunnable;
-import com.skelril.skree.util.Probability;
+import com.skelril.nitro.time.TimedRunnable;
+import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;

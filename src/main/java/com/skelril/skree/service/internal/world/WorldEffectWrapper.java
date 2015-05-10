@@ -4,17 +4,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.extractor;
+package com.skelril.skree.service.internal.world;
 
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
-public class WorldFromExtent implements Extractor<World, Extent> {
-    @Override
-    public World from(Extent extent) {
-        if (extent instanceof World) {
-            return (World) extent;
-        }
-        return null;
-    }
+import java.util.Collection;
+
+public interface WorldEffectWrapper {
+    String getName();
+
+    boolean isApplicable(Extent extent);
+    boolean isApplicable(World world);
+
+    void addWorld(World world);
+
+    Collection<World> getWorlds();
 }

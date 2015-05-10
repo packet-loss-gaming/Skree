@@ -4,8 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.extractor;
+package com.skelril.nitro.time;
 
-public interface Extractor<K, E> {
-    K from(E e);
+public interface IntegratedRunnable {
+
+    public boolean run(int times);
+
+    public void end();
 }

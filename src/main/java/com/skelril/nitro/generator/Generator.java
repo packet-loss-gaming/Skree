@@ -4,11 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.time;
+package com.skelril.nitro.generator;
 
-public interface IntegratedRunnable {
-
-    public boolean run(int times);
-
-    public void end();
+public interface Generator<T> {
+    T get();
 }

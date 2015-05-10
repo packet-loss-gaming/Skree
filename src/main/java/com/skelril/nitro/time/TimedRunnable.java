@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.time;
+package com.skelril.nitro.time;
 
 import org.spongepowered.api.service.scheduler.Task;
 

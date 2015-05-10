@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.zone.global.anexample;
 
-import com.skelril.skree.util.Clause;
+import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.entity.player.Player;

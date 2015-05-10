@@ -4,7 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.api.world;
+package com.skelril.skree.service;
+
+import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 
 import java.util.Collection;
 

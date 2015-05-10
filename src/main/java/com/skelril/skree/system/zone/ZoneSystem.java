@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.system.zone;
+package com.skelril.skree.system.zone;
 
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.RandomPlacementAllocator;

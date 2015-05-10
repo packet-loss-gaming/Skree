@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.api.shutdown;
+package com.skelril.skree.service;
 
 import org.spongepowered.api.text.Text;
 

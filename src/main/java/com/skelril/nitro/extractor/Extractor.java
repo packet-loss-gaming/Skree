@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.generator;
+package com.skelril.nitro.extractor;
 
-public interface Generator<T> {
-    T get();
+public interface Extractor<K, E> {
+    K from(E e);
 }

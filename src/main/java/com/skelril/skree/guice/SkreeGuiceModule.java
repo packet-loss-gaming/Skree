@@ -7,9 +7,9 @@
 package com.skelril.skree.guice;
 
 import com.google.inject.AbstractModule;
-import com.skelril.skree.service.system.shutdown.ShutdownSystem;
-import com.skelril.skree.service.system.world.WorldSystem;
-import com.skelril.skree.service.system.zone.ZoneSystem;
+import com.skelril.skree.system.shutdown.ShutdownSystem;
+import com.skelril.skree.system.world.WorldSystem;
+import com.skelril.skree.system.zone.ZoneSystem;
 
 public class SkreeGuiceModule extends AbstractModule {
     @Override

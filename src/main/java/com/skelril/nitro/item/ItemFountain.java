@@ -4,13 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.item;
+package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
-import com.skelril.skree.generator.Generator;
-import com.skelril.skree.util.Probability;
-import com.skelril.skree.time.IntegratedRunnable;
+import com.skelril.nitro.generator.Generator;
+import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.time.IntegratedRunnable;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;

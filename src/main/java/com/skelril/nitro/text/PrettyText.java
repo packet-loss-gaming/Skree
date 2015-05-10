@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.util;
+package com.skelril.nitro.text;
 
 import java.util.Calendar;
 import java.util.Locale;
