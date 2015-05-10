@@ -11,14 +11,28 @@ import com.skelril.skree.service.ModifierService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModifierServiceImpl implements ModifierService {
+public abstract class ModifierServiceImpl implements ModifierService {
 
-    private Map<String, Long> modifiers = new HashMap<>();
+    protected final Map<String, Long> modifiers = new HashMap<>();
+
+    public ModifierServiceImpl() {
+        refreshData();
+    }
 
     @Override
     public void setExpiry(String modifier, long time) {
         modifiers.put(modifier, time);
+        updateModifier(modifier, time);
     }
+
+    public void refreshData() {
+        modifiers.clear();
+        repopulateData();
+    }
+
+    protected abstract void repopulateData();
+
+    protected abstract void updateModifier(String modifier, long time);
 
     @Override
     public long expiryOf(String modifier) {
