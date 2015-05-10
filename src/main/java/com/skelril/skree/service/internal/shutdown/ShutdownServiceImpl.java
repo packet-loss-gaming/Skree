@@ -107,5 +107,9 @@ public class ShutdownServiceImpl implements ShutdownService {
     @Override
     public void cancelShutdown() {
         ticks = -1;
+        if (task.isPresent()) {
+            task.get().cancel();
+            task = Optional.absent();
+        }
     }
 }
