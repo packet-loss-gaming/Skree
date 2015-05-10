@@ -29,7 +29,7 @@ public class ShutdownSystem {
 
         try {
             game.getServiceManager().setProvider(plugin, ShutdownService.class, service);
-            game.getCommandDispatcher().register(plugin, getCommandSpec(), "shutdown");
+            game.getCommandDispatcher().register(plugin, ShutdownCommand.aquireSpec(service), "shutdown");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
         }
@@ -37,19 +37,5 @@ public class ShutdownSystem {
 
     public ShutdownService getService() {
         return service;
-    }
-
-    private CommandSpec getCommandSpec() {
-       return CommandSpec.builder()
-               .setDescription(Texts.of("Shut the server off"))
-               .setPermission("skree.shutdown")
-               .setArguments(
-                       flags().flag("f").buildWith(
-                               seq(
-                                       onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
-                                       optional(remainingJoinedStrings(Texts.of("message")))
-                               )
-                       )
-               ).setExecutor(new ShutdownCommand(service)).build();
     }
 }

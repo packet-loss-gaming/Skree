@@ -14,6 +14,9 @@ import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
+import org.spongepowered.api.util.command.spec.CommandSpec;
+
+import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 public class ShutdownCommand implements CommandExecutor {
 
@@ -45,5 +48,19 @@ public class ShutdownCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
+    }
+
+    public static CommandSpec aquireSpec(ShutdownService service) {
+        return CommandSpec.builder()
+                .setDescription(Texts.of("Shut the server off"))
+                .setPermission("skree.shutdown")
+                .setArguments(
+                        flags().flag("f").buildWith(
+                                seq(
+                                        onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
+                                        optional(remainingJoinedStrings(Texts.of("message")))
+                                )
+                        )
+                ).setExecutor(new ShutdownCommand(service)).build();
     }
 }
