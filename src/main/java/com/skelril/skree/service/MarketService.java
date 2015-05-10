@@ -20,8 +20,6 @@ public interface MarketService {
     void setBuyPercentValue(MarketEntry entry, float rate);
     void setSellPercentValue(MarketEntry entry, float rate);
 
-    BigDecimal priceCheck(MarketEntry entry);
-
     void sell(Player player, MarketEntry entry);
     void sell(Player player, MarketEntry entry, int amount);
 
