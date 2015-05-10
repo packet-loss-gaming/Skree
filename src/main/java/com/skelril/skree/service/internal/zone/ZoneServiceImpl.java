@@ -108,6 +108,7 @@ public class ZoneServiceImpl implements ZoneService {
         return new Clause<>(player, previous.getValue());
     }
 
+    @Override
     public Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players) {
         return players.stream().map(this::rejoin).collect(Collectors.toList());
     }

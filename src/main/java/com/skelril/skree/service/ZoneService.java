@@ -23,4 +23,5 @@ public interface ZoneService {
     Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<?> manager, Collection<Player> players);
 
     Clause<Player, ZoneStatus> rejoin(Player player);
+    Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players);
 }
