@@ -23,37 +23,31 @@ public interface MarketService {
     void setSellPercentValue(MarketEntry entry, float rate);
 
     default SellOffer sell(User user, MarketEntry entry) {
-        return sell(user, entry, entry.getInstantSellPrice());
+        return sell(user, entry, 1);
     }
-    default SellOffer sell(User user, MarketEntry entry, int amount) {
-        return sell(user, entry, entry.getInstantSellPrice(), amount);
-    }
+    SellOffer sell(User user, MarketEntry entry, int amount);
 
-    default SellOffer sell(User user, MarketEntry entry, BigDecimal price) {
-        return sell(user, entry, price, 1);
+    default SellOffer sellRequest(User user, MarketEntry entry, BigDecimal price) {
+        return sellRequest(user, entry, price, 1);
     }
-    SellOffer sell(User user, MarketEntry entry, BigDecimal price, int amount);
+    SellOffer sellRequest(User user, MarketEntry entry, BigDecimal price, int amount);
 
 
     default BuyOffer buy(User user, MarketEntry entry) {
-        return buy(user, entry, entry.getInstantBuyPrice());
+        return buy(user, entry, 1);
     }
-    default BuyOffer buy(User user, MarketEntry entry, int amount) {
-        return buy(user, entry, entry.getInstantBuyPrice(), amount);
-    }
+    BuyOffer buy(User user, MarketEntry entry, int amount);
 
-    default BuyOffer buy(User user, MarketEntry entry, BigDecimal price) {
-        return buy(user, entry, price, 1);
+    default BuyOffer buyRequest(User user, MarketEntry entry, BigDecimal price) {
+        return buyRequest(user, entry, price, 1);
     }
-    BuyOffer buy(User user, MarketEntry entry, BigDecimal price, int amount);
+    BuyOffer buyRequest(User user, MarketEntry entry, BigDecimal price, int amount);
 
     List<BuyOffer> findBuyOffers(MarketEntry entry);
     List<SellOffer> findSellOffers(MarketEntry entry);
     List<MarketOffer> findOffers(MarketEntry entry);
 
     List<MarketOffer> getActiveOffers();
-
-    MarketTransaction forceComplete(MarketOffer offer);
 
     List<MarketTransaction> getTransactions();
     List<MarketTransaction> getTransactions(Date start, Date end);
