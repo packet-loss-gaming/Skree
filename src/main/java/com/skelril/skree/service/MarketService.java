@@ -53,11 +53,16 @@ public interface MarketService {
 
     List<MarketOffer> getActiveOffers();
 
-    MarketTransaction complete(SellOffer sold, BuyOffer bought);
     MarketTransaction forceComplete(MarketOffer offer);
 
     List<MarketTransaction> getTransactions();
     List<MarketTransaction> getTransactions(Date start, Date end);
+
+    List<MarketTransaction> getPurchasesFrom(User user);
+    List<MarketTransaction> getPurchasesFrom(User user, Date start, Date end);
+
+    List<MarketTransaction> getSalesTo(User user);
+    List<MarketTransaction> getSalesTo(User user, Date start, Date end);
 
     List<MarketTransaction> getTransactionsFrom(User user);
     List<MarketTransaction> getTransactionsFrom(User user, Date start, Date end);

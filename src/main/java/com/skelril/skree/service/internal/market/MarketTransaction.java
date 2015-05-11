@@ -19,6 +19,4 @@ public interface MarketTransaction {
 
     BigDecimal getPricePerItem();
     BigDecimal getTotalPrice();
-
-    TransactionType getType();
 }
