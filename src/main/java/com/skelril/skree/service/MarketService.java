@@ -23,14 +23,29 @@ public interface MarketService {
     void setSellPercentValue(MarketEntry entry, float rate);
 
     default SellOffer sell(User user, MarketEntry entry) {
-        return sell(user, entry, 1);
+        return sell(user, entry, entry.getInstantSellPrice());
     }
-    SellOffer sell(User user, MarketEntry entry, int amount);
+    default SellOffer sell(User user, MarketEntry entry, int amount) {
+        return sell(user, entry, entry.getInstantSellPrice(), amount);
+    }
+
+    default SellOffer sell(User user, MarketEntry entry, BigDecimal price) {
+        return sell(user, entry, price, 1);
+    }
+    SellOffer sell(User user, MarketEntry entry, BigDecimal price, int amount);
+
 
     default BuyOffer buy(User user, MarketEntry entry) {
-        return buy(user, entry, 1);
+        return buy(user, entry, entry.getInstantBuyPrice());
     }
-    BuyOffer buy(User user, MarketEntry entry, int amount);
+    default BuyOffer buy(User user, MarketEntry entry, int amount) {
+        return buy(user, entry, entry.getInstantBuyPrice(), amount);
+    }
+
+    default BuyOffer buy(User user, MarketEntry entry, BigDecimal price) {
+        return buy(user, entry, price, 1);
+    }
+    BuyOffer buy(User user, MarketEntry entry, BigDecimal price, int amount);
 
     List<BuyOffer> findBuyOffers(MarketEntry entry);
     List<SellOffer> findSellOffers(MarketEntry entry);

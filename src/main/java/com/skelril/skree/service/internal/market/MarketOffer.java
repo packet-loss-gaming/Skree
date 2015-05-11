@@ -16,6 +16,10 @@ public interface MarketOffer {
     int getAmountRequested();
     int getAmountCompleted();
 
+    default boolean failedToProcess() {
+        return getAmountCompleted() == -1;
+    }
+
     default boolean isCompleted() {
         return getAmountRequested() == getAmountCompleted();
     }
