@@ -13,6 +13,9 @@ public interface MarketOffer {
 
     MarketEntry getEntry();
 
+    default int getAmountRemaining() {
+        return getAmountRequested() - getAmountCompleted();
+    }
     int getAmountRequested();
     int getAmountCompleted();
 
@@ -21,6 +24,6 @@ public interface MarketOffer {
     }
 
     default boolean isCompleted() {
-        return getAmountRequested() == getAmountCompleted();
+        return getAmountRemaining() == 0;
     }
 }
