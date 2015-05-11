@@ -6,17 +6,19 @@
 
 package com.skelril.skree.service.internal.market;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-
 import java.math.BigDecimal;
+import java.util.UUID;
 
-public interface MarketEntry {
-    String getName();
+public interface MarketTransaction {
+    UUID getBuyer();
+    UUID getSeller();
 
-    ItemStack buildItem();
+    MarketEntry getEntry();
 
-    BigDecimal getValue();
+    int getQuantity();
 
-    BigDecimal getInstantBuyPrice();
-    BigDecimal getInstantSellPrice();
+    BigDecimal getPricePerItem();
+    BigDecimal getTotalPrice();
+
+    TransactionType getType();
 }

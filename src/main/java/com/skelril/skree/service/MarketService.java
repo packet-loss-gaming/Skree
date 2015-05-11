@@ -6,11 +6,13 @@
 
 package com.skelril.skree.service;
 
-import com.skelril.skree.service.internal.market.MarketEntry;
-import org.spongepowered.api.entity.player.Player;
+import com.skelril.skree.service.internal.market.*;
+import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 public interface MarketService {
     MarketEntry lookup(ItemStack stack);
@@ -20,9 +22,28 @@ public interface MarketService {
     void setBuyPercentValue(MarketEntry entry, float rate);
     void setSellPercentValue(MarketEntry entry, float rate);
 
-    void sell(Player player, MarketEntry entry);
-    void sell(Player player, MarketEntry entry, int amount);
+    default SellOffer sell(User user, MarketEntry entry) {
+        return sell(user, entry, 1);
+    }
+    SellOffer sell(User user, MarketEntry entry, int amount);
 
-    void buy(Player player, MarketEntry entry);
-    void buy(Player player, MarketEntry entry, int amount);
+    default BuyOffer buy(User user, MarketEntry entry) {
+        return buy(user, entry, 1);
+    }
+    BuyOffer buy(User user, MarketEntry entry, int amount);
+
+    List<BuyOffer> findBuyOffers(MarketEntry entry);
+    List<SellOffer> findSellOffers(MarketEntry entry);
+    List<MarketOffer> findOffers(MarketEntry entry);
+
+    List<MarketOffer> getActiveOffers();
+
+    MarketTransaction complete(SellOffer sold, BuyOffer bought);
+    MarketTransaction forceComplete(MarketOffer offer);
+
+    List<MarketTransaction> getTransactions();
+    List<MarketTransaction> getTransactions(Date start, Date end);
+
+    List<MarketTransaction> getTransactionsFrom(User user);
+    List<MarketTransaction> getTransactionsFrom(User user, Date start, Date end);
 }
