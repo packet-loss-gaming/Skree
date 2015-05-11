@@ -15,7 +15,7 @@ public interface MarketTransaction {
 
     MarketEntry getEntry();
 
-    int getQuantity();
+    int getAmount();
 
     BigDecimal getPricePerItem();
     BigDecimal getTotalPrice();
