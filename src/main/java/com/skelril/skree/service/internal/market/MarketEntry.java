@@ -17,6 +17,12 @@ public interface MarketEntry {
 
     BigDecimal getValue();
 
-    BigDecimal getInstantBuyPrice();
-    BigDecimal getInstantSellPrice();
+    /**
+     * @return the price the system will instantly buy the entry from you for
+     */
+    BigDecimal getValueBoughtFor();
+    /**
+     * @return the price the system will instantly sell the entry to you for
+     */
+    BigDecimal getValueSoldFor();
 }
