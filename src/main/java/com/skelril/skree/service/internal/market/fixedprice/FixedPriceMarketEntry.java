@@ -6,22 +6,31 @@
 
 package com.skelril.skree.service.internal.market.fixedprice;
 
+import com.google.common.collect.Lists;
 import com.skelril.skree.service.internal.market.MarketEntry;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 public class FixedPriceMarketEntry implements MarketEntry {
 
     private final String name;
+    private final Collection<String> aliases;
     private ItemStackBuilder builder;
     private BigDecimal value;
     private float buyPercent;
     private float sellPercent;
 
     public FixedPriceMarketEntry(String name, ItemStackBuilder builder, BigDecimal value, float buyPercent, float sellPercent) {
+        this(name, Lists.newArrayList(name), builder, value, buyPercent, sellPercent);
+    }
+
+
+    public FixedPriceMarketEntry(String name, Collection<String> aliases, ItemStackBuilder builder, BigDecimal value, float buyPercent, float sellPercent) {
         this.name = name;
+        this.aliases = aliases;
         this.builder = builder;
         this.value = value;
         this.buyPercent = buyPercent;
@@ -31,6 +40,11 @@ public class FixedPriceMarketEntry implements MarketEntry {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Collection<String> getAliases() {
+        return aliases;
     }
 
     @Override

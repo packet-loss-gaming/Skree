@@ -9,9 +9,11 @@ package com.skelril.skree.service.internal.market;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 public interface MarketEntry {
     String getName();
+    Collection<String> getAliases();
 
     ItemStack buildItem();
 
