@@ -19,9 +19,7 @@ public interface MarketOffer {
     int getAmountRequested();
     int getAmountCompleted();
 
-    default boolean failedToProcess() {
-        return getAmountCompleted() == -1;
-    }
+    OfferStatus getStatus();
 
     default boolean isCompleted() {
         return getAmountRemaining() == 0;

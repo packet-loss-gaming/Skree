@@ -7,6 +7,7 @@
 package com.skelril.skree.service.internal.market.fixedprice;
 
 import com.skelril.skree.service.internal.market.MarketEntry;
+import com.skelril.skree.service.internal.market.OfferStatus;
 import com.skelril.skree.service.internal.market.SellOffer;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public class FixedPriceSellOffer implements SellOffer {
     private BigDecimal price;
     private int amount;
     private int completed = 0;
+    private OfferStatus status = OfferStatus.OKAY;
 
     public FixedPriceSellOffer(UUID offerer, MarketEntry entry, BigDecimal price, int amount) {
         this.offerer = offerer;
@@ -56,7 +58,12 @@ public class FixedPriceSellOffer implements SellOffer {
         return completed;
     }
 
-    protected void fail() {
-        completed = -1;
+    protected void setStatus(OfferStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public OfferStatus getStatus() {
+        return status;
     }
 }

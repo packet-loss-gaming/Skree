@@ -8,6 +8,7 @@ package com.skelril.skree.service.internal.market.infinite;
 
 import com.skelril.skree.service.internal.market.BuyOffer;
 import com.skelril.skree.service.internal.market.MarketEntry;
+import com.skelril.skree.service.internal.market.OfferStatus;
 
 import java.math.BigDecimal;
 
@@ -19,5 +20,10 @@ public class InfiniteBuyOffer extends InfiniteMarketOffer implements BuyOffer {
     @Override
     public BigDecimal getMaxPricePerItem() {
         return entry.getValueBoughtFor();
+    }
+
+    @Override
+    public OfferStatus getStatus() {
+        return OfferStatus.OKAY;
     }
 }

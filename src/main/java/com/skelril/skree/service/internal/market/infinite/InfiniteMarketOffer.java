@@ -8,6 +8,7 @@ package com.skelril.skree.service.internal.market.infinite;
 
 import com.skelril.skree.service.internal.market.MarketEntry;
 import com.skelril.skree.service.internal.market.MarketOffer;
+import com.skelril.skree.service.internal.market.OfferStatus;
 
 import java.util.UUID;
 
@@ -37,5 +38,10 @@ public class InfiniteMarketOffer implements MarketOffer {
     @Override
     public int getAmountCompleted() {
         return 0;
+    }
+
+    @Override
+    public OfferStatus getStatus() {
+        return OfferStatus.OKAY;
     }
 }

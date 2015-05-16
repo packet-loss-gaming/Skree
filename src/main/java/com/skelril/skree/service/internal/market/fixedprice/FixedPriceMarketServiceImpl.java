@@ -68,7 +68,7 @@ public abstract class FixedPriceMarketServiceImpl implements MarketService {
         if (systemsOffer.compareTo(offer.getMinPricePerItem()) >= 0) {
             complete(offer);
         } else {
-            offer.fail();
+            offer.setStatus(OfferStatus.REJECTED);
         }
         return offer;
     }
@@ -95,7 +95,7 @@ public abstract class FixedPriceMarketServiceImpl implements MarketService {
         if (offer.getMaxPricePerItem().compareTo(systemsOffer) >= 0) {
             complete(offer);
         } else {
-            offer.fail();
+            offer.setStatus(OfferStatus.REJECTED);
         }
         return offer;
     }
