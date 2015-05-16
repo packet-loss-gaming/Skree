@@ -61,7 +61,7 @@ public abstract class FixedPriceMarketServiceImpl implements MarketService {
 
     @Override
     public SellOffer sellRequest(User user, MarketEntry entry, BigDecimal price, int amount) {
-        BigDecimal systemsOffer = entries.get(entry.getName()).getValueBoughtFor();
+        BigDecimal systemsOffer = entry.getValueBoughtFor();
         FixedPriceSellOffer offer = new FixedPriceSellOffer(user.getUniqueId(), entry, price, amount);
         // If the system's offer is greater than or equal to the amount you're requesting
         // allow the transaction, otherwise fail
@@ -88,7 +88,7 @@ public abstract class FixedPriceMarketServiceImpl implements MarketService {
 
     @Override
     public BuyOffer buyRequest(User user, MarketEntry entry, BigDecimal price, int amount) {
-        BigDecimal systemsOffer = entries.get(entry.getName()).getValueSoldFor();
+        BigDecimal systemsOffer = entry.getValueSoldFor();
         FixedPriceBuyOffer offer = new FixedPriceBuyOffer(user.getUniqueId(), entry, price, amount);
         // If your offer is greater than or equal to the amount the system is requesting
         // allow the transaction, otherwise fail
