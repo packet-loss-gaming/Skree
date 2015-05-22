@@ -52,15 +52,15 @@ public class ShutdownCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec(ShutdownService service) {
         return CommandSpec.builder()
-                .setDescription(Texts.of("Shut the server off"))
-                .setPermission("skree.shutdown")
-                .setArguments(
+                .description(Texts.of("Shut the server off"))
+                .permission("skree.shutdown")
+                .arguments(
                         flags().flag("f").buildWith(
                                 seq(
                                         onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
                                         optional(remainingJoinedStrings(Texts.of("message")))
                                 )
                         )
-                ).setExecutor(new ShutdownCommand(service)).build();
+                ).executor(new ShutdownCommand(service)).build();
     }
 }
