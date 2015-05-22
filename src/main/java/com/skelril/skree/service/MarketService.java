@@ -37,6 +37,9 @@ public interface MarketService {
     MarketOfferSnapshot offer(BuyOffer offer);
     MarketOfferSnapshot offer(SellOffer offer);
 
+    // Modification
+    void submit(PriceUpdate update);
+
     // Lookup
     MarketItem getItem(UUID ID);
     MarketItem getItem(String name);

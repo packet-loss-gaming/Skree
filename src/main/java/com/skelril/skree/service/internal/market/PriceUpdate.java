@@ -6,5 +6,14 @@
 
 package com.skelril.skree.service.internal.market;
 
-public interface PriceSnapshot extends PriceData {
+import java.math.BigDecimal;
+
+public interface PriceUpdate extends PriceData {
+    void setMinMode(Mode mode);
+    void setMaxMode(Mode mode);
+
+    void setMin(BigDecimal min);
+    void setMax(BigDecimal max);
+
+    MarketItem getItem();
 }
