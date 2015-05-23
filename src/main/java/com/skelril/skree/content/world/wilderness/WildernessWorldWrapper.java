@@ -18,14 +18,18 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.entity.living.Human;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockBreakEvent;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
+import org.spongepowered.api.event.entity.EntityDeathEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -56,20 +60,50 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
     public void onEntitySpawn(EntitySpawnEvent event) {
         if (!isApplicable(event.getLocation().getExtent())) return;
 
-        Optional<HealthData> data = event.getEntity().getData(HealthData.class);
-        if (data.isPresent()) {
-            HealthData health = data.get();
+        Entity entity = event.getEntity();
+        Location loc = event.getLocation();
+
+        Optional<HealthData> healthData = entity.getData(HealthData.class);
+
+        final int level = getLevel(loc);
+
+        if (healthData.isPresent() && entity instanceof Monster && level > 1) {
+            HealthData health = healthData.get();
             final double max = health.getMaxHealth();
-            final int level = getLevel(event.getLocation());
 
             double newMax = max * 5 * (level - 1);
 
             health.setMaxHealth(newMax);
-            health.setMaxHealth(newMax);
+            health.setHealth(newMax);
 
-            event.getEntity().offer(health);
+            entity.offer(health);
         }
 
+        Optional<ExplosiveRadiusData> explosiveData = event.getEntity().getData(ExplosiveRadiusData.class);
+
+        if (explosiveData.isPresent()) {
+            ExplosiveRadiusData explosive = explosiveData.get();
+            float min = explosive.getExplosionRadius();
+            explosive.setExplosionRadius(
+                    (int) Math.min(
+                            entity instanceof Fireball ? 4 : 9,
+                            Math.max(min, (min + level) / 2)
+                    )
+            );
+            entity.offer(explosive);
+        }
+    }
+
+    @Subscribe
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (!isApplicable(event.getLocation().getExtent())) return;
+
+        Entity entity = event.getEntity();
+        Location loc = event.getLocation();
+
+        if (entity instanceof Monster) {
+            event.setExp(event.getExp() * getLevel(loc));
+        }
     }
 
     private static Set<BlockType> orePoolTypes = new HashSet<>();
@@ -89,13 +123,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
     @Subscribe
     public void onBlockBreak(BlockBreakEvent event) {
         Location loc = event.getBlock();
-        if (!isApplicable(event.getBlock().getExtent())) return;
+        if (!isApplicable(loc.getExtent())) return;
 
         BlockType type = loc.getType();
         if (orePoolTypes.contains(type)) {
             addPool(event.getBlock(), 0, false);
         }
-        event.setExp(event.getExp() * getLevel(loc));
+        // TODO needs updated XP API
+        // event.setExp(event.getExp() * getLevel(loc));
     }
 
     @Subscribe
