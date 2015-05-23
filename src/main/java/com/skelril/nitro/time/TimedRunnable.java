@@ -44,12 +44,20 @@ public class TimedRunnable implements Runnable {
     @Override
     public void run() {
         if (times > 0) {
-            if (action.run(times)) {
-                times--;
+            boolean completed = true;
+            try {
+                completed = action.run(times);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                if (completed) {
+                    times--;
+                }
             }
         } else {
             cancel(true);
         }
+
     }
 
     public void cancel() {
