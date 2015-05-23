@@ -92,7 +92,7 @@ public class ShutdownServiceImpl implements ShutdownService {
                     server.broadcastMessage(
                             Texts.builder(
                                     "Sever shutting down in "
-                                            + seconds + " seconds - for "
+                                            + times + " seconds - for "
                                             + reopenDate + "."
                             ).color(TextColors.RED).build()
                     );
