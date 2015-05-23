@@ -6,25 +6,32 @@
 
 package com.skelril.skree.content.world.wilderness;
 
-import com.google.common.base.*;
 import com.google.common.base.Optional;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemFountain;
+import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.time.TimedRunnable;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import com.skelril.nitro.time.TimedRunnable;
-import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.entity.HealthData;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.living.Human;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockBreakEvent;
+import org.spongepowered.api.event.block.BlockPlaceEvent;
+import org.spongepowered.api.event.entity.EntitySpawnEvent;
+import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -45,6 +52,26 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         this.game = game;
     }
 
+    @Subscribe
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        if (!isApplicable(event.getLocation().getExtent())) return;
+
+        Optional<HealthData> data = event.getEntity().getData(HealthData.class);
+        if (data.isPresent()) {
+            HealthData health = data.get();
+            final double max = health.getMaxHealth();
+            final int level = getLevel(event.getLocation());
+
+            double newMax = max * 5 * (level - 1);
+
+            health.setMaxHealth(newMax);
+            health.setMaxHealth(newMax);
+
+            event.getEntity().offer(health);
+        }
+
+    }
+
     private static Set<BlockType> orePoolTypes = new HashSet<>();
 
     static {
@@ -61,12 +88,35 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
 
     @Subscribe
     public void onBlockBreak(BlockBreakEvent event) {
+        Location loc = event.getBlock();
         if (!isApplicable(event.getBlock().getExtent())) return;
 
-        BlockType type = event.getBlock().getType();
+        BlockType type = loc.getType();
         if (orePoolTypes.contains(type)) {
-            // TODO add fortune & silk touch support
-            // addPool(event.getBlock(), 0, false);
+            addPool(event.getBlock(), 0, false);
+        }
+        event.setExp(event.getExp() * getLevel(loc));
+    }
+
+    @Subscribe
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Location loc = event.getBlock();
+        if (!isApplicable(loc.getExtent())) return;
+        if (orePoolTypes.contains(loc.getType())) {
+            if (event instanceof PlayerPlaceBlockEvent) {
+                Player player = ((PlayerPlaceBlockEvent) event).getEntity();
+
+                // Allow creative mode players to still place blocks
+                if (player.getGameModeData().getGameMode() == GameModes.CREATIVE) {
+                    return;
+                }
+
+                player.sendMessage(
+                        ChatTypes.SYSTEM,
+                        "You find yourself unable to place that block."
+                );
+            }
+            event.setCancelled(true);
         }
     }
 
