@@ -34,8 +34,8 @@ public class SkreePlugin {
 
     @Subscribe
     public void onPreInit(PreInitializationEvent event) {
-        new CustomItemSystem().init();
-        new CustomBlockSystem().init();
+        new CustomItemSystem(this, game).init();
+        new CustomBlockSystem(this, game).init();
         logger.info("Skree registry modifications complete!");
     }
 
