@@ -41,9 +41,9 @@ public class ShutdownCommand implements CommandExecutor {
             }
         } else {
             if (message.isPresent()) {
-                service.shutdown(seconds * 20, Texts.of(message.get()));
+                service.shutdown(seconds, Texts.of(message.get()));
             } else {
-                service.shutdown(seconds * 20);
+                service.shutdown(seconds);
             }
         }
 

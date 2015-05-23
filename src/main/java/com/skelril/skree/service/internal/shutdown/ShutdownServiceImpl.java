@@ -7,6 +7,9 @@
 package com.skelril.skree.service.internal.shutdown;
 
 import com.google.common.base.Optional;
+import com.skelril.nitro.time.IntegratedRunnable;
+import com.skelril.nitro.time.TimeFilter;
+import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ShutdownService;
 import com.skelril.nitro.text.PrettyText;
@@ -30,9 +33,8 @@ public class ShutdownServiceImpl implements ShutdownService {
     private Game game;
     private Server server;
 
-    private Optional<Task> task = Optional.absent();
+    private Optional<TimedRunnable> runnable = Optional.absent();
     private String reopenDate;
-    private int ticks = -1;
 
     public ShutdownServiceImpl(SkreePlugin plugin, Game game, Server server) {
         this.plugin = plugin;
@@ -41,56 +43,78 @@ public class ShutdownServiceImpl implements ShutdownService {
     }
 
     @Override
-    public int getTicksTilOffline() {
-        return ticks;
+    public int getSecondsTilOffline() {
+        if (isShuttingDown()) {
+            return runnable.get().getTimes();
+        }
+        return -1;
     }
 
     @Override
     public boolean isShuttingDown() {
-        return ticks != -1;
+        return runnable.isPresent();
     }
 
     @Override
-    public boolean shutdown(int ticks) {
-        return shutdown(ticks, DEFAULT_DOWNTIME);
+    public boolean shutdown(int seconds) {
+        return shutdown(seconds, DEFAULT_DOWNTIME);
     }
 
     @Override
-    public boolean shutdown(int ticks, long downtime) {
-        return shutdown(ticks, DEFAULT_DOWNTIME, DEFAULT_REASON);
+    public boolean shutdown(int seconds, long downtime) {
+        return shutdown(seconds, DEFAULT_DOWNTIME, DEFAULT_REASON);
     }
 
     @Override
-    public boolean shutdown(int ticks, Text message) {
-        return shutdown(ticks, DEFAULT_DOWNTIME, message);
+    public boolean shutdown(int seconds, Text message) {
+        return shutdown(seconds, DEFAULT_DOWNTIME, message);
     }
 
+    private static final TimeFilter filter = new TimeFilter(10, 5);
+
     @Override
-    public boolean shutdown(int ticks, long downtime, Text message) {
-        if (ticks < 1) {
+    public boolean shutdown(int seconds, long downtime, Text message) {
+        if (seconds < 1) {
             return false;
         }
 
-        reopenDate = PrettyText.dateFromCur(System.currentTimeMillis() + downtime + (ticks * 20 * 1000));
+        reopenDate = PrettyText.dateFromCur(System.currentTimeMillis() + downtime + (seconds * 1000));
 
-        this.ticks = ticks;
+        if (runnable.isPresent()) {
+            runnable.get().setTimes(seconds);
+            return true;
+        }
 
-        if (!task.isPresent()) {
-            task = game.getSyncScheduler().runRepeatingTask(plugin, () -> {
-                int seconds = this.ticks / 20;
-                if (this.ticks-- % 20 == 0 && (seconds > 0 && seconds % 5 == 0 || seconds <= 10 && seconds > 0)) {
+        IntegratedRunnable shutdown = new IntegratedRunnable() {
+            @Override
+            public boolean run(int times) {
+                if (filter.matchesFilter(times)) {
                     server.broadcastMessage(
                             Texts.builder("Sever shutting down in "
-                                            + seconds + " seconds - for "
-                                            + reopenDate + ".").color(TextColors.RED).build()
-                            );
+                                                  + seconds + " seconds - for "
+                                                  + reopenDate + ".").color(TextColors.RED).build()
+                    );
                 }
-                if (this.ticks <= 0) {
-                    server.broadcastMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
-                    forceShutdown(message);
-                }
-            }, 1);
+                return true;
+            }
+
+            @Override
+            public void end() {
+                server.broadcastMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
+                forceShutdown(message);
+            }
+        };
+
+        TimedRunnable runnable = new TimedRunnable(shutdown, seconds);
+        Optional<Task> task = game.getSyncScheduler().runRepeatingTask(plugin, runnable, 20);
+
+        if (!task.isPresent()) {
+            return false;
         }
+
+        runnable.setTask(task.get());
+        this.runnable = Optional.of(runnable);
+
         return true;
     }
 
@@ -106,10 +130,9 @@ public class ShutdownServiceImpl implements ShutdownService {
 
     @Override
     public void cancelShutdown() {
-        ticks = -1;
-        if (task.isPresent()) {
-            task.get().cancel();
-            task = Optional.absent();
+        if (runnable.isPresent()) {
+            runnable.get().cancel();
+            runnable = Optional.absent();
         }
     }
 }

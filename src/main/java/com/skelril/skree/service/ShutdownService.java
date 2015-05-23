@@ -9,13 +9,13 @@ package com.skelril.skree.service;
 import org.spongepowered.api.text.Text;
 
 public interface ShutdownService {
-    int getTicksTilOffline();
+    int getSecondsTilOffline();
     boolean isShuttingDown();
 
-    boolean shutdown(int ticks);
-    boolean shutdown(int ticks, long downtime);
-    boolean shutdown(int ticks, Text message);
-    boolean shutdown(int ticks, long downtime, Text message);
+    boolean shutdown(int seconds);
+    boolean shutdown(int seconds, long downtime);
+    boolean shutdown(int seconds, Text message);
+    boolean shutdown(int seconds, long downtime, Text message);
 
     void forceShutdown();
     void forceShutdown(Text message);
