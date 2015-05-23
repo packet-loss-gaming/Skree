@@ -8,17 +8,21 @@ package com.skelril.nitro.time;
 
 import org.spongepowered.api.service.scheduler.Task;
 
-public class TimedRunnable implements Runnable {
+public class TimedRunnable<T extends IntegratedRunnable> implements Runnable {
 
     private Task task;
-    private IntegratedRunnable action;
+    private T action;
 
     private int times;
     private boolean done = false;
 
-    public TimedRunnable(IntegratedRunnable action, int times) {
+    public TimedRunnable(T action, int times) {
         this.action = action;
         this.times = times;
+    }
+
+    public T getBaseTask() {
+        return action;
     }
 
     public boolean isComplete() {

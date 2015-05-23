@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.modifier.Modifiers;
@@ -213,7 +214,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
             }
         };
 
-        TimedRunnable runnable = new TimedRunnable(fountain, times);
+        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
         Task task = game.getSyncScheduler().runRepeatingTaskAfter(plugin, runnable, 20, 20).get();
         runnable.setTask(task);
     }

@@ -8,9 +8,10 @@ package com.skelril.skree;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
-import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import org.spongepowered.api.Game;
@@ -62,8 +63,25 @@ public class SkreePlugin {
     }
 
     private void registerPrimaryServerSystems() {
-        new ModifierSystem(this, game);
-        new ShutdownSystem(this, game);
-        new WorldSystem(this, game);
+        try {
+            new DropClearSystem(this, game);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
+            new ModifierSystem(this, game);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
+            new ShutdownSystem(this, game);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
+            new WorldSystem(this, game);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -7,12 +7,12 @@
 package com.skelril.skree.service.internal.shutdown;
 
 import com.google.common.base.Optional;
+import com.skelril.nitro.text.PrettyText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ShutdownService;
-import com.skelril.nitro.text.PrettyText;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.service.scheduler.Task;
@@ -28,10 +28,10 @@ public class ShutdownServiceImpl implements ShutdownService {
     private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
     private static final Text DEFAULT_REASON = Texts.of("Shutting down!");
 
-    private SkreePlugin plugin;
+    private final SkreePlugin plugin;
 
-    private Game game;
-    private Server server;
+    private final Game game;
+    private final Server server;
 
     private Optional<TimedRunnable> runnable = Optional.absent();
     private String reopenDate;
@@ -107,7 +107,7 @@ public class ShutdownServiceImpl implements ShutdownService {
             }
         };
 
-        TimedRunnable runnable = new TimedRunnable(shutdown, seconds);
+        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
         Optional<Task> task = game.getSyncScheduler().runRepeatingTask(plugin, runnable, 20);
 
         if (!task.isPresent()) {
