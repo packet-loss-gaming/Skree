@@ -6,7 +6,10 @@
 
 package com.skelril.skree.service;
 
-import com.skelril.skree.service.internal.market.*;
+import com.skelril.skree.service.internal.market.MarketItem;
+import com.skelril.skree.service.internal.market.MarketOfferSnapshot;
+import com.skelril.skree.service.internal.market.PriceSnapshot;
+import com.skelril.skree.service.internal.market.PriceUpdate;
 import com.skelril.skree.service.internal.market.buy.BuyOffer;
 import com.skelril.skree.service.internal.market.sell.SellOffer;
 import org.spongepowered.api.item.inventory.ItemStack;

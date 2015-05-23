@@ -6,9 +6,9 @@
 
 package com.skelril.skree.service;
 
+import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.ZoneManager;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
-import com.skelril.nitro.Clause;
 import org.spongepowered.api.entity.player.Player;
 
 import java.util.Collection;
