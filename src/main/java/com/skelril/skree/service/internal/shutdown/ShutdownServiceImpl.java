@@ -36,10 +36,10 @@ public class ShutdownServiceImpl implements ShutdownService {
     private Optional<TimedRunnable> runnable = Optional.absent();
     private String reopenDate;
 
-    public ShutdownServiceImpl(SkreePlugin plugin, Game game, Server server) {
+    public ShutdownServiceImpl(SkreePlugin plugin, Game game) {
         this.plugin = plugin;
         this.game = game;
-        this.server = server;
+        this.server = game.getServer();
     }
 
     @Override
@@ -90,9 +90,11 @@ public class ShutdownServiceImpl implements ShutdownService {
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
                     server.broadcastMessage(
-                            Texts.builder("Sever shutting down in "
-                                                  + seconds + " seconds - for "
-                                                  + reopenDate + ".").color(TextColors.RED).build()
+                            Texts.builder(
+                                    "Sever shutting down in "
+                                            + seconds + " seconds - for "
+                                            + reopenDate + "."
+                            ).color(TextColors.RED).build()
                     );
                 }
                 return true;
