@@ -7,17 +7,18 @@
 package com.skelril.skree;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.skelril.skree.guice.SkreeGuiceModule;
+import com.skelril.skree.system.registry.block.CustomBlockSystem;
+import com.skelril.skree.system.registry.item.CustomItemSystem;
+import com.skelril.skree.system.modifier.ModifierSystem;
+import com.skelril.skree.system.shutdown.ShutdownSystem;
+import com.skelril.skree.system.world.WorldSystem;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 @Singleton
@@ -25,27 +26,44 @@ import java.util.logging.Logger;
 public class SkreePlugin {
 
     @Inject
-    @Named(value = "Sponge")
-    private PluginContainer mod;
+    private Game game;
 
     @Inject
     private Logger logger;
 
     @Subscribe
-    public void onServerStart(ServerStartedEvent event) {
-        logger.info("Skree Started! Kaw!");
+    public void onPreInit(PreInitializationEvent event) {
+        new CustomItemSystem().init();
+        new CustomBlockSystem().init();
+        logger.info("Skree registry modifications complete!");
+    }
 
-        // Use reflection to obtain the injector, so that we can have
-        // access to things which are normally injected in a sponge system
-        try {
-            Method m = mod.getClass().getMethod("getInjector");
-            Object res = m.invoke(mod);
-            if (res instanceof Injector) {
-                Injector injector = (Injector) res;
-                injector.createChildInjector(new SkreeGuiceModule());
-            }
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+    @Subscribe
+    public void onServerStart(ServerStartedEvent event) {
+        registerPrimaryHybridSystems();
+        switch (game.getPlatform().getType()) {
+            case CLIENT:
+                registerPrimaryClientSystems();
+                break;
+            case SERVER:
+                registerPrimaryServerSystems();
+                break;
         }
+
+        logger.info("Skree Started! Kaw!");
+    }
+
+    private void registerPrimaryHybridSystems() {
+
+    }
+
+    private void registerPrimaryClientSystems() {
+
+    }
+
+    private void registerPrimaryServerSystems() {
+        new ModifierSystem(this, game);
+        new ShutdownSystem(this, game);
+        new WorldSystem(this, game);
     }
 }
