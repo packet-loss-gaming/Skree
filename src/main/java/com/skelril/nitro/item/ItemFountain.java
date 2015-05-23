@@ -51,7 +51,7 @@ public class ItemFountain implements IntegratedRunnable  {
             Optional<Entity> optEntity = world.createEntity(EntityTypes.DROPPED_ITEM, pos);
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
-                item.getItemData().setValue(builder.build());
+                item.offer(item.getItemData().setValue(builder.build()));
                 world.spawnEntity(item);
             }
         }
