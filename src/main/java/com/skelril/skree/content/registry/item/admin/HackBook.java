@@ -15,7 +15,6 @@ public class HackBook extends Item implements CustomItem {
     public HackBook() {
         maxStackSize = 1;
         setCreativeTab(CreativeTabs.tabMisc);
-        setUnlocalizedName(getID());
     }
 
     @Override

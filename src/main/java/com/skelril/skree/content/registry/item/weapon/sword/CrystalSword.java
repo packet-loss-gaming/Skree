@@ -14,7 +14,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 public class CrystalSword extends CustomSword {
     public CrystalSword() {
         super(ToolMaterial.EMERALD);
-        setUnlocalizedName(getID());
     }
 
     @SuppressWarnings("unchecked")

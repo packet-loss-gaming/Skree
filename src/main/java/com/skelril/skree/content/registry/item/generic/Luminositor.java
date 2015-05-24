@@ -23,7 +23,6 @@ public class Luminositor extends Item implements CustomItem {
     public Luminositor() {
         maxStackSize = 1;
         setCreativeTab(CreativeTabs.tabTools);
-        setUnlocalizedName(getID());
     }
 
     @Override

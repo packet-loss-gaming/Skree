@@ -19,6 +19,10 @@ public class CustomBlockSystem {
         this.game = game;
     }
 
+    public void preInit() {
+
+    }
+
     public void init() {
 
     }
