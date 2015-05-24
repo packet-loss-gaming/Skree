@@ -8,9 +8,7 @@ package com.skelril.skree.system.registry.item;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.registry.item.admin.HackBook;
-import com.skelril.skree.content.registry.item.generic.Luminositor;
-import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -19,14 +17,13 @@ import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Game;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 public class CustomItemSystem {
 
     private final SkreePlugin plugin;
     private final Game game;
-
-    private CrystalSword crystalSword;
-    private HackBook hackBook;
-    private Luminositor luminositor;
 
     public CustomItemSystem(SkreePlugin plugin, Game game) {
         this.plugin = plugin;
@@ -34,47 +31,66 @@ public class CustomItemSystem {
     }
 
     public void preInit() {
-        crystalSword = register(new CrystalSword());
-        hackBook = register(new HackBook());
-        luminositor = register(new Luminositor());
+        try {
+            iterate(CustomItemSystem.class.getDeclaredMethod("register", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void init() {
-        render(crystalSword);
-        render(hackBook);
-        render(luminositor);
-    }
-
-    private <T extends Item & CustomItem> T register(T item) {
         try {
-            item.setUnlocalizedName("skree_" + item.getID());
-
-            GameRegistry.registerItem(item, item.getID(), "skree");
-
-            game.getEventManager().register(plugin, item);
-        } catch (Exception ex) {
+            iterate(CustomItemSystem.class.getDeclaredMethod("render", Object.class));
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
-        return item;
     }
 
-    private <T extends Item & CustomItem> T render(T item) {
-        try {
+
+    private void iterate(Method method) {
+        method.setAccessible(true);
+        for (Field field : CustomItemTypes.class.getFields()) {
+            try {
+                Object result = field.get(null);
+                method.invoke(this, result);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    // Invoked via reflection
+    @SuppressWarnings("unused")
+    private void register(Object item) {
+        if (item instanceof Item && item instanceof CustomItem) {
+            ((Item) item).setUnlocalizedName("skree_" + ((CustomItem) item).getID());
+
+            GameRegistry.registerItem((Item) item, ((CustomItem) item).getID(), "skree");
+
+            game.getEventManager().register(plugin, item);
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
+
+    // Invoked via reflection
+    @SuppressWarnings("unused")
+    private void render(Object item) {
+        if (item instanceof Item && item instanceof CustomItem) {
             if (game.getPlatform().getType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
                 mesher.register(
-                        item,
+                        (Item) item,
                         0,
                         new ModelResourceLocation(
-                                "skree:" + item.getID(),
+                                "skree:" + ((CustomItem) item).getID(),
                                 "inventory"
                         )
                 );
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
         }
-        return item;
     }
 }
