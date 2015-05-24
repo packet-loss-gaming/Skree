@@ -41,7 +41,7 @@ public class SkreePlugin {
         customItemSystem.preInit();
 
         customBlockSystem = new CustomBlockSystem(this, game);
-        customBlockSystem.init();
+        customBlockSystem.preInit();
     }
 
     @Subscribe
