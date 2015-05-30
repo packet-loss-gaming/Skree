@@ -9,6 +9,8 @@ package com.skelril.skree.service.internal.market;
 import java.math.BigDecimal;
 
 public interface PriceUpdate extends PriceData {
+    void setRawValue(BigDecimal value);
+
     void setMinMode(Mode mode);
     void setMaxMode(Mode mode);
 
