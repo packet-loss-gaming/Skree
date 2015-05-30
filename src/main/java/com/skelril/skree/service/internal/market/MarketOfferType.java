@@ -6,17 +6,17 @@
 
 package com.skelril.skree.service.internal.market;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+public enum MarketOfferType {
+    BUY(0),
+    SELL(1);
 
-public interface MarketOffer {
-    UUID getOfferer();
-    MarketOfferType getType();
+    private final int typeCode;
 
-    MarketItem getItem();
-    BigDecimal getPrice();
+    MarketOfferType(int typeCode) {
+        this.typeCode = typeCode;
+    }
 
-    int getQuantity();
-
-    MarketOfferPriority getPriority();
+    public int getTypeCode() {
+        return typeCode;
+    }
 }

@@ -12,14 +12,20 @@ import java.util.UUID;
 public interface MarketOfferSnapshot {
     UUID getOfferID();
     UUID getOfferer();
+    MarketOfferType getType();
 
     MarketItem getItem();
     BigDecimal getPrice();
 
     MarketOfferStatus getStatus();
 
+    int getTakenQuantity();
+    default int getAvailibleQuantity() {
+        return getCompletedQuantity() - getTakenQuantity();
+    }
+
     int getCompletedQuantity();
-    default int getRemainingQuantity() {
+    default int getPendingQuantity() {
         return getTotalQuantity() - getCompletedQuantity();
     }
     int getTotalQuantity();

@@ -7,6 +7,11 @@
 package com.skelril.skree.service.internal.market.sell;
 
 import com.skelril.skree.service.internal.market.MarketOffer;
+import com.skelril.skree.service.internal.market.MarketOfferType;
 
 public interface SellOffer extends MarketOffer {
+    @Override
+    default MarketOfferType getType() {
+        return MarketOfferType.SELL;
+    }
 }

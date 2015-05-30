@@ -6,19 +6,14 @@
 
 package com.skelril.skree.service.internal.market;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-
 import java.util.Collection;
 import java.util.UUID;
 
 public interface MarketItem {
     UUID getID();
 
-    String name();
+    String getItemID();
+
+    String getName();
     Collection<String> getAliases();
-
-    boolean is(ItemStack stack);
-
-    ItemStack create();
-    Collection<ItemStack> create(int amt);
 }

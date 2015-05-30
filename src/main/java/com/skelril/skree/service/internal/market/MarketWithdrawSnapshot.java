@@ -6,17 +6,10 @@
 
 package com.skelril.skree.service.internal.market;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-public interface MarketOffer {
-    UUID getOfferer();
-    MarketOfferType getType();
+public interface MarketWithdrawSnapshot {
+    UUID getOfferID();
 
-    MarketItem getItem();
-    BigDecimal getPrice();
-
-    int getQuantity();
-
-    MarketOfferPriority getPriority();
+    MarketWithdrawStatus getStatus();
 }

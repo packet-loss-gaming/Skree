@@ -6,19 +6,19 @@
 
 package com.skelril.skree.service;
 
-import com.skelril.skree.service.internal.market.MarketItem;
-import com.skelril.skree.service.internal.market.MarketOfferSnapshot;
-import com.skelril.skree.service.internal.market.PriceSnapshot;
-import com.skelril.skree.service.internal.market.PriceUpdate;
+import com.skelril.skree.service.internal.market.*;
 import com.skelril.skree.service.internal.market.buy.BuyOffer;
 import com.skelril.skree.service.internal.market.sell.SellOffer;
+import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
- * A market system composed internally of three tables
+ * A market system composed internally of four tables
  * - Items
+ * - Item aliases
  * - Offers
  * - Transactions (TODO at a later date)
  *
@@ -41,7 +41,8 @@ public interface MarketService {
     MarketOfferSnapshot offer(SellOffer offer);
 
     // Modification
-    void submit(PriceUpdate update);
+    void offer(PriceUpdate update);
+    MarketWithdrawSnapshot offer(MarketWithdraw offer);
 
     // Lookup
     MarketItem getItem(UUID ID);
@@ -51,7 +52,24 @@ public interface MarketService {
     PriceSnapshot getPrice(MarketItem type);
 
     MarketOfferSnapshot getOffer(UUID ID);
-    MarketOfferSnapshot getOffer(MarketOfferSnapshot offer);
+    default MarketOfferSnapshot getOffer(MarketOfferSnapshot offer) {
+        return getOffer(offer.getOfferID());
+    }
+
+    int countOffers(UUID user);
+    default int countOffers(User user) {
+        return countOffers(user.getUniqueId());
+    }
+
+    int getMaxOffers(UUID user);
+    default int getMaxOffers(User user) {
+        return getMaxOffers(user.getUniqueId());
+    }
+
+    List<MarketOfferSnapshot> getOffers(UUID user);
+    default List<MarketOfferSnapshot> getOffers(User user) {
+        return getOffers(user.getUniqueId());
+    }
 
     // Transactions
     //    MarketTransaction getTransaction(UUID ID);

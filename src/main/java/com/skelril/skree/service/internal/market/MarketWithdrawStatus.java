@@ -6,17 +6,9 @@
 
 package com.skelril.skree.service.internal.market;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
-public interface MarketOffer {
-    UUID getOfferer();
-    MarketOfferType getType();
-
-    MarketItem getItem();
-    BigDecimal getPrice();
-
-    int getQuantity();
-
-    MarketOfferPriority getPriority();
+public enum MarketWithdrawStatus {
+    COMPLETED,
+    INVALID_OFFER_ID,
+    CANCELLED_NOT_ENOUGH_ITEMS,
+    CANCELLED_UNKNOWN
 }
