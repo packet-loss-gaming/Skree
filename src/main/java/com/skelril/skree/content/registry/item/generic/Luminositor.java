@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item.generic;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import org.spongepowered.api.entity.EntityInteractionTypes;
@@ -21,7 +22,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class Luminositor extends Item implements CustomItem {
+public class Luminositor extends Item implements CustomItem, EventAwareContent {
 
     public Luminositor() {
         maxStackSize = 1;

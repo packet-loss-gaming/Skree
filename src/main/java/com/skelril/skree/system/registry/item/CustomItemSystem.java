@@ -7,6 +7,8 @@
 package com.skelril.skree.system.registry.item;
 
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.nitro.selector.GameAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.Minecraft;
@@ -67,7 +69,14 @@ public class CustomItemSystem {
 
             GameRegistry.registerItem((Item) item, ((CustomItem) item).getID(), "skree");
 
-            game.getEventManager().register(plugin, item);
+            // Add selective hooks
+            if (item instanceof EventAwareContent) {
+                game.getEventManager().register(plugin, item);
+            }
+
+            if (item instanceof GameAwareContent) {
+                ((GameAwareContent) item).supplyGame(game);
+            }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");
         }
