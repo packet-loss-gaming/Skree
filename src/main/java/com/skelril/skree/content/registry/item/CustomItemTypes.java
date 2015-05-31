@@ -7,11 +7,16 @@
 package com.skelril.skree.content.registry.item;
 
 import com.skelril.skree.content.registry.item.admin.HackBook;
+import com.skelril.skree.content.registry.item.admin.SwordOGreatPain;
 import com.skelril.skree.content.registry.item.generic.Luminositor;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
 
 public class CustomItemTypes {
-    public static final CrystalSword CRYSTAL_SWORD = new CrystalSword();
+    // Admin
     public static final HackBook HACK_BOOK = new HackBook();
+    public static final SwordOGreatPain SWORD_O_GREAT_PAIN = new SwordOGreatPain();
+
+    // Standard
+    public static final CrystalSword CRYSTAL_SWORD = new CrystalSword();
     public static final Luminositor LUMINOSITOR = new Luminositor();
 }

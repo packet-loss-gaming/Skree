@@ -4,22 +4,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.weapon.sword;
+package com.skelril.skree.content.registry.item.admin;
 
 import com.skelril.nitro.registry.item.sword.CustomSword;
 
-public class CrystalSword extends CustomSword {
-    public CrystalSword() {
-        super(ToolMaterial.EMERALD);
+public class SwordOGreatPain extends CustomSword {
+    public SwordOGreatPain() {
+        super(ToolMaterial.WOOD);
     }
 
     @Override
     public String getType() {
-        return "crystal";
+        return "oGreatPain";
     }
 
     @Override
     public double getDamage() {
-        return 8;
+        return 100000000;
     }
 }
