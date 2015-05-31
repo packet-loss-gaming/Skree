@@ -190,7 +190,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         ItemFountain fountain = new ItemFountain(
                 game,
                 toWorld.from(block.getExtent()),
-                block.getPosition(),
+                block.getPosition().add(.5, 0, .5),
                 new FixedIntGenerator(fortune),
                 Collections.singletonList(stack)
         ) {

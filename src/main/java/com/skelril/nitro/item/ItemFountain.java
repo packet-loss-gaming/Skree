@@ -20,8 +20,12 @@ import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.Random;
 
 public class ItemFountain implements IntegratedRunnable  {
+
+    private static Random random = new Random();
+
     private Game game;
     private World world;
     private Vector3d pos;
@@ -52,6 +56,7 @@ public class ItemFountain implements IntegratedRunnable  {
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
                 item.offer(item.getItemData().setValue(builder.build()));
+                // item.offer(item.getData(VelocityData.class).get().setValue(new Vector3d(random.nextFloat() % 1, random.nextFloat() % 1, random.nextFloat() % 1)));
                 world.spawnEntity(item);
             }
         }
