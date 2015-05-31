@@ -10,6 +10,7 @@ import com.google.common.collect.Multimap;
 import com.skelril.nitro.registry.item.CustomTool;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 
 public abstract class CustomSword extends ItemSword implements CustomTool {
@@ -26,6 +27,11 @@ public abstract class CustomSword extends ItemSword implements CustomTool {
     public String getID() {
         String typeStr = getType();
         return "sword" + Character.toUpperCase(typeStr.charAt(0)) + typeStr.substring(1);
+    }
+
+    @Override
+    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+        return false;
     }
 
     @SuppressWarnings("unchecked")
