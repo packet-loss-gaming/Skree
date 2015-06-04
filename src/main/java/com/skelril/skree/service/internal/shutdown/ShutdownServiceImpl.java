@@ -19,6 +19,7 @@ import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.sink.MessageSinks;
 
 import java.util.concurrent.TimeUnit;
 
@@ -89,7 +90,7 @@ public class ShutdownServiceImpl implements ShutdownService {
             @Override
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
-                    server.broadcastMessage(
+                    MessageSinks.toAll().sendMessage(
                             Texts.builder(
                                     "Sever shutting down in "
                                             + times + " seconds - for "
@@ -102,7 +103,7 @@ public class ShutdownServiceImpl implements ShutdownService {
 
             @Override
             public void end() {
-                server.broadcastMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
+                MessageSinks.toAll().sendMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
                 forceShutdown(message);
             }
         };
