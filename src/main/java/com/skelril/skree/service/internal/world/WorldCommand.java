@@ -18,8 +18,7 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
-import static org.spongepowered.api.util.command.args.GenericArguments.string;
+import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 public class WorldCommand implements CommandExecutor {
 
@@ -31,20 +30,29 @@ public class WorldCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        String worldName = args.<String>getOne("world").get();
+
+        if (!(src instanceof Player)) {
+            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            return CommandResult.empty();
+        }
+
+        Optional<String> optWorldName = args.<String>getOne("world");
+
+        if (!optWorldName.isPresent()) {
+            src.sendMessage(Texts.of("You are in: " + ((Player) src).getWorld().getName() + "."));
+        }
+
+
+        String worldName = optWorldName.get();
+
         Optional<World> world = game.getServer().getWorld(worldName);
         if (!world.isPresent()) {
             src.sendMessage(Texts.of("Failed to find a world named: " + worldName));
             return CommandResult.empty();
         }
 
-        if (src instanceof Player) {
-            ((Player) src).setLocationSafely(world.get().getSpawnLocation());
-            src.sendMessage(Texts.of("Entered world: " + worldName + " successfully!"));
-        } else {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
+        ((Player) src).setLocationSafely(world.get().getSpawnLocation());
+        src.sendMessage(Texts.of("Entered world: " + worldName + " successfully!"));
         return CommandResult.success();
     }
 
@@ -52,6 +60,6 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-                .arguments(onlyOne(string(Texts.of("world")))).executor(new WorldCommand(game)).build();
+                .arguments(optional(onlyOne(string(Texts.of("world"))))).executor(new WorldCommand(game)).build();
     }
 }
