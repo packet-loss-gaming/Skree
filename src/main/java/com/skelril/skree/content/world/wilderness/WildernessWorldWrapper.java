@@ -35,9 +35,9 @@ import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
 import org.spongepowered.api.event.entity.EntityBreakBlockEvent;
-import org.spongepowered.api.event.entity.EntityDeathEvent;
 import org.spongepowered.api.event.entity.EntityExplosionEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
+import org.spongepowered.api.event.entity.living.LivingDeathEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
@@ -106,7 +106,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Subscribe
-    public void onEntityDeath(EntityDeathEvent event) {
+    public void onEntityDeath(LivingDeathEvent event) {
         if (!isApplicable(event.getLocation().getExtent())) return;
 
         Entity entity = event.getEntity();
