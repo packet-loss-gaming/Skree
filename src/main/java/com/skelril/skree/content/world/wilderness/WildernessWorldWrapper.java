@@ -20,8 +20,10 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.AttributeData;
 import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
 import org.spongepowered.api.data.manipulator.item.EnchantmentData;
@@ -74,20 +76,29 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         Entity entity = event.getEntity();
         Location loc = event.getLocation();
 
-        Optional<HealthData> healthData = entity.getData(HealthData.class);
-
         final int level = getLevel(loc);
 
-        if (healthData.isPresent() && entity instanceof Monster && level > 1) {
-            HealthData health = healthData.get();
-            final double max = health.getMaxHealth();
+        if (entity instanceof Monster && level > 1) {
+            Optional<HealthData> healthData = entity.getData(HealthData.class);
+            if (healthData.isPresent()) {
+                HealthData health = healthData.get();
+                final double max = health.getMaxHealth();
 
-            double newMax = max * 5 * (level - 1);
+                double newMax = max * level;
 
-            health.setMaxHealth(newMax);
-            health.setHealth(newMax);
+                health.setMaxHealth(newMax);
+                health.setHealth(newMax);
 
-            entity.offer(health);
+                entity.offer(health);
+            }
+
+            Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
+            if (attributeData.isPresent()) {
+                AttributeData attributes = attributeData.get();
+                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, 2 + (level * 2));
+
+                entity.offer(attributes);
+            }
         }
 
         Optional<ExplosiveRadiusData> explosiveData = event.getEntity().getData(ExplosiveRadiusData.class);
