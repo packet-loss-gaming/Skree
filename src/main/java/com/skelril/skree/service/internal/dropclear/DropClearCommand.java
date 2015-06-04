@@ -37,7 +37,7 @@ public class DropClearCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         // World resolution
-        Optional<World> optWorld = Optional.absent();
+        Optional<World> optWorld;
         Optional<String> optWorldName = args.<String>getOne("world");
 
         if (optWorldName.isPresent()) {
@@ -46,6 +46,7 @@ public class DropClearCommand implements CommandExecutor {
             optWorld = Optional.of(((Player) src).getWorld());
         } else {
             src.sendMessage(Texts.of("You are not a player and need to specify a world!"));
+            return CommandResult.empty();
         }
 
         if (!optWorld.isPresent()) {
