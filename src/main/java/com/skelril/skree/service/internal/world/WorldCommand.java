@@ -40,6 +40,7 @@ public class WorldCommand implements CommandExecutor {
 
         if (!optWorldName.isPresent()) {
             src.sendMessage(Texts.of("You are in: " + ((Player) src).getWorld().getName() + "."));
+            return CommandResult.empty();
         }
 
 
