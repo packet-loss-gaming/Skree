@@ -17,7 +17,7 @@ public class DropClearSystem {
     private DropClearService service;
 
     public DropClearSystem(SkreePlugin plugin, Game game) {
-        service = new DropClearServiceImpl(plugin, game);
+        service = new DropClearServiceImpl(plugin, game, 1000, 3);
 
         game.getCommandDispatcher().register(plugin, DropClearCommand.aquireSpec(game, service, 120), "dropclear", "dc");
 
