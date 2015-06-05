@@ -10,11 +10,13 @@ import org.spongepowered.api.world.extent.Extent;
 
 public interface DropClearService {
     default boolean cleanup(Extent extent) {
-        return cleanup(extent, 60);
+        return cleanup(extent, 10);
     }
     boolean cleanup(Extent extent, int seconds);
 
     boolean checkedCleanup(Extent extent);
+
+    boolean isActiveFor(Extent extent);
 
     void forceCleanup(Extent extent);
 }

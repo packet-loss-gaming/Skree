@@ -11,29 +11,27 @@ import org.spongepowered.api.entity.EntityType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class DropClearStats {
     protected Map<EntityType, Integer> counterQuantity = new HashMap<>();
 
+    public DropClearStats merge(DropClearStats stats) {
+        stats.getStats().entrySet().stream().forEach(entry -> increase(entry.getKey(), entry.getValue()));
+        return this;
+    }
+
     public void increase(EntityType type, int amt) {
-        Integer count = counterQuantity.get(type);
-        if (count != null) {
-            count += amt;
-        } else {
-            count = amt;
-        }
-        counterQuantity.put(type, count);
+        counterQuantity.merge(type, amt, (a, b) -> a + b);
     }
 
     public int total() {
-        int total = 0;
-        for (Integer i : counterQuantity.values()) {
-            total += i;
-        }
-        return total;
+        return counterQuantity.values().stream().collect(Collectors.summingInt((a) -> a));
     }
 
     public Map<EntityType, Integer> getStats() {
         return Collections.unmodifiableMap(counterQuantity);
     }
+
+    public abstract String getFriendlyIdentifier();
 }

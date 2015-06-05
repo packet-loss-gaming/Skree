@@ -13,10 +13,25 @@ public class ChunkStats extends DropClearStats {
     private final Vector3i pos;
 
     public ChunkStats(Chunk chunk) {
-        this.pos = chunk.getPosition();
+        this(chunk.getPosition());
+    }
+
+    public ChunkStats(Vector3i pos) {
+        this.pos = pos;
     }
 
     public Vector3i getPosition() {
         return pos;
+    }
+
+    @Override
+    public ChunkStats merge(DropClearStats stats) {
+        super.merge(stats);
+        return this;
+    }
+
+    @Override
+    public String getFriendlyIdentifier() {
+        return "Chunk (" + pos.getX() + ", " + pos.getZ() + ")";
     }
 }

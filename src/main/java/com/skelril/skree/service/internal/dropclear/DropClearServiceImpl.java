@@ -6,6 +6,7 @@
 
 package com.skelril.skree.service.internal.dropclear;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.skelril.nitro.entity.EntityCleanupTask;
 import com.skelril.nitro.time.TimedRunnable;
@@ -16,26 +17,35 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DropClearServiceImpl implements DropClearService {
 
     private final SkreePlugin plugin;
-
     private final Game game;
 
-    private Map<Extent, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
-    private Map<Extent, Collection<? extends DropClearStats>> lastClear = new HashMap<>();
+    private int autoAmt;
+    private float panicMod;
 
-    public DropClearServiceImpl(SkreePlugin plugin, Game game) {
+    private Map<Extent, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
+    private Map<Extent, Map<Vector3i, ? extends DropClearStats>> lastClear = new HashMap<>();
+
+    public DropClearServiceImpl(SkreePlugin plugin, Game game, int autoAmt, float panicMod) {
         this.plugin = plugin;
         this.game = game;
+        this.autoAmt = autoAmt;
+        this.panicMod = panicMod;
     }
 
     @Override
@@ -45,23 +55,33 @@ public class DropClearServiceImpl implements DropClearService {
 
     @Override
     public boolean checkedCleanup(Extent extent) {
-        CheckProfile profile;
-        // TODO needs chunk entity API
-        if (extent instanceof World && false) {
-            profile = CheckProfile.createFor((World) extent, checkedEntities);
-        } else {
-            profile = CheckProfile.createFor(extent, checkedEntities);
-        }
-
+        CheckProfile profile = CheckProfile.createFor(extent, checkedEntities);
         int itemCount = profile.getEntities().size();
-        // TODO configurable counts
-        int count = 1000;
-        if (itemCount >= count) {
-            dropClear(extent, itemCount >= (count * 3) ? 0 : 10, false);
+        if (itemCount >= autoAmt) {
+            if (itemCount >= autoAmt * panicMod) {
+                forceCleanup(extent);
+            } else if (!isActiveFor(extent)) {
+                cleanup(extent);
+            }
+            return true;
         }
         return false;
     }
 
+    @Override
+    public boolean isActiveFor(Extent extent) {
+        return getActiveTask(extent) != null;
+    }
+
+    private TimedRunnable<EntityCleanupTask> getActiveTask(Extent extent) {
+        TimedRunnable<EntityCleanupTask> runnable = timers.get(extent);
+
+        // Check for old task, and overwrite if allowed
+        if (runnable != null && !runnable.isComplete()) {
+            return runnable;
+        }
+        return null;
+    }
 
     @Override
     public void forceCleanup(Extent extent) {
@@ -80,30 +100,39 @@ public class DropClearServiceImpl implements DropClearService {
         return new EntityCleanupTask(extent, checkedEntities) {
             @Override
             public void notifyCleanProgress(int times) {
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.RED);
+                builder.append(Texts.of("Clearing drops in " + times + " seconds!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.RED).append(Texts.of("Clearing drops in " + times + " seconds!")).build()
+                                builder.build()
                         )
                 );
             }
 
             @Override
             public void notifyCleanBeginning() {
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.RED);
+                builder.append(Texts.of("Clearing drops!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.RED).append(Texts.of("Clearing drops!")).build()
+                                builder.build()
                         )
                 );
             }
 
             @Override
             public void notifyCleanEnding() {
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.GREEN);
+                builder.append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.GREEN).append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!")).build()
+                                builder.build()
                         )
                 );
             }
@@ -114,41 +143,35 @@ public class DropClearServiceImpl implements DropClearService {
         return new EntityCleanupTask(world, checkedEntities) {
             @Override
             public void notifyCleanProgress(int times) {
-                world.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.RED).append(Texts.of("Clearing drops of " + world.getName() + " in " + times + " seconds!")).build()
-                        )
-                );
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.RED);
+                builder.append(Texts.of("Clearing drops of " + world.getName() + " in " + times + " seconds!"));
+                MessageSinks.toAll().sendMessage(builder.build());
             }
 
             @Override
             public void notifyCleanBeginning() {
-                world.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.RED).append(Texts.of("Clearing drops of " + world.getName() + "!")).build()
-                        )
-                );
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.RED);
+                builder.append(Texts.of("Clearing drops of " + world.getName() + "!"));
+                MessageSinks.toAll().sendMessage(builder.build());
             }
 
             @Override
             public void notifyCleanEnding() {
-                world.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                Texts.builder().color(TextColors.GREEN).append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!")).build()
-                        )
-                );
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.GREEN);
+                builder.append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!"));
+                MessageSinks.toAll().sendMessage(builder.build());
             }
         };
     }
 
     private boolean dropClear(Extent extent, int seconds, boolean overwrite) {
-        TimedRunnable<EntityCleanupTask> runnable = timers.get(extent);
+        TimedRunnable<EntityCleanupTask> runnable = getActiveTask(extent);
 
         // Check for old task, and overwrite if allowed
-        if (runnable != null && !runnable.isComplete()) {
+        if (runnable != null) {
             if (overwrite) {
                 runnable.setTimes(seconds);
                 return true;
@@ -171,6 +194,7 @@ public class DropClearServiceImpl implements DropClearService {
                 if (withEnd) {
                     lastClear.put(extent, getBaseTask().getLastProfile().getStats());
                 }
+                timers.remove(extent);
             }
         };
 

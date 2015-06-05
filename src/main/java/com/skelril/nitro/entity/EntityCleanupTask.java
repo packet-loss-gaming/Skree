@@ -12,7 +12,6 @@ import com.skelril.nitro.time.TimeFilter;
 import com.skelril.skree.service.internal.dropclear.CheckProfile;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
@@ -56,12 +55,7 @@ public abstract class EntityCleanupTask implements IntegratedRunnable {
     public void end() {
         notifyCleanBeginning();
 
-        // TODO needs chunk entity API
-        if (extent instanceof World && false) {
-            profile = CheckProfile.createFor((World) extent, checkedEntities);
-        } else {
-            profile = CheckProfile.createFor(extent, checkedEntities);
-        }
+        profile = CheckProfile.createFor(extent, checkedEntities);
 
         Collection<? extends Entity> entities = profile.getEntities();
         entities.stream().forEach(Entity::remove);
