@@ -7,10 +7,13 @@
 package com.skelril.skree.content.registry.item.generic;
 
 import com.google.common.base.Optional;
+import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
@@ -22,7 +25,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class Luminositor extends Item implements CustomItem, EventAwareContent {
+public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
 
     public Luminositor() {
         maxStackSize = 1;
@@ -70,5 +73,18 @@ public class Luminositor extends Item implements CustomItem, EventAwareContent {
                 }
             }
         }
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addRecipe(
+                new net.minecraft.item.ItemStack(this),
+                "ABA",
+                " C ",
+                " C ",
+                'A', new net.minecraft.item.ItemStack(Items.glowstone_dust),
+                'B', new net.minecraft.item.ItemStack(Items.redstone),
+                'C', new net.minecraft.item.ItemStack(Items.iron_ingot)
+        );
     }
 }

@@ -6,11 +6,15 @@
 
 package com.skelril.skree.content.registry.item.consumable;
 
+import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CookedGodFish extends ItemFood implements CustomItem {
+public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
     public CookedGodFish() {
         super(10, 1F, false);
         maxStackSize = 16;
@@ -20,5 +24,10 @@ public class CookedGodFish extends ItemFood implements CustomItem {
     @Override
     public String getID() {
         return "cookedGodFish";
+    }
+
+    @Override
+    public void registerIngredients() {
+        GameRegistry.addSmelting(new ItemStack(CustomItemTypes.RAW_GOD_FISH), new ItemStack(this), .45F);
     }
 }

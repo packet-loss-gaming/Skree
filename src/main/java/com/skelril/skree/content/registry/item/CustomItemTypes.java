@@ -10,6 +10,7 @@ import com.skelril.skree.content.registry.item.admin.HackBook;
 import com.skelril.skree.content.registry.item.admin.SwordOGreatPain;
 import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
+import com.skelril.skree.content.registry.item.generic.CrystallizedDiamond;
 import com.skelril.skree.content.registry.item.generic.Luminositor;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
@@ -20,6 +21,9 @@ public class CustomItemTypes {
     public static final SwordOGreatPain SWORD_O_GREAT_PAIN = new SwordOGreatPain();
 
     // Standard
+    // Gems
+    public static final CrystallizedDiamond CRYSTALLIZED_DIAMOND = new CrystallizedDiamond();
+
     // Food
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();
     public static final CookedGodFish COOKED_GOD_FISH = new CookedGodFish();

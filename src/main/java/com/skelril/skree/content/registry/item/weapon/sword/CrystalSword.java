@@ -6,9 +6,14 @@
 
 package com.skelril.skree.content.registry.item.weapon.sword;
 
+import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.sword.CustomSword;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword {
+public class CrystalSword extends CustomSword implements CraftableItem {
     public CrystalSword() {
         super(ToolMaterial.EMERALD);
     }
@@ -21,5 +26,17 @@ public class CrystalSword extends CustomSword {
     @Override
     public double getDamage() {
         return 8;
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addRecipe(
+                new ItemStack(this),
+                " A ",
+                " A ",
+                " B ",
+                'A', new ItemStack(CustomItemTypes.CRYSTALLIZED_DIAMOND),
+                'B', new ItemStack(Items.stick)
+        );
     }
 }
