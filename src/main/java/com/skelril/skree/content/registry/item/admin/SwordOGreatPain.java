@@ -22,4 +22,9 @@ public class SwordOGreatPain extends CustomSword {
     public double getDamage() {
         return 100000000;
     }
+
+    @Override
+    public int getMaxDamage() {
+        return 14;
+    }
 }
