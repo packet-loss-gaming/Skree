@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.internal.dropclear;
+package com.skelril.skree.content.dropclear;
 
 import com.google.common.base.Optional;
 import com.skelril.skree.service.DropClearService;

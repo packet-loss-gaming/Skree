@@ -8,8 +8,8 @@ package com.skelril.skree.system.shutdown;
 
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.shutdown.ShutdownCommand;
 import com.skelril.skree.service.ShutdownService;
-import com.skelril.skree.service.internal.shutdown.ShutdownCommand;
 import com.skelril.skree.service.internal.shutdown.ShutdownServiceImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
