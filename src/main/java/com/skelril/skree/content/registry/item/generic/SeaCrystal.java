@@ -14,16 +14,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystallizedDiamond extends Item implements CustomItem, CraftableItem {
+public class SeaCrystal extends Item implements CustomItem, CraftableItem {
 
-    public CrystallizedDiamond() {
+    public SeaCrystal() {
         maxStackSize = 64;
         setCreativeTab(CreativeTabs.tabMaterials);
     }
 
     @Override
     public String getID() {
-        return "crystallizedDiamond";
+        return "seaCrystal";
     }
 
     @Override
