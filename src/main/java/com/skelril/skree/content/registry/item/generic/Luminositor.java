@@ -10,12 +10,10 @@ import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.nitro.selector.GameAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
@@ -28,9 +26,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class Luminositor extends Item implements CustomItem, EventAwareContent, GameAwareContent, CraftableItem {
-
-    private Game gameRef;
+public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
 
     public Luminositor() {
         maxStackSize = 1;
@@ -44,7 +40,7 @@ public class Luminositor extends Item implements CustomItem, EventAwareContent, 
 
     @Subscribe
     public void onRightClick(PlayerInteractBlockEvent event) {
-        if (gameRef.getPlatform().getType() == Platform.Type.CLIENT) return;
+        if (event.getGame().getPlatform().getType() == Platform.Type.CLIENT) return;
 
         // TODO needs right click support & light level fetching support
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
@@ -93,10 +89,5 @@ public class Luminositor extends Item implements CustomItem, EventAwareContent, 
                 'B', new net.minecraft.item.ItemStack(Items.redstone),
                 'C', new net.minecraft.item.ItemStack(Items.iron_ingot)
         );
-    }
-
-    @Override
-    public void supplyGame(Game game) {
-        this.gameRef = game;
     }
 }
