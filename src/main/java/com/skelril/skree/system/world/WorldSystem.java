@@ -109,7 +109,8 @@ public class WorldSystem {
     }
 
     private WorldBuilder obtainAutoloadingWorld(Game game) {
-        return game.getRegistry().getWorldBuilder().enabled(true).loadsOnStartup(true);
+        WorldBuilder builder = game.getRegistry().getWorldBuilder().reset();
+        return builder.enabled(true).loadsOnStartup(true);
     }
 
 }
