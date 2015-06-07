@@ -14,8 +14,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
  * differs from Sponge's InitializationEVent. Once this discrepancy is
  * resolved, the "Dirty Skree" mod can be removed from the project.
  */
-@Mod(modid = "dirtyskree", version = "1.0", name = "Dirty Skree")
-public class DirtySkree {
+@Mod(modid = "FMLSkree", version = "1.0", name = "FML Skree")
+public class FMLSkree {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         SkreePlugin.customItemSystem.init();
