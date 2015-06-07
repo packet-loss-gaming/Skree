@@ -23,7 +23,7 @@ import java.util.Random;
 
 public class WorldSystem {
 
-    private static final String BUILD = "Build";
+    private static final String BUILD = "Sion";
     private static final String INSTANCE = "Instance";
     private static final String WILDERNESS = "Wilderness";
     private static final String WILDERNESS_NETHER = "Wilderness_nether";
