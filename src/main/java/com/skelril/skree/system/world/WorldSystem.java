@@ -9,6 +9,7 @@ package com.skelril.skree.system.world;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldCommand;
@@ -23,6 +24,7 @@ import java.util.Random;
 
 public class WorldSystem {
 
+    private static final String MAIN = "Main";
     private static final String BUILD = "Sion";
     private static final String INSTANCE = "Instance";
     private static final String WILDERNESS = "Wilderness";
@@ -36,6 +38,9 @@ public class WorldSystem {
     public WorldSystem(SkreePlugin plugin, Game game) {
         service = new WorldServiceImpl();
 
+        // Handle main world
+        initMain(plugin, game);
+
         // Create worlds
         initBuild(plugin, game);
         initInstance(plugin, game);
@@ -43,6 +48,21 @@ public class WorldSystem {
 
         // Command reg
         game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
+    }
+
+    private void initMain(SkreePlugin plugin, Game game) {
+        // Main World
+        MainWorldWrapper wrapper = new MainWorldWrapper(plugin, game);
+
+        Optional<World> curWorld = game.getServer().getWorld(MAIN);
+
+        if (curWorld.isPresent()) {
+            wrapper.addWorld(curWorld.get());
+        }
+
+        // Main wrapper reg
+        game.getEventManager().register(plugin, wrapper);
+        service.registerEffectWrapper(wrapper);
     }
 
     private void initBuild(SkreePlugin plugin, Game game) {
