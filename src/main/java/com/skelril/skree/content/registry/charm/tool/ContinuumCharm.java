@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.charm.melee;
+package com.skelril.skree.content.registry.charm.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.skree.content.registry.charm.AbstractCharm;
@@ -12,16 +12,16 @@ import com.skelril.skree.content.registry.charm.CharmTools;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.EntityInteractEntityEvent;
+import org.spongepowered.api.event.entity.EntityBreakBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class LifeLeachCharm extends AbstractCharm {
-    public LifeLeachCharm() {
-        super(0, "life_leech", 3);
+public class ContinuumCharm extends AbstractCharm {
+    public ContinuumCharm() {
+        super(1, "continuum", 9);
     }
 
     @Subscribe
-    public void onEntityInteract(EntityInteractEntityEvent event) {
+    public void onBlockBreak(EntityBreakBlockEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof ArmorEquipable) {
             Optional<ItemStack> held = ((ArmorEquipable) entity).getItemInHand();
