@@ -27,6 +27,8 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
 
     public Luminositor() {
@@ -60,7 +62,16 @@ public class Luminositor extends Item implements CustomItem, EventAwareContent, 
                 if (this.equals(optHeldItem.get().getItem())) {
                     Location pLoc = player.getLocation();
 
-                    int lightLevel = pLoc.getLuminance();
+                    // TODO Remove temporary workaround
+                    int lightLevel;
+                    try {
+                        lightLevel = (int) pLoc.getClass().getMethod("getLuminance").invoke(pLoc);
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        e.printStackTrace();
+                        lightLevel = 0;
+                    }
+
+                    // int lightLevel = pLoc.getLuminance();
 
                     TextColor color;
                     if (lightLevel >= 12) {
