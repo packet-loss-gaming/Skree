@@ -9,6 +9,7 @@ package com.skelril.skree.system.world;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
@@ -66,14 +67,21 @@ public class WorldSystem {
     }
 
     private void initBuild(SkreePlugin plugin, Game game) {
+        // Build World
+        BuildWorldWrapper wrapper = new BuildWorldWrapper(plugin, game);
+
         Optional<World> curWorld = game.getServer().getWorld(BUILD);
         if (!curWorld.isPresent()) {
             curWorld = obtainOverworld(game).name(BUILD).seed(randy.nextLong()).usesMapFeatures(false).build();
         }
 
         if (curWorld.isPresent()) {
-            // TODO build world wrapper
+            wrapper.addWorld(curWorld.get());
         }
+
+        // Build wrapper reg
+        game.getEventManager().register(plugin, wrapper);
+        service.registerEffectWrapper(wrapper);
     }
 
     private void initInstance(SkreePlugin plugin, Game game) {
