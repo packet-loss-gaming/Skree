@@ -23,11 +23,13 @@ public class ShutdownSystem {
 
         service = new ShutdownServiceImpl(plugin, game);
 
+        // Register the service & command
         try {
             game.getServiceManager().setProvider(plugin, ShutdownService.class, service);
             game.getCommandDispatcher().register(plugin, ShutdownCommand.aquireSpec(service), "shutdown");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
+            return;
         }
     }
 

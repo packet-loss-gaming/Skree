@@ -21,10 +21,13 @@ public class ModifierSystem {
     public ModifierSystem(SkreePlugin plugin, Game game) {
         // TODO add database
         service = new LazyMySQLModifierService(game, "", "modifiers");
+
+        // Register the service
         try {
             game.getServiceManager().setProvider(plugin, ModifierService.class, service);
         } catch (ProviderExistsException e) {
             e.printStackTrace();
+            return;
         }
     }
 

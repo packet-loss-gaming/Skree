@@ -16,6 +16,7 @@ import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldCommand;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
@@ -39,6 +40,15 @@ public class WorldSystem {
     public WorldSystem(SkreePlugin plugin, Game game) {
         service = new WorldServiceImpl();
 
+        // Register the service & command
+        try {
+            game.getServiceManager().setProvider(plugin, WorldService.class, service);
+            game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
+        } catch (ProviderExistsException e) {
+            e.printStackTrace();
+            return;
+        }
+
         // Handle main world
         initMain(plugin, game);
 
@@ -46,9 +56,6 @@ public class WorldSystem {
         initBuild(plugin, game);
         initInstance(plugin, game);
         initWilderness(plugin, game);
-
-        // Command reg
-        game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
     }
 
     private void initMain(SkreePlugin plugin, Game game) {
