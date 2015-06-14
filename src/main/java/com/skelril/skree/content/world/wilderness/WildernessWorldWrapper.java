@@ -30,6 +30,7 @@ import org.spongepowered.api.data.manipulator.item.EnchantmentData;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
@@ -45,19 +46,20 @@ import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
+public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
     private SkreePlugin plugin;
     private Game game;
+
+    private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
     public WildernessWorldWrapper(SkreePlugin plugin, Game game) {
         this(plugin, game, new ArrayList<>());
@@ -67,6 +69,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         super("Wilderness", worlds);
         this.plugin = plugin;
         this.game = game;
+
+        game.getSyncScheduler().runRepeatingTask(plugin, this, 20);
     }
 
     @Subscribe
@@ -300,5 +304,29 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
         Task task = game.getSyncScheduler().runRepeatingTaskAfter(plugin, runnable, 20, 20).get();
         runnable.setTask(task);
+    }
+
+    @Override
+    public void run() {
+        for (World world : getWorlds()) {
+            for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
+                int currentLevel = getLevel(entity.getLocation());
+                int lastLevel = playerLevelMap.getOrDefault(entity, -1);
+                if (currentLevel != lastLevel) {
+                    ((Player) entity).sendTitle(
+                            new Title(
+                                    Texts.of("Wilderness Level"),
+                                    Texts.of(currentLevel),
+                                    20,
+                                    0,
+                                    20,
+                                    false,
+                                    false
+                            )
+                    );
+                    playerLevelMap.put((Player) entity, currentLevel);
+                }
+            }
+        }
     }
 }
