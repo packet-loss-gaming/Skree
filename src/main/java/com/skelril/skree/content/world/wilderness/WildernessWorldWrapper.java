@@ -251,7 +251,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public int getOreMod(int level) {
-        double modifier = Math.max(1, (level * 3));
+        int modifier = Math.max(1, level * 3);
 
         Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
@@ -261,7 +261,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             }
         }
 
-        return (int) modifier;
+        return modifier;
     }
 
     private void addPool(Location block, int fortune, boolean hasSilkTouch) {
