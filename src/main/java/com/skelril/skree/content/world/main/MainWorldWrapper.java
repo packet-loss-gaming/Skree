@@ -6,18 +6,24 @@
 
 package com.skelril.skree.content.world.main;
 
+import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulator.PotionEffectData;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
+import org.spongepowered.api.potion.PotionEffectBuilder;
+import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MainWorldWrapper extends WorldEffectWrapperImpl {
+public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
     private SkreePlugin plugin;
     private Game game;
@@ -30,6 +36,8 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl {
         super("Main", worlds);
         this.plugin = plugin;
         this.game = game;
+
+        game.getSyncScheduler().runRepeatingTask(plugin, this, 20);
     }
 
     @Subscribe
@@ -39,6 +47,26 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl {
         // TODO Smarter "should this mob be allowed to spawn" code
         if (event.getEntity() instanceof Monster) {
             event.setCancelled(true);
+        }
+    }
+
+    @Override
+    public void run() {
+        for (World world : getWorlds()) {
+            for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
+                Optional<PotionEffectData> optPotionData = entity.getData(PotionEffectData.class);
+                if (optPotionData.isPresent()) {
+                    PotionEffectBuilder builder = game.getRegistry().getPotionEffectBuilder();
+                    builder.potionType(PotionEffectTypes.SPEED);
+                    builder.amplifier(5);
+                    builder.duration(3 * 20);
+                    builder.particles(false);
+
+                    PotionEffectData potionData = optPotionData.get();
+                    potionData.addPotionEffect(builder.build(), true);
+                    entity.offer(potionData);
+                }
+            }
         }
     }
 }
