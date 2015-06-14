@@ -26,16 +26,13 @@ public class CheckProfile {
     public static CheckProfile createFor(Extent extent, Collection<EntityType> checkedEntities) {
         Set<Entity> entities = new HashSet<>();
         Map<Vector3i, ChunkStats> stats = new HashMap<>();
-        for (Entity entity : extent.getEntities()) {
-            EntityType eType = entity.getType();
-            if (checkedEntities.contains(eType)) {
-                Vector3i chunkPos = getChunkPos(entity.getLocation());
-                ChunkStats chunkStats = stats.merge(
-                        chunkPos, new ChunkStats(chunkPos), ChunkStats::merge
-                );
-                chunkStats.increase(eType, 1);
-                entities.add(entity);
-            }
+        for (Entity entity : extent.getEntities(e -> checkedEntities.contains(e.getType()))) {
+            Vector3i chunkPos = getChunkPos(entity.getLocation());
+            ChunkStats chunkStats = stats.merge(
+                    chunkPos, new ChunkStats(chunkPos), ChunkStats::merge
+            );
+            chunkStats.increase(entity.getType(), 1);
+            entities.add(entity);
         }
         return new CheckProfile(entities, stats);
     }
