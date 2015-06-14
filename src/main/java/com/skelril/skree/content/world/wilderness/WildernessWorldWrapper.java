@@ -88,7 +88,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 HealthData health = healthData.get();
                 final double max = health.getMaxHealth();
 
-                double newMax = max * level;
+                double newMax = max * getHealthMod(level);
 
                 health.setMaxHealth(newMax);
                 health.setHealth(newMax);
@@ -99,7 +99,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
             if (attributeData.isPresent()) {
                 AttributeData attributes = attributeData.get();
-                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, 2 + (level * 2));
+                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, getDamageMod(level));
 
                 entity.offer(attributes);
             }
@@ -248,6 +248,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         // In Wilderness
         return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
+    }
+
+    public int getHealthMod(int level) {
+        return level > 1 ? level : 1;
+    }
+
+    public int getDamageMod(int level) {
+        return level > 1 ? (level - 1) * 2 : 0;
     }
 
     public int getOreMod(int level) {
