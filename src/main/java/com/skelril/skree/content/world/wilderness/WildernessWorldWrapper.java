@@ -243,7 +243,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl {
         }
 
         // In Wilderness
-        return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 1000) + 1;
+        return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
     }
 
     public int getOreMod(int level) {
