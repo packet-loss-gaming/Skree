@@ -1,19 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.skelril.skree.content.cowcommand;
 
-import net.minecraft.command.CommandException;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
-/**
- * Created by cow_fu on 6/15/15 at 8:18 PM
- */
 public class CowCommand implements CommandExecutor {
 
     @Override
@@ -35,7 +34,4 @@ public class CowCommand implements CommandExecutor {
                 .permission("skree.cowcommand")
                 .executor(new CowCommand()).build();
     }
-
-
-
 }
