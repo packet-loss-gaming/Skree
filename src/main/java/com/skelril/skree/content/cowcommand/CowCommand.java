@@ -5,6 +5,8 @@
  */
 package com.skelril.skree.content.cowcommand;
 
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandResult;
@@ -12,19 +14,43 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.world.Location;
+
+import com.google.common.base.Optional;
+
 
 public class CowCommand implements CommandExecutor {
+
+    public void spawnEntity(EntityType entity,World world, Location location){
+        Optional<Entity> optional = world.createEntity(entity,location.getPosition());
+        if (optional.isPresent()){
+            world.spawnEntity(optional.get());
+        }
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) {
 
         if(src instanceof Player){
             Player player = (Player) src;
+            World world = player.getWorld();
+            Location location = player.getLocation();
+
             player.sendMessage(Texts.of("Hai "+player.getName()+", this is my first command :D"));
+            //spawnEntity(EntityTypes.ENDER_CRYSTAL,world,location);
+            //spawnEntity(EntityTypes.ARROW,world,location.add(0,5,0));
+            for(int i = 0; i<500;++i){
+                spawnEntity(EntityTypes.PRIMED_TNT,world,location);
+            }
+
+
         }
 
         else
             src.sendMessage(Texts.of("Hai not player, its my first command :D!"));
+
 
         return CommandResult.success();
     }
