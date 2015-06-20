@@ -151,7 +151,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Location loc = event.getBlock();
         if (!isApplicable(loc.getExtent())) return;
 
-        BlockType type = loc.getType();
+        BlockType type = loc.getBlockType();
         if (orePoolTypes.contains(type)) {
             orePool:
             {
@@ -167,7 +167,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                         // TODO Currently abusing NMS to determine "breakability"
                         ItemType itemType = stack.getItem();
-                        BlockType blockType = loc.getType();
+                        BlockType blockType = loc.getBlockType();
                         if (itemType instanceof Item && blockType instanceof Block) {
                             if (!((Item) stack.getItem()).canHarvestBlock((Block) blockType)) {
                                 break orePool;
@@ -210,7 +210,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         event.setYield(Probability.getRangedRandom(event.getYield(), 100));
 
         for (Location loc : event.getBlocks()) {
-            BlockType type = loc.getType();
+            BlockType type = loc.getBlockType();
             if (orePoolTypes.contains(type)) {
                 addPool(loc, 0, false);
             }
@@ -221,7 +221,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onBlockPlace(BlockPlaceEvent event) {
         Location loc = event.getBlock();
         if (!isApplicable(loc.getExtent())) return;
-        if (orePoolTypes.contains(loc.getType())) {
+        if (orePoolTypes.contains(loc.getBlockType())) {
             if (event instanceof PlayerPlaceBlockEvent) {
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
@@ -274,7 +274,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     private void addPool(Location block, int fortune, boolean hasSilkTouch) {
 
-        BlockType blockType = block.getType();
+        BlockType blockType = block.getBlockType();
 
         Collection<ItemStack> generalDrop = DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
         if (DropRegistry.dropsSelf(blockType)) {
