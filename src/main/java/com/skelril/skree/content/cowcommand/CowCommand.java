@@ -20,6 +20,8 @@ import org.spongepowered.api.world.Location;
 
 import com.google.common.base.Optional;
 
+import static org.spongepowered.api.util.command.args.GenericArguments.*;
+
 
 public class CowCommand implements CommandExecutor {
 
@@ -37,11 +39,12 @@ public class CowCommand implements CommandExecutor {
             Player player = (Player) src;
             World world = player.getWorld();
             Location location = player.getLocation();
+            int numberOfTnt = args.<Integer>getOne("Number of Tnt").get();
 
             player.sendMessage(Texts.of("Hai "+player.getName()+", this is my first command :D"));
             //spawnEntity(EntityTypes.ENDER_CRYSTAL,world,location);
             //spawnEntity(EntityTypes.ARROW,world,location.add(0,5,0));
-            for(int i = 0; i<500;++i){
+            for(int i = 0; i<numberOfTnt;++i){
                 spawnEntity(EntityTypes.PRIMED_TNT,world,location);
             }
 
@@ -58,6 +61,9 @@ public class CowCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Cow's First Command :D"))
                 .permission("skree.cowcommand")
+                .arguments(
+                        onlyOne(optional(integer(Texts.of("Number of Tnt")),0))
+                )
                 .executor(new CowCommand()).build();
     }
 }
