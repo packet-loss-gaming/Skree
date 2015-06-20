@@ -28,7 +28,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import java.lang.reflect.InvocationTargetException;
-
 public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
 
     public Luminositor() {
@@ -49,7 +48,7 @@ public class Luminositor extends Item implements CustomItem, EventAwareContent, 
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
             // TODO remove workaround depends on (Sponge #260)
             // BEGIN WORKAROUND
-            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getType() == BlockTypes.LOG) {
+            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getBlockType() == BlockTypes.LOG) {
                 return;
             }
             // END WORKAROUND

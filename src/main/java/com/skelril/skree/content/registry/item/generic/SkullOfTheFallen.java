@@ -60,7 +60,7 @@ public class SkullOfTheFallen extends Item implements CustomItem, EventAwareCont
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
             // TODO remove workaround depends on (Sponge #260)
             // BEGIN WORKAROUND
-            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getType() == BlockTypes.LOG) {
+            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getBlockType() == BlockTypes.LOG) {
                 return;
             }
             // END WORKAROUND
