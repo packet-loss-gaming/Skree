@@ -8,7 +8,10 @@ package com.skelril.skree.content.cowcommand;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
@@ -24,6 +27,8 @@ import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 
 public class CowCommand implements CommandExecutor {
+
+    private final int MaxTNT = 1000;
 
     public void spawnEntity(EntityType entity,World world, Location location){
         Optional<Entity> optional = world.createEntity(entity,location.getPosition());
@@ -41,9 +46,19 @@ public class CowCommand implements CommandExecutor {
             Location location = player.getLocation();
             int numberOfTnt = args.<Integer>getOne("Number of Tnt").get();
 
+            if (numberOfTnt > MaxTNT){
+                TextBuilder builder = Texts.builder();
+                builder.color(TextColors.RED);
+                builder.append(Texts.of("You can not have more than "+MaxTNT+" TNT at a time."));
+                player.sendMessage(
+                        ChatTypes.SYSTEM,
+                        builder.build()
+                );
+                return CommandResult.empty();
+            }
+
             player.sendMessage(Texts.of("Hai "+player.getName()+", this is my first command :D"));
-            //spawnEntity(EntityTypes.ENDER_CRYSTAL,world,location);
-            //spawnEntity(EntityTypes.ARROW,world,location.add(0,5,0));
+
             for(int i = 0; i<numberOfTnt;++i){
                 spawnEntity(EntityTypes.PRIMED_TNT,world,location);
             }
