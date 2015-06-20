@@ -28,6 +28,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import java.lang.reflect.InvocationTargetException;
+
 public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
 
     public Luminositor() {
