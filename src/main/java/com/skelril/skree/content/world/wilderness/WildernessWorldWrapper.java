@@ -54,6 +54,8 @@ import org.spongepowered.api.world.World;
 
 import java.util.*;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
     private SkreePlugin plugin;
@@ -70,7 +72,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         this.plugin = plugin;
         this.game = game;
 
-        game.getSyncScheduler().runRepeatingTask(plugin, this, 20);
+        game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
     }
 
     @Subscribe
@@ -310,7 +312,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
-        Task task = game.getSyncScheduler().runRepeatingTaskAfter(plugin, runnable, 20, 20).get();
+        Task task = game.getScheduler().getTaskBuilder().execute(runnable).delay(1, SECONDS).interval(
+                1,
+                SECONDS
+        ).submit(plugin);
         runnable.setTask(task);
     }
 
