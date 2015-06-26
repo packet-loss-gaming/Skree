@@ -22,6 +22,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
@@ -37,7 +38,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         this.plugin = plugin;
         this.game = game;
 
-        game.getSyncScheduler().runRepeatingTask(plugin, this, 20);
+        game.getScheduler().getTaskBuilder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
     }
 
     @Subscribe

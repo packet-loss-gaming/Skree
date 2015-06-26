@@ -109,15 +109,10 @@ public class ShutdownServiceImpl implements ShutdownService {
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
-        Optional<Task> task = game.getSyncScheduler().runRepeatingTask(plugin, runnable, 20);
+        Task task = game.getScheduler().getTaskBuilder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(plugin);
+        runnable.setTask(task);
 
-        if (!task.isPresent()) {
-            return false;
-        }
-
-        runnable.setTask(task.get());
         this.runnable = Optional.of(runnable);
-
         return true;
     }
 

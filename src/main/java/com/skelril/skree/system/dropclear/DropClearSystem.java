@@ -29,10 +29,8 @@ public class DropClearSystem {
             return;
         }
 
-        game.getSyncScheduler().runRepeatingTask(
-                plugin,
-                () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup),
-                10
-        );
+        game.getScheduler().getTaskBuilder().execute(
+                () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
+        ).interval(10).submit(plugin);
     }
 }

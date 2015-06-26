@@ -7,7 +7,6 @@
 package com.skelril.skree.service.internal.dropclear;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 import com.skelril.nitro.entity.EntityCleanupTask;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class DropClearServiceImpl implements DropClearService {
 
@@ -199,13 +199,12 @@ public class DropClearServiceImpl implements DropClearService {
         };
 
         // Offset this by one to prevent the drop clear from triggering twice
-        Optional<Task> task = game.getSyncScheduler().runRepeatingTaskAfter(plugin, runnable, 20, 1);
+        Task task = game.getScheduler().getTaskBuilder().execute(runnable).delay(1).interval(
+                1,
+                TimeUnit.SECONDS
+        ).submit(plugin);
 
-        if (!task.isPresent()) {
-            return false;
-        }
-
-        runnable.setTask(task.get());
+        runnable.setTask(task);
         timers.put(extent, runnable);
         return true;
     }
