@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.world.wilderness;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemFountain;
@@ -27,6 +28,8 @@ import org.spongepowered.api.data.manipulator.AttributeData;
 import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
 import org.spongepowered.api.data.manipulator.item.EnchantmentData;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
@@ -226,6 +229,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Location loc = event.getBlock();
         if (!isApplicable(loc.getExtent())) return;
         if (orePoolTypes.contains(loc.getBlockType())) {
+
             if (event instanceof PlayerPlaceBlockEvent) {
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
@@ -234,10 +238,29 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     return;
                 }
 
-                TextBuilder builder = Texts.builder().color(TextColors.RED).append(
-                        Texts.of("You find yourself unable to place that block.")
-                );
-                player.sendMessage(/* ChatTypes.SYSTEM, */builder.build());
+                try {
+                    Vector3d origin = loc.getPosition();
+                    World world = toWorld.from(loc.getExtent());
+                    for (int i = 0; i < 40; ++i) {
+                        ParticleEffect effect = game.getRegistry().getParticleEffectBuilder(
+                                ParticleTypes.CRIT_MAGIC
+                        ).motion(
+                                new Vector3d(
+                                        Probability.getRangedRandom(-1, 1),
+                                        Probability.getRangedRandom(-.7, .7),
+                                        Probability.getRangedRandom(-1, 1)
+                                )
+                        ).count(1).build();
+
+                        world.spawnParticles(effect, origin.add(.5, .5, .5));
+                    }
+
+                } catch (Exception ex) {
+                    TextBuilder builder = Texts.builder().color(TextColors.RED).append(
+                            Texts.of("You find yourself unable to place that block.")
+                    );
+                    player.sendMessage(/* ChatTypes.SYSTEM, */builder.build());
+                }
             }
             event.setCancelled(true);
         }
