@@ -48,7 +48,8 @@ public class SkreePlugin {
     @Subscribe
     public void onServerStart(ServerStartedEvent event) {
         registerPrimaryHybridSystems();
-        switch (game.getPlatform().getType()) {
+        System.out.println(game.getPlatform().getExecutionType());
+        switch (game.getPlatform().getExecutionType()) {
             case CLIENT:
                 registerPrimaryClientSystems();
                 break;

@@ -46,6 +46,9 @@ public class Probability {
     }
 
     public static double getRandom(double highestValue) {
+        if (highestValue <= 1 && highestValue > 0) {
+            return r.nextDouble();
+        }
         if (highestValue < 0) {
             return (r.nextDouble() * (highestValue * -1)) * -1;
         }

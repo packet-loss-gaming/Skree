@@ -96,7 +96,7 @@ public class CustomItemSystem {
     @SuppressWarnings("unused")
     private void render(Object item) {
         if (item instanceof Item && item instanceof CustomItem) {
-            if (game.getPlatform().getType().isClient()) {
+            if (game.getPlatform().getExecutionType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
                 mesher.register(
