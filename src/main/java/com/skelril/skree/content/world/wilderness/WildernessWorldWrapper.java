@@ -46,8 +46,10 @@ import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -232,10 +234,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     return;
                 }
 
-                player.sendMessage(
-                        ChatTypes.SYSTEM,
-                        "You find yourself unable to place that block."
+                TextBuilder builder = Texts.builder().color(TextColors.RED).append(
+                        Texts.of("You find yourself unable to place that block.")
                 );
+                player.sendMessage(/* ChatTypes.SYSTEM, */builder.build());
             }
             event.setCancelled(true);
         }
