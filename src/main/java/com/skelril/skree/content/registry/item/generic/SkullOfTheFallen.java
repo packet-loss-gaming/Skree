@@ -55,7 +55,7 @@ public class SkullOfTheFallen extends Item implements CustomItem, EventAwareCont
 
     @Subscribe
     public void onRightClick(PlayerInteractBlockEvent event) {
-        if (event.getGame().getPlatform().getType() == Platform.Type.CLIENT) return;
+        if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
             // TODO remove workaround depends on (Sponge #260)
