@@ -26,9 +26,14 @@ repositories {
         name 'Sponge maven repo'
         url 'http://repo.spongepowered.org/maven'
     }
+    maven {
+        name 'sk89q-repo'
+        url 'http://maven.sk89q.com/repo/'
+    }
 }
 
 dependencies {
+    compile group: 'com.sk89q', name: 'worldedit', version: '6.+'
     compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
 }
 

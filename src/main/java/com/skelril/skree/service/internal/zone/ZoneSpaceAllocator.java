@@ -6,6 +6,11 @@
 
 package com.skelril.skree.service.internal.zone;
 
+import com.skelril.nitro.Clause;
+import com.skelril.skree.service.internal.zone.ZoneRegion.State;
+
 public interface ZoneSpaceAllocator {
     float getLoad();
+
+    Clause<ZoneRegion, State> regionFor(String managerName);
 }

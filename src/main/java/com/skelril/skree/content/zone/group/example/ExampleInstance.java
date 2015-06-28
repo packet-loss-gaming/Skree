@@ -8,12 +8,20 @@ package com.skelril.skree.content.zone.group.example;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.Zone;
+import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.entity.player.Player;
 
 import java.util.Collection;
 
 public class ExampleInstance implements Zone {
+
+    private ZoneRegion region;
+
+    public ExampleInstance(ZoneRegion region) {
+        this.region = region;
+    }
+
     @Override
     public boolean init() {
         return false;
