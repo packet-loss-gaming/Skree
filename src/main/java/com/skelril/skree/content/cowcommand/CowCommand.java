@@ -5,9 +5,10 @@
  */
 package com.skelril.skree.content.cowcommand;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -21,7 +22,8 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.world.Location;
 
-import com.google.common.base.Optional;
+import com.skelril.nitro.entity.SpawnEntity;
+
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -29,13 +31,13 @@ import static org.spongepowered.api.util.command.args.GenericArguments.*;
 public class CowCommand implements CommandExecutor {
 
     private final int MaxTNT = 1000;
+    private static Game game;
 
-    public void spawnEntity(EntityType entity,World world, Location location){
-        Optional<Entity> optional = world.createEntity(entity,location.getPosition());
-        if (optional.isPresent()){
-            world.spawnEntity(optional.get());
-        }
+    public static void getGame(Game game1){
+        game = game1;
     }
+
+
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) {
@@ -57,27 +59,29 @@ public class CowCommand implements CommandExecutor {
                 return CommandResult.empty();
             }
 
-            player.sendMessage(Texts.of("Hai "+player.getName()+", this is my first command :D"));
+            player.sendMessage(Texts.of("Hai " + player.getName() + ", this is my first command :D"));
 
             for(int i = 0; i<numberOfTnt;++i){
-                spawnEntity(EntityTypes.PRIMED_TNT,world,location);
+                SpawnEntity.spawnMob(EntityTypes.PRIMED_TNT,world,location);
             }
 
-
+            ItemStackBuilder builder = game.getRegistry().getItemBuilder().itemType(ItemTypes.MILK_BUCKET).quantity(1);
+            SpawnEntity.spawnDroppedItem(builder,world,location);
         }
 
-        else
+        else{
             src.sendMessage(Texts.of("Hai not player, its my first command :D!"));
-
-
+        }
         return CommandResult.success();
     }
+
+
     public static CommandSpec aquireSpec(){
         return CommandSpec.builder()
                 .description(Texts.of("Cow's First Command :D"))
                 .permission("skree.cowcommand")
                 .arguments(
-                        onlyOne(optional(integer(Texts.of("Number of Tnt")),0))
+                        onlyOne(optional(integer(Texts.of("Number of Tnt")), 0))
                 )
                 .executor(new CowCommand()).build();
     }

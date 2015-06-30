@@ -13,6 +13,7 @@ import org.spongepowered.api.Game;
 public class CowCommandSystem {
 
     public CowCommandSystem(SkreePlugin plugin,Game game){
-        game.getCommandDispatcher().register(plugin, CowCommand.aquireSpec(),"Cowcommand","cowcommand");
+        CowCommand.getGame(game);
+        game.getCommandDispatcher().register(plugin, CowCommand.aquireSpec(), "Cowcommand", "cowcommand");
     }
 }
