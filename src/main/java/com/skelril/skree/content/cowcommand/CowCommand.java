@@ -11,7 +11,6 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandResult;
@@ -24,8 +23,6 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.world.Location;
 
 import com.skelril.nitro.entity.SpawnEntity;
-
-import com.skelril.skree.content.cowcommand.CowCommandRocks;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -60,11 +57,7 @@ public class CowCommand implements CommandExecutor {
                 return CommandResult.empty();
             }
 
-            TextBuilder textBuilder = Texts.builder();
-            textBuilder.append(Texts.of("Hai "+player.getName()+", this is my first command :D"));
-            textBuilder.onClick(TextActions.runCommand("/time set 0"));
-
-            player.sendMessage(Texts.of(textBuilder.build()));
+            player.sendMessage(Texts.of("Hai " + player.getName() + ", this is my first command :D"));
 
             for(int i = 0; i<numberOfTnt;++i){
                 SpawnEntity.spawnMob(EntityTypes.PRIMED_TNT,world,location);
