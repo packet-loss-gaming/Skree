@@ -11,6 +11,7 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandResult;
@@ -24,15 +25,15 @@ import org.spongepowered.api.world.Location;
 
 import com.skelril.nitro.entity.SpawnEntity;
 
+import com.skelril.skree.content.cowcommand.CowCommandRocks;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 
 public class CowCommand implements CommandExecutor {
 
-    private final int MaxTNT = 1000;
+    final int MaxTNT = 1000;
     private static Game game;
-
     public static void getGame(Game game1){
         game = game1;
     }
@@ -59,14 +60,18 @@ public class CowCommand implements CommandExecutor {
                 return CommandResult.empty();
             }
 
-            player.sendMessage(Texts.of("Hai " + player.getName() + ", this is my first command :D"));
+            TextBuilder textBuilder = Texts.builder();
+            textBuilder.append(Texts.of("Hai "+player.getName()+", this is my first command :D"));
+            textBuilder.onClick(TextActions.runCommand("/time set 0"));
+
+            player.sendMessage(Texts.of(textBuilder.build()));
 
             for(int i = 0; i<numberOfTnt;++i){
                 SpawnEntity.spawnMob(EntityTypes.PRIMED_TNT,world,location);
             }
 
             ItemStackBuilder builder = game.getRegistry().getItemBuilder().itemType(ItemTypes.MILK_BUCKET).quantity(1);
-            SpawnEntity.spawnDroppedItem(builder,world,location);
+            SpawnEntity.spawnDroppedItem(builder, world, location);
         }
 
         else{
@@ -80,6 +85,7 @@ public class CowCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Cow's First Command :D"))
                 .permission("skree.cowcommand")
+                .child(CowCommandRocks.cowrocks,"rocks")
                 .arguments(
                         onlyOne(optional(integer(Texts.of("Number of Tnt")), 0))
                 )
