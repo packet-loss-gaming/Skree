@@ -7,12 +7,15 @@
 package com.skelril.skree.content.registry.item.tool.pickaxe;
 
 import com.skelril.nitro.registry.HarvestTier;
+import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.HarvestTiers;
 import com.skelril.nitro.registry.item.pickaxe.CustomPickaxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalPickaxe extends CustomPickaxe {
+public class CrystalPickaxe extends CustomPickaxe implements CraftableItem {
     @Override
     public String __getType() {
         return "crystal";
@@ -46,5 +49,17 @@ public class CrystalPickaxe extends CustomPickaxe {
     @Override
     public int __getMaxUses() {
         return ToolMaterial.EMERALD.getMaxUses();
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addRecipe(
+                new ItemStack(this),
+                "AAA",
+                " B ",
+                " B ",
+                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
+                'B', new ItemStack(Items.stick)
+        );
     }
 }
