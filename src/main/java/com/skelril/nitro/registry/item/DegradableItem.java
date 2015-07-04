@@ -6,11 +6,11 @@
 
 package com.skelril.nitro.registry.item;
 
-import net.minecraft.creativetab.CreativeTabs;
+public abstract class DegradableItem extends NitroItem {
+    public DegradableItem() {
+        super();
+        this.setMaxDamage(__getMaxUses());
+    }
 
-public interface CustomItem {
-    String __getID();
-
-    int __getMaxStackSize();
-    CreativeTabs __getCreativeTab();
+    public abstract int __getMaxUses();
 }

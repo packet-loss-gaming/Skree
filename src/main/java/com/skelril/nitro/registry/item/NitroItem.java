@@ -6,11 +6,11 @@
 
 package com.skelril.nitro.registry.item;
 
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 
-public interface CustomItem {
-    String __getID();
-
-    int __getMaxStackSize();
-    CreativeTabs __getCreativeTab();
+public abstract class NitroItem extends Item implements CustomItem {
+    public NitroItem() {
+        this.maxStackSize = __getMaxStackSize();
+        this.setCreativeTab(__getCreativeTab());
+    }
 }
