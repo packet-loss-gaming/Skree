@@ -14,18 +14,29 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CrystalSword extends CustomSword implements CraftableItem {
-    public CrystalSword() {
-        super(ToolMaterial.EMERALD);
+    @Override
+    public int __getMaxUses() {
+        return ToolMaterial.EMERALD.getMaxUses();
     }
 
     @Override
-    public String getType() {
-        return "crystal";
+    public ItemStack __getRepairItemStack() {
+        return new ItemStack(CustomItemTypes.SEA_CRYSTAL);
     }
 
     @Override
-    public double getDamage() {
+    public double __getHitPower() {
         return 8;
+    }
+
+    @Override
+    public int __getEnchantability() {
+        return ToolMaterial.EMERALD.getEnchantability();
+    }
+
+    @Override
+    public String __getType() {
+        return "crystal";
     }
 
     @Override

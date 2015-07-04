@@ -4,21 +4,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.generic;
+package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.NitroItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
@@ -29,12 +27,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class SkullOfTheFallen extends Item implements CustomItem, EventAwareContent, CraftableItem {
-
-    public SkullOfTheFallen() {
-        maxStackSize = 1;
-        setCreativeTab(CreativeTabs.tabTools);
-    }
+public class SkullOfTheFallen extends NitroItem implements EventAwareContent, CraftableItem {
 
     @Override
     public void registerRecipes() {
@@ -49,8 +42,18 @@ public class SkullOfTheFallen extends Item implements CustomItem, EventAwareCont
     }
 
     @Override
-    public String getID() {
+    public String __getID() {
         return "skullOfTheFallen";
+    }
+
+    @Override
+    public int __getMaxStackSize() {
+        return 1;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabTools;
     }
 
     @Subscribe

@@ -11,9 +11,13 @@ import com.skelril.skree.content.registry.item.admin.SwordOGreatPain;
 import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.generic.BloodDiamond;
-import com.skelril.skree.content.registry.item.generic.Luminositor;
 import com.skelril.skree.content.registry.item.generic.SeaCrystal;
-import com.skelril.skree.content.registry.item.generic.SkullOfTheFallen;
+import com.skelril.skree.content.registry.item.tool.Luminositor;
+import com.skelril.skree.content.registry.item.tool.SkullOfTheFallen;
+import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
+import com.skelril.skree.content.registry.item.tool.hoe.CrystalHoe;
+import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
+import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
 
@@ -38,6 +42,10 @@ public class CustomItemTypes {
     public static final RedFeather RED_FEATHER = new RedFeather();
 
     // Tools
+    public static final CrystalAxe CRYSTAL_AXE = new CrystalAxe();
+    public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
+    public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
+    public static final CrystalShovel CRYSTAL_SHOVEL = new CrystalShovel();
     public static final Luminositor LUMINOSITOR = new Luminositor();
     public static final SkullOfTheFallen SKULL_OF_THE_FALLEN = new SkullOfTheFallen();
 }

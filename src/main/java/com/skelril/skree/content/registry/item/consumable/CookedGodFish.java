@@ -17,13 +17,23 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
     public CookedGodFish() {
         super(10, 1F, false);
-        maxStackSize = 16;
-        setCreativeTab(CreativeTabs.tabFood);
+        maxStackSize = __getMaxStackSize();
+        setCreativeTab(__getCreativeTab());
     }
 
     @Override
-    public String getID() {
+    public String __getID() {
         return "cookedGodFish";
+    }
+
+    @Override
+    public int __getMaxStackSize() {
+        return 16;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabFood;
     }
 
     @Override

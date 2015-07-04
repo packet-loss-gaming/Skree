@@ -13,12 +13,22 @@ import net.minecraft.item.ItemFood;
 public class RawGodFish extends ItemFood implements CustomItem {
     public RawGodFish() {
         super(5, .5F, false);
-        maxStackSize = 16;
-        setCreativeTab(CreativeTabs.tabFood);
+        maxStackSize = __getMaxStackSize();
+        setCreativeTab(__getCreativeTab());
     }
 
     @Override
-    public String getID() {
+    public String __getID() {
         return "godFish";
+    }
+
+    @Override
+    public int __getMaxStackSize() {
+        return 16;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabFood;
     }
 }
