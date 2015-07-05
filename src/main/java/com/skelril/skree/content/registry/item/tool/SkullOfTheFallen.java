@@ -8,13 +8,14 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockTypes;
@@ -27,7 +28,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class SkullOfTheFallen extends NitroItem implements EventAwareContent, CraftableItem {
+public class SkullOfTheFallen extends Item implements EventAwareContent, CraftableItem, CustomItem {
 
     @Override
     public void registerRecipes() {

@@ -7,13 +7,14 @@
 package com.skelril.skree.content.registry.item.generic;
 
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class BloodDiamond extends NitroItem implements CraftableItem {
+public class BloodDiamond extends Item implements CraftableItem, CustomItem {
 
     @Override
     public String __getID() {

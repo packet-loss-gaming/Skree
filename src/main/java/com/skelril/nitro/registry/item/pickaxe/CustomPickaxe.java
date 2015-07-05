@@ -6,93 +6,116 @@
 
 package com.skelril.nitro.registry.item.pickaxe;
 
-import com.google.common.collect.Lists;
-import com.skelril.nitro.registry.item.CustomTool;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 
-public abstract class CustomPickaxe extends CustomTool {
+public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickaxe {
+    protected CustomPickaxe() {
+        super(ToolMaterial.EMERALD);
+        this.maxStackSize = __getMaxStackSize();
+        this.setCreativeTab(__getCreativeTab());
 
-    @Override
-    public String __getToolClass() {
-        return "pickaxe";
-    }
-
-    @Override
-    public Collection<Block> __getEffectiveBlocks() {
-        return Lists.newArrayList(
-                Blocks.activator_rail,
-                Blocks.coal_ore,
-                Blocks.cobblestone,
-                Blocks.detector_rail,
-                Blocks.diamond_block,
-                Blocks.diamond_ore,
-                Blocks.double_stone_slab,
-                Blocks.golden_rail,
-                Blocks.gold_block,
-                Blocks.gold_ore,
-                Blocks.ice,
-                Blocks.iron_block,
-                Blocks.iron_ore,
-                Blocks.lapis_block,
-                Blocks.lapis_ore,
-                Blocks.lit_redstone_ore,
-                Blocks.mossy_cobblestone,
-                Blocks.netherrack,
-                Blocks.packed_ice,
-                Blocks.rail,
-                Blocks.redstone_ore,
-                Blocks.sandstone,
-                Blocks.red_sandstone,
-                Blocks.stone,
-                Blocks.stone_slab
-        );
+        this.setMaxDamage(__getMaxUses());
     }
 
     // Modified Native ItemTool methods
 
     @Override
-    public boolean canHarvestBlock(Block blockIn) {
-        if (blockIn == Blocks.obsidian) {
-            return __getHarvestTier().getTranslation() == 3;
-        } else if (blockIn != Blocks.diamond_block && blockIn != Blocks.diamond_ore) {
-            if (blockIn != Blocks.emerald_ore && blockIn != Blocks.emerald_block) {
-                if (blockIn != Blocks.gold_block && blockIn != Blocks.gold_ore) {
-                    if (blockIn != Blocks.iron_block && blockIn != Blocks.iron_ore) {
-                        if (blockIn != Blocks.lapis_block && blockIn != Blocks.lapis_ore) {
-                            if (blockIn != Blocks.redstone_ore && blockIn != Blocks.lit_redstone_ore) {
-                                return (blockIn.getMaterial() == Material.rock || (blockIn.getMaterial() == Material.iron || blockIn.getMaterial() == Material.anvil));
-                            } else {
-                                return __getHarvestTier().getTranslation() >= 2;
-                            }
-                        } else {
-                            return __getHarvestTier().getTranslation() >= 1;
-                        }
-                    } else {
-                        return __getHarvestTier().getTranslation() >= 1;
-                    }
-                } else {
-                    return __getHarvestTier().getTranslation() >= 2;
-                }
-            } else {
-                return __getHarvestTier().getTranslation() >= 2;
-            }
-        } else {
-            return __getHarvestTier().getTranslation() >= 2;
-        }
+    public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
+        return false; // Use functionality defined in Item
     }
 
     @Override
-    public float getStrVsBlock(ItemStack stack, Block p_150893_2_) {
-        return p_150893_2_.getMaterial() != Material.iron && p_150893_2_.getMaterial() != Material.anvil && p_150893_2_.getMaterial() != Material.rock ? super.getStrVsBlock(
-                stack,
-                p_150893_2_
-        ) : __getSpecializedSpeed();
+    public Multimap __superGetItemAttributeModifiers() {
+        return HashMultimap.create(); // Use functionality defined in Item
     }
 
+    @Override
+    public UUID __itemModifierUUID() {
+        return itemModifierUUID;
+    }
+
+    @Override
+    public int __superGetHarvestLevel(ItemStack stack, String toolClass) {
+        return super.getHarvestLevel(stack, toolClass);
+    }
+
+    @Override
+    public Set<String> __superGetToolClasses(ItemStack stack) {
+        return super.getToolClasses(stack);
+    }
+
+    @Override
+    public float __superGetDigSpeed(ItemStack stack, IBlockState state) {
+        return super.getDigSpeed(stack, state);
+    }
+
+    @Override
+    public boolean canHarvestBlock(Block blockIn) {
+        return ICustomPickaxe.super.canHarvestBlock(blockIn);
+    }
+    
+    @Override
+    public float getStrVsBlock(ItemStack stack, Block block) {
+        return ICustomPickaxe.super.getStrVsBlock(stack, block);
+    }
+
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        return ICustomPickaxe.super.hitEntity(stack, target, attacker);
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
+        return ICustomPickaxe.super.onBlockDestroyed(stack, worldIn, blockIn, pos, playerIn);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean isFull3D() {
+        return ICustomPickaxe.super.isFull3D();
+    }
+
+    @Override
+    public int getItemEnchantability() {
+        return ICustomPickaxe.super.getItemEnchantability();
+    }
+
+    @Override
+    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+        return ICustomPickaxe.super.getIsRepairable(toRepair, repair);
+    }
+
+    @Override
+    public Multimap getItemAttributeModifiers() {
+        return ICustomPickaxe.super.getItemAttributeModifiers();
+    }
+
+    @Override
+    public int getHarvestLevel(ItemStack stack, String toolClass) {
+        return ICustomPickaxe.super.getHarvestLevel(stack, toolClass);
+    }
+
+    @Override
+    public Set<String> getToolClasses(ItemStack stack) {
+        return ICustomPickaxe.super.getToolClasses(stack);
+    }
+
+    @Override
+    public float getDigSpeed(ItemStack stack, net.minecraft.block.state.IBlockState state) {
+        return ICustomPickaxe.super.getDigSpeed(stack, state);
+    }
 }
 

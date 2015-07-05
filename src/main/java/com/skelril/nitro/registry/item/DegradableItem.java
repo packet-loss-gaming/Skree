@@ -6,11 +6,6 @@
 
 package com.skelril.nitro.registry.item;
 
-public abstract class DegradableItem extends NitroItem {
-    public DegradableItem() {
-        super();
-        this.setMaxDamage(__getMaxUses());
-    }
-
-    public abstract int __getMaxUses();
+public interface DegradableItem {
+    int __getMaxUses();
 }
