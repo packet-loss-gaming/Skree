@@ -4,17 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.generic;
+package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.NitroItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
@@ -28,16 +26,26 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import java.lang.reflect.InvocationTargetException;
+<<<<<<< HEAD:src/main/java/com/skelril/skree/content/registry/item/generic/Luminositor.java
 public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
+=======
 
-    public Luminositor() {
-        maxStackSize = 1;
-        setCreativeTab(CreativeTabs.tabTools);
+public class Luminositor extends NitroItem implements EventAwareContent, CraftableItem {
+>>>>>>> origin/master:src/main/java/com/skelril/skree/content/registry/item/tool/Luminositor.java
+
+    @Override
+    public String __getID() {
+        return "luminositor";
     }
 
     @Override
-    public String getID() {
-        return "luminositor";
+    public int __getMaxStackSize() {
+        return 1;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabTools;
     }
 
     @Subscribe

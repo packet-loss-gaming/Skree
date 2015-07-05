@@ -67,9 +67,9 @@ public class CustomItemSystem {
     @SuppressWarnings("unused")
     private void register(Object item) {
         if (item instanceof Item && item instanceof CustomItem) {
-            ((Item) item).setUnlocalizedName("skree_" + ((CustomItem) item).getID());
+            ((Item) item).setUnlocalizedName("skree_" + ((CustomItem) item).__getID());
 
-            GameRegistry.registerItem((Item) item, ((CustomItem) item).getID(), "skree");
+            GameRegistry.registerItem((Item) item, ((CustomItem) item).__getID(), "skree");
 
             // Add selective hooks
             if (item instanceof EventAwareContent) {
@@ -103,7 +103,7 @@ public class CustomItemSystem {
                         (Item) item,
                         0,
                         new ModelResourceLocation(
-                                "skree:" + ((CustomItem) item).getID(),
+                                "skree:" + ((CustomItem) item).__getID(),
                                 "inventory"
                         )
                 );

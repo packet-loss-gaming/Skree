@@ -7,18 +7,27 @@
 package com.skelril.skree.content.registry.item.generic;
 
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.NitroItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class BloodDiamond extends Item implements CustomItem, CraftableItem {
+public class BloodDiamond extends NitroItem implements CraftableItem {
 
-    public BloodDiamond() {
-        maxStackSize = 64;
-        setCreativeTab(CreativeTabs.tabMaterials);
+    @Override
+    public String __getID() {
+        return "bloodDiamond";
+    }
+
+    @Override
+    public int __getMaxStackSize() {
+        return 64;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabMaterials;
     }
 
     @Override
@@ -31,10 +40,5 @@ public class BloodDiamond extends Item implements CustomItem, CraftableItem {
                 'A', new ItemStack(Items.diamond),
                 'B', new ItemStack(Items.redstone)
         );
-    }
-
-    @Override
-    public String getID() {
-        return "bloodDiamond";
     }
 }

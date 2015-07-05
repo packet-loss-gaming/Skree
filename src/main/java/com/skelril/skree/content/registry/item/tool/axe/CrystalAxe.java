@@ -4,19 +4,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.weapon.sword;
+package com.skelril.skree.content.registry.item.tool.axe;
 
+import com.skelril.nitro.registry.HarvestTier;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.sword.CustomSword;
+import com.skelril.nitro.registry.item.HarvestTiers;
+import com.skelril.nitro.registry.item.axe.CustomAxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword implements CraftableItem {
+public class CrystalAxe extends CustomAxe implements CraftableItem {
     @Override
-    public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+    public String __getType() {
+        return "crystal";
     }
 
     @Override
@@ -26,7 +28,7 @@ public class CrystalSword extends CustomSword implements CraftableItem {
 
     @Override
     public double __getHitPower() {
-        return 8;
+        return 7;
     }
 
     @Override
@@ -35,16 +37,26 @@ public class CrystalSword extends CustomSword implements CraftableItem {
     }
 
     @Override
-    public String __getType() {
-        return "crystal";
+    public HarvestTier __getHarvestTier() {
+        return HarvestTiers.CRYSTAL;
+    }
+
+    @Override
+    public float __getSpecializedSpeed() {
+        return 10.0F;
+    }
+
+    @Override
+    public int __getMaxUses() {
+        return ToolMaterial.EMERALD.getMaxUses();
     }
 
     @Override
     public void registerRecipes() {
         GameRegistry.addRecipe(
                 new ItemStack(this),
-                " A ",
-                " A ",
+                "AA ",
+                "AB ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
                 'B', new ItemStack(Items.stick)

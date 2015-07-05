@@ -7,24 +7,31 @@
 package com.skelril.skree.content.registry.item.admin;
 
 import com.skelril.nitro.registry.item.sword.CustomSword;
+import net.minecraft.item.ItemStack;
 
 public class SwordOGreatPain extends CustomSword {
-    public SwordOGreatPain() {
-        super(ToolMaterial.WOOD);
+    @Override
+    public int __getMaxUses() {
+        return 14;
     }
 
     @Override
-    public String getType() {
-        return "oGreatPain";
+    public ItemStack __getRepairItemStack() {
+        return null;
     }
 
     @Override
-    public double getDamage() {
+    public double __getHitPower() {
         return 100000000;
     }
 
     @Override
-    public int getMaxDamage() {
-        return 14;
+    public int __getEnchantability() {
+        return ToolMaterial.WOOD.getEnchantability();
+    }
+
+    @Override
+    public String __getType() {
+        return "oGreatPain";
     }
 }
