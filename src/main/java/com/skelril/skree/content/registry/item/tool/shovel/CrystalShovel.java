@@ -28,7 +28,7 @@ public class CrystalShovel extends CustomShovel implements CraftableItem {
 
     @Override
     public double __getHitPower() {
-        return 6;
+        return 5;
     }
 
     @Override

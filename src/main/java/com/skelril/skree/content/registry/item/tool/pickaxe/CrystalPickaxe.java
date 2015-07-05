@@ -28,7 +28,7 @@ public class CrystalPickaxe extends CustomPickaxe implements CraftableItem {
 
     @Override
     public double __getHitPower() {
-        return 7;
+        return 6;
     }
 
     @Override
