@@ -15,7 +15,6 @@ import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockTypes;
@@ -28,7 +27,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class SkullOfTheFallen extends Item implements EventAwareContent, CraftableItem, CustomItem {
+public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
 
     @Override
     public void registerRecipes() {

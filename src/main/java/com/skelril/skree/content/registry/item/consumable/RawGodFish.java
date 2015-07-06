@@ -6,11 +6,11 @@
 
 package com.skelril.skree.content.registry.item.consumable;
 
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemFood;
 
-public class RawGodFish extends ItemFood implements CustomItem {
+public class RawGodFish extends ItemFood implements ICustomItem {
     public RawGodFish() {
         super(5, .5F, false);
         maxStackSize = __getMaxStackSize();

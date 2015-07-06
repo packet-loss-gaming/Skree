@@ -6,11 +6,11 @@
 
 package com.skelril.skree.content.registry.item.weapon;
 
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 
-public class RedFeather extends Item implements CustomItem {
+public class RedFeather extends CustomItem implements ICustomItem {
 
     @Override
     public String __getID() {

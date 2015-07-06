@@ -12,7 +12,6 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityInteractionTypes;
@@ -28,7 +27,7 @@ import org.spongepowered.api.world.Location;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class Luminositor extends Item implements EventAwareContent, CraftableItem, CustomItem {
+public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
 
     @Override
     public String __getID() {

@@ -8,9 +8,8 @@ package com.skelril.skree.content.registry.item.admin;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 
-public class HackBook extends Item implements CustomItem {
+public class HackBook extends CustomItem {
 
     @Override
     public String __getID() {

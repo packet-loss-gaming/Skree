@@ -7,14 +7,14 @@
 package com.skelril.skree.content.registry.item.consumable;
 
 import com.skelril.nitro.registry.item.CookedItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
+public class CookedGodFish extends ItemFood implements ICustomItem, CookedItem {
     public CookedGodFish() {
         super(10, 1F, false);
         maxStackSize = __getMaxStackSize();

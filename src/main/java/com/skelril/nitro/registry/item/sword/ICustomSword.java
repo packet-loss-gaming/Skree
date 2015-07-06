@@ -7,7 +7,7 @@
 package com.skelril.nitro.registry.item.sword;
 
 import com.google.common.collect.Multimap;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.registry.item.DegradableItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -26,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 
-public interface ICustomSword extends CustomItem, DegradableItem {
+public interface ICustomSword extends ICustomItem, DegradableItem {
     // Skelril Methods
 
     // General

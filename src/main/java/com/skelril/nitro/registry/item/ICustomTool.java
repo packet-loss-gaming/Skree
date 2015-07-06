@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-public interface ICustomTool extends CustomItem, DegradableItem {
+public interface ICustomTool extends ICustomItem, DegradableItem {
     // Skelril Methods
 
     // General

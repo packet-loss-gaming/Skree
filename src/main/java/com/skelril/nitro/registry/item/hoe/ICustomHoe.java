@@ -6,7 +6,7 @@
 
 package com.skelril.nitro.registry.item.hoe;
 
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.registry.item.DegradableItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -21,7 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public interface ICustomHoe extends CustomItem, DegradableItem {
+public interface ICustomHoe extends ICustomItem, DegradableItem {
 
     @Override
     default String __getID() {

@@ -10,11 +10,10 @@ import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class BloodDiamond extends Item implements CraftableItem, CustomItem {
+public class BloodDiamond extends CustomItem implements CraftableItem {
 
     @Override
     public String __getID() {
