@@ -6,11 +6,15 @@
 
 package com.skelril.nitro.registry.item;
 
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 
-public interface CustomItem {
-    String __getID();
+public abstract class CustomItem extends Item implements ICustomItem {
+    protected CustomItem() {
+        this.maxStackSize = __getMaxStackSize();
+        this.setCreativeTab(__getCreativeTab());
 
-    int __getMaxStackSize();
-    CreativeTabs __getCreativeTab();
+        if (this instanceof DegradableItem) {
+            this.setMaxDamage(((DegradableItem) this).__getMaxUses());
+        }
+    }
 }
