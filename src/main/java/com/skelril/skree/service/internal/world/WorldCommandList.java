@@ -1,5 +1,8 @@
 package com.skelril.skree.service.internal.world;
 
+import com.google.common.base.Optional;
+import com.skelril.skree.service.WorldService;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
@@ -16,40 +19,48 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
  * Created by cow_fu on 7/1/15 at 5:19 PM
  */
 public class WorldCommandList implements CommandExecutor {
+
+    private Game game;
+
+    public WorldCommandList(Game game){
+        this.game = game;
+    }
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        if (!(src instanceof Player)){
-            src.sendMessage(Texts.of("You're not a player!"));
-            return CommandResult.empty();
+        if (src instanceof Player){
+            src.sendMessage(Texts.of("Please Select A World To Teleport To:"));
         }
+        else
+        {src.sendMessage(Texts.of("List Of All Worlds That Can Be Teleported To"));}
 
-        src.sendMessage(Texts.of("Please Select A World To Teleport To:"));
+        Optional<WorldService> service = game.getServiceManager().provide(WorldService.class);
+        TextBuilder builder = Texts.builder();
+        String worldName;
 
-        TextBuilder worldMain = Texts.builder();
-        TextBuilder worldSion = Texts.builder();
-        TextBuilder worldWilderness = Texts.builder();
 
-        worldMain.color(TextColors.AQUA);
-        worldSion.color(TextColors.GREEN);
-        worldWilderness.color(TextColors.DARK_RED);
+        for(WorldEffectWrapper wrapper: service.get().getEffectWrappers()){
+            worldName = wrapper.getName();
+            if (worldName.contentEquals("Build")) {
+                worldName = "Sion";
+            }
 
-        worldMain.append(Texts.of("Main World: Main"));
-        worldSion.append(Texts.of("Building World: Sion"));
-        worldWilderness.append(Texts.of("Wilderness World: Wilderness"));
+            builder.color(TextColors.GREEN);
+            builder.append(Texts.of(worldName));
+            builder.onClick(TextActions.runCommand("/world " + worldName));
 
-        worldMain.onClick(TextActions.runCommand("/world Main"));
-        worldSion.onClick(TextActions.runCommand("/world Sion"));
-        worldWilderness.onClick(TextActions.runCommand("/world Wilderness"));
+            src.sendMessage(Texts.of(builder.build()));
 
-        src.sendMessage(Texts.of(worldMain));
-        src.sendMessage(Texts.of(worldSion));
-        src.sendMessage(Texts.of(worldWilderness));
+            builder.removeAll();
+        }
 
         return CommandResult.success();
     }
 
-    public static CommandSpec ListWorlds = CommandSpec.builder()
+    public static CommandSpec ListWorlds(Game game){
+        return CommandSpec.builder()
             .description(Texts.of("Teleport to a different world"))
             .permission("skree.world")
-            .executor(new WorldCommandList()).build();
+            .executor(new WorldCommandList(game)).build();}
+
 }
