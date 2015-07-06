@@ -14,7 +14,7 @@ public class RedFeather extends Item implements CustomItem {
 
     @Override
     public String __getID() {
-        return "redFeather";
+        return "red_feather";
     }
 
     @Override

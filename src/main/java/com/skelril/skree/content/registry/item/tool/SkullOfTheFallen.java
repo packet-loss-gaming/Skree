@@ -44,7 +44,7 @@ public class SkullOfTheFallen extends Item implements EventAwareContent, Craftab
 
     @Override
     public String __getID() {
-        return "skullOfTheFallen";
+        return "skull_of_the_fallen";
     }
 
     @Override

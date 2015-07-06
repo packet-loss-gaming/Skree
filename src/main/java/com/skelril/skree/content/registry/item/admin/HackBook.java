@@ -14,7 +14,7 @@ public class HackBook extends Item implements CustomItem {
 
     @Override
     public String __getID() {
-        return "hackBook";
+        return "hack_book";
     }
 
     @Override

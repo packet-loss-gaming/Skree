@@ -32,6 +32,11 @@ public class SwordOGreatPain extends CustomSword {
 
     @Override
     public String __getType() {
-        return "oGreatPain";
+        return "o_great_pain";
+    }
+
+    @Override
+    public String __getID() {
+        return "sword_" + __getType();
     }
 }

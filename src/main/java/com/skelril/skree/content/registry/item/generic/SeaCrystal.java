@@ -18,7 +18,7 @@ public class SeaCrystal extends Item implements CraftableItem, CustomItem {
 
     @Override
     public String __getID() {
-        return "seaCrystal";
+        return "sea_crystal";
     }
 
     @Override

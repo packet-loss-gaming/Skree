@@ -18,7 +18,7 @@ public class BloodDiamond extends Item implements CraftableItem, CustomItem {
 
     @Override
     public String __getID() {
-        return "bloodDiamond";
+        return "blood_diamond";
     }
 
     @Override

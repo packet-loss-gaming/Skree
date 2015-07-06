@@ -19,7 +19,7 @@ public class RawGodFish extends ItemFood implements CustomItem {
 
     @Override
     public String __getID() {
-        return "godFish";
+        return "god_fish";
     }
 
     @Override

@@ -23,7 +23,7 @@ public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
 
     @Override
     public String __getID() {
-        return "cookedGodFish";
+        return "cooked_god_fish";
     }
 
     @Override

@@ -65,8 +65,7 @@ public interface ICustomSword extends CustomItem, DegradableItem {
 
     @Override
     default String __getID() {
-        String typeStr = __getType();
-        return "sword" + Character.toUpperCase(typeStr.charAt(0)) + typeStr.substring(1);
+        return __getType() + "_sword";
     }
 
     // Native compatibility methods
