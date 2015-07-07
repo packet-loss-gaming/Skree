@@ -149,6 +149,7 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
     /**
      * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
      */
+    @SuppressWarnings("unchecked")
     default Multimap getItemAttributeModifiers() {
         Multimap multimap = __superGetItemAttributeModifiers();
         multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(__itemModifierUUID(), "Tool modifier", __getHitPower(), 0));

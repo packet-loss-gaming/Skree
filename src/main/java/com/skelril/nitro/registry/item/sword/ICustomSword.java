@@ -7,8 +7,8 @@
 package com.skelril.nitro.registry.item.sword;
 
 import com.google.common.collect.Multimap;
-import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.registry.item.DegradableItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -169,6 +169,7 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
     /**
      * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
      */
+    @SuppressWarnings("unchecked")
     default Multimap getItemAttributeModifiers() {
         Multimap multimap = __superGetItemAttributeModifiers();
         multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(__itemModifierUUID(), "Weapon modifier", __getHitPower(), 0));
