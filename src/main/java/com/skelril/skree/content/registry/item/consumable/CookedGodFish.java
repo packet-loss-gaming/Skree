@@ -7,23 +7,16 @@
 package com.skelril.skree.content.registry.item.consumable;
 
 import com.skelril.nitro.registry.item.CookedItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.food.CustomFood;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
-    public CookedGodFish() {
-        super(10, 1F, false);
-        maxStackSize = __getMaxStackSize();
-        setCreativeTab(__getCreativeTab());
-    }
+public class CookedGodFish extends CustomFood implements CookedItem {
 
     @Override
     public String __getID() {
-        return "cookedGodFish";
+        return "cooked_god_fish";
     }
 
     @Override
@@ -32,8 +25,13 @@ public class CookedGodFish extends ItemFood implements CustomItem, CookedItem {
     }
 
     @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabFood;
+    public double __getHealAmount() {
+        return 10;
+    }
+
+    @Override
+    public double __getSaturationModifier() {
+        return 1F;
     }
 
     @Override

@@ -6,20 +6,14 @@
 
 package com.skelril.skree.content.registry.item.consumable;
 
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.food.CustomFood;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemFood;
 
-public class RawGodFish extends ItemFood implements CustomItem {
-    public RawGodFish() {
-        super(5, .5F, false);
-        maxStackSize = __getMaxStackSize();
-        setCreativeTab(__getCreativeTab());
-    }
+public class RawGodFish extends CustomFood {
 
     @Override
     public String __getID() {
-        return "godFish";
+        return "god_fish";
     }
 
     @Override
@@ -30,5 +24,15 @@ public class RawGodFish extends ItemFood implements CustomItem {
     @Override
     public CreativeTabs __getCreativeTab() {
         return CreativeTabs.tabFood;
+    }
+
+    @Override
+    public double __getHealAmount() {
+        return 5;
+    }
+
+    @Override
+    public double __getSaturationModifier() {
+        return .5F;
     }
 }

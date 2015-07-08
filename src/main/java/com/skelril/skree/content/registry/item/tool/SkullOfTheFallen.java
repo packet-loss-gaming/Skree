@@ -8,7 +8,7 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
@@ -27,7 +27,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-public class SkullOfTheFallen extends NitroItem implements EventAwareContent, CraftableItem {
+public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
 
     @Override
     public void registerRecipes() {
@@ -43,7 +43,7 @@ public class SkullOfTheFallen extends NitroItem implements EventAwareContent, Cr
 
     @Override
     public String __getID() {
-        return "skullOfTheFallen";
+        return "skull_of_the_fallen";
     }
 
     @Override

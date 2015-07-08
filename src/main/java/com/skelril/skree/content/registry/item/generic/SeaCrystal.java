@@ -7,17 +7,17 @@
 package com.skelril.skree.content.registry.item.generic;
 
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class SeaCrystal extends NitroItem implements CraftableItem {
+public class SeaCrystal extends CustomItem implements CraftableItem {
 
     @Override
     public String __getID() {
-        return "seaCrystal";
+        return "sea_crystal";
     }
 
     @Override

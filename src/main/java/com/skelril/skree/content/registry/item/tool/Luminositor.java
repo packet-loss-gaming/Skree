@@ -8,7 +8,7 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
@@ -26,12 +26,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import java.lang.reflect.InvocationTargetException;
-<<<<<<< HEAD:src/main/java/com/skelril/skree/content/registry/item/generic/Luminositor.java
-public class Luminositor extends Item implements CustomItem, EventAwareContent, CraftableItem {
-=======
 
-public class Luminositor extends NitroItem implements EventAwareContent, CraftableItem {
->>>>>>> origin/master:src/main/java/com/skelril/skree/content/registry/item/tool/Luminositor.java
+public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
 
     @Override
     public String __getID() {

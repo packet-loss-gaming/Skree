@@ -6,14 +6,14 @@
 
 package com.skelril.skree.content.registry.item.admin;
 
-import com.skelril.nitro.registry.item.NitroItem;
+import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 
-public class HackBook extends NitroItem {
+public class HackBook extends CustomItem {
 
     @Override
     public String __getID() {
-        return "hackBook";
+        return "hack_book";
     }
 
     @Override
