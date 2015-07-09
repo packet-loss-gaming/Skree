@@ -57,6 +57,22 @@ public class WorldCommand implements CommandExecutor {
 
         ((Player) src).setLocationSafely(world.get().getSpawnLocation());
         src.sendMessage(Texts.of("Entered world: " + worldName + " successfully!"));
+
+        ParticleEffectBuilder effectBuilder = game.getRegistry().getParticleEffectBuilder(
+                ParticleTypes.SMOKE_NORMAL
+        ).motion(new Vector3d(
+                0,
+                .1
+                , 0
+        )).offset(
+                new Vector3d(
+                        1,
+                        1,
+                        1
+                )).count(500);
+
+        world.get().spawnParticles(effectBuilder.build(), ((Player) src).getLocation().getPosition(), 5);
+
         return CommandResult.success();
     }
 
