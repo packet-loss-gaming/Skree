@@ -15,29 +15,30 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
 
-/**
- * Created by cow_fu on 7/1/15 at 5:19 PM
- */
 public class WorldCommandList implements CommandExecutor {
 
     private Game game;
 
-    public WorldCommandList(Game game){
+    public WorldCommandList(Game game) {
         this.game = game;
     }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        src.sendMessage(Texts.of("Available worlds (click to teleport)"));
+        TextBuilder header = Texts.builder();
+        header.color(TextColors.GOLD);
+        header.append(Texts.of("Available worlds (click to teleport):"));
+
+        src.sendMessage(header.build());
 
         Optional<WorldService> service = game.getServiceManager().provide(WorldService.class);
 
-        for(WorldEffectWrapper wrapper: service.get().getEffectWrappers()){
+        for (WorldEffectWrapper wrapper : service.get().getEffectWrappers()) {
             String worldType = wrapper.getName();
-            for (World world:wrapper.getWorlds()){
+            for (World world : wrapper.getWorlds()) {
                 TextBuilder builder = Texts.builder();
                 String worldName = world.getName();
-                builder.append(Texts.of(worldName+" ["+worldType+"]"));
+                builder.append(Texts.of(worldName + " [" + worldType + "]"));
                 builder.color(TextColors.GREEN);
                 builder.onClick(TextActions.runCommand("/world " + worldName));
                 builder.onHover(TextActions.showText(Texts.of("Teleport to " + worldName)));
@@ -47,9 +48,9 @@ public class WorldCommandList implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec ListWorlds(Game game){
+    public static CommandSpec ListWorlds(Game game) {
         return CommandSpec.builder()
-            .description(Texts.of("Teleport to a different world"))
+            .description(Texts.of("List available worlds"))
             .permission("skree.world")
             .executor(new WorldCommandList(game)).build();
     }
