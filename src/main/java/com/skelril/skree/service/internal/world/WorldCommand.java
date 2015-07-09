@@ -61,6 +61,8 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-                .arguments(optional(onlyOne(string(Texts.of("world"))))).executor(new WorldCommand(game)).build();
+                .child(WorldCommandList.ListWorlds(game), "List", "list")
+                .arguments(optional(onlyOne(string(Texts.of("world")))))
+                .executor(new WorldCommand(game)).build();
     }
 }
