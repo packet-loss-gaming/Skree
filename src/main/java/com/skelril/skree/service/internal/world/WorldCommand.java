@@ -6,8 +6,11 @@
 
 package com.skelril.skree.service.internal.world;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.effect.particle.ParticleEffectBuilder;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -61,7 +64,7 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-                .child(WorldCommandList.ListWorlds(game),"List","list")
+                .child(WorldCommandList.ListWorlds(game), "List", "list")
                 .arguments(optional(onlyOne(string(Texts.of("world")))))
                 .executor(new WorldCommand(game)).build();
     }

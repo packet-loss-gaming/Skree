@@ -14,6 +14,7 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.world.World;
 
 /**
  * Created by cow_fu on 7/1/15 at 5:19 PM
@@ -28,32 +29,22 @@ public class WorldCommandList implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        if (src instanceof Player){
-            src.sendMessage(Texts.of("Please Select A World To Teleport To:"));
-        }
-        else
-        {src.sendMessage(Texts.of("List Of All Worlds That Can Be Teleported To"));}
+        src.sendMessage(Texts.of("Available worlds (click to teleport)"));
 
         Optional<WorldService> service = game.getServiceManager().provide(WorldService.class);
-        TextBuilder builder = Texts.builder();
-        String worldName;
-
 
         for(WorldEffectWrapper wrapper: service.get().getEffectWrappers()){
-            worldName = wrapper.getName();
-            if (worldName.contentEquals("Build")) {
-                worldName = "Sion";
+            String worldType = wrapper.getName();
+            for (World world:wrapper.getWorlds()){
+                TextBuilder builder = Texts.builder();
+                String worldName = world.getName();
+                builder.append(Texts.of(worldName+" ["+worldType+"]"));
+                builder.color(TextColors.GREEN);
+                builder.onClick(TextActions.runCommand("/world " + worldName));
+                builder.onHover(TextActions.showText(Texts.of("Teleport to " + worldName)));
+                src.sendMessage(builder.build());
             }
-
-            builder.color(TextColors.GREEN);
-            builder.append(Texts.of(worldName));
-            builder.onClick(TextActions.runCommand("/world " + worldName));
-
-            src.sendMessage(Texts.of(builder.build()));
-
-            builder.removeAll();
         }
-
         return CommandResult.success();
     }
 
@@ -61,6 +52,6 @@ public class WorldCommandList implements CommandExecutor {
         return CommandSpec.builder()
             .description(Texts.of("Teleport to a different world"))
             .permission("skree.world")
-            .executor(new WorldCommandList(game)).build();}
-
+            .executor(new WorldCommandList(game)).build();
+    }
 }
