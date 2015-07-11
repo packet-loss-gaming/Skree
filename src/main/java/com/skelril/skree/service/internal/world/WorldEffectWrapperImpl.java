@@ -12,13 +12,15 @@ import org.spongepowered.api.world.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     protected static WorldFromExtent toWorld = new WorldFromExtent();
 
     protected String name;
-    protected Collection<World> worlds;
+    protected Map<UUID, World> worlds;
 
     public WorldEffectWrapperImpl(String name) {
         this(name, new ArrayList<>());
@@ -26,7 +28,7 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     public WorldEffectWrapperImpl(String name, Collection<World> worlds) {
         this.name = name;
-        this.worlds = new ArrayList<>(worlds);
+        addWorld(worlds);
     }
 
     @Override
@@ -36,22 +38,22 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     @Override
     public boolean isApplicable(Extent extent) {
-        return isApplicable(toWorld.from(extent));
-    }
-
-    @Override
-    public boolean isApplicable(World world) {
-        return worlds.contains(world);
+        return worlds.containsKey(extent.getUniqueId());
     }
 
     @Override
     public void addWorld(World world) {
-        worlds.add(world);
+        worlds.put(world.getUniqueId(), world);
+    }
+
+    @Override
+    public void addWorld(Collection<World> worlds) {
+        worlds.forEach(this::addWorld);
     }
 
     @Override
     public Collection<World> getWorlds() {
-        return worlds;
+        return worlds.values();
     }
 
     @Override
