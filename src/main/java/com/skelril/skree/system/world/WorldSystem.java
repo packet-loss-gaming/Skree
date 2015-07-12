@@ -9,11 +9,12 @@ package com.skelril.skree.system.world;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.WorldCommand;
+import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
-import com.skelril.skree.service.internal.world.WorldCommand;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
@@ -44,6 +45,7 @@ public class WorldSystem {
         try {
             game.getServiceManager().setProvider(plugin, WorldService.class, service);
             game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
+            game.getCommandDispatcher().register(plugin, WorldListCommand.aquireSpec(game), "worlds");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

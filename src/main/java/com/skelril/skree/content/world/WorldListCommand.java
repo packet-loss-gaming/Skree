@@ -1,7 +1,8 @@
-package com.skelril.skree.service.internal.world;
+package com.skelril.skree.content.world;
 
 import com.google.common.base.Optional;
 import com.skelril.skree.service.WorldService;
+import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
@@ -15,11 +16,11 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
 
-public class WorldCommandList implements CommandExecutor {
+public class WorldListCommand implements CommandExecutor {
 
     private Game game;
 
-    public WorldCommandList(Game game) {
+    public WorldListCommand(Game game) {
         this.game = game;
     }
 
@@ -48,10 +49,10 @@ public class WorldCommandList implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec ListWorlds(Game game) {
+    public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
             .description(Texts.of("List available worlds"))
             .permission("skree.world")
-            .executor(new WorldCommandList(game)).build();
+            .executor(new WorldListCommand(game)).build();
     }
 }
