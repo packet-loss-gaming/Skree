@@ -17,7 +17,7 @@ public class CofferItem extends CustomItem {
 
     public CofferItem(String ID, int cofferValue) {
         super();
-        Validate.isTrue(cofferValue < 1, "Currency can now be worth less than 1 coffer");
+        Validate.isTrue(cofferValue >= 1, "Currency can now be worth less than 1 coffer");
         this.ID = ID.toLowerCase();
         this.cofferValue = cofferValue;
     }
