@@ -32,5 +32,9 @@ public class CondensedCofferItem extends CofferItem implements CraftableItem {
                 "AAA",
                 'A', new ItemStack(parent)
         );
+        GameRegistry.addShapelessRecipe(
+                new ItemStack(parent, 9),
+                new ItemStack(this)
+        );
     }
 }
