@@ -15,9 +15,9 @@ public interface WorldEffectWrapper {
     String getName();
 
     boolean isApplicable(Extent extent);
+    boolean isApplicable(World world);
 
     void addWorld(World world);
-    void addWorld(Collection<World> worlds);
 
     Collection<World> getWorlds();
 }

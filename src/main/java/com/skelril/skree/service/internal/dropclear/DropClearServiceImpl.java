@@ -24,7 +24,10 @@ import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class DropClearServiceImpl implements DropClearService {
@@ -35,8 +38,8 @@ public class DropClearServiceImpl implements DropClearService {
     private int autoAmt;
     private float panicMod;
 
-    private Map<UUID, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
-    private Map<UUID, Map<Vector3i, ? extends DropClearStats>> lastClear = new HashMap<>();
+    private Map<Extent, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
+    private Map<Extent, Map<Vector3i, ? extends DropClearStats>> lastClear = new HashMap<>();
 
     public DropClearServiceImpl(SkreePlugin plugin, Game game, int autoAmt, float panicMod) {
         this.plugin = plugin;
@@ -71,7 +74,7 @@ public class DropClearServiceImpl implements DropClearService {
     }
 
     private TimedRunnable<EntityCleanupTask> getActiveTask(Extent extent) {
-        TimedRunnable<EntityCleanupTask> runnable = timers.get(extent.getUniqueId());
+        TimedRunnable<EntityCleanupTask> runnable = timers.get(extent);
 
         // Check for old task, and overwrite if allowed
         if (runnable != null && !runnable.isComplete()) {
@@ -189,9 +192,9 @@ public class DropClearServiceImpl implements DropClearService {
             public void cancel(boolean withEnd) {
                 super.cancel(withEnd);
                 if (withEnd) {
-                    lastClear.put(extent.getUniqueId(), getBaseTask().getLastProfile().getStats());
+                    lastClear.put(extent, getBaseTask().getLastProfile().getStats());
                 }
-                timers.remove(extent.getUniqueId());
+                timers.remove(extent);
             }
         };
 
@@ -202,7 +205,7 @@ public class DropClearServiceImpl implements DropClearService {
         ).submit(plugin);
 
         runnable.setTask(task);
-        timers.put(extent.getUniqueId(), runnable);
+        timers.put(extent, runnable);
         return true;
     }
 }
