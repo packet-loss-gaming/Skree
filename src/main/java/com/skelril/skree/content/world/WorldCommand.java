@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.internal.world;
+package com.skelril.skree.content.world;
 
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
@@ -61,6 +61,7 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-                .arguments(optional(onlyOne(string(Texts.of("world"))))).executor(new WorldCommand(game)).build();
+                .arguments(optional(onlyOne(string(Texts.of("world")))))
+                .executor(new WorldCommand(game)).build();
     }
 }
