@@ -30,7 +30,7 @@ public class SlipperyDiceRoller implements DiceRoller {
 
     @Override
     public <T extends DropTableChanceEntry> Collection<ItemStack> pickEntry(List<T> input, int highRoll, double modifier) {
-        int roll = (int) modiFunc.apply(Probability.getRandom(highRoll), modifier);
+        int roll = Probability.getRandom((int) modiFunc.apply(highRoll, modifier));
         ListIterator<T> it = input.listIterator(input.size());
 
         T cur = null;
