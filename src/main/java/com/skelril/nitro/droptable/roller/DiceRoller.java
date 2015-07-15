@@ -4,12 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.droptable;
+package com.skelril.nitro.droptable.roller;
 
+import com.skelril.nitro.droptable.DropTableChanceEntry;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.List;
 
-public interface DropTableEntry {
-    Collection<ItemStack> getItemStacks(double modifier);
+public interface DiceRoller {
+    <T extends DropTableChanceEntry> Collection<ItemStack> pickEntry(List<T> input, int highRoll, double modifier);
 }

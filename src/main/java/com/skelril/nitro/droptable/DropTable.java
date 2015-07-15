@@ -6,11 +6,14 @@
 
 package com.skelril.nitro.droptable;
 
+import com.skelril.nitro.droptable.roller.DiceRoller;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Collection;
 
 public interface DropTable {
     Collection<ItemStack> getDrops(int quantity);
+    Collection<ItemStack> getDrops(int quantity, double modifier);
     Collection<ItemStack> getDrops(int quantity, DiceRoller roller);
+    Collection<ItemStack> getDrops(int quantity, double modifier, DiceRoller roller);
 }

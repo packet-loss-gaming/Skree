@@ -4,22 +4,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.droptable;
+package com.skelril.nitro.droptable.resolver;
 
-import com.skelril.nitro.droptable.resolver.DropResolver;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Collection;
 
-public class DropTableEntryImpl implements DropTableEntry {
-    private final DropResolver resolver;
+public class SimpleDropResolver implements DropResolver {
+    private Collection<ItemStack> itemStacks;
 
-    public DropTableEntryImpl(DropResolver resolver) {
-        this.resolver = resolver;
+    public SimpleDropResolver(Collection<ItemStack> itemStacks) {
+        this.itemStacks = itemStacks;
     }
 
     @Override
     public Collection<ItemStack> getItemStacks(double modifier) {
-        return resolver.getItemStacks(modifier);
+        return itemStacks;
     }
 }

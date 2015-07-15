@@ -6,10 +6,6 @@
 
 package com.skelril.nitro.droptable;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.util.Collection;
-
-public interface DropTableEntry {
-    Collection<ItemStack> getItemStacks(double modifier);
+public interface DropTableChanceEntry extends DropTableEntry {
+    int getChance();
 }
