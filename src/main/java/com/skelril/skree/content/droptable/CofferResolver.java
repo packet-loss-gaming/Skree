@@ -14,8 +14,7 @@ import com.skelril.nitro.modifier.ModifierFunctions;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.item.ItemType;
 
-import static com.skelril.skree.content.registry.item.CustomItemTypes.AQUIS;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.TESTRIL;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
 public class CofferResolver extends SimplePointDropResolver {
     public CofferResolver(Game game, int maxCoffers) {
@@ -36,6 +35,42 @@ public class CofferResolver extends SimplePointDropResolver {
                                         game.getRegistry().getItemBuilder().itemType((ItemType) AQUIS).build()
                                 ),
                                 AQUIS.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) MARSINCO).build()
+                                ),
+                                MARSINCO.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) POSTRE).build()
+                                ),
+                                POSTRE.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) EQESTA).build()
+                                ),
+                                EQESTA.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) REDISTRAL).build()
+                                ),
+                                REDISTRAL.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) RETESRUM).build()
+                                ),
+                                RETESRUM.getCofferValue()
+                        ),
+                        new SimplePointValue(
+                                Lists.newArrayList(
+                                        game.getRegistry().getItemBuilder().itemType((ItemType) MESARDITH).build()
+                                ),
+                                MESARDITH.getCofferValue()
                         )
                 ),
                 maxCoffers,
