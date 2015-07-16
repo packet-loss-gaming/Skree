@@ -9,9 +9,9 @@ package com.skelril.skree.content.world.wilderness;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.skelril.nitro.droptable.DropTableChanceEntryImpl;
+import com.skelril.nitro.droptable.DropTableEntryImpl;
 import com.skelril.nitro.droptable.DropTableImpl;
-import com.skelril.nitro.droptable.roller.SlipperyDiceRoller;
+import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
@@ -89,9 +89,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         this.game = game;
 
         dropTable = new DropTableImpl(
-                new SlipperyDiceRoller(ModifierFunctions.ADD),
-                Lists.newArrayList(),
-                Lists.newArrayList(new DropTableChanceEntryImpl(new CofferResolver(game, 10), 12))
+                new SlipperySingleHitDiceRoller(ModifierFunctions.ADD),
+                Lists.newArrayList(new DropTableEntryImpl(new CofferResolver(game, 10), 12))
         );
 
         game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
@@ -152,13 +151,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Location loc = event.getLocation();
 
         if (entity instanceof Monster) {
+            System.out.println("Trying");
             int level = getLevel(loc);
 
             new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
                     dropTable.getDrops(level, getDropMod(level))
             );
 
-            event.setExp(event.getExp() * level);
+            // TODO needs updated XP API
+            // event.setExp(event.getExp() * level);
         }
     }
 
