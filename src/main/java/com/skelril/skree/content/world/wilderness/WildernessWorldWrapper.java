@@ -111,12 +111,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 HealthData health = healthData.get();
                 final double max = health.getMaxHealth();
 
-                double newMax = max * getHealthMod(level);
+                if (max <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                health.setMaxHealth(newMax);
-                health.setHealth(newMax);
+                    double newMax = max * getHealthMod(level);
 
-                entity.offer(health);
+                    health.setMaxHealth(newMax);
+                    health.setHealth(newMax);
+
+                    entity.offer(health);
+                }
             }
 
             Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
