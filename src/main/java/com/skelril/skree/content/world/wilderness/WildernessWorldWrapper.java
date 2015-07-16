@@ -154,7 +154,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Location loc = event.getLocation();
 
         if (entity instanceof Monster) {
-            System.out.println("Trying");
             int level = getLevel(loc);
 
             new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
