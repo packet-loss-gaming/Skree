@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.droptable.resolver.point;
 
+import com.skelril.nitro.probability.Probability;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public abstract class AbstractSlipperyPointResolver implements PointDropResolver {
+    private int points = getBasePointCount();
     protected final List<PointValue> choices;
 
     protected AbstractSlipperyPointResolver(List<PointValue> choices) {
@@ -23,13 +25,21 @@ public abstract class AbstractSlipperyPointResolver implements PointDropResolver
         Validate.isTrue(!this.choices.isEmpty() && this.choices.get(0).getPoints() > 0);
     }
 
+    public int getBasePointCount() {
+        return 0;
+    }
+
     @Override
-    public Collection<ItemStack> getItemStacks(double modifier) {
+    public void enqueue(double modifier) {
+        points += Probability.getRandom(getMaxPoints(modifier));
+    }
+
+    @Override
+    public Collection<ItemStack> flush() {
         List<ItemStack> results = new ArrayList<>();
 
         ListIterator<PointValue> it = choices.listIterator(choices.size());
 
-        int points = getMaxPoints(modifier);
         while (it.hasPrevious()) {
             PointValue cur = it.previous();
 
@@ -40,6 +50,9 @@ public abstract class AbstractSlipperyPointResolver implements PointDropResolver
                 results.addAll(cur.getItemStacks());
             }
         }
+
+        points = getBasePointCount();
+
         return results;
     }
 }

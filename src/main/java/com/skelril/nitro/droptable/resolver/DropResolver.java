@@ -11,5 +11,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.Collection;
 
 public interface DropResolver {
-    Collection<ItemStack> getItemStacks(double modifier);
+    void enqueue(double modifier);
+    Collection<ItemStack> flush();
 }

@@ -6,30 +6,30 @@
 
 package com.skelril.nitro.droptable.roller;
 
-import com.skelril.nitro.droptable.DropTableChanceEntry;
+import com.google.common.collect.ImmutableList;
+import com.skelril.nitro.droptable.DropTableEntry;
 import com.skelril.nitro.modifier.ModifierFunction;
 import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.ListIterator;
 
-public class SlipperyDiceRoller implements DiceRoller {
+public class SlipperySingleHitDiceRoller implements DiceRoller {
 
     private final ModifierFunction modiFunc;
 
-    public SlipperyDiceRoller() {
+    public SlipperySingleHitDiceRoller() {
         this(ModifierFunctions.NOOP);
     }
 
-    public SlipperyDiceRoller(ModifierFunction modiFunc) {
+    public SlipperySingleHitDiceRoller(ModifierFunction modiFunc) {
         this.modiFunc = modiFunc;
     }
 
     @Override
-    public <T extends DropTableChanceEntry> Collection<ItemStack> pickEntry(List<T> input, int highRoll, double modifier) {
+    public <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, int highRoll, double modifier) {
         int roll = Probability.getRandom((int) modiFunc.apply(highRoll, modifier));
         ListIterator<T> it = input.listIterator(input.size());
 
@@ -45,6 +45,6 @@ public class SlipperyDiceRoller implements DiceRoller {
             cur = null;
         }
 
-        return cur == null ? null : cur.getItemStacks(modifier);
+        return cur == null ? Collections.emptySet() : Collections.singleton(cur);
     }
 }

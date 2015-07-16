@@ -6,27 +6,21 @@
 
 package com.skelril.nitro.droptable;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableCollection;
 import com.skelril.nitro.droptable.roller.DiceRoller;
-import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class DropTableImpl implements DropTable {
+public class MasterDropTable implements DropTable {
     private final DiceRoller roller;
-    private ImmutableList<DropTableEntry> possible;
+    private final ImmutableCollection<DropTable> subTables;
 
-    public DropTableImpl(DiceRoller roller, List<DropTableEntry> possible) {
+    public MasterDropTable(DiceRoller roller, ImmutableCollection<DropTable> subTables) {
         this.roller = roller;
-
-        // First sort possible, then apply
-        possible.sort((a, b) -> a.getChance() - b.getChance());
-        Validate.isTrue(!possible.isEmpty() && possible.get(0).getChance() > 0);
-
-        this.possible = ImmutableList.copyOf(possible);
+        this.subTables = subTables;
     }
 
     @Override
@@ -46,20 +40,10 @@ public class DropTableImpl implements DropTable {
 
     @Override
     public Collection<ItemStack> getDrops(int quantity, double modifier, DiceRoller roller) {
-        List<ItemStack> results = new ArrayList<>();
-        int highRoll = possible.get(possible.size() - 1).getChance();
-
-        for (int i = 0; i < quantity; ++i) {
-            Collection<DropTableEntry> hits = roller.getHits(possible, highRoll, modifier);
-            for (DropTableEntry entry : hits) {
-                entry.enque(modifier);
-            }
+        List<ItemStack> itemStacks = new ArrayList<>();
+        for (DropTable table : subTables) {
+            itemStacks.addAll(table.getDrops(quantity, modifier, roller));
         }
-
-        for (DropTableEntry entry : possible) {
-            results.addAll(entry.flush());
-        }
-
-        return results;
+        return itemStacks;
     }
 }

@@ -13,13 +13,29 @@ import java.util.Collection;
 
 public class DropTableEntryImpl implements DropTableEntry {
     private final DropResolver resolver;
+    private final int chance;
 
     public DropTableEntryImpl(DropResolver resolver) {
+        this(resolver, 0);
+    }
+
+    public DropTableEntryImpl(DropResolver resolver, int chance) {
         this.resolver = resolver;
+        this.chance = chance;
     }
 
     @Override
-    public Collection<ItemStack> getItemStacks(double modifier) {
-        return resolver.getItemStacks(modifier);
+    public void enque(double modifier) {
+        resolver.enqueue(modifier);
+    }
+
+    @Override
+    public Collection<ItemStack> flush() {
+        return resolver.flush();
+    }
+
+    @Override
+    public int getChance() {
+        return chance;
     }
 }

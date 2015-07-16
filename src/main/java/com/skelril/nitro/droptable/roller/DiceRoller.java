@@ -6,12 +6,11 @@
 
 package com.skelril.nitro.droptable.roller;
 
-import com.skelril.nitro.droptable.DropTableChanceEntry;
-import org.spongepowered.api.item.inventory.ItemStack;
+import com.google.common.collect.ImmutableList;
+import com.skelril.nitro.droptable.DropTableEntry;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface DiceRoller {
-    <T extends DropTableChanceEntry> Collection<ItemStack> pickEntry(List<T> input, int highRoll, double modifier);
+    <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, int highRoll, double modifier);
 }
