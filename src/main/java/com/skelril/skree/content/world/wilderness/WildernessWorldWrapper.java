@@ -23,7 +23,6 @@ import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.AttributeData;
 import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
@@ -51,14 +50,17 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.WeakHashMap;
 
+import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
@@ -139,27 +141,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
     }
 
-    private static Set<BlockType> orePoolTypes = new HashSet<>();
-
-    static {
-        orePoolTypes.add(BlockTypes.COAL_ORE);
-        orePoolTypes.add(BlockTypes.DIAMOND_ORE);
-        orePoolTypes.add(BlockTypes.EMERALD_ORE);
-        orePoolTypes.add(BlockTypes.REDSTONE_ORE);
-        orePoolTypes.add(BlockTypes.GOLD_ORE);
-        orePoolTypes.add(BlockTypes.IRON_ORE);
-        orePoolTypes.add(BlockTypes.LAPIS_ORE);
-        orePoolTypes.add(BlockTypes.LIT_REDSTONE_ORE);
-        orePoolTypes.add(BlockTypes.QUARTZ_ORE);
-    }
-
     @Subscribe
     public void onBlockBreak(EntityBreakBlockEvent event) {
         Location loc = event.getBlock();
         if (!isApplicable(loc.getExtent())) return;
 
         BlockType type = loc.getBlockType();
-        if (orePoolTypes.contains(type)) {
+        if (ore().contains(type)) {
             orePool:
             {
                 Entity entity = event.getEntity();
@@ -218,7 +206,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         for (Location loc : event.getBlocks()) {
             BlockType type = loc.getBlockType();
-            if (orePoolTypes.contains(type)) {
+            if (ore().contains(type)) {
                 addPool(loc, 0, false);
             }
         }
@@ -228,7 +216,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onBlockPlace(BlockPlaceEvent event) {
         Location loc = event.getBlock();
         if (!isApplicable(loc.getExtent())) return;
-        if (orePoolTypes.contains(loc.getBlockType())) {
+        if (ore().contains(loc.getBlockType())) {
 
             if (event instanceof PlayerPlaceBlockEvent) {
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
