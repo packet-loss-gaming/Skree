@@ -14,6 +14,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.entity.living.animal.Chicken;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
@@ -54,6 +55,11 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
         // TODO Smarter "should this mob be allowed to spawn" code
         if (event.getEntity() instanceof Monster) {
+            event.setCancelled(true);
+        }
+
+        // TODO remove this hack which prevents evil chicken spawning
+        if (event.getEntity() instanceof Chicken && event.getLocation().getLuminance() <= 8) {
             event.setCancelled(true);
         }
     }
