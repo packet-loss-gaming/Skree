@@ -8,13 +8,20 @@ package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.skelril.nitro.droptable.DropTableEntryImpl;
+import com.skelril.nitro.droptable.DropTableImpl;
+import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.generator.FixedIntGenerator;
+import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
+import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
@@ -68,6 +75,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private SkreePlugin plugin;
     private Game game;
 
+    private DropTableImpl dropTable;
+
     private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
     public WildernessWorldWrapper(SkreePlugin plugin, Game game) {
@@ -78,6 +87,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         super("Wilderness", worlds);
         this.plugin = plugin;
         this.game = game;
+
+        dropTable = new DropTableImpl(
+                new SlipperySingleHitDiceRoller(ModifierFunctions.ADD),
+                Lists.newArrayList(new DropTableEntryImpl(new CofferResolver(game, 10), 12))
+        );
 
         game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
     }
@@ -97,12 +111,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 HealthData health = healthData.get();
                 final double max = health.getMaxHealth();
 
-                double newMax = max * getHealthMod(level);
+                if (max <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                health.setMaxHealth(newMax);
-                health.setHealth(newMax);
+                    double newMax = max * getHealthMod(level);
 
-                entity.offer(health);
+                    health.setMaxHealth(newMax);
+                    health.setHealth(newMax);
+
+                    entity.offer(health);
+                }
             }
 
             Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
@@ -137,7 +154,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Location loc = event.getLocation();
 
         if (entity instanceof Monster) {
-            event.setExp(event.getExp() * getLevel(loc));
+            int level = getLevel(loc);
+
+            new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
+                    dropTable.getDrops(level, getDropMod(level))
+            );
+
+            // TODO needs updated XP API
+            // event.setExp(event.getExp() * level);
         }
     }
 
@@ -263,6 +287,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         // In Wilderness
         return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
+    }
+
+    public double getDropMod(int level) {
+        return .8 + (level * .2);
     }
 
     public int getHealthMod(int level) {

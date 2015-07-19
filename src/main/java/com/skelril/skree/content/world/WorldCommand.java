@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.internal.world;
+package com.skelril.skree.content.world;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
@@ -80,7 +80,10 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
+<<<<<<< HEAD:src/main/java/com/skelril/skree/service/internal/world/WorldCommand.java
                 .child(WorldCommandList.ListWorlds(game), "List", "list")
+=======
+>>>>>>> origin/master:src/main/java/com/skelril/skree/content/world/WorldCommand.java
                 .arguments(optional(onlyOne(string(Texts.of("world")))))
                 .executor(new WorldCommand(game)).build();
     }
