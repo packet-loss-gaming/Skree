@@ -31,7 +31,7 @@ import static org.spongepowered.api.util.command.args.GenericArguments.*;
 public class WeatherCommand implements CommandExecutor {
     private Game game;
 
-    public WeatherCommand(Game game){
+    public WeatherCommand(Game game) {
         this.game = game;
     }
     @Override
