@@ -14,6 +14,7 @@ import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
+import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
@@ -93,6 +94,11 @@ public class SkreePlugin {
         try{
             new CowCommandSystem(this,game);
         } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        try {
+            new WeatherCommandSystem(this, game);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
