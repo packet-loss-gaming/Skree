@@ -6,7 +6,6 @@
 
 package com.skelril.nitro.droptable;
 
-import com.google.common.collect.ImmutableCollection;
 import com.skelril.nitro.droptable.roller.DiceRoller;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -16,9 +15,9 @@ import java.util.List;
 
 public class MasterDropTable implements DropTable {
     private final DiceRoller roller;
-    private final ImmutableCollection<DropTable> subTables;
+    private final List<DropTable> subTables;
 
-    public MasterDropTable(DiceRoller roller, ImmutableCollection<DropTable> subTables) {
+    public MasterDropTable(DiceRoller roller, List<DropTable> subTables) {
         this.roller = roller;
         this.subTables = subTables;
     }
