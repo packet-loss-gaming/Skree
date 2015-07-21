@@ -183,7 +183,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             int level = getLevel(loc);
 
             new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
-                    dropTable.getDrops(level, getDropMod(level))
+                    dropTable.getDrops(level, getDropMod(level, ((Monster) entity).getHealthData().getMaxHealth()))
             );
 
             // TODO needs updated XP API
@@ -315,8 +315,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
     }
 
-    public double getDropMod(int level) {
-        return .8 + (level * .2);
+    public double getDropMod(int level, double mobHealth) {
+        return (level * .2) + (mobHealth * .04);
     }
 
     public int getHealthMod(int level) {
