@@ -35,7 +35,7 @@ public class WeatherCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         TextBuilder builder = Texts.builder();
-        Optional<String> worldName;
+        Optional<World> world;
 
         if (!(args.getOne("World Name").isPresent())) {
             if (!(src instanceof Player)) {
@@ -45,25 +45,23 @@ public class WeatherCommand implements CommandExecutor {
                 return CommandResult.empty();
 
             } else {
-                worldName = Optional.of(((Player) src).getWorld().getName());
+                world = Optional.of(((Player) src).getWorld());
             }
         } else {
-            worldName = args.<String>getOne("World Name");
+            world = game.getServer().getWorld(args.<String>getOne("World Name").get());
         }
 
-        Optional<World> world = game.getServer().getWorld(worldName.get());
-
         if (!world.isPresent()) {
-            builder.append(Texts.of("Failed to find a world named: " + worldName.get())).color(TextColors.RED);
+            builder.append(Texts.of("Failed to find a world named: " + args.<String>getOne("World Name").get())).color(TextColors.RED);
             src.sendMessage(Texts.of(builder.build()));
             return CommandResult.empty();
         }
 
         String weatherType = args.getOne("Weather Type").get().toString();
-
         Weather weather;
 
         switch (weatherType.toLowerCase()) {
+            case "sun":
             case "sunny":
             case "clear":
                 weather = Weathers.CLEAR;
@@ -101,7 +99,7 @@ public class WeatherCommand implements CommandExecutor {
 
         world.get().forecast(weather, duration.get());
 
-        src.sendMessage(Texts.of("Changed weather to " + weatherType + " in " + worldName.get()));
+        src.sendMessage(Texts.of("Changed weather to " + weatherType + " in " + world.get().getName()));
         return CommandResult.success();
 
     }
