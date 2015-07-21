@@ -10,11 +10,9 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.weather.WeatherCommand;
 import org.spongepowered.api.Game;
 
-/**
- * Created by cow_fu on 7/19/15 at 7:39 PM
- */
 public class WeatherCommandSystem {
-        public WeatherCommandSystem(SkreePlugin plugin,Game game){
-            game.getCommandDispatcher().register(plugin, WeatherCommand.aquireSpec(game), "setweather");
-        }
+    public WeatherCommandSystem(SkreePlugin plugin, Game game) {
+        game.getCommandDispatcher().register(plugin, WeatherCommand.aquireSpec(game), "setweather");
     }
+}
+

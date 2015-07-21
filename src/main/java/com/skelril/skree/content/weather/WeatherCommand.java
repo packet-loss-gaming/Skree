@@ -25,15 +25,13 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
-/**
- * Created by cow_fu on 7/19/15 at 7:04 PM
- */
 public class WeatherCommand implements CommandExecutor {
-    private Game game;
+    private final Game game;
 
     public WeatherCommand(Game game) {
         this.game = game;
     }
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         TextBuilder builder = Texts.builder();
@@ -41,7 +39,6 @@ public class WeatherCommand implements CommandExecutor {
 
         if (!(args.getOne("World Name").isPresent())) {
             if (!(src instanceof Player)) {
-
                 builder.append(Texts.of("You need to specify a world!")).color(TextColors.RED);
                 src.sendMessage(builder.build());
 
@@ -55,6 +52,7 @@ public class WeatherCommand implements CommandExecutor {
         }
 
         Optional<World> world = game.getServer().getWorld(worldName.get());
+
         if (!world.isPresent()) {
             builder.append(Texts.of("Failed to find a world named: " + worldName.get())).color(TextColors.RED);
             src.sendMessage(Texts.of(builder.build()));
@@ -65,16 +63,20 @@ public class WeatherCommand implements CommandExecutor {
 
         Weather weather;
 
-        switch (weatherType) {
-            case "sunny": case "clear":
+        switch (weatherType.toLowerCase()) {
+            case "sunny":
+            case "clear":
                 weather = Weathers.CLEAR;
                 break;
 
-            case "rain": case "rainy":
+            case "rain":
+            case "rainy":
                 weather = Weathers.RAIN;
                 break;
 
-            case "storm": case "stormy":case "thunder":
+            case "storm":
+            case "stormy":
+            case "thunder":
                 weather = Weathers.THUNDER_STORM;
                 break;
 
@@ -99,10 +101,11 @@ public class WeatherCommand implements CommandExecutor {
 
         world.get().forecast(weather, duration.get());
 
-        src.sendMessage(Texts.of("Changed weather to " + weatherType + " in " +worldName.get()));
+        src.sendMessage(Texts.of("Changed weather to " + weatherType + " in " + worldName.get()));
         return CommandResult.success();
 
     }
+
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Change the weather"))
