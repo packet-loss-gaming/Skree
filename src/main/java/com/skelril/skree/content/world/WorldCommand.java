@@ -17,6 +17,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -36,24 +37,17 @@ public class WorldCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<String> optWorldName = args.<String>getOne("world");
+        Optional<WorldProperties> optWorldName = args.getOne("world");
 
         if (!optWorldName.isPresent()) {
             src.sendMessage(Texts.of("You are in: " + ((Player) src).getWorld().getName() + "."));
             return CommandResult.empty();
         }
 
+        World world = game.getServer().getWorld(optWorldName.get().getUniqueId()).get();
 
-        String worldName = optWorldName.get();
-
-        Optional<World> world = game.getServer().getWorld(worldName);
-        if (!world.isPresent()) {
-            src.sendMessage(Texts.of("Failed to find a world named: " + worldName));
-            return CommandResult.empty();
-        }
-
-        ((Player) src).setLocationSafely(world.get().getSpawnLocation());
-        src.sendMessage(Texts.of("Entered world: " + worldName + " successfully!"));
+        ((Player) src).setLocationSafely(world.getSpawnLocation());
+        src.sendMessage(Texts.of("Entered world: " + world.getName() + " successfully!"));
         return CommandResult.success();
     }
 
@@ -61,7 +55,7 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-                .arguments(optional(onlyOne(string(Texts.of("world")))))
+                .arguments(optional(onlyOne(world(Texts.of("world"), game))))
                 .executor(new WorldCommand(game)).build();
     }
 }
