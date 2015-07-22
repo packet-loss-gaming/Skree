@@ -8,7 +8,7 @@ package com.skelril.skree;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.skelril.skree.system.cowcommand.CowCommandSystem;
+import com.skelril.skree.content.weather.WeatherCommand;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
@@ -89,11 +89,6 @@ public class SkreePlugin {
         try {
             new WorldSystem(this, game);
         } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try{
-            new CowCommandSystem(this,game);
-        } catch (Exception ex){
             ex.printStackTrace();
         }
         try {

@@ -20,98 +20,87 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
-/**
- * Created by cow_fu on 7/19/15 at 7:04 PM
- */
 public class WeatherCommand implements CommandExecutor {
-    private Game game;
+    private final Game game;
 
-    public WeatherCommand(Game game){
+    public WeatherCommand(Game game) {
         this.game = game;
     }
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         TextBuilder builder = Texts.builder();
-        Optional<String> worldName;
 
-        if (!(args.getOne("World Name").isPresent())) {
+        // World resolution
+        Optional<WorldProperties> optWorldProps = args.getOne("world");
+        Optional<World> optWorld;
+
+        if (!optWorldProps.isPresent()) {
             if (!(src instanceof Player)) {
-
-                builder.append(Texts.of("You need to specify a world!")).color(TextColors.RED);
-                src.sendMessage(builder.build());
-
+                builder.append(Texts.of("You are not a player and need to specify a world!")).color(TextColors.RED);
+                src.sendMessage(Texts.of(builder.build()));
                 return CommandResult.empty();
-
-            } else {
-                worldName = Optional.of(((Player) src).getWorld().getName());
             }
+            optWorld = Optional.of(((Player) src).getWorld());
         } else {
-            worldName = args.<String>getOne("World Name");
+            optWorld = game.getServer().getWorld(optWorldProps.get().getUniqueId());
         }
 
-        Optional<World> world = game.getServer().getWorld(worldName.get());
-        if (!world.isPresent()) {
-            builder.append(Texts.of("Failed to find a world named: " + worldName.get())).color(TextColors.RED);
-            src.sendMessage(Texts.of(builder.build()));
-            return CommandResult.empty();
+        // Handled by command spec, so always provided
+        Weather weather = args.<Weather>getOne("type").get();
+
+        Optional<Integer> duration = args.getOne("duration");
+        if (!duration.isPresent()) {
+            duration = Optional.of(Probability.getRangedRandom(5 * 60, 15 * 60)); // Between 5 and 15 minutes
         }
 
-        String weatherType = args.getOne("Weather Type").get().toString();
-
-        Weather weather;
-
-        switch (weatherType) {
-            case "sunny": case "clear":
-                weather = Weathers.CLEAR;
-                break;
-
-            case "rain": case "rainy":
-                weather = Weathers.RAIN;
-                break;
-
-            case "storm": case "stormy":case "thunder":
-                weather = Weathers.THUNDER_STORM;
-                break;
-
-            default:
-                builder.append(Texts.of("Not a valid type of weather!")).color(TextColors.RED);
-                src.sendMessage(builder.build());
-
-                return CommandResult.empty();
-        }
-
-        Optional<Integer> duration = args.<Integer>getOne("duration");
-
-        if (!(duration.isPresent())) {
-            duration = Optional.of(Probability.getRangedRandom(6000, 18000));
-        }
-
-        if (duration.get() < 1 || duration.get() > 1000000) {
-            builder.append(Texts.of("\"" + duration.get().toString() + "\" not a valid number!")).color(TextColors.RED);
+        if (duration.get() < 1) {
+            builder.append(Texts.of("Weather duration must be at least 1 second!")).color(TextColors.RED);
             src.sendMessage(builder.build());
             return CommandResult.empty();
         }
 
-        world.get().forecast(weather, duration.get());
+        World world = optWorld.get();
+        if (!world.isLoaded()) {
+            builder.append(Texts.of("The specified world was not loaded!")).color(TextColors.RED);
+            src.sendMessage(Texts.of(builder.build()));
+            return CommandResult.empty();
+        }
 
-        src.sendMessage(Texts.of("Changed weather to " + weatherType + " in " +worldName.get()));
+        world.forecast(weather, duration.get() * 20);
+
+        builder.append(Texts.of("Changed weather state in " + world.getName() + " to: " + weather.getName() + '.'));
+        builder.color(TextColors.YELLOW);
+        src.sendMessage(builder.build());
+
         return CommandResult.success();
-
     }
+
     public static CommandSpec aquireSpec(Game game) {
+        Map<String, Weather> map = new HashMap<>();
+
+        map.put("clear", Weathers.CLEAR);
+        map.put("rain", Weathers.RAIN);
+        map.put("thunder", Weathers.THUNDER_STORM);
+
         return CommandSpec.builder()
                 .description(Texts.of("Change the weather"))
                 .permission("skree.weathercommand")
                 .arguments(
                         seq(
-                                onlyOne(string(Texts.of("Weather Type"))),
+                                onlyOne(choices(Texts.of("type"), map)),
+                                // TODO should be onlyOne(catalogedElement(Texts.of("type"), game, Weather.class)),
                                 onlyOne(optionalWeak(integer(Texts.of("duration")))),
-                                onlyOne(optionalWeak(string(Texts.of("World Name"))))
+                                onlyOne(optional(world(Texts.of("world"), game)))
                         )
                 )
                 .executor(new WeatherCommand(game)).build();

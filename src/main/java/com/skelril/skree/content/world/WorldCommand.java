@@ -6,11 +6,8 @@
 
 package com.skelril.skree.content.world;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.effect.particle.ParticleEffectBuilder;
-import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -20,6 +17,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -39,40 +37,17 @@ public class WorldCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<String> optWorldName = args.<String>getOne("world");
+        Optional<WorldProperties> optWorldName = args.getOne("world");
 
         if (!optWorldName.isPresent()) {
             src.sendMessage(Texts.of("You are in: " + ((Player) src).getWorld().getName() + "."));
             return CommandResult.empty();
         }
 
+        World world = game.getServer().getWorld(optWorldName.get().getUniqueId()).get();
 
-        String worldName = optWorldName.get();
-
-        Optional<World> world = game.getServer().getWorld(worldName);
-        if (!world.isPresent()) {
-            src.sendMessage(Texts.of("Failed to find a world named: " + worldName));
-            return CommandResult.empty();
-        }
-
-        ((Player) src).setLocationSafely(world.get().getSpawnLocation());
-        src.sendMessage(Texts.of("Entered world: " + worldName + " successfully!"));
-
-        ParticleEffectBuilder effectBuilder = game.getRegistry().getParticleEffectBuilder(
-                ParticleTypes.SMOKE_NORMAL
-        ).motion(new Vector3d(
-                0,
-                .1
-                , 0
-        )).offset(
-                new Vector3d(
-                        1,
-                        1,
-                        1
-                )).count(500);
-
-        world.get().spawnParticles(effectBuilder.build(), ((Player) src).getLocation().getPosition(), 5);
-
+        ((Player) src).setLocationSafely(world.getSpawnLocation());
+        src.sendMessage(Texts.of("Entered world: " + world.getName() + " successfully!"));
         return CommandResult.success();
     }
 
@@ -80,11 +55,7 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Teleport to a different world"))
                 .permission("skree.world")
-<<<<<<< HEAD:src/main/java/com/skelril/skree/service/internal/world/WorldCommand.java
-                .child(WorldCommandList.ListWorlds(game), "List", "list")
-=======
->>>>>>> origin/master:src/main/java/com/skelril/skree/content/world/WorldCommand.java
-                .arguments(optional(onlyOne(string(Texts.of("world")))))
+                .arguments(optional(onlyOne(world(Texts.of("world"), game))))
                 .executor(new WorldCommand(game)).build();
     }
 }

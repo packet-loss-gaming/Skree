@@ -9,8 +9,11 @@ package com.skelril.skree.content.world.wilderness;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
 import com.skelril.nitro.droptable.DropTableImpl;
+import com.skelril.nitro.droptable.MasterDropTable;
+import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemDropper;
@@ -54,6 +57,7 @@ import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
@@ -68,6 +72,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import static com.skelril.skree.content.registry.TypeCollections.ore;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
@@ -75,7 +80,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private SkreePlugin plugin;
     private Game game;
 
-    private DropTableImpl dropTable;
+    private DropTable dropTable;
 
     private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
@@ -88,9 +93,30 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         this.plugin = plugin;
         this.game = game;
 
-        dropTable = new DropTableImpl(
-                new SlipperySingleHitDiceRoller(ModifierFunctions.ADD),
-                Lists.newArrayList(new DropTableEntryImpl(new CofferResolver(game, 10), 12))
+        ItemStackBuilder builder = game.getRegistry().getItemBuilder();
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.ADD);
+        dropTable = new MasterDropTable(
+                slipRoller,
+                Lists.newArrayList(
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(new CofferResolver(game, 10), 12)
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                builder.reset().itemType((ItemType) RED_FEATHER).quantity(1).build()
+                                                        )
+                                                ), 100000
+                                        )
+                                )
+                        )
+                )
         );
 
         game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
@@ -157,7 +183,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             int level = getLevel(loc);
 
             new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
-                    dropTable.getDrops(level, getDropMod(level))
+                    dropTable.getDrops(level, getDropMod(level, ((Monster) entity).getHealthData().getMaxHealth()))
             );
 
             // TODO needs updated XP API
@@ -289,8 +315,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
     }
 
-    public double getDropMod(int level) {
-        return .8 + (level * .2);
+    public double getDropMod(int level, double mobHealth) {
+        return (level * .2) + (mobHealth * .04);
     }
 
     public int getHealthMod(int level) {
