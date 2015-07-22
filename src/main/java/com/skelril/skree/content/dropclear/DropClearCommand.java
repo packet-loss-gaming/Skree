@@ -10,7 +10,9 @@ import com.google.common.base.Optional;
 import com.skelril.skree.service.DropClearService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
@@ -18,6 +20,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -35,29 +38,34 @@ public class DropClearCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        TextBuilder builder = Texts.builder();
 
         // World resolution
+        Optional<WorldProperties> optWorldProps = args.getOne("world");
         Optional<World> optWorld;
-        Optional<String> optWorldName = args.<String>getOne("world");
 
-        if (optWorldName.isPresent()) {
-            optWorld = game.getServer().getWorld(optWorldName.get());
-        } else if (src instanceof Player) {
+        if (!optWorldProps.isPresent()) {
+            if (!(src instanceof Player)) {
+                builder.append(Texts.of("You are not a player and need to specify a world!")).color(TextColors.RED);
+                src.sendMessage(Texts.of(builder.build()));
+                return CommandResult.empty();
+            }
             optWorld = Optional.of(((Player) src).getWorld());
         } else {
-            src.sendMessage(Texts.of("You are not a player and need to specify a world!"));
-            return CommandResult.empty();
-        }
-
-        if (!optWorld.isPresent()) {
-            src.sendMessage(Texts.of("The specified world could not be found!"));
-            return CommandResult.empty();
+            optWorld = game.getServer().getWorld(optWorldProps.get().getUniqueId());
         }
 
         // Handled by command spec, so always provided
         int seconds = args.<Integer>getOne("seconds").get();
 
-        service.cleanup(optWorld.get(), Math.max(0, Math.min(seconds, maxDelay)));
+        World world = optWorld.get();
+        if (!world.isLoaded()) {
+            builder.append(Texts.of("The specified world was not loaded!")).color(TextColors.RED);
+            src.sendMessage(Texts.of(builder.build()));
+            return CommandResult.empty();
+        }
+
+        service.cleanup(world, Math.max(0, Math.min(seconds, maxDelay)));
 
         return CommandResult.success();
     }
@@ -69,7 +77,7 @@ public class DropClearCommand implements CommandExecutor {
                 .arguments(
                         seq(
                                 onlyOne(optionalWeak(integer(Texts.of("seconds")), 10)),
-                                onlyOne(optional(string(Texts.of("world"))))
+                                onlyOne(optional(world(Texts.of("world"), game)))
                         )
                 ).executor(new DropClearCommand(game, service, maxDelay)).build();
     }
