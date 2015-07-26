@@ -8,4 +8,5 @@ package com.skelril.skree.content.modifier;
 
 public class Modifiers {
     public static final String DOUBLE_WILD_ORES = "DOUBLE_WILD_ORES";
+    public static final String DOUBLE_WILD_DROPS = "DOUBLE_WILD_DROPS";
 }

@@ -182,9 +182,28 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (entity instanceof Monster) {
             int level = getLevel(loc);
 
-            new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition()).dropItems(
-                    dropTable.getDrops(level, getDropMod(level, ((Monster) entity).getHealthData().getMaxHealth()))
+            Collection<ItemStack> drops = dropTable.getDrops(
+                    level,
+                    getDropMod(
+                            level,
+                            ((Monster) entity).getHealthData().getMaxHealth()
+                    )
             );
+
+            int times = 1;
+
+            Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+            if (optService.isPresent()) {
+                ModifierService service = optService.get();
+                if (service.isActive(Modifiers.DOUBLE_WILD_DROPS)) {
+                    times *= 2;
+                }
+            }
+
+            ItemDropper dropper = new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition());
+            for (int i = 0; i < times; ++i) {
+                dropper.dropItems(drops);
+            }
 
             // TODO needs updated XP API
             // event.setExp(event.getExp() * level);
