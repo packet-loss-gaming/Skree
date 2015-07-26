@@ -8,7 +8,14 @@ package com.skelril.skree.content.registry.item.currency;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.Validate;
+
+import java.text.DecimalFormat;
+import java.util.List;
 
 public class CofferItem extends CustomItem {
 
@@ -39,5 +46,14 @@ public class CofferItem extends CustomItem {
     @Override
     public CreativeTabs __getCreativeTab() {
         return CreativeTabs.tabMisc;
+    }
+
+    // Modified Native Item methods
+
+    @SuppressWarnings("unchecked")
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        tooltip.add(formatter.format(stack.stackSize * getCofferValue()) + " Coffers");
     }
 }
