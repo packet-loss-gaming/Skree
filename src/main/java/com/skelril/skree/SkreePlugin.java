@@ -6,6 +6,7 @@
 
 package com.skelril.skree;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.skelril.skree.system.dropclear.DropClearSystem;
@@ -22,6 +23,7 @@ import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 @Singleton
@@ -71,35 +73,22 @@ public class SkreePlugin {
     }
 
     private void registerPrimaryServerSystems() {
-        try {
-            new DropClearSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new ModifierSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new ShutdownSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new WorldSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new WeatherCommandSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new PlayerStateSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        ImmutableList<Class> initialized = ImmutableList.of(
+                DropClearSystem.class,
+                ModifierSystem.class,
+                PlayerStateSystem.class,
+                ShutdownSystem.class,
+                WorldSystem.class,
+                WeatherCommandSystem.class
+        );
+
+        for (Class<?> entry : initialized) {
+            try {
+                Constructor<?> constructor = entry.getConstructor(SkreePlugin.class, Game.class);
+                constructor.newInstance(this, game);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
