@@ -5,7 +5,9 @@
  */
 package com.skelril.skree.content.cowcommand;
 
+import com.skelril.nitro.entity.SpawnEntity;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
@@ -18,11 +20,8 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.world.Location;
-
-import com.skelril.nitro.entity.SpawnEntity;
+import org.spongepowered.api.world.World;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -31,11 +30,10 @@ public class CowCommand implements CommandExecutor {
 
     final int MaxTNT = 1000;
     private static Game game;
-    public static void getGame(Game game1){
-        game = game1;
+
+    public CowCommand(Game game) {
+        CowCommand.game = game;
     }
-
-
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) {
@@ -62,7 +60,6 @@ public class CowCommand implements CommandExecutor {
             for(int i = 0; i<numberOfTnt;++i){
                 SpawnEntity.spawnMob(EntityTypes.PRIMED_TNT,world,location);
             }
-
             ItemStackBuilder builder = game.getRegistry().getItemBuilder().itemType(ItemTypes.MILK_BUCKET).quantity(1);
             SpawnEntity.spawnDroppedItem(builder, world, location);
         }
@@ -74,7 +71,7 @@ public class CowCommand implements CommandExecutor {
     }
 
 
-    public static CommandSpec aquireSpec(){
+    public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Cow's First Command :D"))
                 .permission("skree.cowcommand")
@@ -82,6 +79,6 @@ public class CowCommand implements CommandExecutor {
                 .arguments(
                         onlyOne(optional(integer(Texts.of("Number of Tnt")), 0))
                 )
-                .executor(new CowCommand()).build();
+                .executor(new CowCommand(game)).build();
     }
 }

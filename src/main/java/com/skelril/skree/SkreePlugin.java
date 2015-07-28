@@ -9,6 +9,7 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.skree.system.cowcommand.CowCommandSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
@@ -79,7 +80,8 @@ public class SkreePlugin {
                 PlayerStateSystem.class,
                 ShutdownSystem.class,
                 WorldSystem.class,
-                WeatherCommandSystem.class
+                WeatherCommandSystem.class,
+                CowCommandSystem.class
         );
 
         for (Class<?> entry : initialized) {
