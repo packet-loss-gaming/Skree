@@ -8,9 +8,9 @@ package com.skelril.skree;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.skelril.skree.content.weather.WeatherCommand;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
+import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
@@ -93,6 +93,11 @@ public class SkreePlugin {
         }
         try {
             new WeatherCommandSystem(this, game);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
+            new PlayerStateSystem(this, game);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
