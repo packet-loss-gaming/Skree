@@ -94,8 +94,14 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                             Text oreText = Texts.builder().color(TextColors.YELLOW).append(
                                     Texts.of("Ore modifier: x" + wrapper.getOreMod(level))
                             ).build();
+                            Text dropText = Texts.builder().color(TextColors.YELLOW).append(
+                                    Texts.of("Base drop modifier: " + wrapper.getDropMod(level, 0))
+                            ).build();
+                            Text healthDropText = Texts.builder().color(TextColors.YELLOW).append(
+                                    Texts.of("Health drop modifier: " + wrapper.getDropMod(0, 1) + " x HP")
+                            ).build();
 
-                            player.sendMessage(levelText, damageText, healthText, oreText);
+                            player.sendMessage(levelText, damageText, healthText, oreText, dropText, healthDropText);
                         } else {
                             Text notWildernessText = Texts.builder().color(TextColors.RED).append(
                                     Texts.of("You're not in a Wilderness world!")
