@@ -47,10 +47,9 @@ public class DropTableImpl implements DropTable {
     @Override
     public Collection<ItemStack> getDrops(int quantity, double modifier, DiceRoller roller) {
         List<ItemStack> results = new ArrayList<>();
-        int highRoll = possible.get(possible.size() - 1).getChance();
 
         for (int i = 0; i < quantity; ++i) {
-            Collection<DropTableEntry> hits = roller.getHits(possible, highRoll, modifier);
+            Collection<DropTableEntry> hits = roller.getHits(possible, modifier);
             for (DropTableEntry entry : hits) {
                 entry.enque(modifier);
             }

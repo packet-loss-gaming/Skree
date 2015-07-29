@@ -29,16 +29,16 @@ public class SlipperySingleHitDiceRoller implements DiceRoller {
     }
 
     @Override
-    public <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, int highRoll, double modifier) {
-        int roll = Probability.getRandom((int) modiFunc.apply(highRoll, modifier));
+    public <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, double modifier) {
         ListIterator<T> it = input.listIterator(input.size());
 
         T cur = null;
         while (it.hasPrevious()) {
             cur = it.previous();
 
-            // Slip through until we hit something which our roll is <= to
-            if (cur.getChance() <= roll) {
+            // Slip through until something which is >= the chance is hit, unless a modifier is applied
+            // this is equivalent to a 1 / chance probability
+            if (cur.getChance() >= Probability.getRandom((int) modiFunc.apply(cur.getChance(), modifier))) {
                 break;
             }
 
