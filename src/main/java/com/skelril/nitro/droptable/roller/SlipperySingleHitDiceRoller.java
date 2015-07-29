@@ -38,7 +38,7 @@ public class SlipperySingleHitDiceRoller implements DiceRoller {
 
             // Slip through until something which is >= the chance is hit, unless a modifier is applied
             // this is equivalent to a 1 / chance probability
-            if (cur.getChance() >= Probability.getRandom((int) modiFunc.apply(cur.getChance(), modifier))) {
+            if (cur.getChance() <= Probability.getRandom((int) modiFunc.apply(cur.getChance(), modifier))) {
                 break;
             }
 
