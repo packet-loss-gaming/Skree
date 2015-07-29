@@ -25,12 +25,13 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.extent.Extent;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.util.command.args.GenericArguments.player;
 
-public class TeleportCommand implements CommandExecutor {
+public class BringCommand implements CommandExecutor {
     private final Game game;
 
-    public TeleportCommand(Game game) {
+    public BringCommand(Game game) {
         this.game = game;
     }
 
@@ -38,39 +39,34 @@ public class TeleportCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         TextBuilder builder = Texts.builder();
 
-        Player target;
-            if (src instanceof Player) {
-            target = (Player) src;
+        Vector3d dest;
+        Vector3d rotation;
+        Extent targetExtent;
+        if (src instanceof Player) {
+            Player srcPlayer = (Player) src;
+            Location loc = srcPlayer.getLocation();
+            dest = loc.getPosition();
+            rotation = srcPlayer.getRotation();
+            targetExtent = loc.getExtent();
         } else {
-            builder.append(Texts.of("You are not a player and teleporting other players is not currently supported!")).color(TextColors.RED);
+            builder.append(Texts.of("You are not a player and teleporting other players is not currently supported!"));
+            builder.color(TextColors.RED);
             src.sendMessage(Texts.of(builder.build()));
             return CommandResult.empty();
         }
 
-        Optional<Vector3d> dest = args.<Vector3d>getOne("dest");
-        Vector3d rotation = new Vector3d(0, 0, 0);
-        Extent targetExtent = target.getWorld();
-        String destStr;
 
-        if (dest.isPresent()) {
-            destStr = dest.get().toString();
-        } else {
-            Player player = args.<Player>getOne("dest-player").get();
-            targetExtent = player.getWorld();
-            rotation = player.getRotation();
-            dest = Optional.of(player.getLocation().getPosition());
-            destStr = player.getName();
-        }
+        Player target = args.<Player>getOne("target").get();
 
         Optional<GameModeData> data = target.getData(GameModeData.class);
         if (!data.isPresent() || !(data.get().getGameMode() == GameModes.CREATIVE || data.get().getGameMode() == GameModes.SPECTATOR)) {
-            while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR)) {
-                dest = Optional.of(dest.get().add(0, -1, 0));
+            while (dest.getFloorY() > 0 && targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.AIR)) {
+                dest = dest.add(0, -1, 0);
             }
         }
-        target.setLocationAndRotation(new Location(targetExtent, dest.get().add(0, 1, 0)), rotation);
+        target.setLocationAndRotation(new Location(targetExtent, dest.add(0, 1, 0)), rotation);
 
-        builder.append(Texts.of("Teleported to " + destStr + '.'));
+        builder.append(Texts.of("Player brought to you, my lord."));
         builder.color(TextColors.YELLOW);
         src.sendMessage(builder.build());
 
@@ -79,15 +75,12 @@ public class TeleportCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
-                .description(Texts.of("Teleport to a player or destination"))
-                .permission("skree.teleport.teleport")
+                .description(Texts.of("Bring a player to your current location"))
+                .permission("skree.teleport.bring")
                 .arguments(
                         onlyOne(
-                                firstParsing(
-                                        player(Texts.of("dest-player"), game),
-                                        vector3d(Texts.of("dest"))
-                                )
+                                player(Texts.of("target"), game)
                         )
-                ).executor(new TeleportCommand(game)).build();
+                ).executor(new BringCommand(game)).build();
     }
 }

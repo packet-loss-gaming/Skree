@@ -7,6 +7,7 @@
 package com.skelril.skree.system.teleport;
 
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.teleport.BringCommand;
 import com.skelril.skree.content.teleport.TeleportCommand;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.command.CommandService;
@@ -17,5 +18,6 @@ public class TeleportSystem {
 
         cmdDispatcher.removeMapping(cmdDispatcher.get("tp").get());
         cmdDispatcher.register(plugin, TeleportCommand.aquireSpec(game), "teleport", "tp");
+        cmdDispatcher.register(plugin, BringCommand.aquireSpec(game), "bring", "br");
     }
 }
