@@ -15,6 +15,7 @@ import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
+import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import org.spongepowered.api.Game;
@@ -78,6 +79,7 @@ public class SkreePlugin {
                 ModifierSystem.class,
                 PlayerStateSystem.class,
                 ShutdownSystem.class,
+                TeleportSystem.class,
                 WorldSystem.class,
                 WeatherCommandSystem.class
         );
