@@ -91,11 +91,10 @@ public class ShutdownServiceImpl implements ShutdownService {
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
                     MessageSinks.toAll().sendMessage(
-                            Texts.builder(
-                                    "Sever shutting down in "
-                                            + times + " seconds - for "
-                                            + reopenDate + "."
-                            ).color(TextColors.RED).build()
+                            Texts.of(
+                                    TextColors.RED,
+                                    "Sever shutting down in " + times + " seconds - for " + reopenDate + "."
+                            )
                     );
                 }
                 return true;
@@ -103,7 +102,7 @@ public class ShutdownServiceImpl implements ShutdownService {
 
             @Override
             public void end() {
-                MessageSinks.toAll().sendMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
+                MessageSinks.toAll().sendMessage(Texts.of(TextColors.RED, "Server shutting down!"));
                 forceShutdown(message);
             }
         };

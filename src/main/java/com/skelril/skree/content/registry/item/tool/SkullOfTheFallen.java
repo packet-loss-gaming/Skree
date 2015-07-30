@@ -22,7 +22,6 @@ import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -82,32 +81,15 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                         if (wrapper.isApplicable(pLoc.getExtent())) {
                             int level = wrapper.getLevel(pLoc);
 
-                            Text levelText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Wilderness level: " + level)
-                            ).build();
-                            Text damageText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Mob damage: +" + wrapper.getDamageMod(level))
-                            ).build();
-                            Text healthText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Mob health: x" + wrapper.getHealthMod(level))
-                            ).build();
-                            Text oreText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Ore modifier: x" + wrapper.getOreMod(level))
-                            ).build();
-                            Text dropText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Base drop modifier: " + wrapper.getDropMod(level, 0))
-                            ).build();
-                            Text healthDropText = Texts.builder().color(TextColors.YELLOW).append(
-                                    Texts.of("Health drop modifier: " + wrapper.getDropMod(0, 1) + " x HP")
-                            ).build();
-
-                            player.sendMessage(levelText, damageText, healthText, oreText, dropText, healthDropText);
+                            player.sendMessage(
+                                Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
+                                Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
+                                Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
+                                Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
+                                Texts.of(TextColors.YELLOW, "Drop modifier: x" + level * wrapper.getDropMod(level, 0))
+                            );
                         } else {
-                            Text notWildernessText = Texts.builder().color(TextColors.RED).append(
-                                    Texts.of("You're not in a Wilderness world!")
-                            ).build();
-
-                            player.sendMessage(notWildernessText);
+                            player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
                         }
                     }
                 }
