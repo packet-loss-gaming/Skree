@@ -16,7 +16,6 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.service.scheduler.Task;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
@@ -100,7 +99,6 @@ public class DropClearServiceImpl implements DropClearService {
         return new EntityCleanupTask(extent, checkedEntities) {
             @Override
             public void notifyCleanProgress(int times) {
-                TextBuilder builder = Texts.builder();
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.CHAT,
