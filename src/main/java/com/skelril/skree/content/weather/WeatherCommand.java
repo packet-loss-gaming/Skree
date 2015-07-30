@@ -10,7 +10,6 @@ import com.google.common.base.Optional;
 import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
@@ -38,16 +37,13 @@ public class WeatherCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        TextBuilder builder = Texts.builder();
-
         // World resolution
         Optional<WorldProperties> optWorldProps = args.getOne("world");
         Optional<World> optWorld;
 
         if (!optWorldProps.isPresent()) {
             if (!(src instanceof Player)) {
-                builder.append(Texts.of("You are not a player and need to specify a world!")).color(TextColors.RED);
-                src.sendMessage(Texts.of(builder.build()));
+                src.sendMessage(Texts.of(TextColors.RED, "You are not a player and need to specify a world!"));
                 return CommandResult.empty();
             }
             optWorld = Optional.of(((Player) src).getWorld());
@@ -64,23 +60,24 @@ public class WeatherCommand implements CommandExecutor {
         }
 
         if (duration.get() < 1) {
-            builder.append(Texts.of("Weather duration must be at least 1 second!")).color(TextColors.RED);
-            src.sendMessage(builder.build());
+            src.sendMessage(Texts.of(TextColors.RED, "Weather duration must be at least 1 second!"));
             return CommandResult.empty();
         }
 
         World world = optWorld.get();
         if (!world.isLoaded()) {
-            builder.append(Texts.of("The specified world was not loaded!")).color(TextColors.RED);
-            src.sendMessage(Texts.of(builder.build()));
+            src.sendMessage(Texts.of(TextColors.RED, "The specified world was not loaded!"));
             return CommandResult.empty();
         }
 
         world.forecast(weather, duration.get() * 20);
 
-        builder.append(Texts.of("Changed weather state in " + world.getName() + " to: " + weather.getName() + '.'));
-        builder.color(TextColors.YELLOW);
-        src.sendMessage(builder.build());
+        src.sendMessage(
+                Texts.of(
+                        TextColors.YELLOW,
+                        "Changed weather state in " + world.getName() + " to: " + weather.getName() + '.'
+                )
+        );
 
         return CommandResult.success();
     }

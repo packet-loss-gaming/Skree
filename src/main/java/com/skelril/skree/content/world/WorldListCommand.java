@@ -26,11 +26,8 @@ public class WorldListCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        TextBuilder header = Texts.builder();
-        header.color(TextColors.GOLD);
-        header.append(Texts.of("Available worlds (click to teleport):"));
 
-        src.sendMessage(header.build());
+        src.sendMessage(Texts.of(TextColors.GOLD, "Available worlds (click to teleport):"));
 
         Optional<WorldService> service = game.getServiceManager().provide(WorldService.class);
 

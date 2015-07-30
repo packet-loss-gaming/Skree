@@ -59,7 +59,6 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.service.scheduler.Task;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
@@ -313,10 +312,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     }
 
                 } catch (Exception ex) {
-                    TextBuilder builder = Texts.builder().color(TextColors.RED).append(
-                            Texts.of("You find yourself unable to place that block.")
+                    player.sendMessage(
+                            /* ChatTypes.SYSTEM, */
+                            Texts.of(TextColors.RED, "You find yourself unable to place that block.")
                     );
-                    player.sendMessage(/* ChatTypes.SYSTEM, */builder.build());
                 }
             }
             event.setCancelled(true);

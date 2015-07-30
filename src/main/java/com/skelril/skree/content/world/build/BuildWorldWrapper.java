@@ -23,7 +23,6 @@ import org.spongepowered.api.event.block.BlockBreakEvent;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -107,10 +106,13 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                     }
 
                 } catch (Exception ex) {
-                    TextBuilder builder = Texts.builder().color(TextColors.RED).append(
-                            Texts.of("You find yourself unable to place that block.")
+                    player.sendMessage(
+                            /* ChatTypes.SYSTEM, */
+                            Texts.of(
+                                    TextColors.RED,
+                                    "You find yourself unable to place that block."
+                            )
                     );
-                    player.sendMessage(/* ChatTypes.SYSTEM, */builder.build());
                 }
             }
             event.setCancelled(true);

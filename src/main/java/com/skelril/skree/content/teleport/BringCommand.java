@@ -13,7 +13,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
@@ -37,8 +36,6 @@ public class BringCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        TextBuilder builder = Texts.builder();
-
         Vector3d dest;
         Vector3d rotation;
         Extent targetExtent;
@@ -49,9 +46,7 @@ public class BringCommand implements CommandExecutor {
             rotation = srcPlayer.getRotation();
             targetExtent = loc.getExtent();
         } else {
-            builder.append(Texts.of("You are not a player and teleporting other players is not currently supported!"));
-            builder.color(TextColors.RED);
-            src.sendMessage(Texts.of(builder.build()));
+            src.sendMessage(Texts.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
             return CommandResult.empty();
         }
 
@@ -66,9 +61,7 @@ public class BringCommand implements CommandExecutor {
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.add(0, 1, 0)), rotation);
 
-        builder.append(Texts.of("Player brought to you, my lord."));
-        builder.color(TextColors.YELLOW);
-        src.sendMessage(builder.build());
+        src.sendMessage(Texts.of(TextColors.YELLOW, "Player brought to you, my lord."));
 
         return CommandResult.success();
     }

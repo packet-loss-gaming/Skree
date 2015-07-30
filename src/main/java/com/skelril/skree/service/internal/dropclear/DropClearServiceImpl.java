@@ -101,38 +101,30 @@ public class DropClearServiceImpl implements DropClearService {
             @Override
             public void notifyCleanProgress(int times) {
                 TextBuilder builder = Texts.builder();
-                builder.color(TextColors.RED);
-                builder.append(Texts.of("Clearing drops in " + times + " seconds!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                builder.build()
+                                ChatTypes.CHAT,
+                                Texts.of(TextColors.RED, "Clearing drops in " + times + " seconds!")
                         )
                 );
             }
 
             @Override
             public void notifyCleanBeginning() {
-                TextBuilder builder = Texts.builder();
-                builder.color(TextColors.RED);
-                builder.append(Texts.of("Clearing drops!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                builder.build()
+                                ChatTypes.CHAT,
+                                Texts.of(TextColors.RED, "Clearing drops!")
                         )
                 );
             }
 
             @Override
             public void notifyCleanEnding() {
-                TextBuilder builder = Texts.builder();
-                builder.color(TextColors.GREEN);
-                builder.append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!"));
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
-                                ChatTypes.SYSTEM,
-                                builder.build()
+                                ChatTypes.CHAT,
+                                Texts.of(TextColors.GREEN, getLastProfile().getEntities().size() + " drops cleared!")
                         )
                 );
             }
@@ -143,26 +135,32 @@ public class DropClearServiceImpl implements DropClearService {
         return new EntityCleanupTask(world, checkedEntities) {
             @Override
             public void notifyCleanProgress(int times) {
-                TextBuilder builder = Texts.builder();
-                builder.color(TextColors.RED);
-                builder.append(Texts.of("Clearing drops of " + world.getName() + " in " + times + " seconds!"));
-                MessageSinks.toAll().sendMessage(builder.build());
+                MessageSinks.toAll().sendMessage(
+                        Texts.of(
+                                TextColors.RED,
+                                "Clearing drops of " + world.getName() + " in " + times + " seconds!"
+                        )
+                );
             }
 
             @Override
             public void notifyCleanBeginning() {
-                TextBuilder builder = Texts.builder();
-                builder.color(TextColors.RED);
-                builder.append(Texts.of("Clearing drops of " + world.getName() + "!"));
-                MessageSinks.toAll().sendMessage(builder.build());
+                MessageSinks.toAll().sendMessage(
+                        Texts.of(
+                                TextColors.RED,
+                                "Clearing drops of " + world.getName() + "!"
+                        )
+                );
             }
 
             @Override
             public void notifyCleanEnding() {
-                TextBuilder builder = Texts.builder();
-                builder.color(TextColors.GREEN);
-                builder.append(Texts.of(getLastProfile().getEntities().size() + " drops cleared!"));
-                MessageSinks.toAll().sendMessage(builder.build());
+                MessageSinks.toAll().sendMessage(
+                        Texts.of(
+                                TextColors.GREEN,
+                                getLastProfile().getEntities().size() + " drops cleared!"
+                        )
+                );
             }
         };
     }

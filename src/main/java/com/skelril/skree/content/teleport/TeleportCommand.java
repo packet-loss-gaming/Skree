@@ -13,7 +13,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
@@ -36,14 +35,11 @@ public class TeleportCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        TextBuilder builder = Texts.builder();
-
         Player target;
             if (src instanceof Player) {
             target = (Player) src;
         } else {
-            builder.append(Texts.of("You are not a player and teleporting other players is not currently supported!")).color(TextColors.RED);
-            src.sendMessage(Texts.of(builder.build()));
+            src.sendMessage(Texts.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
             return CommandResult.empty();
         }
 
@@ -70,9 +66,7 @@ public class TeleportCommand implements CommandExecutor {
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.get().add(0, 1, 0)), rotation);
 
-        builder.append(Texts.of("Teleported to " + destStr + '.'));
-        builder.color(TextColors.YELLOW);
-        src.sendMessage(builder.build());
+        src.sendMessage(Texts.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
 
         return CommandResult.success();
     }

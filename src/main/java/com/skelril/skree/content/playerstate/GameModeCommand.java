@@ -12,7 +12,6 @@ import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
@@ -45,10 +44,7 @@ public class GameModeCommand implements CommandExecutor {
         target.offer(data.setGameMode(mode));
         service.load(target, data.getGameMode().getId());
 
-        TextBuilder builder = Texts.builder();
-        builder.color(TextColors.YELLOW);
-        builder.append(Texts.of("Changed game mode to " + mode.getName() + '.'));
-        target.sendMessage(builder.build());
+        target.sendMessage(Texts.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
         return CommandResult.success();
     }
 
