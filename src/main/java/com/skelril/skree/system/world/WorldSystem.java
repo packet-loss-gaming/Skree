@@ -12,10 +12,12 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.world.WorldCommand;
 import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
+import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.DimensionTypes;
@@ -25,7 +27,7 @@ import org.spongepowered.api.world.WorldBuilder;
 
 import java.util.Random;
 
-public class WorldSystem {
+public class WorldSystem implements ServiceProvider<WorldService> {
 
     private static final String MAIN = "Main";
     private static final String BUILD = "Sion";
@@ -95,14 +97,20 @@ public class WorldSystem {
 
     private void initInstance(SkreePlugin plugin, Game game) {
         // Instance World
+        InstanceWorldWrapper wrapper = new InstanceWorldWrapper(plugin, game);
+
         Optional<World> curWorld = game.getServer().getWorld(INSTANCE);
         if (!curWorld.isPresent()) {
             curWorld = obtainFlatworld(game).name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false).build();
         }
 
         if (curWorld.isPresent()) {
-            // TODO Instance world wrapper
+            wrapper.addWorld(curWorld.get());
         }
+
+        // Instance wrapper reg
+        game.getEventManager().register(plugin, wrapper);
+        service.registerEffectWrapper(wrapper);
     }
 
     private void initWilderness(SkreePlugin plugin, Game game) {
@@ -150,4 +158,8 @@ public class WorldSystem {
         return builder.enabled(true).loadsOnStartup(true);
     }
 
+    @Override
+    public WorldService getService() {
+        return service;
+    }
 }
