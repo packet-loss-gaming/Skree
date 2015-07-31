@@ -11,6 +11,7 @@ import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.Location;
 
 import java.util.Collection;
 
@@ -39,7 +40,8 @@ public class ExampleInstance implements Zone {
 
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
-        return null;
+        player.setLocation(new Location(region.getExtent(), region.getMaximumPoint()));
+        return new Clause<>(player, ZoneStatus.ADDED);
     }
 
     @Override

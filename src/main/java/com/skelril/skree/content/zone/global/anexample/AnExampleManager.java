@@ -6,17 +6,32 @@
 
 package com.skelril.skree.content.zone.global.anexample;
 
+import com.skelril.nitro.Clause;
+import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
 
 public class AnExampleManager extends GlobalZoneManager<AnExampleInstance> {
+
+    private String name;
+
+    public AnExampleManager(String name) {
+        this.name = name;
+    }
+
     @Override
     public AnExampleInstance init(ZoneSpaceAllocator allocator) {
-        return new AnExampleInstance();
+        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
+        ZoneRegion region = result.getKey();
+
+        AnExampleInstance instance = new AnExampleInstance(region);
+        instance.init();
+
+        return instance;
     }
 
     @Override
     public String getName() {
-        return "An Example";
+        return name;
     }
 }
