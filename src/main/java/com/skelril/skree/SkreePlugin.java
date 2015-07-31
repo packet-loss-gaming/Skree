@@ -18,6 +18,7 @@ import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
+import com.skelril.skree.system.zone.ZoneSystem;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.state.PreInitializationEvent;
@@ -81,7 +82,8 @@ public class SkreePlugin {
                 ShutdownSystem.class,
                 TeleportSystem.class,
                 WorldSystem.class,
-                WeatherCommandSystem.class
+                WeatherCommandSystem.class,
+                ZoneSystem.class
         );
 
         for (Class<?> entry : initialized) {

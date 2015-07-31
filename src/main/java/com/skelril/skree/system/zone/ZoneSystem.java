@@ -6,24 +6,71 @@
 
 package com.skelril.skree.system.zone;
 
+import com.google.common.base.Optional;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.world.World;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.zone.ZoneMeCommand;
+import com.skelril.skree.content.zone.global.anexample.AnExampleManager;
+import com.skelril.skree.content.zone.group.example.ExampleManager;
+import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
+import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.world.World;
 
 import java.io.File;
+import java.util.Arrays;
 
-public class ZoneSystem {
+public class ZoneSystem implements ServiceProvider<ZoneService> {
 
     private ZoneService service;
 
     public ZoneSystem(SkreePlugin plugin, Game game) {
-        WorldEdit worldEdit = WorldEdit.getInstance();
-        File baseDir = null;
-        World world = null;
-        service = new ZoneServiceImpl(new ChainPlacementAllocator(baseDir, world));
+        game.getScheduler().getTaskBuilder().delay(15 * 20).execute(
+                () -> {
+                    System.out.println("Starting zone system...");
+                    initialize(plugin, game);
+                }
+        ).submit(plugin);
+    }
+
+    private void initialize(SkreePlugin plugin, Game game) {
+        // TODO this is a very dumb way of doing this
+        Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
+        if (!optService.isPresent()) {
+            game.getScheduler().getTaskBuilder().delay(1).execute(() -> initialize(plugin, game)).submit(plugin);
+            return;
+        }
+
+
+        World world = optService.get().getEffectWrapper("Instance").getWorlds().iterator().next();
+        WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
+
+        File targetDir = new File("./mods/skree/zones/");
+        targetDir.mkdirs();
+
+        service = new ZoneServiceImpl(new ChainPlacementAllocator(targetDir, instWorldResolver));
+        for (String name : Arrays.asList("CursedMine")) {
+            service.registerManager(new AnExampleManager(name));
+        }
+        for (String name : Arrays.asList("Catacombs", "FreakyFour", "GoldRush", "PatientX", "ShnugglesPrime")) {
+            service.registerManager(new ExampleManager(name));
+        }
+        game.getCommandDispatcher().register(plugin, ZoneMeCommand.aquireSpec(service), "zoneme");
+
+        try {
+            game.getServiceManager().setProvider(plugin, ZoneService.class, service);
+        } catch (ProviderExistsException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public ZoneService getService() {
+        return service;
     }
 }
