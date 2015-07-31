@@ -10,10 +10,11 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.dropclear.DropClearCommand;
 import com.skelril.skree.service.DropClearService;
 import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 
-public class DropClearSystem {
+public class DropClearSystem implements ServiceProvider<DropClearService> {
 
     private DropClearService service;
 
@@ -32,5 +33,10 @@ public class DropClearSystem {
         game.getScheduler().getTaskBuilder().execute(
                 () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
         ).interval(10).submit(plugin);
+    }
+
+    @Override
+    public DropClearService getService() {
+        return service;
     }
 }

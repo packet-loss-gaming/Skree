@@ -10,10 +10,11 @@ import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.modifier.mysql.lazy.LazyMySQLModifierService;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 
-public class ModifierSystem {
+public class ModifierSystem implements ServiceProvider<ModifierService> {
 
     private ModifierService service;
 
@@ -31,6 +32,7 @@ public class ModifierSystem {
         }
     }
 
+    @Override
     public ModifierService getService() {
         return service;
     }

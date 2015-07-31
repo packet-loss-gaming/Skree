@@ -10,11 +10,12 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.playerstate.GameModeCommand;
 import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.PlayerStateServiceImpl;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.command.CommandService;
 
-public class PlayerStateSystem {
+public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
 
     private PlayerStateService service;
 
@@ -36,6 +37,7 @@ public class PlayerStateSystem {
         }
     }
 
+    @Override
     public PlayerStateService getService() {
         return service;
     }
