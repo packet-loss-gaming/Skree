@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'com.sk89q', name: 'worldedit', version: '6.+'
+    compile group: 'com.sk89q.worldedit', name: 'worldedit-forge-mc1.8', version: '6.1.1-SNAPSHOT'
     compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
 }
 
