@@ -18,8 +18,8 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.WorldData;
+import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 
@@ -54,12 +54,12 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
         }
     }
 
-    public ZoneRegion pasteAt(World world, Vector3i origin, String managerName) {
-        EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+    public ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName) {
+        EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
 
         Operation operation;
         try {
-            ClipboardHolder holder = getHolder(managerName, world.getWorldData());
+            ClipboardHolder holder = getHolder(managerName, world.getWorldEditWorld().getWorldData());
             Region clipReg = holder.getClipboard().getRegion();
             holder.getClipboard().setOrigin(clipReg.getMinimumPoint());
             operation = holder
@@ -71,7 +71,7 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
             Vector dimensions = holder.getClipboard().getDimensions();
 
-            return new ZoneRegion(origin, new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ()));
+            return new ZoneRegion(world.getSpongeWorld(), origin, new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ()));
         } catch (IOException | MaxChangedBlocksException e) {
             e.printStackTrace();
             transaction.undo(transaction);
