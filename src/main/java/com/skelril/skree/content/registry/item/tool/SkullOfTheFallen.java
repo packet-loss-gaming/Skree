@@ -17,7 +17,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
@@ -60,13 +59,6 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
-            // TODO remove workaround depends on (Sponge #260)
-            // BEGIN WORKAROUND
-            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getBlockType() == BlockTypes.LOG) {
-                return;
-            }
-            // END WORKAROUND
-
             Player player = event.getEntity();
             Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
 

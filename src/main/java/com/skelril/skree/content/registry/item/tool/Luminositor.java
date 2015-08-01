@@ -13,7 +13,6 @@ import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
@@ -47,13 +46,6 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
         // TODO needs right click support
         if (event.getInteractionType() == EntityInteractionTypes.USE) {
-            // TODO remove workaround depends on (Sponge #260)
-            // BEGIN WORKAROUND
-            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getBlockType() == BlockTypes.LOG) {
-                return;
-            }
-            // END WORKAROUND
-
             Player player = event.getEntity();
             //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
             Optional<ItemStack> optHeldItem = player.getItemInHand();
