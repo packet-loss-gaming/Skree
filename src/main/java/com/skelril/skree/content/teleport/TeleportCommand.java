@@ -60,8 +60,30 @@ public class TeleportCommand implements CommandExecutor {
 
         Optional<GameModeData> data = target.getData(GameModeData.class);
         if (!data.isPresent() || !(data.get().getGameMode() == GameModes.CREATIVE || data.get().getGameMode() == GameModes.SPECTATOR)) {
+            //make sure no lava/fire is at the targets destination
+            dest = Optional.of(dest.get().add(0, 2, 0));
+
+            while (dest.get().getFloorY() > 0) {
+                dest = Optional.of(dest.get().add(0, -1, 0));
+
+                if (!(targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR))) {
+                    if (targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.LAVA) || targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.FLOWING_LAVA) || targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.FIRE)) {
+                        src.sendMessage(Texts.of(TextColors.RED, "My lord, thou would burn thy feet teleporting here!"));
+                        return CommandResult.empty();
+                    }
+                    break;
+                }
+            }
+            dest = Optional.of(target.getLocation().getPosition());
+
+            //make sure target doesn't fall
             while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR)) {
                 dest = Optional.of(dest.get().add(0, -1, 0));
+            }
+
+            //make sure target doesn't suffocate
+            while (!(targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR) && dest.get().getFloorY() < 255)) {
+                dest = Optional.of(dest.get().add(0, 1, 0));
             }
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.get().add(0, 1, 0)), rotation);

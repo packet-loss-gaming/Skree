@@ -55,8 +55,29 @@ public class BringCommand implements CommandExecutor {
 
         Optional<GameModeData> data = target.getData(GameModeData.class);
         if (!data.isPresent() || !(data.get().getGameMode() == GameModes.CREATIVE || data.get().getGameMode() == GameModes.SPECTATOR)) {
+            //make sure no lava/fire is at the targets destination
+            dest = dest.add(0, 2, 0);
+            while (dest.getFloorY() > 0) {
+                dest = dest.add(0, -1, 0);
+
+                if (!(targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.AIR))) {
+                    if (targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.LAVA) || targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.FLOWING_LAVA) || targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.FIRE)) {
+                        src.sendMessage(Texts.of(TextColors.RED, "My lord, thou would burn thy feet teleporting here!"));
+                        return CommandResult.empty();
+                    }
+                    break;
+                }
+            }
+            dest = ((Player) src).getLocation().getPosition();
+
+            //make sure target doesn't fall
             while (dest.getFloorY() > 0 && targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.AIR)) {
                 dest = dest.add(0, -1, 0);
+            }
+
+            //make sure target doesn't suffocate
+            while (!(targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.AIR) && dest.getFloorY() < 255)) {
+                dest = dest.add(0, 1, 0);
             }
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.add(0, 1, 0)), rotation);
