@@ -394,7 +394,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                 1,
                                 (((float) timesL / times) * .6F) + ((float) 1 / times)
                         ),
-                        2
+                        1
                 );
                 return super.run(timesL);
             }
