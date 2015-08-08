@@ -28,9 +28,6 @@ import org.spongepowered.api.world.Location;
 import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RAW_GOD_FISH;
 
-/**
- * Created by cow_fu on 7/11/15 at 7:02 PM
- */
 public class ArrowFishingHandler {
     private static WorldFromExtent toWorld = new WorldFromExtent();
 
