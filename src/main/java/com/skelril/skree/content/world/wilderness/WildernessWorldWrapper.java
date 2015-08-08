@@ -7,6 +7,7 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.droptable.DropTable;
@@ -51,10 +52,10 @@ import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
 import org.spongepowered.api.event.entity.EntityBreakBlockEvent;
-import org.spongepowered.api.event.entity.EntityExplosionEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.event.entity.living.LivingDeathEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
+import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -268,13 +269,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Subscribe
-    public void onExplode(EntityExplosionEvent event) {
-        Location origin = event.getExplosionLocation();
-        if (!isApplicable(origin.getExtent())) return;
+    public void onExplode(WorldOnExplosionEvent event) {
+        World world = event.getWorld();
+        if (!isApplicable(world)) return;
 
-        event.setYield(Probability.getRangedRandom(event.getYield(), 100));
-
-        for (Location loc : event.getBlocks()) {
+        for (Vector3i pos : event.getAffectedBlockPositions()) {
+            Location loc = new Location(world, pos);
             BlockType type = loc.getBlockType();
             if (ore().contains(type)) {
                 addPool(loc, 0, false);
