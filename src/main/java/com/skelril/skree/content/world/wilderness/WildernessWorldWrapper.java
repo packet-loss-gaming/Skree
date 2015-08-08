@@ -22,6 +22,7 @@ import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
+import com.skelril.nitro.registry.block.MultiTypeRegistry;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
@@ -34,7 +35,6 @@ import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.AttributeData;
 import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
@@ -362,7 +362,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
-        if (!hasSilkTouch && (blockType == BlockTypes.REDSTONE_ORE || blockType == BlockTypes.LIT_REDSTONE_ORE)) {
+        if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
             return Lists.newArrayList(game.getRegistry().getItemBuilder().itemType((ItemType) RED_SHARD).build());
         }
         return DropRegistry.createDropsFor(game, blockType, hasSilkTouch);

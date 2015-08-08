@@ -49,7 +49,7 @@ public class DropRegistry {
                 return Lists.newArrayList(builder.itemType(ItemTypes.DYE).itemData(data).quantity(
                                                   Probability.getRangedRandom(4, 8)
                                           ).build());
-            } else if (type == BlockTypes.REDSTONE_ORE || type == BlockTypes.LIT_REDSTONE_ORE) {
+            } else if (MultiTypeRegistry.isRedstoneOre(type)) {
                 return Lists.newArrayList(builder.itemType(ItemTypes.REDSTONE).quantity(Probability.getRangedRandom(4, 5)).build());
             } else if (type == BlockTypes.DIAMOND_ORE) {
                 return Lists.newArrayList(builder.itemType(ItemTypes.DIAMOND).build());
