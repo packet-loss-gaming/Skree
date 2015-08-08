@@ -13,6 +13,7 @@ import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.BloodDiamond;
+import com.skelril.skree.content.registry.item.generic.RedShard;
 import com.skelril.skree.content.registry.item.generic.SeaCrystal;
 import com.skelril.skree.content.registry.item.tool.Luminositor;
 import com.skelril.skree.content.registry.item.tool.SkullOfTheFallen;
@@ -47,6 +48,9 @@ public class CustomItemTypes {
     /* Gems */
     public static final BloodDiamond BLOOD_DIAMOND = new BloodDiamond();
     public static final SeaCrystal SEA_CRYSTAL = new SeaCrystal();
+
+    /* Resources */
+    public static final RedShard RED_SHARD = new RedShard();
 
     /* Food */
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();

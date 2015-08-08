@@ -33,6 +33,7 @@ import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.AttributeData;
 import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
 import org.spongepowered.api.data.manipulator.entity.HealthData;
@@ -72,6 +73,7 @@ import java.util.WeakHashMap;
 
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_SHARD;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
@@ -359,11 +361,18 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return modifier;
     }
 
+    public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
+        if (!hasSilkTouch && (blockType == BlockTypes.REDSTONE_ORE || blockType == BlockTypes.LIT_REDSTONE_ORE)) {
+            return Lists.newArrayList(game.getRegistry().getItemBuilder().itemType((ItemType) RED_SHARD).build());
+        }
+        return DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
+    }
+
     private void addPool(Location block, int fortune, boolean hasSilkTouch) {
 
         BlockType blockType = block.getBlockType();
 
-        Collection<ItemStack> generalDrop = DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
+        Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
         if (DropRegistry.dropsSelf(blockType)) {
             fortune = 0;
         }
@@ -385,14 +394,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                 1,
                                 (((float) timesL / times) * .6F) + ((float) 1 / times)
                         ),
-                        0
+                        2
                 );
                 return super.run(timesL);
             }
 
             @Override
             public void end() {
-                getWorld().playSound(SoundTypes.BLAZE_BREATH, getPos(), .2F, 0);
+                getWorld().playSound(SoundTypes.BLAZE_DEATH, getPos(), .2F, 0);
             }
         };
 
