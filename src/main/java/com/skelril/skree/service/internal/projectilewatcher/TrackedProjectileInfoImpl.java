@@ -5,9 +5,6 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.world.Location;
 
-/**
- * Created by cow_fu on 7/11/15 at 7:32 PM
- */
 public class TrackedProjectileInfoImpl implements TrackedProjectileInfo {
     private final Projectile projectile;
     private final Optional<ProjectileSource> source;

@@ -16,18 +16,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Created by cow_fu on 7/11/15 at 7:12 PM
- */
 public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, Runnable {
+    private final SkreePlugin plugin;
+    private final Game game;
+
     private Map<UUID, TrackedProjectileInfo> watched = new HashMap<>();
     private Optional<Task> task = Optional.absent();
-    private final Game game;
-    private final SkreePlugin plugin;
 
-    public ProjectileWatcherServiceImpl(Game game, SkreePlugin plugin) {
-        this.game = game;
+    public ProjectileWatcherServiceImpl(SkreePlugin plugin, Game game) {
         this.plugin = plugin;
+        this.game = game;
     }
 
     @Subscribe

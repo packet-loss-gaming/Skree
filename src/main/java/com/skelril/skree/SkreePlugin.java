@@ -9,9 +9,11 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
+import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
@@ -76,8 +78,10 @@ public class SkreePlugin {
 
     private void registerPrimaryServerSystems() {
         ImmutableList<Class> initialized = ImmutableList.of(
+                ArrowFishingSystem.class,
                 DropClearSystem.class,
                 ModifierSystem.class,
+                ProjectileWatcherSystem.class,
                 PlayerStateSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
