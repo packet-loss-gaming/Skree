@@ -59,7 +59,6 @@ import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -72,6 +71,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_SHARD;
@@ -95,7 +95,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         this.plugin = plugin;
         this.game = game;
 
-        ItemStackBuilder builder = game.getRegistry().getItemBuilder();
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.ADD);
         dropTable = new MasterDropTable(
                 slipRoller,
@@ -103,7 +102,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
-                                        new DropTableEntryImpl(new CofferResolver(game, 10), 12)
+                                        new DropTableEntryImpl(new CofferResolver(10), 12)
                                 )
                         ),
                         new DropTableImpl(
@@ -112,7 +111,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                builder.reset().itemType((ItemType) RED_FEATHER).quantity(1).build()
+                                                                newItemStack((ItemType) RED_FEATHER)
                                                         )
                                                 ), 100000
                                         )
@@ -363,7 +362,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
         if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
-            return Lists.newArrayList(game.getRegistry().getItemBuilder().itemType((ItemType) RED_SHARD).build());
+            return Lists.newArrayList(newItemStack((ItemType) RED_SHARD));
         }
         return DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
     }

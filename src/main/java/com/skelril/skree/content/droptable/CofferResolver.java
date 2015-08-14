@@ -11,65 +11,49 @@ import com.skelril.nitro.droptable.resolver.point.SimplePointDropResolver;
 import com.skelril.nitro.droptable.resolver.point.SimplePointValue;
 import com.skelril.nitro.modifier.ModifierFunction;
 import com.skelril.nitro.modifier.ModifierFunctions;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.item.ItemType;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
 public class CofferResolver extends SimplePointDropResolver {
-    public CofferResolver(Game game, int maxCoffers) {
-        this(game, maxCoffers, ModifierFunctions.MULTI);
+    public CofferResolver(int maxCoffers) {
+        this(maxCoffers, ModifierFunctions.MULTI);
     }
 
-    public CofferResolver(Game game, int maxCoffers, ModifierFunction modifierFunction) {
+    public CofferResolver(int maxCoffers, ModifierFunction modifierFunction) {
         super(
                 Lists.newArrayList(
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) TESTRIL).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) TESTRIL)),
                                 TESTRIL.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) AQUIS).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) AQUIS)),
                                 AQUIS.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) MARSINCO).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) MARSINCO)),
                                 MARSINCO.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) POSTRE).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) POSTRE)),
                                 POSTRE.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) EQESTA).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) EQESTA)),
                                 EQESTA.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) REDISTRAL).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) REDISTRAL)),
                                 REDISTRAL.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) RETESRUM).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) RETESRUM)),
                                 RETESRUM.getCofferValue()
                         ),
                         new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) MESARDITH).build()
-                                ),
+                                Lists.newArrayList(newItemStack((ItemType) MESARDITH)),
                                 MESARDITH.getCofferValue()
                         )
                 ),

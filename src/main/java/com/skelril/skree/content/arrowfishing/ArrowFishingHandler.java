@@ -15,16 +15,15 @@ import com.skelril.nitro.registry.block.MultiTypeRegistry;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.projectilewatcher.ProjectileTickEvent;
 import com.skelril.skree.service.internal.projectilewatcher.TrackedProjectileInfo;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.projectile.Arrow;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.world.Location;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RAW_GOD_FISH;
 
@@ -33,8 +32,7 @@ public class ArrowFishingHandler {
 
     private DropTable dropTable;
 
-    public ArrowFishingHandler(Game game) {
-        ItemStackBuilder builder = game.getRegistry().getItemBuilder();
+    public ArrowFishingHandler() {
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.MULTI);
         dropTable = new DropTableImpl(
                 slipRoller,
@@ -42,7 +40,7 @@ public class ArrowFishingHandler {
                         new DropTableEntryImpl(
                                 new SimpleDropResolver(
                                         Lists.newArrayList(
-                                                builder.reset().itemType(ItemTypes.FISH).quantity(1).build()
+                                                newItemStack(ItemTypes.FISH)
                                         )
                                 ),
                                 32
@@ -50,7 +48,7 @@ public class ArrowFishingHandler {
                         new DropTableEntryImpl(
                                 new SimpleDropResolver(
                                         Lists.newArrayList(
-                                                builder.reset().itemType((ItemType) RAW_GOD_FISH).quantity(1).build()
+                                                newItemStack((ItemType) RAW_GOD_FISH)
                                         )
                                 ),
                                 500

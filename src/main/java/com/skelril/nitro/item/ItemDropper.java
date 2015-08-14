@@ -13,10 +13,11 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class ItemDropper {
 
@@ -32,12 +33,10 @@ public class ItemDropper {
 
     public void dropItems(Collection<ItemStack> stacks) {
         for (ItemStack stack : stacks) {
-            ItemStackBuilder builder = game.getRegistry().getItemBuilder().fromItemStack(stack);
-
             Optional<Entity> optEntity = world.createEntity(EntityTypes.DROPPED_ITEM, pos);
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
-                item.offer(item.getItemData().setValue(builder.build()));
+                item.offer(item.getItemData().setValue(newItemStack(stack)));
                 // item.offer(item.getData(VelocityData.class).get().setValue(new Vector3d(random.nextFloat() % 1, random.nextFloat() % 1, random.nextFloat() % 1)));
                 world.spawnEntity(item);
             }

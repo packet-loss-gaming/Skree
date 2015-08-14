@@ -12,7 +12,7 @@ import org.spongepowered.api.Game;
 
 public class ArrowFishingSystem {
     public ArrowFishingSystem(SkreePlugin plugin, Game game) {
-        ArrowFishingHandler fishing = new ArrowFishingHandler(game);
+        ArrowFishingHandler fishing = new ArrowFishingHandler();
         game.getEventManager().register(plugin, fishing);
     }
 }

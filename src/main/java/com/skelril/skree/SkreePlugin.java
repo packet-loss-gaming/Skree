@@ -9,6 +9,7 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
@@ -45,6 +46,9 @@ public class SkreePlugin {
 
     @Subscribe
     public void onPreInit(PreInitializationEvent event) {
+        // Handle utility hooks early on
+        new ItemStackFactory(event.getGame());
+
         customItemSystem = new CustomItemSystem(this, game);
         customItemSystem.preInit();
 
