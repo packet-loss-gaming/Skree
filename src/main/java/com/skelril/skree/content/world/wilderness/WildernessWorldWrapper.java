@@ -9,6 +9,7 @@ package com.skelril.skree.content.world.wilderness;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.skelril.nitro.data.util.AttributeUtil;
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
@@ -145,13 +146,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 entity.offer(healthData);
             }
 
-//            Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
-//            if (attributeData.isPresent()) {
-//                AttributeData attributes = attributeData.get();
-//                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, getDamageMod(level));
-//
-//                entity.offer(attributes);
-//            }
+            AttributeUtil.setGenericAttackDamage(
+                    entity,
+                    getDamageMod(level) * AttributeUtil.getGenericAttackDamage(entity)
+            );
         }
 
         Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
