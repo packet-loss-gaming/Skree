@@ -10,8 +10,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.manipulator.entity.GameModeData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -58,10 +60,15 @@ public class TeleportCommand implements CommandExecutor {
             destStr = player.getName();
         }
 
-        Optional<GameModeData> data = target.getData(GameModeData.class);
-        if (!data.isPresent() || !(data.get().getGameMode() == GameModes.CREATIVE || data.get().getGameMode() == GameModes.SPECTATOR)) {
-            while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR)) {
-                dest = Optional.of(dest.get().add(0, -1, 0));
+        Optional<Value<GameMode>> data = target.getValue(Keys.GAME_MODE);
+        if (!data.isPresent()) {
+            GameMode gameMode = data.get().get();
+            if (!(gameMode.equals(GameModes.CREATIVE) || gameMode.equals(GameModes.SPECTATOR))) {
+                while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(
+                        BlockTypes.AIR
+                )) {
+                    dest = Optional.of(dest.get().add(0, -1, 0));
+                }
             }
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.get().add(0, 1, 0)), rotation);

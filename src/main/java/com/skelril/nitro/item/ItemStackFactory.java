@@ -7,7 +7,7 @@
 package com.skelril.nitro.item;
 
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.DataManipulator;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -23,19 +23,19 @@ public class ItemStackFactory {
         return newItemStack(type, 1);
     }
 
-    public static ItemStack newItemStack(ItemType type, DataManipulator<?> data) {
+    public static ItemStack newItemStack(ItemType type, DataManipulator<?, ?> data) {
         return newItemStack(type, data, 1);
     }
 
     public static ItemStack newItemStack(ItemType type, int quantity) {
-        return game.getRegistry().getItemBuilder().itemType(type).quantity(quantity).build();
+        return game.getRegistry().createItemBuilder().itemType(type).quantity(quantity).build();
     }
 
-    public static ItemStack newItemStack(ItemType type, DataManipulator<?> data, int quantity) {
-        return game.getRegistry().getItemBuilder().itemType(type).quantity(quantity).itemData(data).build();
+    public static ItemStack newItemStack(ItemType type, DataManipulator<?, ?> data, int quantity) {
+        return game.getRegistry().createItemBuilder().itemType(type).quantity(quantity).itemData(data).build();
     }
 
     public static ItemStack newItemStack(ItemStack itemStack) {
-        return game.getRegistry().getItemBuilder().fromItemStack(itemStack).build();
+        return game.getRegistry().createItemBuilder().fromItemStack(itemStack).build();
     }
 }

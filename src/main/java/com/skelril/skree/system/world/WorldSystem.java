@@ -154,7 +154,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
     }
 
     private WorldBuilder obtainAutoloadingWorld(Game game) {
-        WorldBuilder builder = game.getRegistry().getWorldBuilder().reset();
+        WorldBuilder builder = game.getRegistry().createWorldBuilder().reset();
         return builder.enabled(true).loadsOnStartup(true);
     }
 

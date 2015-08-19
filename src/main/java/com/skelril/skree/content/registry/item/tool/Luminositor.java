@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
+import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -54,7 +55,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
                 if (this.equals(optHeldItem.get().getItem())) {
                     Location pLoc = player.getLocation();
 
-                    int lightLevel = pLoc.getLuminance();
+                    int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
 
                     TextColor color;
                     if (lightLevel >= 12) {

@@ -7,9 +7,9 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
 import com.skelril.nitro.droptable.DropTableImpl;
@@ -33,12 +33,11 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.manipulator.AttributeData;
-import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
-import org.spongepowered.api.data.manipulator.entity.HealthData;
-import org.spongepowered.api.data.manipulator.item.EnchantmentData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -62,7 +61,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.text.title.TitleBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -120,7 +119,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 )
         );
 
-        game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
+        game.getScheduler().createTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
     }
 
     @Subscribe
@@ -133,43 +132,41 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         final int level = getLevel(loc);
 
         if (entity instanceof Monster && level > 1) {
-            Optional<HealthData> healthData = entity.getData(HealthData.class);
-            if (healthData.isPresent()) {
-                HealthData health = healthData.get();
-                final double max = health.getMaxHealth();
+            HealthData healthData = ((Monster) entity).getHealthData();
+            double curMax = healthData.maxHealth().get();
 
-                if (max <= 80) { // TODO do this a better way, but for now it prevents super mobs
+            if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                    double newMax = max * getHealthMod(level);
+                double newMax = curMax * getHealthMod(level);
 
-                    health.setMaxHealth(newMax);
-                    health.setHealth(newMax);
+                healthData.set(Keys.MAX_HEALTH, newMax);
+                healthData.set(Keys.HEALTH, newMax);
 
-                    entity.offer(health);
-                }
+                entity.offer(healthData);
             }
 
-            Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
-            if (attributeData.isPresent()) {
-                AttributeData attributes = attributeData.get();
-                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, getDamageMod(level));
-
-                entity.offer(attributes);
-            }
+//            Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
+//            if (attributeData.isPresent()) {
+//                AttributeData attributes = attributeData.get();
+//                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, getDamageMod(level));
+//
+//                entity.offer(attributes);
+//            }
         }
 
-        Optional<ExplosiveRadiusData> explosiveData = event.getEntity().getData(ExplosiveRadiusData.class);
+        Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
 
-        if (explosiveData.isPresent()) {
-            ExplosiveRadiusData explosive = explosiveData.get();
-            float min = explosive.getExplosionRadius();
-            explosive.setExplosionRadius(
-                    (int) Math.min(
+        if (optExplosiveRadius.isPresent()) {
+            Value<Integer> explosiveRadius = optExplosiveRadius.get();
+            int min = explosiveRadius.get();
+
+            entity.offer(
+                    Keys.EXPLOSIVE_RADIUS,
+                    Math.min(
                             entity instanceof Fireball ? 4 : 9,
                             Math.max(min, (min + level) / 2)
                     )
             );
-            entity.offer(explosive);
         }
     }
 
@@ -187,7 +184,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     level,
                     getDropMod(
                             level,
-                            ((Monster) entity).getHealthData().getMaxHealth()
+                            ((Monster) entity).getHealthData().maxHealth().get()
                     )
             );
 
@@ -213,7 +210,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Subscribe
     public void onBlockBreak(EntityBreakBlockEvent event) {
-        Location loc = event.getBlock();
+        Location loc = event.getLocation();
         if (!isApplicable(loc.getExtent())) return;
 
         BlockType type = loc.getBlockType();
@@ -239,21 +236,22 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                             }
                         }
 
-                        Optional<EnchantmentData> optEnchantData = stack.getData(EnchantmentData.class);
-                        if (optEnchantData.isPresent()) {
-                            EnchantmentData enchantmentData = optEnchantData.get();
+                        // Handle fortune
+                        Optional<ItemEnchantment> optFortune = EnchantmentUtil.getHighestEnchantment(
+                                stack,
+                                Enchantments.FORTUNE
+                        );
+                        if (optFortune.isPresent()) {
+                            fortuneMod = optFortune.get().getLevel();
+                        }
 
-                            // Handle fortune
-                            Optional<Integer> optFortune = enchantmentData.get(Enchantments.FORTUNE);
-                            if (optFortune.isPresent()) {
-                                fortuneMod = optFortune.get();
-                            }
-
-                            // Handle silk touch
-                            Optional<Integer> optSilkTouch = enchantmentData.get(Enchantments.SILK_TOUCH);
-                            if (optSilkTouch.isPresent()) {
-                                silkTouch = true;
-                            }
+                        // Handle silk touch
+                        Optional<ItemEnchantment> optSilkTouch = EnchantmentUtil.getHighestEnchantment(
+                                stack,
+                                Enchantments.SILK_TOUCH
+                        );
+                        if (optSilkTouch.isPresent()) {
+                            silkTouch = true;
                         }
                     } else if (entity instanceof Player) {
                         break orePool;
@@ -272,8 +270,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         World world = event.getWorld();
         if (!isApplicable(world)) return;
 
-        for (Vector3i pos : event.getAffectedBlockPositions()) {
-            Location loc = new Location(world, pos);
+        for (Location loc : event.getLocations()) {
             BlockType type = loc.getBlockType();
             if (ore().contains(type)) {
                 addPool(loc, 0, false);
@@ -283,7 +280,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Subscribe
     public void onBlockPlace(BlockPlaceEvent event) {
-        Location loc = event.getBlock();
+        Location loc = event.getLocation();
         if (!isApplicable(loc.getExtent())) return;
         if (ore().contains(loc.getBlockType())) {
 
@@ -291,7 +288,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
                 // Allow creative mode players to still place blocks
-                if (player.getGameModeData().getGameMode() == GameModes.CREATIVE) {
+                if (player.getValue(Keys.GAME_MODE).get().get().equals(GameModes.CREATIVE)) {
                     return;
                 }
 
@@ -299,7 +296,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     Vector3d origin = loc.getPosition();
                     World world = toWorld.from(loc.getExtent());
                     for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().getParticleEffectBuilder(
+                        ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
                                 ParticleTypes.CRIT_MAGIC
                         ).motion(
                                 new Vector3d(
@@ -405,7 +402,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
-        Task task = game.getScheduler().getTaskBuilder().execute(runnable).delay(1, SECONDS).interval(
+        Task task = game.getScheduler().createTaskBuilder().execute(runnable).delay(1, SECONDS).interval(
                 1,
                 SECONDS
         ).submit(plugin);
@@ -420,15 +417,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {
                     ((Player) entity).sendTitle(
-                            new Title(
-                                    Texts.of("Wilderness Level"),
-                                    Texts.of(currentLevel),
-                                    20,
-                                    0,
-                                    20,
-                                    false,
-                                    false
-                            )
+                            new TitleBuilder()
+                                    .title(Texts.of("Wilderness Level"))
+                                    .subtitle(Texts.of(currentLevel))
+                                    .fadeIn(20)
+                                    .fadeOut(20)
+                                    .build()
                     );
                     playerLevelMap.put((Player) entity, currentLevel);
                 }

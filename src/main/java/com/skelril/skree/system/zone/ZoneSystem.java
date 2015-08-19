@@ -30,7 +30,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
     private ZoneService service;
 
     public ZoneSystem(SkreePlugin plugin, Game game) {
-        game.getScheduler().getTaskBuilder().delay(15 * 20).execute(
+        game.getScheduler().createTaskBuilder().delay(15 * 20).execute(
                 () -> {
                     System.out.println("Starting zone system...");
                     initialize(plugin, game);
@@ -42,7 +42,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
         // TODO this is a very dumb way of doing this
         Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
         if (!optService.isPresent()) {
-            game.getScheduler().getTaskBuilder().delay(1).execute(() -> initialize(plugin, game)).submit(plugin);
+            game.getScheduler().createTaskBuilder().delay(1).execute(() -> initialize(plugin, game)).submit(plugin);
             return;
         }
 

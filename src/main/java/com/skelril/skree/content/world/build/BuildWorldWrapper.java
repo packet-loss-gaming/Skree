@@ -12,15 +12,16 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.entity.living.animal.Chicken;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockBreakEvent;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
+import org.spongepowered.api.event.entity.EntityInteractEntityEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.text.Texts;
@@ -56,16 +57,26 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
         if (event.getEntity() instanceof Monster) {
             event.setCancelled(true);
         }
+    }
 
-        // TODO remove this hack which prevents evil chicken spawning
-        if (event.getEntity() instanceof Chicken && event.getLocation().getLuminance() <= 8) {
+
+    @Subscribe
+    public void onEntityAttack(EntityInteractEntityEvent event) {
+        if (!isApplicable(event.getTargetEntity().getWorld())) return;
+
+        if (!(event.getEntity() instanceof Player) && event.getTargetEntity() instanceof Player) {
+            // This condition prevents a potential bug abuse by disallowing cross world removal
+            // while still protecting the player from damage
+            if (isApplicable(event.getEntity().getWorld())) {
+                event.getEntity().remove();
+            }
             event.setCancelled(true);
         }
     }
 
     @Subscribe
     public void onBlockBreak(BlockBreakEvent event) {
-        Location block = event.getBlock();
+        Location block = event.getLocation();
         if (!isApplicable(block.getExtent())) return;
 
         if (ore().contains(block.getBlockType())) {
@@ -76,7 +87,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Subscribe
     public void onBlockPlace(BlockPlaceEvent event) {
-        Location loc = event.getBlock();
+        Location loc = event.getLocation();
         if (!isApplicable(loc.getExtent())) return;
         if (ore().contains(loc.getBlockType())) {
 
@@ -84,7 +95,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
                 // Allow creative mode players to still place blocks
-                if (player.getGameModeData().getGameMode() == GameModes.CREATIVE) {
+                if (player.getValue(Keys.GAME_MODE) == GameModes.CREATIVE) {
                     return;
                 }
 
@@ -92,7 +103,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                     Vector3d origin = loc.getPosition();
                     World world = toWorld.from(loc.getExtent());
                     for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().getParticleEffectBuilder(
+                        ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
                                 ParticleTypes.CRIT_MAGIC
                         ).motion(
                                 new Vector3d(

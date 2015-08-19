@@ -10,8 +10,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.manipulator.entity.GameModeData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -53,10 +55,15 @@ public class BringCommand implements CommandExecutor {
 
         Player target = args.<Player>getOne("target").get();
 
-        Optional<GameModeData> data = target.getData(GameModeData.class);
-        if (!data.isPresent() || !(data.get().getGameMode() == GameModes.CREATIVE || data.get().getGameMode() == GameModes.SPECTATOR)) {
-            while (dest.getFloorY() > 0 && targetExtent.getBlock(dest.toInt()).getType().equals(BlockTypes.AIR)) {
-                dest = dest.add(0, -1, 0);
+        Optional<Value<GameMode>> data = target.getValue(Keys.GAME_MODE);
+        if (!data.isPresent()) {
+            GameMode gameMode = data.get().get();
+            if (!(gameMode.equals(GameModes.CREATIVE) || gameMode.equals(GameModes.SPECTATOR))) {
+                while (dest.getFloorY() > 0 && targetExtent.getBlock(dest.toInt()).getType().equals(
+                        BlockTypes.AIR
+                )) {
+                    dest = dest.add(0, -1, 0);
+                }
             }
         }
         target.setLocationAndRotation(new Location(targetExtent, dest.add(0, 1, 0)), rotation);

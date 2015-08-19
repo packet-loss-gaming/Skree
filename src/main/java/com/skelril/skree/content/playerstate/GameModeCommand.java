@@ -8,7 +8,7 @@ package com.skelril.skree.content.playerstate;
 
 import com.skelril.skree.service.PlayerStateService;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.entity.GameModeData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
@@ -39,10 +39,9 @@ public class GameModeCommand implements CommandExecutor {
         GameMode mode = args.<GameMode>getOne("mode").get();
         Player target = args.<Player>getOne("target").get();
 
-        GameModeData data = target.getGameModeData();
-        service.save(target, data.getGameMode().getId());
-        target.offer(data.setGameMode(mode));
-        service.load(target, data.getGameMode().getId());
+        service.save(target, target.getValue(Keys.GAME_MODE).get().get().getId());
+        target.offer(target.getGameModeData().set(Keys.GAME_MODE, mode));
+        service.load(target, target.getValue(Keys.GAME_MODE).get().get().getId());
 
         target.sendMessage(Texts.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
         return CommandResult.success();

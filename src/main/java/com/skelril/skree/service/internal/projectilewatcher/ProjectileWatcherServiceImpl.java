@@ -43,7 +43,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
     public void track(Projectile projectile, Optional<ProjectileSource> source) {
         watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, source));
         if (!task.isPresent()) {
-            task = Optional.of(game.getScheduler().getTaskBuilder().execute(this).delay(1).interval(1).submit(plugin));
+            task = Optional.of(game.getScheduler().createTaskBuilder().execute(this).delay(1).interval(1).submit(plugin));
         }
     }
 

@@ -9,7 +9,7 @@ package com.skelril.skree.system.modifier;
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ModifierService;
-import com.skelril.skree.service.internal.modifier.mysql.lazy.LazyMySQLModifierService;
+import com.skelril.skree.service.internal.modifier.LazyMySQLModifierService;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;

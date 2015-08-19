@@ -10,11 +10,13 @@ import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.PotionEffectData;
+import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.EntityInteractEntityEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.potion.PotionEffectBuilder;
 import org.spongepowered.api.potion.PotionEffectTypes;
@@ -38,7 +40,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         this.plugin = plugin;
         this.game = game;
 
-        game.getScheduler().getTaskBuilder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
+        game.getScheduler().createTaskBuilder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
     }
 
     @Subscribe
@@ -51,20 +53,35 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         }
     }
 
+
+    @Subscribe
+    public void onEntityAttack(EntityInteractEntityEvent event) {
+        if (!isApplicable(event.getTargetEntity().getWorld())) return;
+
+        if (!(event.getEntity() instanceof Player) && event.getTargetEntity() instanceof Player) {
+            // This condition prevents a potential bug abuse by disallowing cross world removal
+            // while still protecting the player from damage
+            if (isApplicable(event.getEntity().getWorld())) {
+                event.getEntity().remove();
+            }
+            event.setCancelled(true);
+        }
+    }
+
     @Override
     public void run() {
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
-                Optional<PotionEffectData> optPotionData = entity.getData(PotionEffectData.class);
+                Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
                 if (optPotionData.isPresent()) {
-                    PotionEffectBuilder builder = game.getRegistry().getPotionEffectBuilder();
+                    PotionEffectBuilder builder = game.getRegistry().createPotionEffectBuilder();
                     builder.potionType(PotionEffectTypes.SPEED);
                     builder.amplifier(5);
                     builder.duration(3 * 20);
                     builder.particles(false);
 
                     PotionEffectData potionData = optPotionData.get();
-                    potionData.addPotionEffect(builder.build(), true);
+                    potionData.effects().add(builder.build());
                     entity.offer(potionData);
                 }
             }

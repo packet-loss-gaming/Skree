@@ -30,7 +30,7 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
             return;
         }
 
-        game.getScheduler().getTaskBuilder().execute(
+        game.getScheduler().createTaskBuilder().execute(
                 () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
         ).interval(10).submit(plugin);
     }
