@@ -33,6 +33,9 @@ repositories {
 }
 
 dependencies {
+    compile group: 'org.jooq', name: 'jooq', version: '3.6.1'
+    compile group: 'org.jooq', name: 'jooq-meta', version: '3.6.1'
+    compile group: 'org.jooq', name: 'jooq-codegen', version: '3.6.1'
     compile group: 'com.sk89q.worldedit', name: 'worldedit-forge-mc1.8', version: '6.1.1-SNAPSHOT'
     compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
 }

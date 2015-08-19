@@ -4,9 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.internal.modifier.mysql.lazy;
+package com.skelril.skree.service.internal.modifier;
 
-import com.skelril.skree.service.internal.modifier.ModifierServiceImpl;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.sql.SqlService;
 
@@ -14,41 +18,40 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.jooq.impl.DSL.table;
+
 public class LazyMySQLModifierService extends ModifierServiceImpl {
 
-    private String table;
+    private final Table<Record> table;
+    private final Field<String> name = DSL.field("name", String.class);
+    private final Field<Long> expirey = DSL.field("expirey", Long.class);
+
     private DataSource source;
 
     public LazyMySQLModifierService(Game game, String database, String table) {
         super();
         try {
             establishDataSource(game, database);
-            establishDatatable(table);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        this.table = table;
+        this.table = table(table);
     }
 
     private void establishDataSource(Game game, String database) throws SQLException {
         source = game.getServiceManager().provide(SqlService.class).get().getDataSource(database);
     }
 
-    private void establishDatatable(String table) throws SQLException {
-        try (Connection con = source.getConnection()) {
-            TableCreationStatement statement = new TableCreationStatement(table);
-            statement.setConnection(con);
-            statement.executeStatement();
-        }
-    }
-
     @Override
     protected void repopulateData() {
         try {
             try (Connection con = source.getConnection()) {
-                FetchStatement statement = new FetchStatement(table);
-                statement.setConnection(con);
-                modifiers.putAll(statement.executeStatement());
+                Result<?> data = DSL.using(con)
+                        .select(name, expirey)
+                        .from(table)
+                        .fetch();
+
+                data.forEach(a -> setExpiry(a.getValue(name), a.getValue(expirey)));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,9 +62,13 @@ public class LazyMySQLModifierService extends ModifierServiceImpl {
     protected void updateModifier(String modifier, long time) {
         try {
             try (Connection con = source.getConnection()) {
-                UpdateStatement statement = new UpdateStatement(table, modifier, time);
-                statement.setConnection(con);
-                statement.executeStatement();
+                DSL.using(con)
+                        .insertInto(table)
+                        .columns(name, expirey)
+                        .values(modifier, time)
+                        .onDuplicateKeyUpdate()
+                        .set(expirey, time)
+                        .execute();
             }
         } catch (SQLException e) {
             e.printStackTrace();
