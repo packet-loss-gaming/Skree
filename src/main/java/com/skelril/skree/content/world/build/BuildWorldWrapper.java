@@ -12,7 +12,6 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
@@ -95,7 +94,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
                 // Allow creative mode players to still place blocks
-                if (player.getValue(Keys.GAME_MODE) == GameModes.CREATIVE) {
+                if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
                     return;
                 }
 

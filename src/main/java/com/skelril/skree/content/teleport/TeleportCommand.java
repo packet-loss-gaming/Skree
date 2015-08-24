@@ -10,7 +10,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
@@ -24,7 +23,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.World;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -47,7 +46,7 @@ public class TeleportCommand implements CommandExecutor {
 
         Optional<Vector3d> dest = args.<Vector3d>getOne("dest");
         Vector3d rotation = new Vector3d(0, 0, 0);
-        Extent targetExtent = target.getWorld();
+        World targetExtent = target.getWorld();
         String destStr;
 
         if (dest.isPresent()) {
@@ -60,9 +59,9 @@ public class TeleportCommand implements CommandExecutor {
             destStr = player.getName();
         }
 
-        Optional<Value<GameMode>> data = target.getValue(Keys.GAME_MODE);
-        if (!data.isPresent()) {
-            GameMode gameMode = data.get().get();
+        Value<GameMode> data = target.getGameModeData().type();
+        if (!data.exists()) {
+            GameMode gameMode = data.get();
             if (!(gameMode.equals(GameModes.CREATIVE) || gameMode.equals(GameModes.SPECTATOR))) {
                 while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(
                         BlockTypes.AIR
@@ -71,7 +70,7 @@ public class TeleportCommand implements CommandExecutor {
                 }
             }
         }
-        target.setLocationAndRotation(new Location(targetExtent, dest.get().add(0, 1, 0)), rotation);
+        target.setLocationAndRotation(new Location<>(targetExtent, dest.get().add(0, 1, 0)), rotation);
 
         src.sendMessage(Texts.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
 

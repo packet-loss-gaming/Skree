@@ -7,7 +7,6 @@
 package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
-import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -20,7 +19,6 @@ import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
@@ -55,6 +53,9 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
                 if (this.equals(optHeldItem.get().getItem())) {
                     Location pLoc = player.getLocation();
 
+                    player.sendMessage(Texts.of(TextColors.RED, "Functionality temporarily broken due to a Sponge update."));
+
+                    /*
                     int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
 
                     TextColor color;
@@ -68,6 +69,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
                     // TODO system message.color(color)
                     player.sendMessage(Texts.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
+                    */
                 }
             }
         }

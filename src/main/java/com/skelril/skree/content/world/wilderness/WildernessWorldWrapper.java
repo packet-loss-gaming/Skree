@@ -148,11 +148,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             AttributeUtil.setGenericAttackDamage(
                     entity,
-                    getDamageMod(level) * AttributeUtil.getGenericAttackDamage(entity)
+                    getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
             );
         }
 
-        Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
+        Optional<Value<Integer>> optExplosiveRadius = Optional.absent();
+        // Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
 
         if (optExplosiveRadius.isPresent()) {
             Value<Integer> explosiveRadius = optExplosiveRadius.get();
@@ -286,7 +287,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
                 // Allow creative mode players to still place blocks
-                if (player.getValue(Keys.GAME_MODE).get().get().equals(GameModes.CREATIVE)) {
+                if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
                     return;
                 }
 

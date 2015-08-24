@@ -7,10 +7,8 @@
 package com.skelril.skree.content.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
@@ -24,7 +22,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.World;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.util.command.args.GenericArguments.player;
@@ -40,10 +38,10 @@ public class BringCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Vector3d dest;
         Vector3d rotation;
-        Extent targetExtent;
+        World targetExtent;
         if (src instanceof Player) {
             Player srcPlayer = (Player) src;
-            Location loc = srcPlayer.getLocation();
+            Location<World> loc = srcPlayer.getLocation();
             dest = loc.getPosition();
             rotation = srcPlayer.getRotation();
             targetExtent = loc.getExtent();
@@ -55,9 +53,9 @@ public class BringCommand implements CommandExecutor {
 
         Player target = args.<Player>getOne("target").get();
 
-        Optional<Value<GameMode>> data = target.getValue(Keys.GAME_MODE);
-        if (!data.isPresent()) {
-            GameMode gameMode = data.get().get();
+        Value<GameMode> data = target.getGameModeData().type();
+        if (!data.exists()) {
+            GameMode gameMode = data.get();
             if (!(gameMode.equals(GameModes.CREATIVE) || gameMode.equals(GameModes.SPECTATOR))) {
                 while (dest.getFloorY() > 0 && targetExtent.getBlock(dest.toInt()).getType().equals(
                         BlockTypes.AIR
@@ -66,7 +64,7 @@ public class BringCommand implements CommandExecutor {
                 }
             }
         }
-        target.setLocationAndRotation(new Location(targetExtent, dest.add(0, 1, 0)), rotation);
+        target.setLocationAndRotation(new Location<>(targetExtent, dest.add(0, 1, 0)), rotation);
 
         src.sendMessage(Texts.of(TextColors.YELLOW, "Player brought to you, my lord."));
 
