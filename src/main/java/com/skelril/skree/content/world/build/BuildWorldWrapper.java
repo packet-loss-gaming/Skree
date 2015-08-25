@@ -10,17 +10,18 @@ import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
+import net.minecraft.entity.passive.EntityChicken;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockBreakEvent;
 import org.spongepowered.api.event.block.BlockPlaceEvent;
-import org.spongepowered.api.event.entity.EntityInteractEntityEvent;
 import org.spongepowered.api.event.entity.EntitySpawnEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.text.Texts;
@@ -52,23 +53,14 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     public void onEntitySpawn(EntitySpawnEvent event) {
         if (!isApplicable(event.getLocation().getExtent())) return;
 
+        Entity entity = event.getEntity();
+
         // TODO Smarter "should this mob be allowed to spawn" code
-        if (event.getEntity() instanceof Monster) {
+        if (entity instanceof Monster) {
             event.setCancelled(true);
         }
-    }
 
-
-    @Subscribe
-    public void onEntityAttack(EntityInteractEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity().getWorld())) return;
-
-        if (!(event.getEntity() instanceof Player) && event.getTargetEntity() instanceof Player) {
-            // This condition prevents a potential bug abuse by disallowing cross world removal
-            // while still protecting the player from damage
-            if (isApplicable(event.getEntity().getWorld())) {
-                event.getEntity().remove();
-            }
+        if (entity instanceof EntityChicken && ((EntityChicken) entity).func_152116_bZ()) {
             event.setCancelled(true);
         }
     }
