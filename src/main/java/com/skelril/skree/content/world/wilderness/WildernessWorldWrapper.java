@@ -411,7 +411,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     @Override
     public void run() {
         for (World world : getWorlds()) {
-            for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
+            for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 int currentLevel = getLevel(entity.getLocation());
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {

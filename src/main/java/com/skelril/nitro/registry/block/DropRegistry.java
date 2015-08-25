@@ -23,7 +23,7 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class DropRegistry {
     public static boolean dropsSelf(BlockType type) {
-        return type == BlockTypes.IRON_ORE || type == BlockTypes.GOLD_ORE;
+        return type.equals(BlockTypes.IRON_ORE) || type.equals(BlockTypes.GOLD_ORE);
     }
 
     public static Collection<ItemStack> createDropsFor(Game game, BlockType type) {
@@ -33,7 +33,7 @@ public class DropRegistry {
     public static Collection<ItemStack> createDropsFor(Game game, BlockType type, boolean silkTouch) {
         // TODO incomplete logic
         if (silkTouch) {
-            if (type == BlockTypes.LIT_REDSTONE_ORE) {
+            if (type.equals(BlockTypes.LIT_REDSTONE_ORE)) {
                 return Lists.newArrayList(newItemStack(BlockTypes.REDSTONE_ORE.getHeldItem().get()));
             } else {
                 return Lists.newArrayList(newItemStack(type.getHeldItem().get()));
@@ -41,19 +41,19 @@ public class DropRegistry {
         } else {
             if (dropsSelf(type)) {
                 return Lists.newArrayList(newItemStack(type.getHeldItem().get()));
-            } else if (type == BlockTypes.COAL_ORE) {
+            } else if (type.equals(BlockTypes.COAL_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.COAL));
-            } else if (type == BlockTypes.LAPIS_ORE) {
+            } else if (type.equals(BlockTypes.LAPIS_ORE)) {
                 DyeableData data = game.getRegistry().getManipulatorRegistry().getBuilder(DyeableData.class).get().create();
                 data.set(Keys.DYE_COLOR, DyeColors.BLUE);
                 return Lists.newArrayList(newItemStack(ItemTypes.DYE, data, Probability.getRangedRandom(4, 8)));
             } else if (MultiTypeRegistry.isRedstoneOre(type)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.REDSTONE, Probability.getRangedRandom(4, 5)));
-            } else if (type == BlockTypes.DIAMOND_ORE) {
+            } else if (type.equals(BlockTypes.DIAMOND_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.DIAMOND));
-            } else if (type == BlockTypes.EMERALD_ORE) {
+            } else if (type.equals(BlockTypes.EMERALD_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.EMERALD));
-            } else if (type == BlockTypes.QUARTZ_ORE) {
+            } else if (type.equals(BlockTypes.QUARTZ_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.QUARTZ));
             }
         }

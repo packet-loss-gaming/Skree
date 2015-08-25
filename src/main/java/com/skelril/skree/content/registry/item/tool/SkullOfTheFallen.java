@@ -58,7 +58,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     public void onRightClick(PlayerInteractBlockEvent event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
-        if (event.getInteractionType() == EntityInteractionTypes.USE) {
+        if (event.getInteractionType().equals(EntityInteractionTypes.USE)) {
             Player player = event.getEntity();
             Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
 

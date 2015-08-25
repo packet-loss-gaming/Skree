@@ -44,7 +44,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         // TODO needs right click support
-        if (event.getInteractionType() == EntityInteractionTypes.USE) {
+        if (event.getInteractionType().equals(EntityInteractionTypes.USE)) {
             Player player = event.getEntity();
             //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
             Optional<ItemStack> optHeldItem = player.getItemInHand();

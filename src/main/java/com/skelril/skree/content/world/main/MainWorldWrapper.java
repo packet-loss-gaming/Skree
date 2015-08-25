@@ -61,7 +61,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     @Override
     public void run() {
         for (World world : getWorlds()) {
-            for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
+            for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
                 if (optPotionData.isPresent()) {
                     PotionEffectBuilder builder = game.getRegistry().createPotionEffectBuilder();
