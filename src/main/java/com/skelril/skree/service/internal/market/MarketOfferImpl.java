@@ -6,7 +6,7 @@
 
 package com.skelril.skree.service.internal.market;
 
-import org.spongepowered.api.entity.player.User;
+import org.spongepowered.api.entity.living.player.User;
 
 import java.math.BigDecimal;
 import java.util.UUID;

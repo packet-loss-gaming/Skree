@@ -73,7 +73,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Main wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        game.getEventManager().registerListeners(plugin, wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
@@ -91,7 +91,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Build wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        game.getEventManager().registerListeners(plugin, wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
@@ -109,7 +109,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Instance wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        game.getEventManager().registerListeners(plugin, wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
@@ -137,7 +137,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Wilderness wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        game.getEventManager().registerListeners(plugin, wrapper);
         service.registerEffectWrapper(wrapper);
     }
 

@@ -22,7 +22,7 @@ public class ProjectileWatcherSystem implements ServiceProvider<ProjectileWatche
 
         // Register the service & command
         try {
-            game.getEventManager().register(plugin, service);
+            game.getEventManager().registerListeners(plugin, service);
             game.getServiceManager().setProvider(plugin, ProjectileWatcherService.class, service);
         } catch (ProviderExistsException e) {
             e.printStackTrace();

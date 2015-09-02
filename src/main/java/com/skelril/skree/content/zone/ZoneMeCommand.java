@@ -7,7 +7,7 @@
 package com.skelril.skree.content.zone;
 
 import com.skelril.skree.service.ZoneService;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;

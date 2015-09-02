@@ -9,7 +9,7 @@ package com.skelril.skree.service;
 import com.skelril.skree.service.internal.market.*;
 import com.skelril.skree.service.internal.market.buy.BuyOffer;
 import com.skelril.skree.service.internal.market.sell.SellOffer;
-import org.spongepowered.api.entity.player.User;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.List;

@@ -23,9 +23,9 @@ import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import com.skelril.skree.system.zone.ZoneSystem;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.state.PreInitializationEvent;
-import org.spongepowered.api.event.state.ServerStartedEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
@@ -44,8 +44,8 @@ public class SkreePlugin {
     public static CustomItemSystem customItemSystem;
     public static CustomBlockSystem customBlockSystem;
 
-    @Subscribe
-    public void onPreInit(PreInitializationEvent event) {
+    @Listener
+    public void onPreInit(GamePreInitializationEvent event) {
         // Handle utility hooks early on
         new ItemStackFactory(event.getGame());
 
@@ -56,8 +56,8 @@ public class SkreePlugin {
         customBlockSystem.preInit();
     }
 
-    @Subscribe
-    public void onServerStart(ServerStartedEvent event) {
+    @Listener
+    public void onServerStart(GameStartedServerEvent event) {
         registerPrimaryHybridSystems();
         System.out.println(game.getPlatform().getExecutionType());
         switch (game.getPlatform().getExecutionType()) {

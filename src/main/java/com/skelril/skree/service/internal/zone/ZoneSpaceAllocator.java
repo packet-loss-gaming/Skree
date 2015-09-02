@@ -8,6 +8,7 @@ package com.skelril.skree.service.internal.zone;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.ZoneRegion.State;
+import org.spongepowered.api.world.World;
 
 public interface ZoneSpaceAllocator {
     float getLoad();

@@ -9,7 +9,7 @@ package com.skelril.skree.service.internal.market.sell;
 import com.skelril.skree.service.internal.market.MarketItem;
 import com.skelril.skree.service.internal.market.MarketOfferImpl;
 import com.skelril.skree.service.internal.market.MarketOfferPriority;
-import org.spongepowered.api.entity.player.User;
+import org.spongepowered.api.entity.living.player.User;
 
 import java.math.BigDecimal;
 

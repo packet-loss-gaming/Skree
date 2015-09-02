@@ -18,9 +18,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.entity.EntityInteractionTypes;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -54,35 +54,33 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
         return CreativeTabs.tabTools;
     }
 
-    @Subscribe
-    public void onRightClick(PlayerInteractBlockEvent event) {
+    @Listener
+    public void onRightClick(InteractBlockEvent.Use.SourcePlayer event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
-        if (event.getInteractionType().equals(EntityInteractionTypes.USE)) {
-            Player player = event.getEntity();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Player player = event.getSourceEntity();
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
 
-            if (optHeldItem.isPresent()) {
-                if (this.equals(optHeldItem.get().getItem())) {
-                    Location pLoc = player.getLocation();
+        if (optHeldItem.isPresent()) {
+            if (this.equals(optHeldItem.get().getItem())) {
+                Location pLoc = player.getLocation();
 
-                    Optional<WorldService> optWorldService = event.getGame().getServiceManager().provide(WorldService.class);
-                    if (optWorldService.isPresent()) {
-                        WorldService worldService = optWorldService.get();
-                        WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
-                        if (wrapper.isApplicable(pLoc.getExtent())) {
-                            int level = wrapper.getLevel(pLoc);
+                Optional<WorldService> optWorldService = event.getGame().getServiceManager().provide(WorldService.class);
+                if (optWorldService.isPresent()) {
+                    WorldService worldService = optWorldService.get();
+                    WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
+                    if (wrapper.isApplicable(pLoc.getExtent())) {
+                        int level = wrapper.getLevel(pLoc);
 
-                            player.sendMessage(
-                                Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
-                                Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
-                                Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
-                                Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
-                                Texts.of(TextColors.YELLOW, "Drop modifier: x" + level * wrapper.getDropMod(level, 0))
-                            );
-                        } else {
-                            player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
-                        }
+                        player.sendMessage(
+                            Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
+                            Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
+                            Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
+                            Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
+                            Texts.of(TextColors.YELLOW, "Drop modifier: x" + level * wrapper.getDropMod(level, 0))
+                        );
+                    } else {
+                        player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
                     }
                 }
             }

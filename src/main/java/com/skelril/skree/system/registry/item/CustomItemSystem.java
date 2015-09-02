@@ -73,7 +73,7 @@ public class CustomItemSystem {
 
             // Add selective hooks
             if (item instanceof EventAwareContent) {
-                game.getEventManager().register(plugin, item);
+                game.getEventManager().registerListeners(plugin, item);
             }
 
             if (item instanceof GameAwareContent) {

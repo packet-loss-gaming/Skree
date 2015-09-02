@@ -13,10 +13,9 @@ import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.entity.EntityInteractionTypes;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -39,38 +38,36 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
         return CreativeTabs.tabTools;
     }
 
-    @Subscribe
-    public void onRightClick(PlayerInteractBlockEvent event) {
+    @Listener
+    public void onRightClick(InteractBlockEvent.Use.SourcePlayer event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         // TODO needs right click support
-        if (event.getInteractionType().equals(EntityInteractionTypes.USE)) {
-            Player player = event.getEntity();
-            //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
-            Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Player player = event.getSourceEntity();
+        //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
+        Optional<ItemStack> optHeldItem = player.getItemInHand();
 
-            if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
-                if (this.equals(optHeldItem.get().getItem())) {
-                    Location pLoc = player.getLocation();
+        if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
+            if (this.equals(optHeldItem.get().getItem())) {
+                Location pLoc = player.getLocation();
 
-                    player.sendMessage(Texts.of(TextColors.RED, "Functionality temporarily broken due to a Sponge update."));
+                player.sendMessage(Texts.of(TextColors.RED, "Functionality temporarily broken due to a Sponge update."));
 
-                    /*
-                    int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
+                /*
+                int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
 
-                    TextColor color;
-                    if (lightLevel >= 12) {
-                        color = TextColors.GREEN;
-                    } else if (lightLevel >= 8) {
-                        color = TextColors.RED;
-                    } else {
-                        color = TextColors.DARK_RED;
-                    }
-
-                    // TODO system message.color(color)
-                    player.sendMessage(Texts.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
-                    */
+                TextColor color;
+                if (lightLevel >= 12) {
+                    color = TextColors.GREEN;
+                } else if (lightLevel >= 8) {
+                    color = TextColors.RED;
+                } else {
+                    color = TextColors.DARK_RED;
                 }
+
+                // TODO system message.color(color)
+                player.sendMessage(Texts.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
+                */
             }
         }
     }

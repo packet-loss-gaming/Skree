@@ -6,8 +6,8 @@ import com.skelril.skree.service.ProjectileWatcherService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.ProjectileLaunchEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.projectile.LaunchProjectileEvent;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
@@ -28,9 +28,9 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
         this.game = game;
     }
 
-    @Subscribe
-    public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        track(event.getLaunchedProjectile(), event.getSource());
+    @Listener
+    public void onProjectileLaunch(LaunchProjectileEvent event) {
+        track(event.getTargetEntity(), event.getSource());
     }
 
     public boolean hasChanged(TrackedProjectileInfo info) {

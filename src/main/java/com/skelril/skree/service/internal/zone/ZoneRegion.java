@@ -7,22 +7,23 @@
 package com.skelril.skree.service.internal.zone;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
 public class ZoneRegion {
 
-    private final Extent extent;
+    private final World world;
     private final Vector3i origin;
     private final Vector3i boundingBox;
 
-    public ZoneRegion(Extent extent, Vector3i origin, Vector3i boundingBox) {
-        this.extent = extent;
+    public ZoneRegion(World world, Vector3i origin, Vector3i boundingBox) {
+        this.world = world;
         this.origin = origin;
         this.boundingBox = boundingBox;
     }
 
-    public Extent getExtent() {
-        return extent;
+    public World getExtent() {
+        return world;
     }
 
     public Vector3i getOrigin() {

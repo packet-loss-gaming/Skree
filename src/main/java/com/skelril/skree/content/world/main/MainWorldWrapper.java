@@ -10,13 +10,14 @@ import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.entity.passive.EntityChicken;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.EntitySpawnEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.potion.PotionEffectBuilder;
 import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.world.World;
@@ -42,11 +43,11 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         game.getScheduler().createTaskBuilder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
     }
 
-    @Subscribe
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        if (!isApplicable(event.getLocation().getExtent())) return;
+    @Listener
+    public void onEntitySpawn(SpawnEntityEvent.TargetLiving event) {
+        Entity entity = event.getTargetEntity();
 
-        Entity entity = event.getEntity();
+        if (!isApplicable(entity.getWorld())) return;
 
         // TODO Smarter "should this mob be allowed to spawn" code
         if (entity instanceof Monster) {
