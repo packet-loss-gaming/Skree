@@ -8,8 +8,14 @@ package com.skelril.nitro.data.util;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 
 public class AttributeUtil {
+
+    public static boolean respectsGenericAttackDamage(org.spongepowered.api.entity.Entity entity) {
+        EntityLiving entity1 = (EntityLiving) entity;
+        return entity1.getEntityAttribute(SharedMonsterAttributes.attackDamage) != null;
+    }
 
     public static double getGenericAttackDamage(org.spongepowered.api.entity.Entity entity) {
         EntityLiving entity1 = (EntityLiving) entity;

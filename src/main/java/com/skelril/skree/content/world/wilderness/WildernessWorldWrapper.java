@@ -144,10 +144,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 entity.offer(healthData);
             }
 
-            AttributeUtil.setGenericAttackDamage(
-                    entity,
-                    getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
-            );
+            if (AttributeUtil.respectsGenericAttackDamage(entity)) {
+                AttributeUtil.setGenericAttackDamage(
+                        entity,
+                        getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
+                );
+            }
         }
 
         Optional<Value<Integer>> optExplosiveRadius = Optional.absent();
