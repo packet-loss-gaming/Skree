@@ -19,11 +19,12 @@ import java.util.stream.Collectors;
 
 public class EnchantmentUtil {
     public static List<ItemEnchantment> getEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
-        Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
+        /* Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
         if (results.isPresent()) {
             List<ItemEnchantment> enchantments = results.get();
             return enchantments.stream().filter(e -> e.getEnchantment().equals(enchantment)).collect(Collectors.toList());
         }
+        */
         return Lists.newArrayList();
     }
 
