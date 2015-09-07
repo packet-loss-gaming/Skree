@@ -43,7 +43,7 @@ dependencies {
 apply plugin: 'forge'
 
 minecraft {
-    ext.forgeVersion = "11.14.3.1487"
+    ext.forgeVersion = "11.14.3.1499"
     version = "1.8-$forgeVersion"
 }
 
