@@ -54,7 +54,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Listener
-    public void onEntitySpawn(SpawnEntityEvent.TargetLiving event) {
+    public void onEntitySpawn(SpawnEntityEvent event) {
         Entity entity = event.getTargetEntity();
 
         if (!isApplicable(entity.getWorld())) return;
@@ -105,7 +105,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
             Location loc = optLoc.get();
 
             if (ore().contains(loc.getBlockType())) {
-                Optional<?> rootCause = event.getCause().getRoot();
+                Optional<?> rootCause = event.getCause().root();
                 if (rootCause.isPresent() && rootCause.get() instanceof Player) {
                     Player player = (Player) rootCause.get();
 

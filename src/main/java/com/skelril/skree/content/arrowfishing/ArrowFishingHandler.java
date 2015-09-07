@@ -60,11 +60,11 @@ public class ArrowFishingHandler {
     @Listener
     public void onProjectileTickEvent(ProjectileTickEvent event) {
 
-        if (!(event.getSourceEntity() instanceof Arrow) || Probability.getChance(3)) {
+        if (!(event.getTargetEntity() instanceof Arrow) || Probability.getChance(3)) {
             return;
         }
 
-        Location loc = event.getSourceEntity().getLocation();
+        Location loc = event.getTargetEntity().getLocation();
         TrackedProjectileInfo info = event.getProjectileInfo();
 
         if (info.getProjectileSource().isPresent() && MultiTypeRegistry.isWater(loc.getBlockType())) {

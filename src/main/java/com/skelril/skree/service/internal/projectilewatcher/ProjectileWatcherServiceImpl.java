@@ -30,7 +30,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
 
     @Listener
     public void onProjectileLaunch(LaunchProjectileEvent event) {
-        track(event.getTargetEntity(), event.getSource());
+        track(event.getTargetEntity(), event.getCause().first(ProjectileSource.class));
     }
 
     public boolean hasChanged(TrackedProjectileInfo info) {

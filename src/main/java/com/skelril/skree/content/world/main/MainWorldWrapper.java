@@ -44,7 +44,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     }
 
     @Listener
-    public void onEntitySpawn(SpawnEntityEvent.TargetLiving event) {
+    public void onEntitySpawn(SpawnEntityEvent event) {
         Entity entity = event.getTargetEntity();
 
         if (!isApplicable(entity.getWorld())) return;

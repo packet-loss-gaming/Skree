@@ -33,7 +33,6 @@ import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraftforge.event.world.ExplosionEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
@@ -56,7 +55,7 @@ import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.world.WorldExplosionEvent;
+import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -208,7 +207,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onBlockBreak(BreakBlockEvent.SourceEntity event) {
+    public void onBlockBreak(BreakBlockEvent event) {
+
+        Optional<?> rootCause = event.getCause().root();
+
+        if (!(rootCause.isPresent() && rootCause.get() instanceof Entity)) return;
+
+        Entity entity = (Entity) rootCause.get();
+
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
@@ -221,8 +227,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             BlockType type = loc.getBlockType();
             if (ore().contains(type)) {
-                Entity entity = event.getSourceEntity();
-
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
@@ -270,7 +274,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onExplode(WorldExplosionEvent.Detonate event) {
+    public void onExplode(ExplosionEvent.Detonate event) {
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
@@ -301,7 +305,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             Location loc = optLoc.get();
 
             if (ore().contains(loc.getBlockType())) {
-                Optional<?> rootCause = event.getCause().getRoot();
+                Optional<?> rootCause = event.getCause().root();
                 if (rootCause.isPresent() && rootCause.get() instanceof Player) {
                     Player player = (Player) rootCause.get();
 
