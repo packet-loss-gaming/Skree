@@ -67,6 +67,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.TitleBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.*;
 
@@ -275,7 +276,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
-                World world = event.getTargetWorld();
+                Extent world = loc.getExtent();
 
                 // Do this one tick later to guarantee no collision with transaction data
                 game.getScheduler().createTaskBuilder().delay(1).execute(() -> {
