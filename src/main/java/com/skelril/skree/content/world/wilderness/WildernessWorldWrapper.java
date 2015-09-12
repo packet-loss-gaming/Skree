@@ -7,6 +7,7 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.data.util.AttributeUtil;
@@ -36,6 +37,7 @@ import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
@@ -269,6 +271,29 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 addPool(loc, fortuneMod, silkTouch);
+            } else if (type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - getLevel(loc)))) {
+                Vector3d max = loc.getPosition().add(1, 1, 1);
+                Vector3d min = loc.getPosition().sub(1, 1, 1);
+
+                World world = event.getTargetWorld();
+
+                // Do this one tick later to guarantee no collision with transaction data
+                game.getScheduler().createTaskBuilder().delay(1).execute(() -> {
+                    for (int x = min.getFloorX(); x < max.getFloorX(); ++x) {
+                        for (int z = min.getFloorZ(); z < max.getFloorZ(); ++z) {
+                            for (int y = min.getFloorY(); y < max.getFloorY(); ++y) {
+                                if (!world.containsBlock(x, y, z)) {
+                                    continue;
+                                }
+
+                                if (world.getBlockType(x, y, z) == BlockTypes.STONE) {
+                                    world.setBlockType(x, y, z, BlockTypes.MONSTER_EGG);
+                                }
+                            }
+                        }
+                    }
+                }).submit(plugin);
+
             }
         }
         // TODO needs updated XP API
