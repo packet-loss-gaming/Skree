@@ -17,7 +17,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -55,7 +54,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Use event) {
+    public void onRightClick(InteractBlockEvent.Secondary event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         Optional<?> rootCause = event.getCause().root();

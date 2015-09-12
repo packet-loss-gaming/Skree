@@ -39,7 +39,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Use event) {
+    public void onRightClick(InteractBlockEvent.Secondary event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
         // TODO needs right click support
