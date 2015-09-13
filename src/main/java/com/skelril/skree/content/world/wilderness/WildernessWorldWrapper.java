@@ -55,6 +55,7 @@ import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
@@ -278,11 +279,18 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                 Extent world = loc.getExtent();
 
+                if (Probability.getChance(3)) {
+                    Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
+                    if (optEntity.isPresent()) {
+                        world.spawnEntity(optEntity.get(), Cause.empty());
+                    }
+                }
+
                 // Do this one tick later to guarantee no collision with transaction data
                 game.getScheduler().createTaskBuilder().delay(1).execute(() -> {
-                    for (int x = min.getFloorX(); x < max.getFloorX(); ++x) {
-                        for (int z = min.getFloorZ(); z < max.getFloorZ(); ++z) {
-                            for (int y = min.getFloorY(); y < max.getFloorY(); ++y) {
+                    for (int x = min.getFloorX(); x <= max.getFloorX(); ++x) {
+                        for (int z = min.getFloorZ(); z <= max.getFloorZ(); ++z) {
+                            for (int y = min.getFloorY(); y <= max.getFloorY(); ++y) {
                                 if (!world.containsBlock(x, y, z)) {
                                     continue;
                                 }
