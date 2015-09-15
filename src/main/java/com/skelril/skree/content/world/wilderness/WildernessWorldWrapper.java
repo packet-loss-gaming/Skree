@@ -174,7 +174,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onEntityDeath(DestructEntityEvent event) {
+    public void onEntityDeath(DestructEntityEvent.Death event) {
         Entity entity = event.getTargetEntity();
 
         if (!isApplicable(entity.getWorld())) return;
