@@ -54,9 +54,11 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BreakBlockEvent;
+import org.spongepowered.api.event.block.HarvestBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
@@ -206,9 +208,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             for (int i = 0; i < times; ++i) {
                 dropper.dropItems(drops);
             }
-
-            // TODO needs updated XP API
-            // event.setExp(event.getExp() * level);
         }
     }
 
@@ -305,8 +304,28 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             }
         }
-        // TODO needs updated XP API
-        // event.setExp(event.getExp() * getLevel(loc));
+    }
+
+    @Listener
+    public void onBlockHarvest(HarvestBlockEvent event) {
+        Location blockLoc = event.getTargetBlock().getLocation().get();
+
+        if (!isApplicable(blockLoc.getExtent())) {
+            return;
+        }
+
+        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * getLevel(blockLoc)));
+    }
+
+    @Listener
+    public void onEntityHarvest(HarvestEntityEvent event) {
+        Location entityLoc = event.getTargetEntity().getLocation();
+
+        if (!isApplicable(entityLoc.getExtent())) {
+            return;
+        }
+
+        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * getLevel(entityLoc)));
     }
 
     @Listener
