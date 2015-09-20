@@ -90,7 +90,7 @@ public class DropClearServiceImpl implements DropClearService {
     private static Set<EntityType> checkedEntities = new HashSet<>();
 
     static {
-        checkedEntities.add(EntityTypes.DROPPED_ITEM);
+        checkedEntities.add(EntityTypes.ITEM);
         checkedEntities.add(EntityTypes.ARROW);
         checkedEntities.add(EntityTypes.EXPERIENCE_ORB);
     }

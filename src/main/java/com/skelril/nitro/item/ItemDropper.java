@@ -37,7 +37,7 @@ public class ItemDropper {
 
     public void dropItems(Collection<ItemStack> stacks) {
         for (ItemStack stack : stacks) {
-            Optional<Entity> optEntity = world.createEntity(EntityTypes.DROPPED_ITEM, pos);
+            Optional<Entity> optEntity = world.createEntity(EntityTypes.ITEM, pos);
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
                 // TODO Go back to Sponge
