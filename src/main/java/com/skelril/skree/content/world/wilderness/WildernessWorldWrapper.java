@@ -308,7 +308,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockHarvest(HarvestBlockEvent event) {
-        Location blockLoc = event.getTargetBlock().getLocation().get();
+        Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
+
+        if (!optBlockLoc.isPresent()) {
+            return;
+        }
+        
+        Location blockLoc = optBlockLoc.get();
 
         if (!isApplicable(blockLoc.getExtent())) {
             return;
