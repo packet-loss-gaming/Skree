@@ -33,7 +33,12 @@ import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.item.Item;
+import net.minecraft.potion.Potion;
+import org.lwjgl.util.glu.Project;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
@@ -51,6 +56,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.Arrow;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
@@ -136,25 +142,33 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         final int level = getLevel(loc);
 
-        if (entity instanceof Monster && level > 1) {
-            HealthData healthData = ((Monster) entity).getHealthData();
-            double curMax = healthData.maxHealth().get();
+        if (level > 1) {
+            // TODO move damage modification
+            if (entity instanceof Monster) {
+                HealthData healthData = ((Monster) entity).getHealthData();
+                double curMax = healthData.maxHealth().get();
 
-            if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
+                if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                double newMax = curMax * getHealthMod(level);
+                    double newMax = curMax * getHealthMod(level);
 
-                healthData.set(Keys.MAX_HEALTH, newMax);
-                healthData.set(Keys.HEALTH, newMax);
+                    healthData.set(Keys.MAX_HEALTH, newMax);
+                    healthData.set(Keys.HEALTH, newMax);
 
-                entity.offer(healthData);
-            }
+                    entity.offer(healthData);
+                }
 
-            if (AttributeUtil.respectsGenericAttackDamage(entity)) {
-                AttributeUtil.setGenericAttackDamage(
-                        entity,
-                        getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
-                );
+                if (AttributeUtil.respectsGenericAttackDamage(entity)) {
+                    AttributeUtil.setGenericAttackDamage(
+                            entity,
+                            getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
+                    );
+                }
+            } else if (entity instanceof Arrow) {
+                // Handles cases of both blocks and entities
+                if (!(((Arrow) entity).getShooter() instanceof Player)) {
+                    ((EntityArrow) entity).setDamage(((EntityArrow) entity).getDamage() + getDamageMod(level));
+                }
             }
         }
 
@@ -176,12 +190,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onEntityInteract(DamageEntityEvent event) {
+    public void onEntityDamage(DamageEntityEvent event) {
         Entity entity = event.getTargetEntity();
 
         if (!isApplicable(entity.getWorld())) return;
 
-        if (getLevel(entity.getLocation()) > 5) {
+        int level = getLevel(entity.getLocation());
+
+        if (!allowsPvP(level)) {
             return;
         }
 
@@ -441,6 +457,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         // In Wilderness
         return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
+    }
+
+    public boolean allowsPvP(int level) {
+        return level > 5;
     }
 
     public double getDropMod(int level, double mobHealth) {
