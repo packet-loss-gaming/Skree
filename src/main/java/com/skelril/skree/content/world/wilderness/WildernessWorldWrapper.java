@@ -38,6 +38,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
+import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import org.lwjgl.util.glu.Project;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTransaction;
@@ -190,7 +191,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onEntityDamage(DamageEntityEvent event) {
+    public void onEntityAttack(InteractEntityEvent event) {
         Entity entity = event.getTargetEntity();
 
         if (!isApplicable(entity.getWorld())) return;
@@ -201,10 +202,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             return;
         }
 
-        // TODO this should be cancelled, but isn't currently cancelled
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
-            event.setBaseDamage(0);
+            event.setCancelled(true);
             return;
         }
 
@@ -212,7 +212,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (optProjectile.isPresent()) {
             ProjectileSource source = optProjectile.get().getShooter();
             if (source instanceof Player) {
-                event.setBaseDamage(0);
+                event.setCancelled(true);
             }
         }
     }
