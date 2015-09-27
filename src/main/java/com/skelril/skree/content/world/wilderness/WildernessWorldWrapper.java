@@ -51,15 +51,15 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
+import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.HarvestBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.HarvestEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.*;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
@@ -172,6 +172,32 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                             Math.max(min, (min + level) / 2)
                     )
             );
+        }
+    }
+
+    @Listener
+    public void onEntityInteract(DamageEntityEvent event) {
+        Entity entity = event.getTargetEntity();
+
+        if (!isApplicable(entity.getWorld())) return;
+
+        if (getLevel(entity.getLocation()) > 5) {
+            return;
+        }
+
+        // TODO this should be cancelled, but isn't currently cancelled
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+            event.setBaseDamage(0);
+            return;
+        }
+
+        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+        if (optProjectile.isPresent()) {
+            ProjectileSource source = optProjectile.get().getShooter();
+            if (source instanceof Player) {
+                event.setBaseDamage(0);
+            }
         }
     }
 
