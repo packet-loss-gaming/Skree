@@ -350,6 +350,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockHarvest(HarvestBlockEvent event) {
+        /*
         Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
 
         if (!optBlockLoc.isPresent()) {
@@ -363,6 +364,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
 
         event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * getLevel(blockLoc)));
+        */
     }
 
     @Listener
