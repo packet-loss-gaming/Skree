@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.item.tool;
 
 import com.google.common.base.Optional;
+import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -18,8 +19,10 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
 
@@ -42,23 +45,19 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
     public void onRightClick(InteractBlockEvent.Secondary event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
-        // TODO needs right click support
-        Optional<?> rootCause = event.getCause().root();
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
 
-        if (!(rootCause.isPresent() && rootCause.get() instanceof Player)) return;
+        if (!optPlayer.isPresent()) return;
 
-        Player player = (Player) rootCause.get();
+        Player player = optPlayer.get();
 
         //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
         Optional<ItemStack> optHeldItem = player.getItemInHand();
 
         if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
             if (this.equals(optHeldItem.get().getItem())) {
-                Location pLoc = player.getLocation();
+                Location<World> pLoc = player.getLocation();
 
-                player.sendMessage(Texts.of(TextColors.RED, "Functionality temporarily broken due to a Sponge update."));
-
-                /*
                 int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
 
                 TextColor color;
@@ -72,7 +71,6 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
                 // TODO system message.color(color)
                 player.sendMessage(Texts.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
-                */
             }
         }
     }

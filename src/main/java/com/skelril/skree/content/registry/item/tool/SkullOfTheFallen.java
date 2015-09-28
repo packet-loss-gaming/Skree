@@ -15,11 +15,11 @@ import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -29,12 +29,12 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     @Override
     public void registerRecipes() {
         GameRegistry.addRecipe(
-                new ItemStack(this),
+                new net.minecraft.item.ItemStack(this),
                 "BBB",
                 "BAB",
                 "B B",
-                'A', new ItemStack(CustomItemTypes.BLOOD_DIAMOND),
-                'B', new ItemStack(Items.bone)
+                'A', new net.minecraft.item.ItemStack(CustomItemTypes.BLOOD_DIAMOND),
+                'B', new net.minecraft.item.ItemStack(Items.bone)
         );
     }
 
@@ -57,14 +57,14 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     public void onRightClick(InteractBlockEvent.Secondary event) {
         if (event.getGame().getPlatform().getExecutionType().isClient()) return;
 
-        Optional<?> rootCause = event.getCause().root();
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
 
-        if (!(rootCause.isPresent() && rootCause.get() instanceof Player)) return;
+        if (!optPlayer.isPresent()) return;
 
-        Player player = (Player) rootCause.get();
+        Player player = optPlayer.get();
 
 
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand();
 
         if (optHeldItem.isPresent()) {
             if (this.equals(optHeldItem.get().getItem())) {
@@ -79,6 +79,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
                         player.sendMessage(
                             Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
+                            Texts.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
                             Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
                             Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
                             Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
