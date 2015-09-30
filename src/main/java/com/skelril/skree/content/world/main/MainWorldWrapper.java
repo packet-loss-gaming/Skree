@@ -10,7 +10,6 @@ import com.google.common.base.Optional;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.entity.passive.EntityChicken;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.entity.Entity;

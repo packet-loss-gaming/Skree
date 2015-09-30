@@ -10,18 +10,14 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import net.minecraft.entity.item.EntityItem;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
-
-import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class ItemDropper {
 

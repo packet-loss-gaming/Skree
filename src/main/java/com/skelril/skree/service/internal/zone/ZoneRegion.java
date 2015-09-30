@@ -8,7 +8,6 @@ package com.skelril.skree.service.internal.zone;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 public class ZoneRegion {
 

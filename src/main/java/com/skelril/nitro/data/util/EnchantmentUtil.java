@@ -8,13 +8,11 @@ package com.skelril.nitro.data.util;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.item.Enchantment;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class EnchantmentUtil {
