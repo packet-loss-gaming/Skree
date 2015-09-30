@@ -13,6 +13,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
+import org.spongepowered.api.data.property.block.HeldItemProperty;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -34,13 +35,13 @@ public class DropRegistry {
         // TODO incomplete logic
         if (silkTouch) {
             if (type.equals(BlockTypes.LIT_REDSTONE_ORE)) {
-                return Lists.newArrayList(newItemStack(BlockTypes.REDSTONE_ORE.getHeldItem().get()));
+                return Lists.newArrayList(newItemStack(BlockTypes.REDSTONE_ORE.getProperty(HeldItemProperty.class).get().getValue()));
             } else {
-                return Lists.newArrayList(newItemStack(type.getHeldItem().get()));
+                return Lists.newArrayList(newItemStack(type.getProperty(HeldItemProperty.class).get().getValue()));
             }
         } else {
             if (dropsSelf(type)) {
-                return Lists.newArrayList(newItemStack(type.getHeldItem().get()));
+                return Lists.newArrayList(newItemStack(type.getProperty(HeldItemProperty.class).get().getValue()));
             } else if (type.equals(BlockTypes.COAL_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.COAL));
             } else if (type.equals(BlockTypes.LAPIS_ORE)) {
