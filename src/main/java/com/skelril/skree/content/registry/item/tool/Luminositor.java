@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.registry.item.tool;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.item.CraftableItem;
@@ -14,6 +15,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -21,8 +23,11 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import javax.swing.text.html.Option;
 
 public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
 
@@ -51,14 +56,22 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
         Player player = optPlayer.get();
 
-        //Optional<Vector3d> optClickedPosition = event.getClickedPosition();
         Optional<ItemStack> optHeldItem = player.getItemInHand();
 
         if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
             if (this.equals(optHeldItem.get().getItem())) {
-                Location<World> pLoc = player.getLocation();
+                Direction dir = event.getTargetSide();
+                Optional<Location<World>> optTargetBlockLoc = event.getTargetBlock().getLocation();
 
-                int lightLevel = LightLevelUtil.getMaxLightLevel(pLoc).get();
+                if (!optTargetBlockLoc.isPresent()) {
+                    return;
+                }
+
+                Location<World> targetBlockLoc = optTargetBlockLoc.get();
+                Vector3i targPos = targetBlockLoc.getBlockPosition().add(dir.toVector3d().toInt());
+                Location<World> trueTargBlock = new Location<>(targetBlockLoc.getExtent(), targPos);
+
+                int lightLevel = LightLevelUtil.getMaxLightLevel(trueTargBlock).get();
 
                 TextColor color;
                 if (lightLevel >= 12) {
