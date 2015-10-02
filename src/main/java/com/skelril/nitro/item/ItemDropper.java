@@ -8,8 +8,8 @@ package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
-import net.minecraft.entity.item.EntityItem;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
@@ -36,9 +36,7 @@ public class ItemDropper {
             Optional<Entity> optEntity = world.createEntity(EntityTypes.ITEM, pos);
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
-                // TODO Go back to Sponge
-                ((EntityItem) item).setEntityItemStack(new net.minecraft.item.ItemStack((net.minecraft.item.Item) stack.getItem(), stack.getQuantity()));
-                // item.offer(item.getItemData().set(Keys.REPRESENTED_ITEM, newItemStack(stack).createSnapshot()));
+                item.offer(item.getItemData().set(Keys.REPRESENTED_ITEM, stack.createSnapshot()));
                 // item.offer(item.getData(VelocityData.class).get().setValue(new Vector3d(random.nextFloat() % 1, random.nextFloat() % 1, random.nextFloat() % 1)));
                 world.spawnEntity(item, Cause.empty());
             }
