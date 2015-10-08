@@ -7,7 +7,6 @@
 package com.skelril.skree.content.world.build;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
@@ -35,6 +34,7 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 

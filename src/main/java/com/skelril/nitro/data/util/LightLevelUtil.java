@@ -6,11 +6,13 @@
 
 package com.skelril.nitro.data.util;
 
-import com.google.common.base.Optional;
+
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 public class LightLevelUtil {
     public static Optional<Integer> getMaxLightLevel(Location<World> valueStore) {
@@ -19,7 +21,7 @@ public class LightLevelUtil {
         Optional<SkyLuminanceProperty> skyLuminanceProperty = valueStore.getProperty(SkyLuminanceProperty.class);
 
         if (!lightEmissionProperty.isPresent() || !skyLuminanceProperty.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         //noinspection ConstantConditions

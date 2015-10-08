@@ -1,9 +1,11 @@
 package com.skelril.skree.service.internal.projectilewatcher;
 
-import com.google.common.base.Optional;
+
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.world.Location;
+
+import java.util.Optional;
 
 public class TrackedProjectileInfoImpl implements TrackedProjectileInfo {
     private final Projectile projectile;
@@ -11,7 +13,7 @@ public class TrackedProjectileInfoImpl implements TrackedProjectileInfo {
     private Location location;
 
     public TrackedProjectileInfoImpl(Projectile projectile) {
-        this(projectile, Optional.absent());
+        this(projectile, Optional.empty());
     }
 
     public TrackedProjectileInfoImpl(Projectile projectile, ProjectileSource source) {

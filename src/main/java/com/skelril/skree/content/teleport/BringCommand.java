@@ -7,7 +7,6 @@
 package com.skelril.skree.content.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -22,6 +21,8 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.util.command.args.GenericArguments.player;

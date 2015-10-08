@@ -6,13 +6,14 @@
 
 package com.skelril.nitro.data.util;
 
-import com.google.common.base.Optional;
+
 import com.google.common.collect.Lists;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.item.Enchantment;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public class EnchantmentUtil {
@@ -31,6 +32,6 @@ public class EnchantmentUtil {
         if (!enchantments.isEmpty()) {
             return Optional.of(enchantments.stream().sorted((a, b) -> a.getLevel() - b.getLevel()).findFirst().get());
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

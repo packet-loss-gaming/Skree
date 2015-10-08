@@ -7,7 +7,6 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.data.util.AttributeUtil;
 import com.skelril.nitro.data.util.EnchantmentUtil;
@@ -170,7 +169,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             }
         }
 
-        Optional<Value<Integer>> optExplosiveRadius = Optional.absent();
+        Optional<Value<Integer>> optExplosiveRadius = Optional.empty();
         // Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
 
         if (optExplosiveRadius.isPresent()) {

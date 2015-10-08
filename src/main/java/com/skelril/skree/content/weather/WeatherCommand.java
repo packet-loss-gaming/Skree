@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.weather;
 
-import com.google.common.base.Optional;
+
 import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,6 +25,7 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 

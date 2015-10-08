@@ -7,7 +7,6 @@
 package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -18,6 +17,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class ItemDropper {
 

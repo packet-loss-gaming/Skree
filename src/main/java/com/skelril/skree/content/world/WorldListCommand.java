@@ -1,6 +1,6 @@
 package com.skelril.skree.content.world;
 
-import com.google.common.base.Optional;
+
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import org.spongepowered.api.Game;
@@ -15,6 +15,8 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 public class WorldListCommand implements CommandExecutor {
 

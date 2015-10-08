@@ -1,6 +1,6 @@
 package com.skelril.skree.content.arrowfishing;
 
-import com.google.common.base.Optional;
+
 import com.google.common.collect.Lists;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
@@ -22,6 +22,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.world.Location;
+
+import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;

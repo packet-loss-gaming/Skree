@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.registry.item.tool;
 
-import com.google.common.base.Optional;
+
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -23,6 +23,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+
+import java.util.Optional;
 
 public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
 

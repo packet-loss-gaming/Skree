@@ -6,7 +6,7 @@
 
 package com.skelril.skree.system.world;
 
-import com.google.common.base.Optional;
+
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.world.WorldCommand;
@@ -25,6 +25,7 @@ import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBuilder;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class WorldSystem implements ServiceProvider<WorldService> {

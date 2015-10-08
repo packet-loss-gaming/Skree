@@ -7,7 +7,6 @@
 package com.skelril.skree.content.registry.item.tool;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
@@ -25,6 +24,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
 

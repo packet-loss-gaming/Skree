@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.world.main;
 
-import com.google.common.base.Optional;
+
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.entity.passive.EntityChicken;
@@ -23,6 +23,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {

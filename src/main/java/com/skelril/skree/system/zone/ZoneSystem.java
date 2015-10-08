@@ -6,7 +6,7 @@
 
 package com.skelril.skree.system.zone;
 
-import com.google.common.base.Optional;
+
 import com.sk89q.worldedit.WorldEdit;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneMeCommand;
@@ -24,6 +24,7 @@ import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class ZoneSystem implements ServiceProvider<ZoneService> {
 

@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.world;
 
-import com.google.common.base.Optional;
+
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -18,6 +18,8 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
+
+import java.util.Optional;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 

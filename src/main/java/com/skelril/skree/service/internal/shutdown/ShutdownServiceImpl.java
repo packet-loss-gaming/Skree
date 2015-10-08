@@ -6,7 +6,7 @@
 
 package com.skelril.skree.service.internal.shutdown;
 
-import com.google.common.base.Optional;
+
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
@@ -21,6 +21,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.sink.MessageSinks;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -34,7 +35,7 @@ public class ShutdownServiceImpl implements ShutdownService {
     private final Game game;
     private final Server server;
 
-    private Optional<TimedRunnable> runnable = Optional.absent();
+    private Optional<TimedRunnable> runnable = Optional.empty();
     private String reopenDate;
 
     public ShutdownServiceImpl(SkreePlugin plugin, Game game) {
@@ -129,7 +130,7 @@ public class ShutdownServiceImpl implements ShutdownService {
     public void cancelShutdown() {
         if (runnable.isPresent()) {
             runnable.get().cancel();
-            runnable = Optional.absent();
+            runnable = Optional.empty();
         }
     }
 }
