@@ -79,6 +79,7 @@ import java.util.*;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
+import static com.skelril.skree.content.registry.block.CustomBlockTypes.GRAVE_STONE;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_SHARD;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -247,6 +248,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 dropper.dropItems(drops);
             }
         }
+        GRAVE_STONE.createGraveFromDeath(event);
     }
 
     @Listener
