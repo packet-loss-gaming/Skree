@@ -1,3 +1,9 @@
+// These imports are needed further down
+// -------------------------------------
+import org.jooq.util.GenerationTool
+
+import javax.xml.bind.JAXB
+
 apply plugin: 'java'
 
 buildscript {
@@ -16,6 +22,8 @@ buildscript {
 
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'org.jooq:jooq-codegen:3.6.0'
+        classpath group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.2.+'
     }
 }
 
@@ -33,11 +41,12 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jooq', name: 'jooq', version: '3.6.1'
-    compile group: 'org.jooq', name: 'jooq-meta', version: '3.6.1'
-    compile group: 'org.jooq', name: 'jooq-codegen', version: '3.6.1'
+    compile group: 'org.jooq', name: 'jooq', version: '3.7.0'
+    compile group: 'org.jooq', name: 'jooq-meta', version: '3.7.0'
     compile group: 'com.sk89q.worldedit', name: 'worldedit-forge-mc1.8', version: '6.1.1-SNAPSHOT'
     compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
+
+    runtime group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.2.+'
 }
 
 apply plugin: 'forge'
@@ -56,3 +65,34 @@ sourceSets {
         resources.srcDirs = ["assets/Primary"]
     }
 }
+
+// Use your favourite XML builder to construct the code generation configuration file
+// ----------------------------------------------------------------------------------
+def writer = new StringWriter()
+def xml = new groovy.xml.MarkupBuilder(writer)
+        .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd') {
+    jdbc() {
+        driver('org.mariadb.jdbc.Driver')
+        url('jdbc:mariadb://localhost:3306')
+        user('mc_db_dev')
+        password('mc_db_dev')
+    }
+    generator() {
+        database() {
+            name('org.jooq.util.mariadb.MariaDBDatabase')
+            inputSchema('mc_db')
+        }
+        generate() {
+        }
+        target() {
+            packageName('com.skelril.skree.db.schema')
+            directory('src/main/java')
+        }
+    }
+}
+
+// Run the code generator
+// ----------------------
+GenerationTool.main(
+        JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
+)

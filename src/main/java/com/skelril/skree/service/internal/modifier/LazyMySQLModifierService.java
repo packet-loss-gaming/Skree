@@ -6,52 +6,27 @@
 
 package com.skelril.skree.service.internal.modifier;
 
-import org.jooq.Field;
-import org.jooq.Record;
+import com.skelril.skree.db.SQLHandle;
 import org.jooq.Result;
-import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.sql.SqlService;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
-import static org.jooq.impl.DSL.table;
+import static com.skelril.skree.db.schema.tables.Modifiers.MODIFIERS;
 
 public class LazyMySQLModifierService extends ModifierServiceImpl {
-
-    private final Table<Record> table;
-    private final Field<String> name = DSL.field("name", String.class);
-    private final Field<Long> expirey = DSL.field("expirey", Long.class);
-
-    private DataSource source;
-
-    public LazyMySQLModifierService(Game game, String database, String table) {
-        super();
-        try {
-            establishDataSource(game, database);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        this.table = table(table);
-    }
-
-    private void establishDataSource(Game game, String database) throws SQLException {
-        source = game.getServiceManager().provide(SqlService.class).get().getDataSource(database);
-    }
 
     @Override
     protected void repopulateData() {
         try {
-            try (Connection con = source.getConnection()) {
-                Result<?> data = DSL.using(con)
-                        .select(name, expirey)
-                        .from(table)
+            try (Connection con = SQLHandle.getConnection()) {
+                Result<?> results = DSL.using(con)
+                        .select(MODIFIERS.NAME, MODIFIERS.EXPIREY)
+                        .from(MODIFIERS)
                         .fetch();
-
-                data.forEach(a -> setExpiry(a.getValue(name), a.getValue(expirey)));
+                results.forEach(a -> setExpiry(a.getValue(MODIFIERS.NAME), a.getValue(MODIFIERS.EXPIREY).getTime()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,13 +36,14 @@ public class LazyMySQLModifierService extends ModifierServiceImpl {
     @Override
     protected void updateModifier(String modifier, long time) {
         try {
-            try (Connection con = source.getConnection()) {
+            try (Connection con = SQLHandle.getConnection()) {
+                Timestamp newExpirey = new Timestamp(time);
                 DSL.using(con)
-                        .insertInto(table)
-                        .columns(name, expirey)
-                        .values(modifier, time)
+                        .insertInto(MODIFIERS)
+                        .columns(MODIFIERS.NAME, MODIFIERS.EXPIREY)
+                        .values(modifier, newExpirey)
                         .onDuplicateKeyUpdate()
-                        .set(expirey, time)
+                        .set(MODIFIERS.EXPIREY, newExpirey)
                         .execute();
             }
         } catch (SQLException e) {
