@@ -31,11 +31,17 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
     public GraveStone() {
         super(new Material(MapColor.stoneColor)); // Create a new non-burnable stone like block
+        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING_PROP, EnumFacing.NORTH));
     }
 
     @Override
     public String __getID() {
         return "grave_stone";
+    }
+
+    @Override
+    public int getRenderType() {
+        return 3;
     }
 
     @Override
@@ -116,8 +122,6 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
             Collections.addAll(items, (ItemStack[]) (Object[]) mainInv);
             Collections.addAll(items, (ItemStack[]) (Object[]) armInv);
-
-            System.out.println("Stored " + items.size() + " items");
 
             items.removeAll(Collections.singleton(null));
 
