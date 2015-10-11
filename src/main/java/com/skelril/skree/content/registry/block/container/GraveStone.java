@@ -1,6 +1,7 @@
 package com.skelril.skree.content.registry.block.container;
 
 import com.skelril.nitro.registry.block.ICustomBlock;
+import com.skelril.skree.SkreePlugin;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -8,6 +9,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
@@ -112,7 +114,23 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
         return items.subList(remnants, items.size());
     }
 
-    public List<ItemStack> createGraveFromDeath(DestructEntityEvent.Death event) {
+    public void createGraveDropExcess(List<ItemStack> items, Location<org.spongepowered.api.world.World> pos) {
+        List<ItemStack> excess = createGrave(items, pos);
+        World world = (World) pos.getExtent();
+        for (ItemStack stack : excess) {
+            world.spawnEntityInWorld(
+                    new EntityItem(
+                            world,
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ(),
+                            (net.minecraft.item.ItemStack) (Object) stack
+                    )
+            );
+        }
+    }
+
+    public void createGraveFromDeath(DestructEntityEvent.Death event) {
         Entity target = event.getTargetEntity();
         if (target instanceof EntityPlayer) {
             net.minecraft.item.ItemStack[] mainInv = ((EntityPlayer) target).inventory.mainInventory;
@@ -127,8 +145,9 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
             ((EntityPlayer) target).inventory.clear();
 
-            return createGrave(items, target.getLocation());
+            event.getGame().getScheduler().createTaskBuilder().execute(() -> {
+                createGraveDropExcess(items, target.getLocation());
+            }).delay(1).submit(SkreePlugin.inst());
         }
-        return null;
     }
 }

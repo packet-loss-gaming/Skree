@@ -44,6 +44,16 @@ public class SkreePlugin {
     public static CustomItemSystem customItemSystem;
     public static CustomBlockSystem customBlockSystem;
 
+    private static SkreePlugin inst;
+
+    public static SkreePlugin inst() {
+        return inst;
+    }
+
+    public SkreePlugin() {
+        inst = this;
+    }
+
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         // Handle utility hooks early on
