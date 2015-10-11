@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
+import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
@@ -59,6 +60,9 @@ public class SkreePlugin {
         // Handle utility hooks early on
         new ItemStackFactory(event.getGame());
 
+        // Handle the database connection setup very early on
+        new DatabaseSystem(this, event.getGame());
+
         customItemSystem = new CustomItemSystem(this, game);
         customItemSystem.preInit();
 
@@ -68,26 +72,13 @@ public class SkreePlugin {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        registerPrimaryHybridSystems();
-        System.out.println(game.getPlatform().getExecutionType());
         switch (game.getPlatform().getExecutionType()) {
-            case CLIENT:
-                registerPrimaryClientSystems();
-                break;
             case SERVER:
                 registerPrimaryServerSystems();
                 break;
         }
 
         logger.info("Skree Started! Kaw!");
-    }
-
-    private void registerPrimaryHybridSystems() {
-
-    }
-
-    private void registerPrimaryClientSystems() {
-
     }
 
     private void registerPrimaryServerSystems() {
