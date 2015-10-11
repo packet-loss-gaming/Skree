@@ -21,7 +21,7 @@ public class ModifierSystem implements ServiceProvider<ModifierService> {
     @Inject
     public ModifierSystem(SkreePlugin plugin, Game game) {
         // TODO add database
-        service = new LazyMySQLModifierService(game, "", "modifiers");
+        service = new LazyMySQLModifierService();
 
         // Register the service
         try {
