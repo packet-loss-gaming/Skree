@@ -12,9 +12,9 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.entity.passive.EntityChicken;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.block.BlockSnapshotBuilder;
-import org.spongepowered.api.block.BlockStateBuilder;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTransaction;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -25,15 +25,14 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.world.chunk.PopulateChunkEvent;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.gen.PopulatorType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 
@@ -79,14 +78,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
             }
 
             if (ore().contains(block.getFinalReplacement().getState().getType())) {
-                event.setCancelled(true);
-                BlockSnapshotBuilder snapBuilder = game.getRegistry().createBlockSnapshotBuilder();
-                BlockStateBuilder stateBuilder = game.getRegistry().createBlockStateBuilder();
-                block.setCustomReplacement(
-                        snapBuilder.blockState(
-                                stateBuilder.blockType(BlockTypes.STONE).build()
-                        ).build()
-                );
+                block.setCustomReplacement(block.getOriginal().withState(BlockTypes.STONE.getDefaultState()));
             }
         }
     }
@@ -95,7 +87,9 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     public void onBlockPlace(ChangeBlockEvent.Place event) {
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            BlockSnapshot finalReplacement = block.getFinalReplacement();
+
+            Optional<Location<World>> optLoc = finalReplacement.getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
@@ -103,7 +97,8 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
             Location loc = optLoc.get();
 
-            if (ore().contains(loc.getBlockType())) {
+            BlockType replacementType = finalReplacement.getState().getType();
+            if (ore().contains(replacementType)) {
                 Optional<?> rootCause = event.getCause().root();
                 if (rootCause.isPresent() && rootCause.get() instanceof Player) {
                     Player player = (Player) rootCause.get();
@@ -138,8 +133,29 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                                 )
                         );
                     }
+                    block.setIsValid(false);
                 }
-                event.setCancelled(true);
+            }
+        }
+    }
+
+    @Listener
+    public void onPopulateChunkPost(PopulateChunkEvent.Post event) {
+        for (Map.Entry<PopulatorType, List<BlockTransaction>> entry : event.getPopulatedTransactions().entrySet()) {
+            for (BlockTransaction transaction : entry.getValue()) {
+                BlockSnapshot finalReplacement = transaction.getFinalReplacement();
+
+                Optional<Location<World>> optLoc = finalReplacement.getLocation();
+
+                if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+                    continue;
+                }
+
+                BlockType replacementType = finalReplacement.getState().getType();
+                if (ore().contains(replacementType)) {
+                    BlockSnapshot stone = transaction.getOriginal().withState(BlockTypes.STONE.getDefaultState());
+                    transaction.setCustomReplacement(stone);
+                }
             }
         }
     }

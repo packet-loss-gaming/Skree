@@ -34,6 +34,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -62,7 +63,6 @@ import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.inventory.DropItemEvent;
-import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -253,15 +253,17 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
 
+        Entity entity = null;
+
         Optional<?> rootCause = event.getCause().root();
-
-        if (!(rootCause.isPresent() && rootCause.get() instanceof Entity)) return;
-
-        Entity entity = (Entity) rootCause.get();
+        if (rootCause.isPresent() && rootCause.get() instanceof Entity) {
+            entity = (Entity) rootCause.get();
+        }
 
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            BlockSnapshot orginal =  block.getOriginal();
+            Optional<Location<World>> optLoc = orginal.getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
@@ -269,7 +271,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             Location loc = optLoc.get();
 
-            BlockType type = loc.getBlockType();
+            BlockType type = orginal.getState().getType();
             if (ore().contains(type)) {
                 int fortuneMod = 0;
                 boolean silkTouch = false;
@@ -281,9 +283,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                         // TODO Currently abusing NMS to determine "breakability"
                         ItemType itemType = stack.getItem();
-                        BlockType blockType = loc.getBlockType();
-                        if (itemType instanceof Item && blockType instanceof Block) {
-                            if (!((Item) stack.getItem()).canHarvestBlock((Block) blockType)) {
+                        if (itemType instanceof Item && type instanceof Block) {
+                            if (!((Item) stack.getItem()).canHarvestBlock((Block) type)) {
                                 continue;
                             }
                         }
@@ -310,8 +311,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     }
                 }
 
-                addPool(loc, fortuneMod, silkTouch);
-            } else if (type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - getLevel(loc)))) {
+                addPool(loc, type, fortuneMod, silkTouch);
+            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - getLevel(loc)))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
@@ -340,7 +341,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         }
                     }
                 }).submit(plugin);
-
             }
         }
     }
@@ -376,73 +376,52 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onExplode(ExplosionEvent.Detonate event) {
-        List<BlockTransaction> transactions = event.getTransactions();
-        for (BlockTransaction block : transactions) {
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
-                continue;
-            }
-
-            Location loc = optLoc.get();
-
-            BlockType type = loc.getBlockType();
-            if (ore().contains(type)) {
-                addPool(loc, 0, false);
-            }
-        }
-    }
-
-    @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            Optional<Location<World>> optLoc = block.getFinalReplacement().getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
             }
 
             Location loc = optLoc.get();
+            Optional<?> rootCause = event.getCause().root();
+            if (rootCause.isPresent() && rootCause.get() instanceof Player && ore().contains(loc.getBlockType())) {
+                Player player = (Player) rootCause.get();
 
-            if (ore().contains(loc.getBlockType())) {
-                Optional<?> rootCause = event.getCause().root();
-                if (rootCause.isPresent() && rootCause.get() instanceof Player) {
-                    Player player = (Player) rootCause.get();
-
-                    // Allow creative mode players to still place blocks
-                    if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
-                        continue;
-                    }
-
-                    try {
-                        Vector3d origin = loc.getPosition();
-                        World world = toWorld.from(loc.getExtent());
-                        for (int i = 0; i < 40; ++i) {
-                            ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
-                                    ParticleTypes.CRIT_MAGIC
-                            ).motion(
-                                    new Vector3d(
-                                            Probability.getRangedRandom(-1, 1),
-                                            Probability.getRangedRandom(-.7, .7),
-                                            Probability.getRangedRandom(-1, 1)
-                                    )
-                            ).count(1).build();
-
-                            world.spawnParticles(effect, origin.add(.5, .5, .5));
-                        }
-                    } catch (Exception ex) {
-                        player.sendMessage(
-                                /* ChatTypes.SYSTEM, */
-                                Texts.of(
-                                        TextColors.RED,
-                                        "You find yourself unable to place that block."
-                                )
-                        );
-                    }
+                // Allow creative mode players to still place blocks
+                if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
+                    continue;
                 }
-                event.setCancelled(true);
+
+                try {
+                    Vector3d origin = loc.getPosition();
+                    World world = toWorld.from(loc.getExtent());
+                    for (int i = 0; i < 40; ++i) {
+                        ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
+                                ParticleTypes.CRIT_MAGIC
+                        ).motion(
+                                new Vector3d(
+                                        Probability.getRangedRandom(-1, 1),
+                                        Probability.getRangedRandom(-.7, .7),
+                                        Probability.getRangedRandom(-1, 1)
+                                )
+                        ).count(1).build();
+
+                        world.spawnParticles(effect, origin.add(.5, .5, .5));
+                    }
+                } catch (Exception ex) {
+                    player.sendMessage(
+                            /* ChatTypes.SYSTEM, */
+                            Texts.of(
+                                    TextColors.RED,
+                                    "You find yourself unable to place that block."
+                            )
+                    );
+                }
+
+                block.setIsValid(false);
             }
         }
     }
@@ -495,9 +474,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
     }
 
-    private void addPool(Location block, int fortune, boolean hasSilkTouch) {
+    private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
 
-        BlockType blockType = block.getBlockType();
 
         Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
         if (DropRegistry.dropsSelf(blockType)) {
@@ -507,7 +485,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         final int times = Probability.getRandom(getOreMod(getLevel(block)));
         ItemFountain fountain = new ItemFountain(
                 game,
-                toWorld.from(block.getExtent()),
+                block.getExtent(),
                 block.getPosition().add(.5, 0, .5),
                 new FixedIntGenerator(fortune),
                 generalDrop
