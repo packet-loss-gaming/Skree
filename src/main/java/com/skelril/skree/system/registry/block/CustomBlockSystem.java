@@ -10,8 +10,12 @@ import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.nitro.selector.GameAwareContent;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Game;
 
@@ -47,7 +51,7 @@ public class CustomBlockSystem {
 
     private void iterate(Method method) {
         method.setAccessible(true);
-        for (Field field : CustomItemTypes.class.getFields()) {
+        for (Field field : CustomBlockTypes.class.getFields()) {
             try {
                 Object result = field.get(null);
                 method.invoke(this, result);
@@ -72,6 +76,28 @@ public class CustomBlockSystem {
 
             if (block instanceof GameAwareContent) {
                 ((GameAwareContent) block).supplyGame(game);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
+
+    // Invoked via reflection
+    @SuppressWarnings("unused")
+    private void render(Object block) {
+        if (block instanceof Block && block instanceof ICustomBlock) {
+            if (game.getPlatform().getExecutionType().isClient()) {
+                RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+
+                renderItem.getItemModelMesher().register(
+                        Item.getItemFromBlock((Block) block),
+                        0,
+                        new ModelResourceLocation(
+                                "skree:" + ((ICustomBlock) block).__getID(),
+                                "inventory"
+                        )
+                );
+
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");

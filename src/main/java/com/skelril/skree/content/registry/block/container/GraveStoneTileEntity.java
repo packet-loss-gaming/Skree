@@ -13,7 +13,11 @@ import net.minecraft.tileentity.TileEntityLockable;
 public class GraveStoneTileEntity extends TileEntityLockable implements IInventory {
 
     private String customName;
-    private ItemStack[] chestContents = new ItemStack[getSizeInventory()];
+    private ItemStack[] graveContents = new ItemStack[getSizeInventory()];
+
+    static {
+        addMapping(GraveStoneTileEntity.class, "GraveStone");
+    }
 
     @Override
     public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
@@ -32,25 +36,25 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
 
     @Override
     public ItemStack getStackInSlot(int index) {
-        return this.chestContents[index];
+        return this.graveContents[index];
     }
 
     @Override
     public ItemStack decrStackSize(int index, int count) {
-        if (this.chestContents[index] != null) {
+        if (this.graveContents[index] != null) {
             ItemStack itemstack;
 
-            if (this.chestContents[index].stackSize <= count) {
-                itemstack = this.chestContents[index];
-                this.chestContents[index] = null;
+            if (this.graveContents[index].stackSize <= count) {
+                itemstack = this.graveContents[index];
+                this.graveContents[index] = null;
                 this.markDirty();
                 return itemstack;
             }
 
-            itemstack = this.chestContents[index].splitStack(count);
+            itemstack = this.graveContents[index].splitStack(count);
 
-            if (this.chestContents[index].stackSize == 0) {
-                this.chestContents[index] = null;
+            if (this.graveContents[index].stackSize == 0) {
+                this.graveContents[index] = null;
             }
 
             this.markDirty();
@@ -61,9 +65,9 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
 
     @Override
     public ItemStack getStackInSlotOnClosing(int index) {
-        if (this.chestContents[index] != null) {
-            ItemStack itemstack = this.chestContents[index];
-            this.chestContents[index] = null;
+        if (this.graveContents[index] != null) {
+            ItemStack itemstack = this.graveContents[index];
+            this.graveContents[index] = null;
             return itemstack;
         } else {
             return null;
@@ -72,7 +76,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        this.chestContents[index] = stack;
+        this.graveContents[index] = stack;
 
         if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
             stack.stackSize = this.getInventoryStackLimit();
@@ -123,7 +127,9 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
 
     @Override
     public void clear() {
-        this.chestContents = new ItemStack[this.chestContents.length];
+        for (int i = 0; i < getSizeInventory(); ++i) {
+            this.graveContents[i] = null;
+        }
     }
 
     @Override
@@ -139,7 +145,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         NBTTagList nbttaglist = compound.getTagList("Items", 10);
-        this.chestContents = new ItemStack[this.getSizeInventory()];
+        this.graveContents = new ItemStack[this.getSizeInventory()];
 
         if (compound.hasKey("CustomName", 8)) {
             this.customName = compound.getString("CustomName");
@@ -149,8 +155,8 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
             NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
             int j = nbttagcompound1.getByte("Slot") & 255;
 
-            if (j >= 0 && j < this.chestContents.length) {
-                this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+            if (j >= 0 && j < this.graveContents.length) {
+                this.graveContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
             }
         }
     }
@@ -159,11 +165,11 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
         super.writeToNBT(compound);
         NBTTagList nbttaglist = new NBTTagList();
 
-        for (int i = 0; i < this.chestContents.length; ++i) {
-            if (this.chestContents[i] != null) {
+        for (int i = 0; i < this.graveContents.length; ++i) {
+            if (this.graveContents[i] != null) {
                 NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                 nbttagcompound1.setByte("Slot", (byte)i);
-                this.chestContents[i].writeToNBT(nbttagcompound1);
+                this.graveContents[i].writeToNBT(nbttagcompound1);
                 nbttaglist.appendTag(nbttagcompound1);
             }
         }

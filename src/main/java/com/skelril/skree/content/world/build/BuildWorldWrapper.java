@@ -23,8 +23,7 @@ import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.BreakBlockEvent;
-import org.spongepowered.api.event.block.PlaceBlockEvent;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -70,7 +69,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Listener
-    public void onBlockBreak(BreakBlockEvent event) {
+    public void onBlockBreak(ChangeBlockEvent.Break event) {
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
@@ -93,7 +92,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Listener
-    public void onBlockPlace(PlaceBlockEvent event) {
+    public void onBlockPlace(ChangeBlockEvent.Place event) {
         List<BlockTransaction> transactions = event.getTransactions();
         for (BlockTransaction block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
