@@ -5,10 +5,20 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import org.spongepowered.api.Game;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class DatabaseSystem {
     public DatabaseSystem(SkreePlugin plugin, Game game) {
+
+        try {
+            Class.forName("org.mariadb.jdbc.Driver").newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         // Insert ugly configuration code
         File targetDir = new File("./mods/skree/config/");
         targetDir.mkdirs();
@@ -22,7 +32,7 @@ public class DatabaseSystem {
             SQLHandle.setDatabase(config.getDatabase());
             SQLHandle.setUsername(config.getUsername());
             SQLHandle.setPassword(config.getPassword());
-        } catch (FileNotFoundException e) {
+        } catch (Exception ex) {
             try {
                 targetFile.createNewFile();
                 new FileWriter(targetFile).write(gson.toJson(new DatabaseConfig()));
