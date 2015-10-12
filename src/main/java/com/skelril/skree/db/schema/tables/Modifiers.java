@@ -7,10 +7,7 @@ package com.skelril.skree.db.schema.tables;
 import com.skelril.skree.db.schema.Keys;
 import com.skelril.skree.db.schema.McDb;
 import com.skelril.skree.db.schema.tables.records.ModifiersRecord;
-import org.jooq.Field;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
@@ -32,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Modifiers extends TableImpl<ModifiersRecord> {
 
-	private static final long serialVersionUID = 529181086;
+	private static final long serialVersionUID = -1120631723;
 
 	/**
 	 * The reference instance of <code>mc_db.modifiers</code>
@@ -82,6 +79,14 @@ public class Modifiers extends TableImpl<ModifiersRecord> {
 
 	private Modifiers(String alias, Table<ModifiersRecord> aliased, Field<?>[] parameters) {
 		super(alias, McDb.MC_DB, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Identity<ModifiersRecord, Integer> getIdentity() {
+		return Keys.IDENTITY_MODIFIERS;
 	}
 
 	/**

@@ -4,8 +4,16 @@
 package com.skelril.skree.db.schema;
 
 
+import com.skelril.skree.db.schema.tables.ItemAliases;
+import com.skelril.skree.db.schema.tables.ItemId;
+import com.skelril.skree.db.schema.tables.ItemValues;
 import com.skelril.skree.db.schema.tables.Modifiers;
+import com.skelril.skree.db.schema.tables.records.ItemAliasesRecord;
+import com.skelril.skree.db.schema.tables.records.ItemIdRecord;
+import com.skelril.skree.db.schema.tables.records.ItemValuesRecord;
 import com.skelril.skree.db.schema.tables.records.ModifiersRecord;
+import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
 
@@ -30,11 +38,20 @@ public class Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	public static final Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = Identities0.IDENTITY_ITEM_ALIASES;
+	public static final Identity<ItemIdRecord, Integer> IDENTITY_ITEM_ID = Identities0.IDENTITY_ITEM_ID;
+	public static final Identity<ItemValuesRecord, Integer> IDENTITY_ITEM_VALUES = Identities0.IDENTITY_ITEM_VALUES;
+	public static final Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = Identities0.IDENTITY_MODIFIERS;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_PRIMARY = UniqueKeys0.KEY_ITEM_ALIASES_PRIMARY;
+	public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_ALIAS_UNIQUE = UniqueKeys0.KEY_ITEM_ALIASES_ALIAS_UNIQUE;
+	public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_PRIMARY = UniqueKeys0.KEY_ITEM_ID_PRIMARY;
+	public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_ITEM = UniqueKeys0.KEY_ITEM_ID_ITEM;
+	public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_PRIMARY = UniqueKeys0.KEY_ITEM_VALUES_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = UniqueKeys0.KEY_MODIFIERS_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = UniqueKeys0.KEY_MODIFIERS_NAME_UNIQUE;
 
@@ -42,13 +59,32 @@ public class Keys {
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final ForeignKey<ItemAliasesRecord, ItemIdRecord> ITEM_ID = ForeignKeys0.ITEM_ID;
+	public static final ForeignKey<ItemValuesRecord, ItemIdRecord> FK_ITEM_VALUES_1 = ForeignKeys0.FK_ITEM_VALUES_1;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
 
+	private static class Identities0 extends AbstractKeys {
+		public static Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = createIdentity(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
+		public static Identity<ItemIdRecord, Integer> IDENTITY_ITEM_ID = createIdentity(ItemId.ITEM_ID, ItemId.ITEM_ID.ID);
+		public static Identity<ItemValuesRecord, Integer> IDENTITY_ITEM_VALUES = createIdentity(ItemValues.ITEM_VALUES, ItemValues.ITEM_VALUES.ID);
+		public static Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = createIdentity(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
+	}
+
 	private static class UniqueKeys0 extends AbstractKeys {
+		public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_PRIMARY = createUniqueKey(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
+		public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_ALIAS_UNIQUE = createUniqueKey(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ALIAS);
+		public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_PRIMARY = createUniqueKey(ItemId.ITEM_ID, ItemId.ITEM_ID.ID);
+		public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_ITEM = createUniqueKey(ItemId.ITEM_ID, ItemId.ITEM_ID.MC_ID, ItemId.ITEM_ID.VARIANT);
+		public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_PRIMARY = createUniqueKey(ItemValues.ITEM_VALUES, ItemValues.ITEM_VALUES.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.NAME);
+	}
+
+	private static class ForeignKeys0 extends AbstractKeys {
+		public static final ForeignKey<ItemAliasesRecord, ItemIdRecord> ITEM_ID = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ID_PRIMARY, ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ITEM_ID);
+		public static final ForeignKey<ItemValuesRecord, ItemIdRecord> FK_ITEM_VALUES_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ID_PRIMARY, ItemValues.ITEM_VALUES, ItemValues.ITEM_VALUES.ITEM_ID);
 	}
 }

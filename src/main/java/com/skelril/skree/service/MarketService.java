@@ -6,74 +6,26 @@
 
 package com.skelril.skree.service;
 
-import com.skelril.skree.service.internal.market.*;
-import com.skelril.skree.service.internal.market.buy.BuyOffer;
-import com.skelril.skree.service.internal.market.sell.SellOffer;
-import org.spongepowered.api.entity.living.player.User;
+import com.skelril.nitro.Clause;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
-/**
- * A market system composed internally of four tables
- * - Items
- * - Item aliases
- * - Offers
- * - Transactions (TODO at a later date)
- *
- * Example usage:
- *      // Get the item
- *      MarketItem item = market.getItem("Magic Bean");
- *      // Get the price
- *      PriceSnapshot price = market.getPrice(item);
- *      // Make a buy offer based off the maximum you are advised to offer based on the items
- *      // current value
- *      BuyOffer offer = new InstantBuyOffer(player, item, price.getMaxAdvisory());
- *      // Get the result
- *      MarketOfferSnapshot result = market.offer(offer);
- *      // Get the status of the offer
- *      MarketOfferStatus status = result.getStatus();
- */
 public interface MarketService {
-    // Supply
-    MarketOfferSnapshot offer(BuyOffer offer);
-    MarketOfferSnapshot offer(SellOffer offer);
+    BigDecimal getPrice(String alias);
+    boolean setPrice(String alias, BigDecimal price);
 
-    // Modification
-    void offer(PriceUpdate update);
-    MarketWithdrawSnapshot offer(MarketWithdraw offer);
+    void addItem(ItemStack stack);
 
-    // Lookup
-    MarketItem getItem(UUID ID);
-    MarketItem getItem(String name);
-    MarketItem getItem(ItemStack itemStack);
+    void setPrimaryAlias(String alias, ItemStack stack);
+    boolean addAlias(String alias, ItemStack stack);
 
-    PriceSnapshot getPrice(MarketItem type);
+    String getAlias(ItemStack stack);
 
-    MarketOfferSnapshot getOffer(UUID ID);
-    default MarketOfferSnapshot getOffer(MarketOfferSnapshot offer) {
-        return getOffer(offer.getOfferID());
-    }
-
-    int countOffers(UUID user);
-    default int countOffers(User user) {
-        return countOffers(user.getUniqueId());
-    }
-
-    int getMaxOffers(UUID user);
-    default int getMaxOffers(User user) {
-        return getMaxOffers(user.getUniqueId());
-    }
-
-    List<MarketOfferSnapshot> getOffers(UUID user);
-    default List<MarketOfferSnapshot> getOffers(User user) {
-        return getOffers(user.getUniqueId());
-    }
-
-    // Transactions
-    //    MarketTransaction getTransaction(UUID ID);
-    //    MarketTransaction getTransactions(PlayerMarketQuery);
-    //    MarketTransaction getTransactions(ItemMarketQuery);
-    //    MarketTransaction getTransactions(TimeQuery);
+    /**
+     * A mapping of the primary alias to the price
+     * @return
+     */
+    List<Clause<String, BigDecimal>> getPrices();
 }

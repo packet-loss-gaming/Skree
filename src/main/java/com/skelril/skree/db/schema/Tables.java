@@ -4,6 +4,9 @@
 package com.skelril.skree.db.schema;
 
 
+import com.skelril.skree.db.schema.tables.ItemAliases;
+import com.skelril.skree.db.schema.tables.ItemId;
+import com.skelril.skree.db.schema.tables.ItemValues;
 import com.skelril.skree.db.schema.tables.Modifiers;
 
 import javax.annotation.Generated;
@@ -21,6 +24,21 @@ import javax.annotation.Generated;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+	/**
+	 * The table mc_db.item_aliases
+	 */
+	public static final ItemAliases ITEM_ALIASES = com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
+
+	/**
+	 * The table mc_db.item_id
+	 */
+	public static final ItemId ITEM_ID = com.skelril.skree.db.schema.tables.ItemId.ITEM_ID;
+
+	/**
+	 * The table mc_db.item_values
+	 */
+	public static final ItemValues ITEM_VALUES = com.skelril.skree.db.schema.tables.ItemValues.ITEM_VALUES;
 
 	/**
 	 * The table mc_db.modifiers
