@@ -25,13 +25,14 @@ import org.spongepowered.api.world.World;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class ZoneSystem implements ServiceProvider<ZoneService> {
 
     private ZoneService service;
 
     public ZoneSystem(SkreePlugin plugin, Game game) {
-        game.getScheduler().createTaskBuilder().delay(15 * 20).execute(
+        game.getScheduler().createTaskBuilder().delay(3, TimeUnit.SECONDS).execute(
                 () -> {
                     System.out.println("Starting zone system...");
                     initialize(plugin, game);
@@ -43,7 +44,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
         // TODO this is a very dumb way of doing this
         Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
         if (!optService.isPresent()) {
-            game.getScheduler().createTaskBuilder().delay(1).execute(() -> initialize(plugin, game)).submit(plugin);
+            game.getScheduler().createTaskBuilder().delayTicks(1).execute(() -> initialize(plugin, game)).submit(plugin);
             return;
         }
 

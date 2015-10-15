@@ -32,7 +32,7 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
 
         game.getScheduler().createTaskBuilder().execute(
                 () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
-        ).interval(10).submit(plugin);
+        ).intervalTicks(10).submit(plugin);
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import net.minecraft.entity.passive.EntityChicken;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTransaction;
@@ -53,17 +52,15 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        Entity entity = event.getTargetEntity();
+        List<Entity> entities = event.getEntities();
 
-        if (!isApplicable(entity.getWorld())) return;
+        for (Entity entity : entities) {
+            if (!isApplicable(entity.getWorld())) continue;
 
-        // TODO Smarter "should this mob be allowed to spawn" code
-        if (entity instanceof Monster) {
-            event.setCancelled(true);
-        }
-
-        if (entity instanceof EntityChicken && ((EntityChicken) entity).func_152116_bZ()) {
-            event.setCancelled(true);
+            if (entity instanceof Monster) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

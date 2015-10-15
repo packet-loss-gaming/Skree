@@ -165,7 +165,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
             event.getGame().getScheduler().createTaskBuilder().execute(() -> {
                 createGraveDropExcess(items, target.getLocation());
-            }).delay(1).submit(SkreePlugin.inst());
+            }).delayTicks(1).submit(SkreePlugin.inst());
         }
     }
 }
