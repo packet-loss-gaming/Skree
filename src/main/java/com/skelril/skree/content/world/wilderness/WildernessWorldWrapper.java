@@ -62,7 +62,6 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.inventory.DropItemEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -131,58 +130,60 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        Entity entity = event.getTargetEntity();
+        List<Entity> entities = event.getEntities();
 
-        if (!isApplicable(entity.getWorld())) return;
+        for (Entity entity : entities) {
+            if (!isApplicable(entity.getWorld())) continue;
 
-        Location loc = entity.getLocation();
+            Location loc = entity.getLocation();
 
-        final int level = getLevel(loc);
+            final int level = getLevel(loc);
 
-        if (level > 1) {
-            // TODO move damage modification
-            if (entity instanceof Monster) {
-                HealthData healthData = ((Monster) entity).getHealthData();
-                double curMax = healthData.maxHealth().get();
+            if (level > 1) {
+                // TODO move damage modification
+                if (entity instanceof Monster) {
+                    HealthData healthData = ((Monster) entity).getHealthData();
+                    double curMax = healthData.maxHealth().get();
 
-                if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
+                    if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                    double newMax = curMax * getHealthMod(level);
+                        double newMax = curMax * getHealthMod(level);
 
-                    healthData.set(Keys.MAX_HEALTH, newMax);
-                    healthData.set(Keys.HEALTH, newMax);
+                        healthData.set(Keys.MAX_HEALTH, newMax);
+                        healthData.set(Keys.HEALTH, newMax);
 
-                    entity.offer(healthData);
-                }
+                        entity.offer(healthData);
+                    }
 
-                if (AttributeUtil.respectsGenericAttackDamage(entity)) {
-                    AttributeUtil.setGenericAttackDamage(
-                            entity,
-                            getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
-                    );
-                }
-            } else if (entity instanceof Arrow) {
-                // Handles cases of both blocks and entities
-                if (!(((Arrow) entity).getShooter() instanceof Player)) {
-                    ((EntityArrow) entity).setDamage(((EntityArrow) entity).getDamage() + getDamageMod(level));
+                    if (AttributeUtil.respectsGenericAttackDamage(entity)) {
+                        AttributeUtil.setGenericAttackDamage(
+                                entity,
+                                getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
+                        );
+                    }
+                } else if (entity instanceof Arrow) {
+                    // Handles cases of both blocks and entities
+                    if (!(((Arrow) entity).getShooter() instanceof Player)) {
+                        ((EntityArrow) entity).setDamage(((EntityArrow) entity).getDamage() + getDamageMod(level));
+                    }
                 }
             }
-        }
 
-        Optional<Value<Integer>> optExplosiveRadius = Optional.empty();
-        // Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
+            Optional<Value<Integer>> optExplosiveRadius = Optional.empty();
+            // Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
 
-        if (optExplosiveRadius.isPresent()) {
-            Value<Integer> explosiveRadius = optExplosiveRadius.get();
-            int min = explosiveRadius.get();
+            if (optExplosiveRadius.isPresent()) {
+                Value<Integer> explosiveRadius = optExplosiveRadius.get();
+                int min = explosiveRadius.get();
 
-            entity.offer(
-                    Keys.EXPLOSIVE_RADIUS,
-                    Math.min(
-                            entity instanceof Fireball ? 4 : 9,
-                            Math.max(min, (min + level) / 2)
-                    )
-            );
+                entity.offer(
+                        Keys.EXPLOSIVE_RADIUS,
+                        Math.min(
+                                entity instanceof Fireball ? 4 : 9,
+                                Math.max(min, (min + level) / 2)
+                        )
+                );
+            }
         }
     }
 
@@ -326,7 +327,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 // Do this one tick later to guarantee no collision with transaction data
-                game.getScheduler().createTaskBuilder().delay(1).execute(() -> {
+                game.getScheduler().createTaskBuilder().delayTicks(1).execute(() -> {
                     for (int x = min.getFloorX(); x <= max.getFloorX(); ++x) {
                         for (int z = min.getFloorZ(); z <= max.getFloorZ(); ++z) {
                             for (int y = min.getFloorY(); y <= max.getFloorY(); ++y) {
@@ -343,25 +344,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }).submit(plugin);
             }
         }
-    }
-
-    @Listener
-    public void onBlockHarvest(DropItemEvent.Harvest event) {
-        /*
-        Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
-
-        if (!optBlockLoc.isPresent()) {
-            return;
-        }
-        
-        Location blockLoc = optBlockLoc.get();
-
-        if (!isApplicable(blockLoc.getExtent())) {
-            return;
-        }
-
-        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * getLevel(blockLoc)));
-        */
     }
 
     @Listener

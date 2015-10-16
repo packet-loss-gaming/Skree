@@ -65,33 +65,32 @@ sourceSets {
     }
 }
 
-// Use your favourite XML builder to construct the code generation configuration file
-// ----------------------------------------------------------------------------------
-def writer = new StringWriter()
-def xml = new groovy.xml.MarkupBuilder(writer)
-        .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd') {
-    jdbc() {
-        driver('org.mariadb.jdbc.Driver')
-        url('jdbc:mariadb://localhost:3306')
-        user('mc_db_dev')
-        password('mc_db_dev')
+task codegen << {
+    println 'Generating new schema classes...'
+    def writer = new StringWriter()
+    def xml = new groovy.xml.MarkupBuilder(writer)
+            .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd') {
+        jdbc() {
+            driver('org.mariadb.jdbc.Driver')
+            url('jdbc:mariadb://localhost:3306')
+            user('mc_db_dev')
+            password('mc_db_dev')
+        }
+        generator() {
+            database() {
+                name('org.jooq.util.mariadb.MariaDBDatabase')
+                inputSchema('mc_db')
+            }
+            generate() {
+            }
+            target() {
+                packageName('com.skelril.skree.db.schema')
+                directory('src/main/java')
+            }
+        }
     }
-    generator() {
-        database() {
-            name('org.jooq.util.mariadb.MariaDBDatabase')
-            inputSchema('mc_db')
-        }
-        generate() {
-        }
-        target() {
-            packageName('com.skelril.skree.db.schema')
-            directory('src/main/java')
-        }
-    }
-}
 
-// Run the code generator
-// ----------------------
-GenerationTool.main(
-        JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
-)
+    GenerationTool.main(
+            JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
+    )
+}

@@ -195,7 +195,7 @@ public class DropClearServiceImpl implements DropClearService {
         };
 
         // Offset this by one to prevent the drop clear from triggering twice
-        Task task = game.getScheduler().createTaskBuilder().execute(runnable).delay(1).interval(
+        Task task = game.getScheduler().createTaskBuilder().execute(runnable).delayTicks(1).interval(
                 1,
                 TimeUnit.SECONDS
         ).submit(plugin);

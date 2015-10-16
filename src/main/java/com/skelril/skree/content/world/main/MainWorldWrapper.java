@@ -9,7 +9,6 @@ package com.skelril.skree.content.world.main;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import net.minecraft.entity.passive.EntityChicken;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.entity.Entity;
@@ -23,6 +22,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -45,17 +45,15 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        Entity entity = event.getTargetEntity();
+        List<Entity> entities = event.getEntities();
 
-        if (!isApplicable(entity.getWorld())) return;
+        for (Entity entity : entities) {
+            if (!isApplicable(entity.getWorld())) continue;
 
-        // TODO Smarter "should this mob be allowed to spawn" code
-        if (entity instanceof Monster) {
-            event.setCancelled(true);
-        }
-
-        if (entity instanceof EntityChicken && ((EntityChicken) entity).func_152116_bZ()) {
-            event.setCancelled(true);
+            if (entity instanceof Monster) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
