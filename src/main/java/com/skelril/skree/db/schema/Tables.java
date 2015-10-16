@@ -4,10 +4,7 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.ItemAliases;
-import com.skelril.skree.db.schema.tables.ItemId;
-import com.skelril.skree.db.schema.tables.ItemValues;
-import com.skelril.skree.db.schema.tables.Modifiers;
+import com.skelril.skree.db.schema.tables.*;
 
 import javax.annotation.Generated;
 
@@ -29,6 +26,11 @@ public class Tables {
 	 * The table mc_db.item_aliases
 	 */
 	public static final ItemAliases ITEM_ALIASES = com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
+
+	/**
+	 * The table mc_db.item_aliases_primary
+	 */
+	public static final ItemAliasesPrimary ITEM_ALIASES_PRIMARY = com.skelril.skree.db.schema.tables.ItemAliasesPrimary.ITEM_ALIASES_PRIMARY;
 
 	/**
 	 * The table mc_db.item_id

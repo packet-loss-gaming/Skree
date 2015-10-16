@@ -51,6 +51,10 @@ public class SkreePlugin {
         return inst;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public SkreePlugin() {
         inst = this;
     }

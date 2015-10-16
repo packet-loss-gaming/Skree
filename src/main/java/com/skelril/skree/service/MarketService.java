@@ -13,12 +13,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface MarketService {
+    ItemStack getItem(String alias);
+
     BigDecimal getPrice(String alias);
+    BigDecimal getPrice(ItemStack stack);
     boolean setPrice(String alias, BigDecimal price);
 
     void addItem(ItemStack stack);
 
-    void setPrimaryAlias(String alias, ItemStack stack);
+    void setPrimaryAlias(String alias);
     boolean addAlias(String alias, ItemStack stack);
 
     String getAlias(ItemStack stack);
