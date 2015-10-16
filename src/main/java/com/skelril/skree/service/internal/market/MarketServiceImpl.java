@@ -155,7 +155,7 @@ public class MarketServiceImpl implements MarketService {
                                                     .and(ITEM_ID.VARIANT
                                                             .equal(idVariant.getValue()))
                                     )
-                    ).and(ITEM_ALIASES_PRIMARY.ALIAS.equal(ITEM_ALIASES.ID))
+                    ).and(ITEM_ALIASES.ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS))))
             ).fetchOne();
             return result.value1();
         } catch (SQLException e) {
