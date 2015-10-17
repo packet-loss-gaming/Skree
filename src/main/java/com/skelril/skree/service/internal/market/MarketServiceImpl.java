@@ -25,8 +25,31 @@ import static com.skelril.skree.db.schema.tables.ItemId.ITEM_ID;
 import static com.skelril.skree.db.schema.tables.ItemValues.ITEM_VALUES;
 
 public class MarketServiceImpl implements MarketService {
+
+    private void validateAlias(String alias) {
+        if (!alias.matches(VALID_ALIAS_REGEX)) {
+            throw new IllegalArgumentException("Aliases must match the pattern " + VALID_ALIAS_REGEX);
+        }
+    }
+
     @Override
     public ItemStack getItem(String alias) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Record2<String, String> result = create.select(ITEM_ID.MC_ID, ITEM_ID.VARIANT)
+                    .from(ITEM_ID)
+                    .where(ITEM_ID.ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES)
+                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    )
+                    ).fetchOne();
+            return getItemStack(new Clause<>(result.getValue(ITEM_ID.MC_ID), result.getValue(ITEM_ID.VARIANT)));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -37,6 +60,8 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public BigDecimal getPrice(String alias) {
+        validateAlias(alias);
+
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             Record1<BigDecimal> result = create.select(ITEM_VALUES.PRICE).from(ITEM_VALUES).where(
@@ -77,6 +102,8 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public boolean setPrice(String alias, BigDecimal price) {
+        validateAlias(alias);
+
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             int updated = create.insertInto(ITEM_VALUES)
@@ -112,6 +139,8 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public void setPrimaryAlias(String alias) {
+        validateAlias(alias);
+
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             create.insertInto(ITEM_ALIASES_PRIMARY).columns(ITEM_ALIASES_PRIMARY.ALIAS)
@@ -131,6 +160,8 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public boolean addAlias(String alias, ItemStack stack) {
+        validateAlias(alias);
+
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 

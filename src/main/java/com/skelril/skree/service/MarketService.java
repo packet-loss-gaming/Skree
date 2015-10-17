@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface MarketService {
+    String VALID_ALIAS_REGEX = "^([A-Za-z-0-9 ]+|)$";
+
     ItemStack getItem(String alias);
 
     BigDecimal getSellFactor(BigDecimal buyPrice);

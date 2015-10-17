@@ -65,6 +65,11 @@ public class MarketListCommand implements CommandExecutor {
         Optional<String> optFilter = args.<String>getOne("name");
         String filter = optFilter.isPresent() ? optFilter.get() : "";
 
+        if (!filter.matches(MarketService.VALID_ALIAS_REGEX)) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid filter supplied."));
+            return CommandResult.empty();
+        }
+
         List<Clause<String, BigDecimal>> prices = filter.isEmpty() ? service.getPrices()
                                                                    : service.getPrices(filter + "%");
 
