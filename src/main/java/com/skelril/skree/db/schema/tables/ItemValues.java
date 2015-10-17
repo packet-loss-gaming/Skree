@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ItemValues extends TableImpl<ItemValuesRecord> {
 
-	private static final long serialVersionUID = 469931251;
+	private static final long serialVersionUID = -1078408851;
 
 	/**
 	 * The reference instance of <code>mc_db.item_values</code>
@@ -57,7 +57,7 @@ public class ItemValues extends TableImpl<ItemValuesRecord> {
 	/**
 	 * The column <code>mc_db.item_values.price</code>.
 	 */
-	public final TableField<ItemValuesRecord, BigDecimal> PRICE = createField("price", org.jooq.impl.SQLDataType.DECIMAL.precision(12, 9).nullable(false), this, "");
+	public final TableField<ItemValuesRecord, BigDecimal> PRICE = createField("price", org.jooq.impl.SQLDataType.DECIMAL.precision(22, 2).nullable(false), this, "");
 
 	/**
 	 * Create a <code>mc_db.item_values</code> table reference
