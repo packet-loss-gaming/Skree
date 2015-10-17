@@ -15,6 +15,8 @@ import java.util.List;
 public interface MarketService {
     ItemStack getItem(String alias);
 
+    BigDecimal getSellFactor(BigDecimal buyPrice);
+
     BigDecimal getPrice(String alias);
     BigDecimal getPrice(ItemStack stack);
     boolean setPrice(String alias, BigDecimal price);
