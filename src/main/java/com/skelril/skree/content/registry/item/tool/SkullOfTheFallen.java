@@ -24,6 +24,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
@@ -79,13 +80,15 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                     if (wrapper.isApplicable(pLoc.getExtent())) {
                         int level = wrapper.getLevel(pLoc);
 
+                        DecimalFormat df = new DecimalFormat("#,###.##");
+
                         player.sendMessage(
                             Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
                             Texts.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
-                            Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
-                            Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
-                            Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
-                            Texts.of(TextColors.YELLOW, "Drop modifier: x" + level * wrapper.getDropMod(level, 0))
+                            Texts.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
+                            Texts.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
+                            Texts.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
+                            Texts.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level, 0)))
                         );
                     } else {
                         player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
