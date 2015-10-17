@@ -53,9 +53,12 @@ public class MarketTrackItemCommand implements CommandExecutor {
 
         ItemStack item = held.get();
 
-        service.addItem(item);
-
-        src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item is now being tracked."));
+        if (service.addItem(item)) {
+            src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item is now being tracked."));
+        } else {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is already tracked."));
+            return CommandResult.empty();
+        }
 
         return CommandResult.success();
     }

@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
@@ -33,7 +34,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public ItemStack getItem(String alias) {
+    public Optional<ItemStack> getItem(String alias) {
         validateAlias(alias);
 
         try (Connection con = SQLHandle.getConnection()) {
@@ -46,11 +47,18 @@ public class MarketServiceImpl implements MarketService {
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     )
                     ).fetchOne();
-            return getItemStack(new Clause<>(result.getValue(ITEM_ID.MC_ID), result.getValue(ITEM_ID.VARIANT)));
+            return result == null ? Optional.empty() : Optional.ofNullable(
+                    getItemStack(
+                            new Clause<>(
+                                    result.getValue(ITEM_ID.MC_ID),
+                                    result.getValue(ITEM_ID.VARIANT)
+                            )
+                    )
+            );
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -59,7 +67,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public BigDecimal getPrice(String alias) {
+    public Optional<BigDecimal> getPrice(String alias) {
         validateAlias(alias);
 
         try (Connection con = SQLHandle.getConnection()) {
@@ -71,15 +79,15 @@ public class MarketServiceImpl implements MarketService {
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     )
             ).fetchOne();
-            return result.getValue(ITEM_VALUES.PRICE);
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_VALUES.PRICE));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public BigDecimal getPrice(ItemStack stack) {
+    public Optional<BigDecimal> getPrice(ItemStack stack) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 
@@ -93,11 +101,11 @@ public class MarketServiceImpl implements MarketService {
                                     )
                     )
             ).fetchOne();
-            return result.getValue(ITEM_VALUES.PRICE);
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_VALUES.PRICE));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -106,15 +114,14 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            int updated = create.insertInto(ITEM_VALUES)
+            int changed = create.insertInto(ITEM_VALUES)
                     .columns(ITEM_VALUES.ITEM_ID, ITEM_VALUES.PRICE).select(
-                            create.select(ITEM_ALIASES.ID, DSL.val(price))
+                            create.select(ITEM_ALIASES.ITEM_ID, DSL.val(price))
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     ).onDuplicateKeyUpdate().set(ITEM_VALUES.PRICE, price)
                     .execute();
-
-            return updated == 1;
+            return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -122,28 +129,50 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public void addItem(ItemStack stack) {
+    public boolean setPrice(ItemStack stack, BigDecimal price) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            create.insertInto(ITEM_ID)
+            int changed = create.insertInto(ITEM_VALUES)
+                    .columns(ITEM_VALUES.ITEM_ID, ITEM_VALUES.PRICE).select(
+                            create.select(ITEM_ID.ID, DSL.val(price))
+                                    .from(ITEM_ID)
+                                    .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
+                                    .and(ITEM_ID.VARIANT.equal(idVariant.getValue())))
+                    ).onDuplicateKeyUpdate().set(ITEM_VALUES.PRICE, price)
+                    .execute();
+            return changed > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;    }
+
+    @Override
+    public boolean addItem(ItemStack stack) {
+        try (Connection con = SQLHandle.getConnection()) {
+            Clause<String, String> idVariant = getIDVariant(stack);
+
+            DSLContext create = DSL.using(con);
+            int changed = create.insertInto(ITEM_ID)
                     .columns(ITEM_ID.MC_ID, ITEM_ID.VARIANT)
                     .values(idVariant.getKey(), idVariant.getValue())
                     .onDuplicateKeyIgnore()
                     .execute();
+            return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
-    public void setPrimaryAlias(String alias) {
+    public boolean setPrimaryAlias(String alias) {
         validateAlias(alias);
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            create.insertInto(ITEM_ALIASES_PRIMARY).columns(ITEM_ALIASES_PRIMARY.ALIAS)
+            int changed = create.insertInto(ITEM_ALIASES_PRIMARY).columns(ITEM_ALIASES_PRIMARY.ALIAS)
                     .select(
                             create.select(ITEM_ALIASES.ID)
                                     .from(ITEM_ALIASES)
@@ -153,9 +182,11 @@ public class MarketServiceImpl implements MarketService {
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias))
                     ).execute();
+            return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -166,7 +197,7 @@ public class MarketServiceImpl implements MarketService {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            int created = create.insertInto(ITEM_ALIASES)
+            int changed = create.insertInto(ITEM_ALIASES)
                     .columns(ITEM_ALIASES.ITEM_ID, ITEM_ALIASES.ALIAS)
                     .select(create.select(ITEM_ID.ID, DSL.val(alias.toLowerCase()))
                             .from(ITEM_ID)
@@ -174,7 +205,7 @@ public class MarketServiceImpl implements MarketService {
                                             .and(ITEM_ID.VARIANT.equal(idVariant.getValue()))
                             )
                     ).onDuplicateKeyIgnore().execute();
-            return created == 1;
+            return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -182,7 +213,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public String getAlias(ItemStack stack) {
+    public Optional<String> getAlias(ItemStack stack) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 
@@ -198,11 +229,11 @@ public class MarketServiceImpl implements MarketService {
                                     )
                     ).and(ITEM_ALIASES.ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
             ).fetchOne();
-            return result.value1();
+            return result == null ? Optional.empty() : Optional.of(result.value1());
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override

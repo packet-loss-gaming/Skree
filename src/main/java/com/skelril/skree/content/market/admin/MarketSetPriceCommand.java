@@ -43,28 +43,31 @@ public class MarketSetPriceCommand implements CommandExecutor {
 
         MarketService service = optService.get();
 
-        String alias = null;
+        BigDecimal price;
+        try {
+            price = new BigDecimal(args.<String>getOne("price").get());
+        } catch (NumberFormatException ex) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid price specified"));
+            return CommandResult.empty();
+        }
 
         Optional<String> optAlias = args.<String>getOne("alias");
         Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand() : Optional.empty();
         if (optAlias.isPresent()) {
-            alias = optAlias.get();
+            String alias = optAlias.get();
+            if (service.setPrice(alias, price)) {
+                src.sendMessage(Texts.of(TextColors.YELLOW, alias + "'s price has been set to " + price.toPlainString()));
+                return CommandResult.success();
+            }
         } else if (held.isPresent()) {
-            alias = service.getAlias(held.get());
+            if (service.setPrice(held.get(), price)) {
+                src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item's price has been set to " + price.toPlainString()));
+                return CommandResult.success();
+            }
         }
 
-        if (alias == null) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "No alias specified, and you're not holding an item."));
-            return CommandResult.empty();
-        }
-
-        BigDecimal price = new BigDecimal(args.<String>getOne("price").get());
-
-        service.setPrice(alias, price);
-
-        src.sendMessage(Texts.of(TextColors.YELLOW, alias + "'s price has been set to " + price.toPlainString()));
-
-        return CommandResult.success();
+        src.sendMessage(Texts.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
+        return CommandResult.empty();
     }
 
     public static CommandSpec aquireSpec(Game game) {

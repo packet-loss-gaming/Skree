@@ -56,16 +56,31 @@ public class MarketQuickAddCommand implements CommandExecutor {
 
         ItemStack item = held.get();
         String alias = args.<String>getOne("alias").get();
-        BigDecimal price = new BigDecimal(args.<String>getOne("price").get());
+        BigDecimal price;
+        try {
+            price = new BigDecimal(args.<String>getOne("price").get());
+        } catch (NumberFormatException ex) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid price specified"));
+            return CommandResult.empty();
+        }
 
-        service.addItem(item);
-        service.addAlias(alias, item);
-        service.setPrice(alias, price);
-        service.setPrimaryAlias(alias);
-
-        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market with a price of " + price.toPlainString()));
-
-        return CommandResult.success();
+        if (service.addItem(item)) {
+            if (service.addAlias(alias, item)) {
+                if (service.setPrice(alias, price)) {
+                    if (service.setPrimaryAlias(alias)) {
+                        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market with a price of " + price.toPlainString()));
+                        return CommandResult.success();
+                    }
+                    // Same error, fall through
+                }
+                src.sendMessage(Texts.of(TextColors.DARK_RED, alias + " is not a valid alias"));
+                return CommandResult.empty();
+            }
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            return CommandResult.empty();
+        }
+        src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is already tracked."));
+        return CommandResult.empty();
     }
 
     public static CommandSpec aquireSpec(Game game) {

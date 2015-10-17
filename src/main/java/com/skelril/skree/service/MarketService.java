@@ -11,24 +11,26 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface MarketService {
     String VALID_ALIAS_REGEX = "^([A-Za-z-0-9 ]+|)$";
 
-    ItemStack getItem(String alias);
+    Optional<ItemStack> getItem(String alias);
 
     BigDecimal getSellFactor(BigDecimal buyPrice);
 
-    BigDecimal getPrice(String alias);
-    BigDecimal getPrice(ItemStack stack);
+    Optional<BigDecimal> getPrice(String alias);
+    Optional<BigDecimal> getPrice(ItemStack stack);
     boolean setPrice(String alias, BigDecimal price);
+    boolean setPrice(ItemStack stack, BigDecimal price);
 
-    void addItem(ItemStack stack);
+    boolean addItem(ItemStack stack);
 
-    void setPrimaryAlias(String alias);
+    boolean setPrimaryAlias(String alias);
     boolean addAlias(String alias, ItemStack stack);
 
-    String getAlias(ItemStack stack);
+    Optional<String> getAlias(ItemStack stack);
 
     /**
      * A mapping of the primary alias to the price

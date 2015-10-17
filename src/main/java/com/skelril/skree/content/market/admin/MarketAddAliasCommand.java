@@ -56,9 +56,12 @@ public class MarketAddAliasCommand implements CommandExecutor {
         ItemStack item = held.get();
         String alias = args.<String>getOne("alias").get();
 
-        service.addAlias(alias, item);
-
-        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market."));
+        if (service.addAlias(alias, item)) {
+            src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market."));
+        } else {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            return CommandResult.empty();
+        }
 
         return CommandResult.success();
     }
