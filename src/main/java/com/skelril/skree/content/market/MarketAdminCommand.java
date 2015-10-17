@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.market;
 
-import com.skelril.skree.content.market.admin.MarketQuickAddCommand;
+import com.skelril.skree.content.market.admin.*;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.spec.CommandSpec;
@@ -16,6 +16,10 @@ public class MarketAdminCommand {
         return CommandSpec.builder()
                 .description(Texts.of("Administrative commands for the market"))
                 .child(MarketQuickAddCommand.aquireSpec(game), "quickadd")
+                .child(MarketAddAliasCommand.aquireSpec(game), "addalias")
+                .child(MarketSetPriceCommand.aquireSpec(game), "setprice")
+                .child(MarketSetPrimaryAliasCommand.aquireSpec(game), "setprimaryalias", "setpalias")
+                .child(MarketTrackItemCommand.aquireSpec(game), "track")
                 .build();
     }
 }

@@ -6,14 +6,21 @@
 
 package com.skelril.skree.content.market.admin;
 
+import com.skelril.skree.service.MarketService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
+
+import java.util.Optional;
+
+import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.util.command.args.GenericArguments.remainingJoinedStrings;
 
 public class MarketSetPrimaryAliasCommand implements CommandExecutor {
 
@@ -24,13 +31,28 @@ public class MarketSetPrimaryAliasCommand implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource commandSource, CommandContext commandContext) throws CommandException {
-        return null;
+    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+
+        Optional<MarketService> optService = game.getServiceManager().provide(MarketService.class);
+        if (!optService.isPresent()) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            return CommandResult.empty();
+        }
+
+        MarketService service = optService.get();
+
+        String alias = args.<String>getOne("alias").get();
+        service.setPrimaryAlias(alias);
+
+        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " set as a primary alias."));
+
+        return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Set the primary alias (name) of an item"))
+                .arguments(onlyOne(remainingJoinedStrings(Texts.of("alias"))))
                 .executor(new MarketSetPrimaryAliasCommand(game))
                 .build();
     }
