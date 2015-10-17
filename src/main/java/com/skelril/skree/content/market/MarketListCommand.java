@@ -68,6 +68,11 @@ public class MarketListCommand implements CommandExecutor {
         List<Clause<String, BigDecimal>> prices = filter.isEmpty() ? service.getPrices()
                                                                    : service.getPrices(filter + "%");
 
+        if (prices.isEmpty()) {
+            src.sendMessage(Texts.of(TextColors.YELLOW, "No items matched."));
+            return CommandResult.success();
+        }
+
         List<Text> result = prices.stream()
                 .filter(a -> filter.isEmpty() || a.getKey().startsWith(filter))
                 .sorted((a, b) -> a.getValue().compareTo(b.getValue()))
