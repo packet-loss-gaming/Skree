@@ -21,10 +21,12 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.spongepowered.api.util.command.args.GenericArguments.optional;
 import static org.spongepowered.api.util.command.args.GenericArguments.remainingJoinedStrings;
 
 public class MarketListCommand implements CommandExecutor {
@@ -36,15 +38,16 @@ public class MarketListCommand implements CommandExecutor {
     }
 
     private Text createLine(Clause<String, BigDecimal> entry, MarketService service) {
-        String buy = entry.getValue().toPlainString();
-        String sell = entry.getValue().multiply(service.getSellFactor(entry.getValue())).toPlainString();
+        DecimalFormat df = new DecimalFormat("#,###.##");
+        String buy = df.format(entry.getValue());
+        String sell = df.format(entry.getValue().multiply(service.getSellFactor(entry.getValue())));
 
         Text buyText = Texts.of(TextColors.WHITE, buy);
         Text sellText = Texts.of(TextColors.WHITE, sell);
 
         return Texts.of(
                 TextColors.BLUE, entry.getKey().toUpperCase(),
-                TextColors.YELLOW, " (Quick Price: " + buyText + " - " + sellText + ")"
+                TextColors.YELLOW, " (Quick Price: ", buyText, " - ", sellText, ")"
         );
     }
 
@@ -59,19 +62,28 @@ public class MarketListCommand implements CommandExecutor {
         MarketService service = optService.get();
         PaginationService pagination = game.getServiceManager().provideUnchecked(PaginationService.class);
 
+        Optional<String> optFilter = args.<String>getOne("name");
+        String filter = optFilter.isPresent() ? optFilter.get() : "";
+
         List<Text> result = service.getPrices().stream()
+                .filter(a -> filter.isEmpty() || a.getKey().startsWith(filter))
                 .sorted((a, b) -> a.getValue().compareTo(b.getValue()))
                 .map(a -> createLine(a, service))
                 .collect(Collectors.toList());
 
-        pagination.builder().contents(result).header(Texts.of(TextColors.GOLD, "Item List")).sendTo(src);
-        return null;
+        pagination.builder()
+                .contents(result)
+                .title(Texts.of(TextColors.GOLD, "Item List"))
+                .paddingString(" ")
+                .sendTo(src);
+
+        return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Manipulate the market"))
-                .arguments(remainingJoinedStrings(Texts.of("name")))
+                .arguments(optional(remainingJoinedStrings(Texts.of("name"))))
                 .executor(new MarketListCommand(game))
                 .build();
     }
