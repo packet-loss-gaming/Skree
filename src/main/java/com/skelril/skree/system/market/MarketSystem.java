@@ -4,31 +4,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.system.modifier;
+package com.skelril.skree.system.market;
 
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.modifier.ModExtendCommand;
+import com.skelril.skree.content.market.MarketCommand;
 import com.skelril.skree.content.modifier.ModifierNotifier;
-import com.skelril.skree.service.ModifierService;
-import com.skelril.skree.service.internal.modifier.LazyMySQLModifierService;
+import com.skelril.skree.service.MarketService;
+import com.skelril.skree.service.internal.market.MarketServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 
-public class ModifierSystem implements ServiceProvider<ModifierService> {
-
-    private ModifierService service;
+public class MarketSystem implements ServiceProvider<MarketService> {
+    private MarketService service;
 
     @Inject
-    public ModifierSystem(SkreePlugin plugin, Game game) {
-        service = new LazyMySQLModifierService();
+    public MarketSystem(SkreePlugin plugin, Game game) {
+        service = new MarketServiceImpl();
 
         // Register the service
         try {
             game.getEventManager().registerListeners(plugin, new ModifierNotifier());
-            game.getServiceManager().setProvider(plugin, ModifierService.class, service);
-            game.getCommandDispatcher().register(plugin, ModExtendCommand.aquireSpec(game), "modextend");
+            game.getServiceManager().setProvider(plugin, MarketService.class, service);
+            game.getCommandDispatcher().register(plugin, MarketCommand.aquireSpec(game), "market", "mk");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;
@@ -36,7 +35,7 @@ public class ModifierSystem implements ServiceProvider<ModifierService> {
     }
 
     @Override
-    public ModifierService getService() {
+    public MarketService getService() {
         return service;
     }
 }

@@ -13,6 +13,7 @@ import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.market.MarketSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
@@ -89,6 +90,7 @@ public class SkreePlugin {
         ImmutableList<Class> initialized = ImmutableList.of(
                 ArrowFishingSystem.class,
                 DropClearSystem.class,
+                MarketSystem.class,
                 ModifierSystem.class,
                 ProjectileWatcherSystem.class,
                 PlayerStateSystem.class,
