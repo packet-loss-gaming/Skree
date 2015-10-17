@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ItemValues extends TableImpl<ItemValuesRecord> {
 
-	private static final long serialVersionUID = 274050287;
+	private static final long serialVersionUID = 469931251;
 
 	/**
 	 * The reference instance of <code>mc_db.item_values</code>
@@ -102,7 +102,7 @@ public class ItemValues extends TableImpl<ItemValuesRecord> {
 	 */
 	@Override
 	public List<UniqueKey<ItemValuesRecord>> getKeys() {
-		return Arrays.<UniqueKey<ItemValuesRecord>>asList(Keys.KEY_ITEM_VALUES_PRIMARY);
+		return Arrays.<UniqueKey<ItemValuesRecord>>asList(Keys.KEY_ITEM_VALUES_PRIMARY, Keys.KEY_ITEM_VALUES_ITEM_ID_UNIQUE);
 	}
 
 	/**

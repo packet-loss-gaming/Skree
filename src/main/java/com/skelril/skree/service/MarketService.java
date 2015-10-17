@@ -33,4 +33,5 @@ public interface MarketService {
      * @return
      */
     List<Clause<String, BigDecimal>> getPrices();
+    List<Clause<String, BigDecimal>> getPrices(String aliasConstraint);
 }

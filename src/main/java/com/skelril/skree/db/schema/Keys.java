@@ -47,6 +47,7 @@ public class Keys {
 	public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_PRIMARY = UniqueKeys0.KEY_ITEM_ID_PRIMARY;
 	public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_ITEM = UniqueKeys0.KEY_ITEM_ID_ITEM;
 	public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_PRIMARY = UniqueKeys0.KEY_ITEM_VALUES_PRIMARY;
+	public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_ITEM_ID_UNIQUE = UniqueKeys0.KEY_ITEM_VALUES_ITEM_ID_UNIQUE;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = UniqueKeys0.KEY_MODIFIERS_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = UniqueKeys0.KEY_MODIFIERS_NAME_UNIQUE;
 
@@ -76,6 +77,7 @@ public class Keys {
 		public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_PRIMARY = createUniqueKey(ItemId.ITEM_ID, ItemId.ITEM_ID.ID);
 		public static final UniqueKey<ItemIdRecord> KEY_ITEM_ID_ITEM = createUniqueKey(ItemId.ITEM_ID, ItemId.ITEM_ID.MC_ID, ItemId.ITEM_ID.VARIANT);
 		public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_PRIMARY = createUniqueKey(ItemValues.ITEM_VALUES, ItemValues.ITEM_VALUES.ID);
+		public static final UniqueKey<ItemValuesRecord> KEY_ITEM_VALUES_ITEM_ID_UNIQUE = createUniqueKey(ItemValues.ITEM_VALUES, ItemValues.ITEM_VALUES.ITEM_ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.NAME);
 	}

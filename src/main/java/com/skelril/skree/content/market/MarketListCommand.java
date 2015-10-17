@@ -65,7 +65,10 @@ public class MarketListCommand implements CommandExecutor {
         Optional<String> optFilter = args.<String>getOne("name");
         String filter = optFilter.isPresent() ? optFilter.get() : "";
 
-        List<Text> result = service.getPrices().stream()
+        List<Clause<String, BigDecimal>> prices = filter.isEmpty() ? service.getPrices()
+                                                                   : service.getPrices(filter + "%");
+
+        List<Text> result = prices.stream()
                 .filter(a -> filter.isEmpty() || a.getKey().startsWith(filter))
                 .sorted((a, b) -> a.getValue().compareTo(b.getValue()))
                 .map(a -> createLine(a, service))

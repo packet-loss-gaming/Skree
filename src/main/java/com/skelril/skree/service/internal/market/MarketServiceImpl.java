@@ -84,7 +84,8 @@ public class MarketServiceImpl implements MarketService {
                             create.select(ITEM_ALIASES.ID, DSL.val(price))
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    ).execute();
+                    ).onDuplicateKeyUpdate().set(ITEM_VALUES.PRICE, price)
+                    .execute();
 
             return updated == 1;
         } catch (SQLException e) {
@@ -118,6 +119,10 @@ public class MarketServiceImpl implements MarketService {
                             create.select(ITEM_ALIASES.ID)
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias))
+                    ).onDuplicateKeyUpdate().set(ITEM_ALIASES_PRIMARY.ALIAS,
+                            create.select(ITEM_ALIASES.ID)
+                                    .from(ITEM_ALIASES)
+                                    .where(ITEM_ALIASES.ALIAS.equal(alias))
                     ).execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,7 +142,7 @@ public class MarketServiceImpl implements MarketService {
                             .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
                                             .and(ITEM_ID.VARIANT.equal(idVariant.getValue()))
                             )
-                    ).execute();
+                    ).onDuplicateKeyIgnore().execute();
             return created == 1;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -177,6 +182,24 @@ public class MarketServiceImpl implements MarketService {
                     .from(ITEM_ALIASES)
                     .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
                     .innerJoin(ITEM_ALIASES_PRIMARY).on(ITEM_ALIASES.ID.equal(ITEM_ALIASES_PRIMARY.ALIAS))
+                    .fetch();
+
+            return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Clause<String, BigDecimal>> getPrices(String aliasConstraint) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_VALUES.PRICE)
+                    .from(ITEM_ALIASES)
+                    .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
+                    .innerJoin(ITEM_ALIASES_PRIMARY).on(ITEM_ALIASES.ID.equal(ITEM_ALIASES_PRIMARY.ALIAS))
+                    .where(ITEM_ALIASES.ALIAS.like(aliasConstraint))
                     .fetch();
 
             return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
