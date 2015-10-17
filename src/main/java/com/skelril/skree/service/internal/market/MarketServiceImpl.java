@@ -243,7 +243,7 @@ public class MarketServiceImpl implements MarketService {
             Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_VALUES.PRICE)
                     .from(ITEM_ALIASES)
                     .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
-                    .innerJoin(ITEM_ALIASES_PRIMARY).on(ITEM_ALIASES.ID.equal(ITEM_ALIASES_PRIMARY.ALIAS))
+                    .where(ITEM_VALUES.ITEM_ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
                     .fetch();
 
             return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
@@ -260,8 +260,8 @@ public class MarketServiceImpl implements MarketService {
             Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_VALUES.PRICE)
                     .from(ITEM_ALIASES)
                     .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
-                    .innerJoin(ITEM_ALIASES_PRIMARY).on(ITEM_ALIASES.ID.equal(ITEM_ALIASES_PRIMARY.ALIAS))
-                    .where(ITEM_ALIASES.ALIAS.like(aliasConstraint))
+                    .where(ITEM_VALUES.ITEM_ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
+                    .and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
                     .fetch();
 
             return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
