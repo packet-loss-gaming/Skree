@@ -72,7 +72,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Texts.of("Add an item to the market"))
                 .arguments(seq(string(Texts.of("price")), remainingJoinedStrings(Texts.of("alias"))))
-                .executor(new MarketAddAliasCommand(game))
+                .executor(new MarketQuickAddCommand(game))
                 .build();
     }
 }
