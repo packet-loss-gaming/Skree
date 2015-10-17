@@ -31,6 +31,11 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
+    public BigDecimal getSellFactor(BigDecimal buyPrice) {
+        return new BigDecimal(0.7);
+    }
+
+    @Override
     public BigDecimal getPrice(String alias) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
