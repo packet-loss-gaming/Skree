@@ -627,6 +627,7 @@ public class MarketCommand {
         return CommandSpec.builder()
                 .description(Texts.of("Manipulate the market"))
                 .child(MarketListCommand.aquireSpec(game), "list", "l")
+                .child(MarketLookupCommand.aquireSpec(game), "lookup", "value", "info", "pc")
                 .child(MarketAdminCommand.aquireSpec(game), "admin")
                 .build();
     }

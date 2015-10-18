@@ -213,6 +213,26 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
+    public Optional<String> getAlias(String alias) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
+                    ITEM_ALIASES.ITEM_ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES)
+                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    ).and(ITEM_ALIASES.ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
+            ).fetchOne();
+            return result == null ? Optional.empty() : Optional.of(result.value1());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<String> getAlias(ItemStack stack) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);

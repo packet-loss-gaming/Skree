@@ -30,6 +30,7 @@ public interface MarketService {
     boolean setPrimaryAlias(String alias);
     boolean addAlias(String alias, ItemStack stack);
 
+    Optional<String> getAlias(String alias);
     Optional<String> getAlias(ItemStack stack);
 
     /**
