@@ -474,7 +474,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         ) {
             @Override
             public boolean run(int timesL) {
-                getWorld().playSound(
+                getExtent().playSound(
                         SoundTypes.BLAZE_BREATH,
                         getPos(),
                         Math.min(
@@ -488,7 +488,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             @Override
             public void end() {
-                getWorld().playSound(SoundTypes.BLAZE_DEATH, getPos(), .2F, 0);
+                getExtent().playSound(SoundTypes.BLAZE_DEATH, getPos(), .2F, 0);
             }
         };
 

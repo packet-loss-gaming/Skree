@@ -31,6 +31,14 @@ public class ItemFountain implements IntegratedRunnable  {
         this.options = options;
     }
 
+    public World getExtent() {
+        return dropper.getExtent();
+    }
+
+    public Vector3d getPos() {
+        return dropper.getPos();
+    }
+
     @Override
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);

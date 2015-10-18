@@ -31,6 +31,14 @@ public class ItemDropper {
         this.pos = pos;
     }
 
+    public World getExtent() {
+        return world;
+    }
+
+    public Vector3d getPos() {
+        return pos;
+    }
+
     public void dropItems(Collection<ItemStack> stacks) {
         for (ItemStack stack : stacks) {
             Optional<Entity> optEntity = world.createEntity(EntityTypes.ITEM, pos);
