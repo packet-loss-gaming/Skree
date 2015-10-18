@@ -73,8 +73,8 @@ public class MarketServiceImpl implements MarketService {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             Record1<BigDecimal> result = create.select(ITEM_VALUES.PRICE).from(ITEM_VALUES).where(
-                    ITEM_VALUES.ID.equal(
-                            create.select(ITEM_ALIASES.ID)
+                    ITEM_VALUES.ITEM_ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     )
@@ -93,7 +93,7 @@ public class MarketServiceImpl implements MarketService {
 
             DSLContext create = DSL.using(con);
             Record1<BigDecimal> result = create.select(ITEM_VALUES.PRICE).from(ITEM_VALUES).where(
-                    ITEM_VALUES.ID.equal(
+                    ITEM_VALUES.ITEM_ID.equal(
                             create.select(ITEM_ID.ID)
                                     .from(ITEM_ID)
                                     .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
