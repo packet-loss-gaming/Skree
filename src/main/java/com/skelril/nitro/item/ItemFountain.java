@@ -16,40 +16,26 @@ import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Random;
 
-public class ItemFountain extends ItemDropper implements IntegratedRunnable  {
+public class ItemFountain implements IntegratedRunnable  {
 
-    private static Random random = new Random();
+    private final ItemDropper dropper;
 
-    private Game game;
-    private World world;
-    private Vector3d pos;
-    private Generator<Integer> amplifier;
-    private Collection<ItemStack> options;
+    private final Generator<Integer> amplifier;
+    private final Collection<ItemStack> options;
 
     public ItemFountain(Game game, World world, Vector3d pos, Generator<Integer> amplifier, Collection<ItemStack> options) {
-        super(game, world, pos);
-        this.game = game;
-        this.world = world;
-        this.pos = pos;
+        this.dropper = new ItemDropper(game, world, pos);
+
         this.amplifier = amplifier;
         this.options = options;
-    }
-
-    public World getWorld() {
-        return world;
-    }
-
-    public Vector3d getPos() {
-        return pos;
     }
 
     @Override
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);
         for (int i = 0; i < amplifier.get() + 1; i++) {
-            dropItems(Collections.singletonList(stack));
+            dropper.dropItems(Collections.singletonList(stack));
         }
         return true;
     }

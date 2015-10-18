@@ -21,9 +21,9 @@ import java.util.Optional;
 
 public class ItemDropper {
 
-    private Game game;
-    private World world;
-    private Vector3d pos;
+    private final Game game;
+    private final World world;
+    private final Vector3d pos;
 
     public ItemDropper(Game game, World world, Vector3d pos) {
         this.game = game;
