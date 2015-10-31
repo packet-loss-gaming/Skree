@@ -35,9 +35,9 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.Item;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
@@ -261,10 +261,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             entity = (Entity) rootCause.get();
         }
 
-        List<BlockTransaction> transactions = event.getTransactions();
-        for (BlockTransaction block : transactions) {
-            BlockSnapshot orginal =  block.getOriginal();
-            Optional<Location<World>> optLoc = orginal.getLocation();
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        for (Transaction<BlockSnapshot> block : transactions) {
+            BlockSnapshot original =  block.getOriginal();
+            Optional<Location<World>> optLoc = original.getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
@@ -272,7 +272,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             Location loc = optLoc.get();
 
-            BlockType type = orginal.getState().getType();
+            BlockType type = original.getState().getType();
             if (ore().contains(type)) {
                 int fortuneMod = 0;
                 boolean silkTouch = false;
@@ -359,9 +359,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
-        List<BlockTransaction> transactions = event.getTransactions();
-        for (BlockTransaction block : transactions) {
-            Optional<Location<World>> optLoc = block.getFinalReplacement().getLocation();
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        for (Transaction<BlockSnapshot> block : transactions) {
+            Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
@@ -403,7 +403,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     );
                 }
 
-                block.setIsValid(false);
+                block.setValid(false);
             }
         }
     }

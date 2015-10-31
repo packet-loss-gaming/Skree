@@ -12,9 +12,9 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
@@ -66,25 +66,25 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
-        List<BlockTransaction> transactions = event.getTransactions();
-        for (BlockTransaction block : transactions) {
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        for (Transaction<BlockSnapshot> block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
 
             if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
                 continue;
             }
 
-            if (ore().contains(block.getFinalReplacement().getState().getType())) {
-                block.setCustomReplacement(block.getOriginal().withState(BlockTypes.STONE.getDefaultState()));
+            if (ore().contains(block.getFinal().getState().getType())) {
+                block.setCustom(block.getOriginal().withState(BlockTypes.STONE.getDefaultState()));
             }
         }
     }
 
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
-        List<BlockTransaction> transactions = event.getTransactions();
-        for (BlockTransaction block : transactions) {
-            BlockSnapshot finalReplacement = block.getFinalReplacement();
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        for (Transaction<BlockSnapshot> block : transactions) {
+            BlockSnapshot finalReplacement = block.getFinal();
 
             Optional<Location<World>> optLoc = finalReplacement.getLocation();
 
@@ -130,7 +130,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                                 )
                         );
                     }
-                    block.setIsValid(false);
+                    block.setValid(false);
                 }
             }
         }
@@ -138,9 +138,9 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onPopulateChunkPost(PopulateChunkEvent.Post event) {
-        for (Map.Entry<PopulatorType, List<BlockTransaction>> entry : event.getPopulatedTransactions().entrySet()) {
-            for (BlockTransaction transaction : entry.getValue()) {
-                BlockSnapshot finalReplacement = transaction.getFinalReplacement();
+        for (Map.Entry<PopulatorType, List<Transaction<BlockSnapshot>>> entry : event.getPopulatedTransactions().entrySet()) {
+            for (Transaction<BlockSnapshot> transaction : entry.getValue()) {
+                BlockSnapshot finalReplacement = transaction.getFinal();
 
                 Optional<Location<World>> optLoc = finalReplacement.getLocation();
 
@@ -151,7 +151,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                 BlockType replacementType = finalReplacement.getState().getType();
                 if (ore().contains(replacementType)) {
                     BlockSnapshot stone = transaction.getOriginal().withState(BlockTypes.STONE.getDefaultState());
-                    transaction.setCustomReplacement(stone);
+                    transaction.setCustom(stone);
                 }
             }
         }
