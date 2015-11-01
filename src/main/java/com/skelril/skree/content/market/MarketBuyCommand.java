@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
@@ -82,7 +83,7 @@ public class MarketBuyCommand implements CommandExecutor {
         }
         Optional<Integer> optAmt = args.<Integer>getOne("amount");
         int amt = Math.max(1, optAmt.isPresent() ? optAmt.get() : 0);
-        price = price.multiply(new BigDecimal(amt));
+        price = price.multiply(BigDecimal.valueOf(amt));
 
         BigDecimal funds = MarketImplUtil.getMoney(player);
         BigDecimal newBalance = funds.subtract(price);
@@ -101,7 +102,12 @@ public class MarketBuyCommand implements CommandExecutor {
                 src.sendMessage(Texts.of(TextColors.DARK_RED, "An item stack could not be resolved, please report this!"));
                 return CommandResult.empty();
             }
-            itemStacks.add(stack.get());
+            int total = amt;
+            while (total > 0) {
+                int increment = Math.min(total, stack.get().getMaxStackQuantity());
+                total -= increment;
+                itemStacks.add(newItemStack(stack.get(), increment));
+            }
         }
 
         // Alright, all items have been found
@@ -125,7 +131,7 @@ public class MarketBuyCommand implements CommandExecutor {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
         }
 
-        player.sendMessage(Texts.of(TextColors.GOLD, "Item(s) purchased for ", TextColors.WHITE, format(price), TextColors.YELLOW, "!"));
+        player.sendMessage(Texts.of(TextColors.YELLOW, "Item(s) purchased for ", TextColors.WHITE, format(price), TextColors.YELLOW, "!"));
 
         return CommandResult.success();
     }

@@ -8,6 +8,7 @@ package com.skelril.skree.content.market;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
+import com.skelril.nitro.item.ItemComparisonUtil;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.service.MarketService;
@@ -17,8 +18,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,14 +31,14 @@ public class MarketImplUtil {
 
     public static BigDecimal getMoney(Player player) {
         EntityPlayer playerEnt = (EntityPlayer) player;
-        BigDecimal totalValue = BigDecimal.ZERO;
+        BigInteger totalValue = BigInteger.ZERO;
         for (net.minecraft.item.ItemStack stack : playerEnt.inventory.mainInventory) {
-            Optional<BigDecimal> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) stack));
+            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) stack));
             if (value.isPresent()) {
                 totalValue = totalValue.add(value.get());
             }
         }
-        return totalValue;
+        return new BigDecimal(totalValue);
     }
 
     public enum QueryMode {
@@ -72,16 +72,28 @@ public class MarketImplUtil {
         }
 
         for (int i = min; i < max; ++i) {
-            net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i].copy();
+            net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i];
+            if (stack == null) {
+                continue;
+            }
+
             if (filter.isPresent()) {
-                stack.stackSize = 1;
-                if (!filter.get().equals(stack)) {
+                if (!ItemComparisonUtil.isSimilar(filter.get(), (ItemStack) (Object) stack)) {
                     continue;
                 }
             }
+
             Optional<BigDecimal> optPrice = service.getPrice((ItemStack) (Object) stack);
             if (optPrice.isPresent()) {
-                totalPrice = totalPrice.add(optPrice.get());
+                double percentageSale = 1;
+                if (stack.isItemStackDamageable()) {
+                    percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
+                }
+
+                BigDecimal unitPrice = optPrice.get().multiply(new BigDecimal(percentageSale));
+                unitPrice = unitPrice.multiply(service.getSellFactor(unitPrice));
+
+                totalPrice = totalPrice.add(unitPrice.multiply(new BigDecimal(stack.stackSize)));
                 ints.add(i);
             }
         }
@@ -104,12 +116,12 @@ public class MarketImplUtil {
         EntityPlayer playerEnt = (EntityPlayer) player;
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
 
-        Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.round(new MathContext(0, RoundingMode.DOWN)));
+        Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.toBigInteger());
         Iterator<ItemStack> resultIt = results.iterator();
 
         // Loop through replacing empty slots and the old coffers with the new balance
         for (int i = 0; i < mainInv.length; ++i) {
-            Optional<BigDecimal> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) mainInv[i]));
+            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) mainInv[i]));
             if (value.isPresent()) {
                 mainInv[i] = null;
             }

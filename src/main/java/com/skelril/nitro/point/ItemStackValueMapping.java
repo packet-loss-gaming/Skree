@@ -6,7 +6,7 @@
 
 package com.skelril.nitro.point;
 
-import com.skelril.nitro.Clause;
+import com.skelril.nitro.item.ItemComparisonUtil;
 import com.skelril.nitro.item.ItemStackFactory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public class ItemStackValueMapping<PointType extends Comparable<PointType>> extends ValueMapping<ItemStack, PointType> {
+public class ItemStackValueMapping<PointType extends Comparable<PointType>> extends ValueMapping<ItemStack, String, PointType> {
     private Function<Integer, PointType> pointTypeFromInt;
     private Function<PointType, Integer> pointTypeToInt;
 
@@ -44,6 +43,15 @@ public class ItemStackValueMapping<PointType extends Comparable<PointType>> exte
     }
 
     @Override
+    protected String createIndexOf(ItemStack stack) {
+        if (stack == null) {
+            return null;
+        }
+
+        return stack.getItem().getId();
+    }
+
+    @Override
     protected Collection<ItemStack> collect(Collection<ItemStack> satisfiers, PointType amt) {
         List<ItemStack> itemStacks = new ArrayList<>();
         for (ItemStack satisfier : satisfiers) {
@@ -60,14 +68,6 @@ public class ItemStackValueMapping<PointType extends Comparable<PointType>> exte
         return itemStacks;
     }
 
-    private List<Clause<ItemStack, ItemStack>> getComparisonList(Collection<ItemStack> stacks) {
-        return stacks.stream().map(stack -> {
-            ItemStack stackCopy = stack.copy();
-            stackCopy.setQuantity(1);
-            return new Clause<>(stackCopy, stack);
-        }).collect(Collectors.toList());
-    }
-
     @Override
     protected Optional<PointType> matches(Collection<ItemStack> a, Collection<ItemStack> b, PointType matchPoints) {
         if (a.size() != b.size()) {
@@ -76,15 +76,12 @@ public class ItemStackValueMapping<PointType extends Comparable<PointType>> exte
 
         int factor = Integer.MAX_VALUE;
 
-        List<Clause<ItemStack, ItemStack>> comparisonListA = getComparisonList(a);
-        List<Clause<ItemStack, ItemStack>> comparisonListB = getComparisonList(b);
-
-        for (Clause<ItemStack, ItemStack> aStack : comparisonListA) {
+        for (ItemStack aStack : a) {
             boolean matchFound = false;
-            for (Clause<ItemStack, ItemStack> bStack : comparisonListB) {
-                if (aStack.getKey().equals(bStack.getKey())) {
+            for (ItemStack bStack : b) {
+                if (ItemComparisonUtil.isSimilar(aStack, bStack)) {
                     matchFound = true;
-                    factor = Math.min(factor, bStack.getValue().getQuantity() / aStack.getValue().getQuantity());
+                    factor = Math.min(factor, aStack.getQuantity() / bStack.getQuantity());
                     break;
                 }
             }

@@ -11,14 +11,14 @@ import com.skelril.nitro.modifier.ModifierFunction;
 import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 
-public class CofferResolver extends SimplePointDropResolver<BigDecimal> {
+public class CofferResolver extends SimplePointDropResolver<BigInteger> {
     public CofferResolver(int maxCoffers) {
         this(maxCoffers, ModifierFunctions.MULTI);
     }
 
     public CofferResolver(int maxCoffers, ModifierFunction modifierFunction) {
-        super(CofferValueMap.inst(), BigDecimal::new, maxCoffers, modifierFunction);
+        super(CofferValueMap.inst(), BigInteger::valueOf, maxCoffers, modifierFunction);
     }
 }

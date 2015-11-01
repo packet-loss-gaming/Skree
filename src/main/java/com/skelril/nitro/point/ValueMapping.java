@@ -7,23 +7,24 @@
 package com.skelril.nitro.point;
 
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.Validate;
 
 import java.util.*;
 import java.util.function.BiFunction;
 
-public abstract class ValueMapping<KeyType, PointType extends Comparable<PointType>> {
+public abstract class ValueMapping<KeyType, IndexType, PointType extends Comparable<PointType>> {
     List<PointValue<KeyType, PointType>> values;
     PointType zeroValue, oneValue;
     BiFunction<PointType, PointType, PointType> pointTypeDiv, pointTypeMod;
 
-    Multimap<KeyType, PointValue<KeyType, PointType>> valueMap;
+    Multimap<IndexType, PointValue<KeyType, PointType>> valueMap = ArrayListMultimap.create();
 
     public ValueMapping(List<PointValue<KeyType, PointType>> values, PointType zeroValue, PointType oneValue,
                         BiFunction<PointType, PointType, PointType> pointTypeDiv,
                         BiFunction<PointType, PointType, PointType> pointTypeMod) {
-        this.values = values;
+        this.values = new ArrayList<>(values);
         this.zeroValue = zeroValue;
         this.oneValue = oneValue;
         this.pointTypeDiv = pointTypeDiv;
@@ -34,10 +35,12 @@ public abstract class ValueMapping<KeyType, PointType extends Comparable<PointTy
 
         for (PointValue<KeyType, PointType> pointVal : this.values) {
             for (KeyType satisfier : pointVal.getSatisfiers()) {
-                valueMap.put(satisfier, pointVal);
+                valueMap.put(createIndexOf(satisfier), pointVal);
             }
         }
     }
+
+    protected abstract IndexType createIndexOf(KeyType keyType);
 
     public Collection<KeyType> getBestSatisifers(PointType value) {
         ListIterator<PointValue<KeyType, PointType>> satisfier = values.listIterator(values.size());
@@ -72,7 +75,7 @@ public abstract class ValueMapping<KeyType, PointType extends Comparable<PointTy
 
     public Optional<PointType> getValue(Collection<KeyType> key) {
         Validate.isTrue(!key.isEmpty());
-        Collection<PointValue<KeyType, PointType>> possibleMatches = valueMap.get(key.iterator().next());
+        Collection<PointValue<KeyType, PointType>> possibleMatches = valueMap.get(createIndexOf(key.iterator().next()));
         for (PointValue<KeyType, PointType> possibleMatch : possibleMatches) {
             Optional<PointType> optPoints = matches(key, possibleMatch.getSatisfiers(), possibleMatch.getPoints());
             if (optPoints.isPresent()) {

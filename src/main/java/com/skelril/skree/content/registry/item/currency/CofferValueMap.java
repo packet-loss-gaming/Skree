@@ -8,50 +8,50 @@ package com.skelril.skree.content.registry.item.currency;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.skelril.nitro.point.ItemStackBigDecimalValueMapping;
+import com.skelril.nitro.point.ItemStackBigIntegerValueMapping;
 import com.skelril.nitro.point.PointValue;
 import com.skelril.nitro.point.SimplePointValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
-public class CofferValueMap extends ItemStackBigDecimalValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigDecimal>> COFFER_VALUE_MAP = ImmutableList.of(
+public class CofferValueMap extends ItemStackBigIntegerValueMapping {
+    public static final ImmutableList<PointValue<ItemStack, BigInteger>> COFFER_VALUE_MAP = ImmutableList.of(
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) TESTRIL)),
-                    new BigDecimal(TESTRIL.getCofferValue())
+                    BigInteger.valueOf(TESTRIL.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) AQUIS)),
-                    new BigDecimal(AQUIS.getCofferValue())
+                    BigInteger.valueOf(AQUIS.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) MARSINCO)),
-                    new BigDecimal(MARSINCO.getCofferValue())
+                    BigInteger.valueOf(MARSINCO.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) POSTRE)),
-                    new BigDecimal(POSTRE.getCofferValue())
+                    BigInteger.valueOf(POSTRE.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) EQESTA)),
-                    new BigDecimal(EQESTA.getCofferValue())
+                    BigInteger.valueOf(EQESTA.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) REDISTRAL)),
-                    new BigDecimal(REDISTRAL.getCofferValue())
+                    BigInteger.valueOf(REDISTRAL.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) RETESRUM)),
-                    new BigDecimal(RETESRUM.getCofferValue())
+                    BigInteger.valueOf(RETESRUM.getCofferValue())
             ),
             new SimplePointValue<>(
                     Lists.newArrayList(newItemStack((ItemType) MESARDITH)),
-                    new BigDecimal(MESARDITH.getCofferValue())
+                    BigInteger.valueOf(MESARDITH.getCofferValue())
             )
     );
 

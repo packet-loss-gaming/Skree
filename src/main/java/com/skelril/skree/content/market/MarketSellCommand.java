@@ -10,8 +10,6 @@ import com.skelril.nitro.Clause;
 import com.skelril.skree.content.market.MarketImplUtil.QueryMode;
 import com.skelril.skree.service.MarketService;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.flags;
-import static org.spongepowered.api.util.command.args.GenericArguments.remainingJoinedStrings;
+import static org.spongepowered.api.util.command.args.GenericArguments.none;
 
 public class MarketSellCommand implements CommandExecutor {
 
@@ -72,15 +70,6 @@ public class MarketSellCommand implements CommandExecutor {
                 src.sendMessage(Texts.of(TextColors.DARK_RED, "You're not holding an item to filter with!"));
                 return CommandResult.empty();
             }
-
-            ItemStack newFilter = filter.get().copy();
-            newFilter.setQuantity(1);
-
-            Optional<MutableBoundedValue<Integer>> optDurability = newFilter.getValue(Keys.ITEM_DURABILITY);
-            if (optDurability.isPresent()) {
-                newFilter.offer(Keys.ITEM_DURABILITY, 0);
-            }
-            filter = Optional.of(newFilter);
         }
 
         Clause<BigDecimal, List<Integer>> changes = MarketImplUtil.getChanges(player, service, mode, filter);
@@ -113,7 +102,7 @@ public class MarketSellCommand implements CommandExecutor {
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Sell an item"))
-                .arguments(flags().flag("h", "a", "u").buildWith(remainingJoinedStrings(Texts.of("item"))))
+                .arguments(flags().flag("h").flag("a").flag("u").buildWith(none()))
                 .executor(new MarketSellCommand(game))
                 .build();
     }
