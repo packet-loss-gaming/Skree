@@ -22,6 +22,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 public class MarketSetPriceCommand implements CommandExecutor {
@@ -56,12 +57,12 @@ public class MarketSetPriceCommand implements CommandExecutor {
         if (optAlias.isPresent()) {
             String alias = optAlias.get();
             if (service.setPrice(alias, price)) {
-                src.sendMessage(Texts.of(TextColors.YELLOW, alias + "'s price has been set to " + price.toPlainString()));
+                src.sendMessage(Texts.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
                 return CommandResult.success();
             }
         } else if (held.isPresent()) {
             if (service.setPrice(held.get(), price)) {
-                src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item's price has been set to " + price.toPlainString()));
+                src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
                 return CommandResult.success();
             }
         }

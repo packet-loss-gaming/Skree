@@ -22,6 +22,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 public class MarketQuickAddCommand implements CommandExecutor {
@@ -68,7 +69,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
             if (service.addAlias(alias, item)) {
                 if (service.setPrice(alias, price)) {
                     if (service.setPrimaryAlias(alias)) {
-                        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market with a price of " + price.toPlainString()));
+                        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
                         return CommandResult.success();
                     }
                     // Same error, fall through

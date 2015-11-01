@@ -43,7 +43,17 @@ public class Tables {
 	public static final ItemValues ITEM_VALUES = com.skelril.skree.db.schema.tables.ItemValues.ITEM_VALUES;
 
 	/**
+	 * The table mc_db.market_transactions
+	 */
+	public static final MarketTransactions MARKET_TRANSACTIONS = com.skelril.skree.db.schema.tables.MarketTransactions.MARKET_TRANSACTIONS;
+
+	/**
 	 * The table mc_db.modifiers
 	 */
 	public static final Modifiers MODIFIERS = com.skelril.skree.db.schema.tables.Modifiers.MODIFIERS;
+
+	/**
+	 * The table mc_db.players
+	 */
+	public static final Players PLAYERS = com.skelril.skree.db.schema.tables.Players.PLAYERS;
 }

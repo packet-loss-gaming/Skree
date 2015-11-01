@@ -4,13 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.droptable.resolver.point;
-
-import org.spongepowered.api.item.inventory.ItemStack;
+package com.skelril.nitro.point;
 
 import java.util.Collection;
 
-public interface PointValue {
-    Collection<ItemStack> getItemStacks();
-    int getPoints();
+public interface PointValue<A, B> extends Comparable<PointValue<A, B>> {
+    Collection<A> getSatisfiers();
+    B getPoints();
 }

@@ -8,19 +8,21 @@ package com.skelril.nitro.droptable.resolver.point;
 
 import com.skelril.nitro.modifier.ModifierFunction;
 import com.skelril.nitro.modifier.ModifierFunctions;
+import com.skelril.nitro.point.ValueMapping;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.List;
+import java.util.function.Function;
 
-public class SimplePointDropResolver extends AbstractSlipperyPointResolver implements PointDropResolver {
+public class SimplePointDropResolver<PointType extends Comparable<PointType>> extends AbstractSlipperyPointResolver<PointType> implements PointDropResolver {
     private final int maxPoints;
     private final ModifierFunction modiFunc;
 
-    public SimplePointDropResolver(List<PointValue> choices, int maxPoints) {
-        this(choices, maxPoints, ModifierFunctions.MULTI);
+    public SimplePointDropResolver(ValueMapping<ItemStack, PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints) {
+        this(choices, pointTypeFromInt, maxPoints, ModifierFunctions.MULTI);
     }
 
-    public SimplePointDropResolver(List<PointValue> choices, int maxPoints, ModifierFunction modiFunc) {
-        super(choices);
+    public SimplePointDropResolver(ValueMapping<ItemStack, PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints, ModifierFunction modiFunc) {
+        super(choices, pointTypeFromInt);
         this.maxPoints = maxPoints;
         this.modiFunc = modiFunc;
     }

@@ -38,4 +38,8 @@ public class ItemStackFactory {
     public static ItemStack newItemStack(ItemStack itemStack) {
         return game.getRegistry().createItemBuilder().fromItemStack(itemStack).build();
     }
+
+    public static ItemStack newItemStack(ItemStack itemStack, int quantity) {
+        return game.getRegistry().createItemBuilder().fromItemStack(itemStack).quantity(quantity).build();
+    }
 }

@@ -1,0 +1,156 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.skelril.skree.content.market;
+
+import com.google.common.collect.Lists;
+import com.skelril.nitro.Clause;
+import com.skelril.nitro.item.ItemDropper;
+import com.skelril.skree.content.registry.item.currency.CofferValueMap;
+import com.skelril.skree.service.MarketService;
+import net.minecraft.entity.player.EntityPlayer;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class MarketImplUtil {
+    public static String format(BigDecimal decimal) {
+        DecimalFormat df = new DecimalFormat("#,###.##");
+        return df.format(decimal);
+    }
+
+    public static BigDecimal getMoney(Player player) {
+        EntityPlayer playerEnt = (EntityPlayer) player;
+        BigDecimal totalValue = BigDecimal.ZERO;
+        for (net.minecraft.item.ItemStack stack : playerEnt.inventory.mainInventory) {
+            Optional<BigDecimal> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) stack));
+            if (value.isPresent()) {
+                totalValue = totalValue.add(value.get());
+            }
+        }
+        return totalValue;
+    }
+
+    public enum QueryMode {
+        EVERYTHING,
+        HOT_BAR,
+        HELD
+    }
+
+    public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, Optional<ItemStack> filter) {
+        EntityPlayer playerEnt = (EntityPlayer) player;
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<Integer> ints = new ArrayList<>();
+
+        int min, max;
+        switch (mode) {
+            case HELD:
+                min = playerEnt.inventory.currentItem;
+                max = min + 1;
+                break;
+            case HOT_BAR:
+                min = 0;
+                max = 9;
+                break;
+            case EVERYTHING:
+                min = 0;
+                max = playerEnt.inventory.mainInventory.length;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid query mode provided!");
+        }
+
+        for (int i = min; i < max; ++i) {
+            net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i].copy();
+            if (filter.isPresent()) {
+                stack.stackSize = 1;
+                if (!filter.get().equals(stack)) {
+                    continue;
+                }
+            }
+            Optional<BigDecimal> optPrice = service.getPrice((ItemStack) (Object) stack);
+            if (optPrice.isPresent()) {
+                totalPrice = totalPrice.add(optPrice.get());
+                ints.add(i);
+            }
+        }
+
+        return new Clause<>(totalPrice, ints);
+    }
+
+    public static List<Clause<ItemStack, Integer>> removeAtPos(Player player, List<Integer> ints) {
+        EntityPlayer playerEnt = (EntityPlayer) player;
+        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+        List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
+        for (int i : ints) {
+            transactions.add(new Clause<>((ItemStack) (Object) mainInv[i], -(mainInv[i].stackSize)));
+            mainInv[i] = null;
+        }
+        return transactions;
+    }
+
+    public static boolean setBalanceTo(Game game, Player player, BigDecimal decimal) {
+        EntityPlayer playerEnt = (EntityPlayer) player;
+        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+
+        Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.round(new MathContext(0, RoundingMode.DOWN)));
+        Iterator<ItemStack> resultIt = results.iterator();
+
+        // Loop through replacing empty slots and the old coffers with the new balance
+        for (int i = 0; i < mainInv.length; ++i) {
+            Optional<BigDecimal> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) mainInv[i]));
+            if (value.isPresent()) {
+                mainInv[i] = null;
+            }
+
+            if (mainInv[i] == null && resultIt.hasNext()) {
+                mainInv[i] = (net.minecraft.item.ItemStack) (Object) resultIt.next();
+                resultIt.remove();
+            }
+        }
+
+        // Add remaining currency
+        new ItemDropper(game, player.getWorld(), player.getLocation().getPosition()).dropItems(results);
+        return true;
+    }
+
+    public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Game game, Player player, Collection<ItemStack> stacks) {
+        EntityPlayer playerEnt = (EntityPlayer) player;
+        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+
+        List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
+        Iterator<ItemStack> stackIt = stacks.iterator();
+
+        // Loop through replacing empty space with the requested items
+        for (int i = 0; i < mainInv.length; ++i) {
+            if (mainInv[i] == null) {
+                if (!stackIt.hasNext()) {
+                    break;
+                }
+
+                ItemStack next = stackIt.next();
+                mainInv[i] = (net.minecraft.item.ItemStack) (Object) next;
+                transactions.add(new Clause<>(next, next.getQuantity()));
+
+                stackIt.remove();
+            }
+        }
+
+        // Add remaining transactions
+        transactions.addAll(stacks.stream().map(stack -> new Clause<>(stack, stack.getQuantity())).collect(Collectors.toList()));
+        new ItemDropper(game, player.getWorld(), player.getLocation().getPosition()).dropItems(stacks);
+
+        return new Clause<>(true, transactions);
+    }
+}

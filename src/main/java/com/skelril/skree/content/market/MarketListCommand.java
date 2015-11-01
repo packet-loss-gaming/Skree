@@ -21,11 +21,11 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static org.spongepowered.api.util.command.args.GenericArguments.optional;
 import static org.spongepowered.api.util.command.args.GenericArguments.remainingJoinedStrings;
 
@@ -38,9 +38,8 @@ public class MarketListCommand implements CommandExecutor {
     }
 
     private Text createLine(Clause<String, BigDecimal> entry, MarketService service) {
-        DecimalFormat df = new DecimalFormat("#,###.##");
-        String buy = df.format(entry.getValue());
-        String sell = df.format(entry.getValue().multiply(service.getSellFactor(entry.getValue())));
+        String buy = format(entry.getValue());
+        String sell = format(entry.getValue().multiply(service.getSellFactor(entry.getValue())));
 
         Text buyText = Texts.of(TextColors.WHITE, buy);
         Text sellText = Texts.of(TextColors.WHITE, sell);

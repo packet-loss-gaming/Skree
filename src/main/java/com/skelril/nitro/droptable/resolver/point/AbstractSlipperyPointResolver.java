@@ -6,23 +6,21 @@
 
 package com.skelril.nitro.droptable.resolver.point;
 
+import com.skelril.nitro.point.ValueMapping;
 import com.skelril.nitro.probability.Probability;
-import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.function.Function;
 
-public abstract class AbstractSlipperyPointResolver implements PointDropResolver {
+public abstract class AbstractSlipperyPointResolver<PointType extends Comparable<PointType>> implements PointDropResolver {
     private int points = getBasePointCount();
-    protected final List<PointValue> choices;
+    private ValueMapping<ItemStack, PointType> mapping;
+    private Function<Integer, PointType> pointTypeFromInt;
 
-    protected AbstractSlipperyPointResolver(List<PointValue> choices) {
-        this.choices = choices;
-        this.choices.sort((a, b) -> a.getPoints() - b.getPoints());
-        Validate.isTrue(!this.choices.isEmpty() && this.choices.get(0).getPoints() > 0);
+    protected AbstractSlipperyPointResolver(ValueMapping<ItemStack, PointType> mapping, Function<Integer, PointType> pointTypeFromInt) {
+        this.mapping = mapping;
+        this.pointTypeFromInt = pointTypeFromInt;
     }
 
     public int getBasePointCount() {
@@ -36,23 +34,8 @@ public abstract class AbstractSlipperyPointResolver implements PointDropResolver
 
     @Override
     public Collection<ItemStack> flush() {
-        List<ItemStack> results = new ArrayList<>();
-
-        ListIterator<PointValue> it = choices.listIterator(choices.size());
-
-        while (it.hasPrevious()) {
-            PointValue cur = it.previous();
-
-            int amt = points / cur.getPoints();
-            points = points % cur.getPoints();
-
-            for (int i = 0; i < amt; ++i) {
-                results.addAll(cur.getItemStacks());
-            }
-        }
-
+        Collection<ItemStack> results = mapping.satisfy(pointTypeFromInt.apply(points));
         points = getBasePointCount();
-
         return results;
     }
 }

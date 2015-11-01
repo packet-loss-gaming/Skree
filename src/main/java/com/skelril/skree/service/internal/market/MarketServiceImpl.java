@@ -14,10 +14,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
@@ -270,7 +268,7 @@ public class MarketServiceImpl implements MarketService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -288,7 +286,27 @@ public class MarketServiceImpl implements MarketService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
+    }
+
+    private <R, T> Map<T, Integer> condenseCount(Collection<Clause<R, Integer>> input, Function<R, T> remap) {
+        Map<T, Integer> count = new HashMap<>();
+        for (Clause<R, Integer> entry : input) {
+            count.merge(remap.apply(entry.getKey()), entry.getValue(), (a, b) -> a + b);
+        }
+        return count;
+    }
+
+    @Override
+    public boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity) {
+        // Map<String, Integer> aliasCount = condenseCount(itemQuantity, (a) -> a);
+        return true;
+    }
+
+    @Override
+    public boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity) {
+        // Map<Clause<String, String>, Integer> itemCount = condenseCount(itemQuantity, this::getIDVariant);
+        return true;
     }
 
     private Map<String, TypeDeducer> varientResolutionMap = new HashMap<>();
