@@ -11,8 +11,8 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
-            name = 'forge'
-            url = 'http://files.minecraftforge.net/maven'
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
         }
         maven {
             name = 'sonatype-snapshots'
@@ -21,10 +21,18 @@ buildscript {
     }
 
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
         classpath 'org.jooq:jooq-codegen:3.6.0'
         classpath group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.2.+'
     }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+minecraft {
+    version = "11.14.3.1530"
+    runDir = "run"
+    mappings = "snapshot_20151031"
 }
 
 repositories {
@@ -46,13 +54,6 @@ dependencies {
     compile group: 'org.spongepowered', name: 'spongeapi', version: '2.+'
 
     runtime group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.2.3'
-}
-
-apply plugin: 'forge'
-
-minecraft {
-    ext.forgeVersion = "11.14.3.1499"
-    version = "1.8-$forgeVersion"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

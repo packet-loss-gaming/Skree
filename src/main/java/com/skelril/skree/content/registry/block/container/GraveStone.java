@@ -71,7 +71,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return this.getDefaultState().withProperty(FACING_PROP, placer.func_174811_aO());
+        return this.getDefaultState().withProperty(FACING_PROP, placer.getHorizontalFacing());
     }
 
     @Override

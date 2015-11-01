@@ -139,7 +139,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public String getName() {
+    public String getCommandSenderName() {
         return this.hasCustomName() ? this.customName : "container.gravestone";
     }
 
