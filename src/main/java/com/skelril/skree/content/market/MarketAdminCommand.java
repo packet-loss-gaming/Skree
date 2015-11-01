@@ -15,6 +15,7 @@ public class MarketAdminCommand {
     public static CommandSpec aquireSpec(Game game) {
         return CommandSpec.builder()
                 .description(Texts.of("Administrative commands for the market"))
+                .permission("skree.market.admin")
                 .child(MarketQuickAddCommand.aquireSpec(game), "quickadd")
                 .child(MarketAddAliasCommand.aquireSpec(game), "addalias")
                 .child(MarketSetPriceCommand.aquireSpec(game), "setprice")
