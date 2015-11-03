@@ -48,7 +48,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         List<Entity> entities = event.getEntities();
 
         for (Entity entity : entities) {
-            if (!isApplicable(entity.getWorld())) continue;
+            if (!isApplicable(entity)) continue;
 
             if (entity instanceof Monster) {
                 event.setCancelled(true);

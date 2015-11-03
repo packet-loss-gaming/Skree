@@ -23,6 +23,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.text.DecimalFormat;
 import java.util.Optional;
@@ -71,14 +72,15 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
         if (optHeldItem.isPresent()) {
             if (this.equals(optHeldItem.get().getItem())) {
-                Location pLoc = player.getLocation();
+                Location<World> pLoc = player.getLocation();
 
                 Optional<WorldService> optWorldService = event.getGame().getServiceManager().provide(WorldService.class);
                 if (optWorldService.isPresent()) {
                     WorldService worldService = optWorldService.get();
                     WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
-                    if (wrapper.isApplicable(pLoc.getExtent())) {
-                        int level = wrapper.getLevel(pLoc);
+                    Optional<Integer> optLevel = wrapper.getLevel(pLoc);
+                    if (optLevel.isPresent()) {
+                        int level = optLevel.get();
 
                         DecimalFormat df = new DecimalFormat("#,###.##");
 

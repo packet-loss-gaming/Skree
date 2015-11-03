@@ -13,7 +13,6 @@ import com.skelril.nitro.droptable.DropTableEntryImpl;
 import com.skelril.nitro.droptable.DropTableImpl;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
-import com.skelril.nitro.extractor.WorldFromExtent;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
@@ -27,6 +26,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -35,8 +35,6 @@ import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.RAW_GOD_FISH;
 
 public class ArrowFishingHandler {
-    private static WorldFromExtent toWorld = new WorldFromExtent();
-
     private DropTable dropTable;
 
     public ArrowFishingHandler() {
@@ -71,7 +69,7 @@ public class ArrowFishingHandler {
             return;
         }
 
-        Location loc = event.getTargetEntity().getLocation();
+        Location<World> loc = event.getTargetEntity().getLocation();
         TrackedProjectileInfo info = event.getProjectileInfo();
 
         if (info.getProjectileSource().isPresent() && MultiTypeRegistry.isWater(loc.getBlockType())) {
@@ -88,8 +86,7 @@ public class ArrowFishingHandler {
                 }
             }
 
-            ItemDropper dropper = new ItemDropper(event.getGame(), toWorld.from(loc.getExtent()), loc.getPosition());
-            dropper.dropItems(dropTable.getDrops(1, modifier));
+            new ItemDropper(loc).dropItems(dropTable.getDrops(1, modifier));
         }
     }
 }

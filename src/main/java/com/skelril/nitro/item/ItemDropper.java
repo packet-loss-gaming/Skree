@@ -7,13 +7,13 @@
 package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
@@ -21,32 +21,27 @@ import java.util.Optional;
 
 public class ItemDropper {
 
-    private final Game game;
-    private final World world;
-    private final Vector3d pos;
+    private final Location<World> location;
 
-    public ItemDropper(Game game, World world, Vector3d pos) {
-        this.game = game;
-        this.world = world;
-        this.pos = pos;
+    public ItemDropper(Location<World> location) {
+        this.location = location;
     }
 
     public World getExtent() {
-        return world;
+        return location.getExtent();
     }
 
     public Vector3d getPos() {
-        return pos;
+        return location.getPosition();
     }
 
     public void dropItems(Collection<ItemStack> stacks) {
         for (ItemStack stack : stacks) {
-            Optional<Entity> optEntity = world.createEntity(EntityTypes.ITEM, pos);
+            Optional<Entity> optEntity = getExtent().createEntity(EntityTypes.ITEM, getPos());
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
-                item.offer(item.getItemData().set(Keys.REPRESENTED_ITEM, stack.createSnapshot()));
-                // item.offer(item.getData(VelocityData.class).get().setValue(new Vector3d(random.nextFloat() % 1, random.nextFloat() % 1, random.nextFloat() % 1)));
-                world.spawnEntity(item, Cause.empty());
+                item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot());
+                getExtent().spawnEntity(item, Cause.empty());
             }
         }
     }

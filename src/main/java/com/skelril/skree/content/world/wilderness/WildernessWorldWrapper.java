@@ -16,7 +16,6 @@ import com.skelril.nitro.droptable.DropTableImpl;
 import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
-import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.probability.Probability;
@@ -32,6 +31,7 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.Item;
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
@@ -132,11 +132,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         List<Entity> entities = event.getEntities();
 
         for (Entity entity : entities) {
-            if (!isApplicable(entity.getWorld())) continue;
+            Location<World> loc = entity.getLocation();
+            Optional<Integer> optLevel = getLevel(loc);
 
-            Location loc = entity.getLocation();
-
-            final int level = getLevel(loc);
+            if (!optLevel.isPresent()) continue;
+            int level = optLevel.get();
 
             if (level > 1) {
                 // TODO move damage modification
@@ -190,10 +190,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onEntityAttack(InteractEntityEvent event) {
         Entity entity = event.getTargetEntity();
 
-        if (!isApplicable(entity.getWorld())) return;
+        Optional<Integer> optLevel = getLevel(entity.getLocation());
 
-        int level = getLevel(entity.getLocation());
+        if (!optLevel.isPresent()) {
+            return;
+        }
 
+        int level = optLevel.get();
         if (!allowsPvP(level)) {
             return;
         }
@@ -217,13 +220,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onEntityDeath(DestructEntityEvent.Death event) {
         Entity entity = event.getTargetEntity();
 
-        if (!isApplicable(entity.getWorld())) return;
+        Location<World> loc = entity.getLocation();
+        Optional<Integer> optLevel = getLevel(loc);
 
-        Location loc = entity.getLocation();
+        if (!optLevel.isPresent()) {
+            return;
+        }
+        int level = optLevel.get();
 
         if (entity instanceof Monster) {
-            int level = getLevel(loc);
-
             Collection<ItemStack> drops = dropTable.getDrops(
                     level,
                     getDropMod(
@@ -242,7 +247,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
             }
 
-            ItemDropper dropper = new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition());
+            ItemDropper dropper = new ItemDropper(loc);
             for (int i = 0; i < times; ++i) {
                 dropper.dropItems(drops);
             }
@@ -262,14 +267,21 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
         for (Transaction<BlockSnapshot> block : transactions) {
-            BlockSnapshot original =  block.getOriginal();
+            BlockSnapshot original = block.getOriginal();
             Optional<Location<World>> optLoc = original.getLocation();
 
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+            if (!optLoc.isPresent()) {
                 continue;
             }
 
-            Location loc = optLoc.get();
+            Optional<Integer> optLevel = getLevel(optLoc.get());
+
+            if (!optLevel.isPresent()) {
+                continue;
+            }
+
+            int level = optLevel.get();
+            Location<World> loc = optLoc.get();
 
             BlockType type = original.getState().getType();
             if (ore().contains(type)) {
@@ -312,7 +324,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 addPool(loc, type, fortuneMod, silkTouch);
-            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - getLevel(loc)))) {
+            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
@@ -347,13 +359,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onEntityHarvest(HarvestEntityEvent event) {
-        Location entityLoc = event.getTargetEntity().getLocation();
+        Location<World> entityLoc = event.getTargetEntity().getLocation();
 
-        if (!isApplicable(entityLoc.getExtent())) {
+        Optional<Integer> optLevel = getLevel(entityLoc);
+        if (!optLevel.isPresent()) {
             return;
         }
+        int level = optLevel.get();
 
-        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * getLevel(entityLoc)));
+        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * level));
     }
 
     @Listener
@@ -362,11 +376,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         for (Transaction<BlockSnapshot> block : transactions) {
             Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+            if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
                 continue;
             }
 
-            Location loc = optLoc.get();
+            Location<World> loc = optLoc.get();
             Optional<?> rootCause = event.getCause().root();
             if (rootCause.isPresent() && rootCause.get() instanceof Player && ore().contains(loc.getBlockType())) {
                 Player player = (Player) rootCause.get();
@@ -378,7 +392,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                 try {
                     Vector3d origin = loc.getPosition();
-                    World world = toWorld.from(loc.getExtent());
+                    World world = loc.getExtent();
                     for (int i = 0; i < 40; ++i) {
                         ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
                                 ParticleTypes.CRIT_MAGIC
@@ -407,15 +421,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
     }
 
-    public int getLevel(Location location) {
+    public Optional<Integer> getLevel(Location<World> location) {
 
         // Not in Wilderness
-        if (!isApplicable(location.getExtent())) {
-            return 0;
+        if (!isApplicable(location)) {
+            return Optional.empty();
         }
 
         // In Wilderness
-        return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
+        return Optional.of(Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1);
     }
 
     public boolean allowsPvP(int level) {
@@ -457,18 +471,20 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
 
+        Optional<Integer> optLevel = getLevel(block);
+        Validate.isTrue(optLevel.isPresent());
+        int level = optLevel.get();
 
         Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
         if (DropRegistry.dropsSelf(blockType)) {
             fortune = 0;
         }
 
-        final int times = Probability.getRandom(getOreMod(getLevel(block)));
+        final int times = Probability.getRandom(getOreMod(level));
+        final int finalFortune = fortune;
         ItemFountain fountain = new ItemFountain(
-                game,
-                block.getExtent(),
-                block.getPosition().add(.5, 0, .5),
-                new FixedIntGenerator(fortune),
+                new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
+                (a) -> finalFortune,
                 generalDrop
         ) {
             @Override
@@ -503,7 +519,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void run() {
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
-                int currentLevel = getLevel(entity.getLocation());
+                int currentLevel = getLevel(entity.getLocation()).get();
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {
                     ((Player) entity).sendTitle(

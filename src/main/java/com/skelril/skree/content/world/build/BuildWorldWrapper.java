@@ -55,7 +55,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
         List<Entity> entities = event.getEntities();
 
         for (Entity entity : entities) {
-            if (!isApplicable(entity.getWorld())) continue;
+            if (!isApplicable(entity)) continue;
 
             if (entity instanceof Monster) {
                 event.setCancelled(true);
@@ -70,7 +70,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
         for (Transaction<BlockSnapshot> block : transactions) {
             Optional<Location<World>> optLoc = block.getOriginal().getLocation();
 
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+            if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
                 continue;
             }
 
@@ -88,11 +88,11 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
             Optional<Location<World>> optLoc = finalReplacement.getLocation();
 
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+            if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
                 continue;
             }
 
-            Location loc = optLoc.get();
+            Location<World> loc = optLoc.get();
 
             BlockType replacementType = finalReplacement.getState().getType();
             if (ore().contains(replacementType)) {
@@ -107,7 +107,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
                     try {
                         Vector3d origin = loc.getPosition();
-                        World world = toWorld.from(loc.getExtent());
+                        World world = loc.getExtent();
                         for (int i = 0; i < 40; ++i) {
                             ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
                                     ParticleTypes.CRIT_MAGIC
@@ -144,7 +144,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
                 Optional<Location<World>> optLoc = finalReplacement.getLocation();
 
-                if (!optLoc.isPresent() || !isApplicable(optLoc.get().getExtent())) {
+                if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
                     continue;
                 }
 

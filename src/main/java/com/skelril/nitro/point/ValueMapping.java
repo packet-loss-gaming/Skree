@@ -15,11 +15,11 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public abstract class ValueMapping<KeyType, IndexType, PointType extends Comparable<PointType>> {
-    List<PointValue<KeyType, PointType>> values;
-    PointType zeroValue, oneValue;
-    BiFunction<PointType, PointType, PointType> pointTypeDiv, pointTypeMod;
+    protected List<PointValue<KeyType, PointType>> values;
+    protected PointType zeroValue, oneValue;
+    protected BiFunction<PointType, PointType, PointType> pointTypeDiv, pointTypeMod;
 
-    Multimap<IndexType, PointValue<KeyType, PointType>> valueMap = ArrayListMultimap.create();
+    protected Multimap<IndexType, PointValue<KeyType, PointType>> valueMap = ArrayListMultimap.create();
 
     public ValueMapping(List<PointValue<KeyType, PointType>> values, PointType zeroValue, PointType oneValue,
                         BiFunction<PointType, PointType, PointType> pointTypeDiv,

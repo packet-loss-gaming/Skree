@@ -133,7 +133,7 @@ public class MarketImplUtil {
         }
 
         // Add remaining currency
-        new ItemDropper(game, player.getWorld(), player.getLocation().getPosition()).dropItems(results);
+        new ItemDropper(player.getLocation()).dropItems(results);
         return true;
     }
 
@@ -161,7 +161,7 @@ public class MarketImplUtil {
 
         // Add remaining transactions
         transactions.addAll(stacks.stream().map(stack -> new Clause<>(stack, stack.getQuantity())).collect(Collectors.toList()));
-        new ItemDropper(game, player.getWorld(), player.getLocation().getPosition()).dropItems(stacks);
+        new ItemDropper(player.getLocation()).dropItems(stacks);
 
         return new Clause<>(true, transactions);
     }

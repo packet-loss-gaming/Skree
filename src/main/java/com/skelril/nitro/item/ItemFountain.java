@@ -7,25 +7,25 @@
 package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.skelril.nitro.generator.Generator;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Function;
 
 public class ItemFountain implements IntegratedRunnable  {
 
     private final ItemDropper dropper;
 
-    private final Generator<Integer> amplifier;
+    private final Function<Integer, Integer> amplifier;
     private final Collection<ItemStack> options;
 
-    public ItemFountain(Game game, World world, Vector3d pos, Generator<Integer> amplifier, Collection<ItemStack> options) {
-        this.dropper = new ItemDropper(game, world, pos);
+    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options) {
+        this.dropper = new ItemDropper(location);
 
         this.amplifier = amplifier;
         this.options = options;
@@ -42,7 +42,7 @@ public class ItemFountain implements IntegratedRunnable  {
     @Override
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);
-        for (int i = 0; i < amplifier.get() + 1; i++) {
+        for (int i = 0; i < amplifier.apply(i) + 1; i++) {
             dropper.dropItems(Collections.singletonList(stack));
         }
         return true;
