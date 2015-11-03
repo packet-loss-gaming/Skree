@@ -6,21 +6,21 @@
 
 package com.skelril.nitro.droptable.resolver.point;
 
-import com.skelril.nitro.modifier.ModifierFunction;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.point.ItemStackValueMapping;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class SimplePointDropResolver<PointType extends Comparable<PointType>> extends AbstractSlipperyPointResolver<PointType> implements PointDropResolver {
     private final int maxPoints;
-    private final ModifierFunction modiFunc;
+    private final BiFunction<Integer, Double, Integer> modiFunc;
 
     public SimplePointDropResolver(ItemStackValueMapping<PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints) {
-        this(choices, pointTypeFromInt, maxPoints, ModifierFunctions.MULTI);
+        this(choices, pointTypeFromInt, maxPoints, (a, b) -> (int) (a * b));
     }
 
-    public SimplePointDropResolver(ItemStackValueMapping<PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints, ModifierFunction modiFunc) {
+    public SimplePointDropResolver(ItemStackValueMapping<PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints,
+                                   BiFunction<Integer, Double, Integer> modiFunc) {
         super(choices, pointTypeFromInt);
         this.maxPoints = maxPoints;
         this.modiFunc = modiFunc;
@@ -28,6 +28,6 @@ public class SimplePointDropResolver<PointType extends Comparable<PointType>> ex
 
     @Override
     public int getMaxPoints(double modifier) {
-        return (int) this.modiFunc.apply(maxPoints, modifier);
+        return modiFunc.apply(maxPoints, modifier);
     }
 }

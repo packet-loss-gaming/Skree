@@ -8,23 +8,22 @@ package com.skelril.nitro.droptable.roller;
 
 import com.google.common.collect.ImmutableList;
 import com.skelril.nitro.droptable.DropTableEntry;
-import com.skelril.nitro.modifier.ModifierFunction;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
+import java.util.function.BiFunction;
 
 public class SlipperySingleHitDiceRoller implements DiceRoller {
 
-    private final ModifierFunction modiFunc;
+    private final BiFunction<Integer, Double, Integer> modiFunc;
 
     public SlipperySingleHitDiceRoller() {
-        this(ModifierFunctions.NOOP);
+        this((a, b) -> a);
     }
 
-    public SlipperySingleHitDiceRoller(ModifierFunction modiFunc) {
+    public SlipperySingleHitDiceRoller(BiFunction<Integer, Double, Integer> modiFunc) {
         this.modiFunc = modiFunc;
     }
 
@@ -38,7 +37,7 @@ public class SlipperySingleHitDiceRoller implements DiceRoller {
 
             // Slip through until something which is >= the chance is hit, unless a modifier is applied
             // this is equivalent to a 1 / chance probability
-            if (cur.getChance() <= Probability.getRandom((int) modiFunc.apply(cur.getChance(), modifier))) {
+            if (cur.getChance() <= Probability.getRandom(modiFunc.apply(cur.getChance(), modifier))) {
                 break;
             }
 

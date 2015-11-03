@@ -15,7 +15,6 @@ import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.extractor.WorldFromExtent;
 import com.skelril.nitro.item.ItemDropper;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
 import com.skelril.skree.service.ModifierService;
@@ -41,7 +40,7 @@ public class ArrowFishingHandler {
     private DropTable dropTable;
 
     public ArrowFishingHandler() {
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.MULTI);
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a * b));
         dropTable = new DropTableImpl(
                 slipRoller,
                 Lists.newArrayList(

@@ -19,7 +19,6 @@ import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.generator.FixedIntGenerator;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
@@ -100,7 +99,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         this.plugin = plugin;
         this.game = game;
 
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.ADD);
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
         dropTable = new MasterDropTable(
                 slipRoller,
                 Lists.newArrayList(

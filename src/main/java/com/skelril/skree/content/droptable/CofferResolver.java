@@ -7,18 +7,17 @@
 package com.skelril.skree.content.droptable;
 
 import com.skelril.nitro.droptable.resolver.point.SimplePointDropResolver;
-import com.skelril.nitro.modifier.ModifierFunction;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 
 import java.math.BigInteger;
+import java.util.function.BiFunction;
 
 public class CofferResolver extends SimplePointDropResolver<BigInteger> {
     public CofferResolver(int maxCoffers) {
-        this(maxCoffers, ModifierFunctions.MULTI);
+        this(maxCoffers, (a, b) -> (int) (a * b));
     }
 
-    public CofferResolver(int maxCoffers, ModifierFunction modifierFunction) {
+    public CofferResolver(int maxCoffers, BiFunction<Integer, Double, Integer> modifierFunction) {
         super(CofferValueMap.inst(), BigInteger::valueOf, maxCoffers, modifierFunction);
     }
 }
