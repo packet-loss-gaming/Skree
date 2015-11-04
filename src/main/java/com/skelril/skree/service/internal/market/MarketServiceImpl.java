@@ -207,7 +207,11 @@ public class MarketServiceImpl implements MarketService {
             Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
                     ITEM_ALIASES.ID.equal(
                             DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
-                                    ITEM_DATA.ID.equal(ITEM_ALIASES.ITEM_ID)
+                                    ITEM_DATA.ID.equal(
+                                            DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
+                                                    ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+                                            )
+                                    )
                             )
                     )
             ).fetchOne();
@@ -243,7 +247,7 @@ public class MarketServiceImpl implements MarketService {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
-                    .from(ITEM_DATA)
+                    .from(ITEM_DATA, ITEM_ALIASES)
                     .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID))
                     .fetch();
 
@@ -259,7 +263,7 @@ public class MarketServiceImpl implements MarketService {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
-                    .from(ITEM_DATA)
+                    .from(ITEM_DATA, ITEM_ALIASES)
                     .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID)).and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
                     .fetch();
 

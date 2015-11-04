@@ -9,6 +9,7 @@ package com.skelril.skree.content.world.instance;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import com.skelril.skree.service.internal.zone.Zone;
+import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.event.Listener;
@@ -36,7 +37,10 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        if (!isApplicable(event.getTargetWorld())) {
+        // Item Expires shouldn't be filtered anyways, but this is added
+        // due to getTargetWorld being unimplemented for the ItemExpireEvent
+        // at the time of writing
+        if (event instanceof ItemExpireEvent || !isApplicable(event.getTargetWorld())) {
             return;
         }
 
