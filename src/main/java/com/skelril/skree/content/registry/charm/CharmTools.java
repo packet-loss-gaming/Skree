@@ -10,32 +10,34 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import java.util.Optional;
+
 public class CharmTools {
 
     private static ItemStack cast(org.spongepowered.api.item.inventory.ItemStack stack) {
         return (ItemStack) ((Object) stack);
     }
 
-    public static int getLevel(org.spongepowered.api.item.inventory.ItemStack stack, Charm charm) {
+    public static Optional<Integer> getLevel(org.spongepowered.api.item.inventory.ItemStack stack, Charm charm) {
         return getLevel(cast(stack), charm);
     }
 
-    public static int getLevel(ItemStack stack, Charm charm) {
+    public static Optional<Integer> getLevel(ItemStack stack, Charm charm) {
         if (hasCharms(stack)) {
             NBTTagList list = stack.getTagCompound().getTagList("skree_charm", 10);
             if (list != null) {
                 for (int i = 0; i < list.tagCount(); ++i) {
-                    short entry = list.getCompoundTagAt(i).getShort("id");
+                    int entry = list.getCompoundTagAt(i).getInteger("id");
                     if (entry == charm.getID()) {
-                        return list.getCompoundTagAt(i).getShort("lvl");
+                        return Optional.of(list.getCompoundTagAt(i).getInteger("lvl"));
                     }
                 }
             }
         }
-        return 0;
+        return Optional.empty();
     }
 
-    public static int addCharm(org.spongepowered.api.item.inventory.ItemStack stack, Charm charm, int level) {
+    public static void addCharm(org.spongepowered.api.item.inventory.ItemStack stack, Charm charm, int level) {
         addCharm(cast(stack), charm, level);
     }
 
@@ -50,12 +52,12 @@ public class CharmTools {
 
         NBTTagList nbttaglist = itemStack.getTagCompound().getTagList("skree_charm", 10);
         NBTTagCompound nbttagcompound = new NBTTagCompound();
-        nbttagcompound.setShort("id", (short) charm.getID());
-        nbttagcompound.setShort("lvl", (short) level);
+        nbttagcompound.setInteger("id", charm.getID());
+        nbttagcompound.setInteger("lvl", level);
         nbttaglist.appendTag(nbttagcompound);
     }
 
-    public static boolean hasCharm(org.spongepowered.api.item.inventory.ItemStack stack) {
+    public static boolean hasCharms(org.spongepowered.api.item.inventory.ItemStack stack) {
         return hasCharms(cast(stack));
     }
 

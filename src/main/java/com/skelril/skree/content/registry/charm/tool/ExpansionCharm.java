@@ -6,10 +6,19 @@
 
 package com.skelril.skree.content.registry.charm.tool;
 
-import com.skelril.skree.content.registry.charm.AbstractCharm;
+import org.spongepowered.api.entity.ArmorEquipable;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class ExpansionCharm extends AbstractCharm {
+public class ExpansionCharm extends BlockPatternCharm {
     public ExpansionCharm() {
         super(2, "expansion", 1);
+    }
+
+    @Override
+    protected void process(ArmorEquipable holder, ItemStack stack, Location<World> pos, Direction direction, int power) {
+
     }
 }

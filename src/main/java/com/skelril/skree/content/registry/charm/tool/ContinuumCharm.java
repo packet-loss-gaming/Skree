@@ -6,31 +6,76 @@
 
 package com.skelril.skree.content.registry.charm.tool;
 
-import com.google.common.base.Optional;
-import com.skelril.skree.content.registry.charm.AbstractCharm;
 import com.skelril.skree.content.registry.charm.CharmTools;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.entity.ArmorEquipable;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.EntityBreakBlockEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class ContinuumCharm extends AbstractCharm {
+import java.util.Map;
+import java.util.Optional;
+
+public class ContinuumCharm extends BlockPatternCharm {
     public ContinuumCharm() {
         super(1, "continuum", 9);
     }
 
-    @Subscribe
-    public void onBlockBreak(EntityBreakBlockEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof ArmorEquipable) {
-            Optional<ItemStack> held = ((ArmorEquipable) entity).getItemInHand();
-            if (held.isPresent()) {
-                int level = CharmTools.getLevel(held.get(), this);
-                if (level > 0) {
+    @Listener
+    public void onBlockTouch(InteractBlockEvent event) {
+        Optional<ArmorEquipable> optHolder = event.getCause().first(ArmorEquipable.class);
+        if (optHolder.isPresent()) {
+            ArmorEquipable holder = optHolder.get();
+            Optional<ItemStack> optHeldItem = holder.getItemInHand();
+            if (optHeldItem.isPresent()) {
+                ItemStack heldItem = optHeldItem.get();
+                Optional<Integer> optCharmLevel = CharmTools.getLevel(heldItem, this);
+                if (optCharmLevel.isPresent()) {
+                    int charmLevel = optCharmLevel.get();
 
+                    Direction dir = event.getTargetSide();
+                    Optional<Location<World>> optTargetBlockLoc = event.getTargetBlock().getLocation();
+
+                    if (!optTargetBlockLoc.isPresent()) {
+                        return;
+                    }
+
+                    Location<World> targetBlockLoc = optTargetBlockLoc.get();
+
+                    if (!accepts(heldItem, targetBlockLoc.getBlock())) {
+                        return;
+                    }
+
+                    process(holder, heldItem, targetBlockLoc, dir.getOpposite(), charmLevel);
                 }
             }
+        }
+    }
+
+    @Override
+    protected void process(ArmorEquipable holder, ItemStack stack, Location<World> pos, Direction direction, int power) {
+        final BlockType startType;
+        final Map<BlockTrait<?>, ?> startTraits;
+
+        BlockType curType = startType = pos.getBlockType();
+        Map<BlockTrait<?>, ?> curTraits = startTraits = pos.getBlock().getTraitMap();
+
+        for (int dist = power; dist > 0; --dist) {
+            if (!startType.equals(curType) || !hasSameTraits(startTraits, curTraits)) {
+                break;
+            }
+
+            if (!breakBlock(holder, pos)) {
+                break;
+            }
+
+            pos = pos.add(direction.toVector3d());
+            curType = pos.getBlockType();
+            curTraits = pos.getBlock().getTraitMap();
         }
     }
 }
