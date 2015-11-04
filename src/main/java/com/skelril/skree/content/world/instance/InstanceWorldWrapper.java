@@ -8,11 +8,16 @@ package com.skelril.skree.content.world.instance;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
+import com.skelril.skree.service.internal.zone.Zone;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.Agent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
@@ -27,5 +32,20 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
         super("Instance", worlds);
         this.plugin = plugin;
         this.game = game;
+    }
+
+    @Listener
+    public void onEntitySpawn(SpawnEntityEvent event) {
+        if (!isApplicable(event.getTargetWorld())) {
+            return;
+        }
+
+        Optional<Zone> manager = event.getCause().first(Zone.class);
+        if (manager.isPresent()) {
+            return;
+        }
+
+        // Remove every entity that is an agent not spawned by a Zone
+        event.filterEntities(e -> !(e instanceof Agent));
     }
 }
