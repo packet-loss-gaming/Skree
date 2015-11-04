@@ -6,20 +6,32 @@
 
 package com.skelril.nitro.droptable;
 
+import com.skelril.nitro.droptable.resolver.DropResolver;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.Collection;
+
 public class DropTableEntryImpl implements DropTableEntry {
-    private final ItemStack stack;
+    private final DropResolver resolver;
     private final int chance;
 
-    public DropTableEntryImpl(ItemStack stack, int chance) {
-        this.stack = stack;
+    public DropTableEntryImpl(DropResolver resolver) {
+        this(resolver, 0);
+    }
+
+    public DropTableEntryImpl(DropResolver resolver, int chance) {
+        this.resolver = resolver;
         this.chance = chance;
     }
 
     @Override
-    public ItemStack getItemStack() {
-        return stack;
+    public void enque(double modifier) {
+        resolver.enqueue(modifier);
+    }
+
+    @Override
+    public Collection<ItemStack> flush() {
+        return resolver.flush();
     }
 
     @Override

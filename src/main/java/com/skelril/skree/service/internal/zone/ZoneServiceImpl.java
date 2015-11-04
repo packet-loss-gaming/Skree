@@ -8,7 +8,7 @@ package com.skelril.skree.service.internal.zone;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.ZoneService;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -40,18 +40,18 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Override
     public void registerManager(ZoneManager<?> manager) {
-        managers.put(manager.getName(), manager);
+        managers.put(manager.getName().toLowerCase(), manager);
     }
 
     @Override
     public Clause<Player, ZoneStatus> requestZone(String managerName, Player player) {
-        ZoneManager<?> manager = managers.get(managerName);
+        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
         return manager != null ? requestZone(manager, player) : null;
     }
 
     @Override
     public Collection<Clause<Player, ZoneStatus>> requestZone(String managerName, Collection<Player> players) {
-        ZoneManager<?> manager = managers.get(managerName);
+        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
         return manager != null ? requestZone(manager, players) : null;
     }
 

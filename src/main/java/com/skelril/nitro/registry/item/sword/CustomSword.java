@@ -6,44 +6,102 @@
 
 package com.skelril.nitro.registry.item.sword;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.skelril.nitro.registry.item.CustomTool;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.block.Block;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class CustomSword extends ItemSword implements CustomTool {
+import java.util.UUID;
 
-    public CustomSword(ToolMaterial p_i45356_1_) {
-        super(p_i45356_1_);
+public abstract class CustomSword extends ItemSword implements ICustomSword {
+    protected CustomSword() {
+        super(ToolMaterial.EMERALD);
+        this.maxStackSize = __getMaxStackSize();
+        this.setCreativeTab(__getCreativeTab());
+
+        this.setMaxDamage(__getMaxUses());
     }
 
-    public abstract String getType();
-
-    public abstract double getDamage();
+    // Native compatibility methods
 
     @Override
-    public String getID() {
-        String typeStr = getType();
-        return "sword" + Character.toUpperCase(typeStr.charAt(0)) + typeStr.substring(1);
+    public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
+        return false; // Use functionality defined in Item
+    }
+
+    @Override
+    public Multimap __superGetItemAttributeModifiers() {
+        return HashMultimap.create(); // Use functionality defined in Item
+    }
+
+    @Override
+    public UUID __itemModifierUUID() {
+        return itemModifierUUID;
+    }
+
+    // Modified Native ItemTool methods
+    @Override
+    public float getStrVsBlock(ItemStack stack, Block p_150893_2_) {
+        return ICustomSword.super.getStrVsBlock(stack, p_150893_2_);
+    }
+
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        return ICustomSword.super.hitEntity(stack, target, attacker);
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
+        return ICustomSword.super.onBlockDestroyed(stack, worldIn, blockIn, pos, playerIn);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean isFull3D() {
+        return ICustomSword.super.isFull3D();
+    }
+
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return ICustomSword.super.getItemUseAction(stack);
+    }
+
+    @Override
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return ICustomSword.super.getMaxItemUseDuration(stack);
+    }
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
+        return ICustomSword.super.onItemRightClick(itemStackIn, worldIn, playerIn);
+    }
+
+    @Override
+    public boolean canHarvestBlock(Block blockIn) {
+        return ICustomSword.super.canHarvestBlock(blockIn);
+    }
+
+    @Override
+    public int getItemEnchantability() {
+        return ICustomSword.super.getItemEnchantability();
     }
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
+        return ICustomSword.super.getIsRepairable(toRepair, repair);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Multimap getItemAttributeModifiers() {
-        Multimap multimap = super.getItemAttributeModifiers();
-        multimap.removeAll(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName());
-        multimap.put(
-                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
-                new AttributeModifier(itemModifierUUID, "Weapon modifier", getDamage(), 0)
-        );
-        return multimap;
+        return ICustomSword.super.getItemAttributeModifiers();
     }
 
 }

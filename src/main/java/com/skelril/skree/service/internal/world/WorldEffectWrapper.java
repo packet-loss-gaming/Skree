@@ -6,15 +6,21 @@
 
 package com.skelril.skree.service.internal.world;
 
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
 
 public interface WorldEffectWrapper {
     String getName();
 
-    boolean isApplicable(Extent extent);
+    default boolean isApplicable(Entity entity) {
+        return isApplicable(entity.getWorld());
+    }
+    default boolean isApplicable(Location<World> location) {
+        return isApplicable(location.getExtent());
+    }
     boolean isApplicable(World world);
 
     void addWorld(World world);

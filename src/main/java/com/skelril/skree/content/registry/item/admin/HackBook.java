@@ -8,17 +8,21 @@ package com.skelril.skree.content.registry.item.admin;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 
-public class HackBook extends Item implements CustomItem {
+public class HackBook extends CustomItem {
 
-    public HackBook() {
-        maxStackSize = 1;
-        setCreativeTab(CreativeTabs.tabMisc);
+    @Override
+    public String __getID() {
+        return "hack_book";
     }
 
     @Override
-    public String getID() {
-        return "hackBook";
+    public int __getMaxStackSize() {
+        return 1;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabMisc;
     }
 }

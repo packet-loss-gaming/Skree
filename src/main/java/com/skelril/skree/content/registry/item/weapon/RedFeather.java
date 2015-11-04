@@ -7,17 +7,23 @@
 package com.skelril.skree.content.registry.item.weapon;
 
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 
-public class RedFeather extends Item implements CustomItem {
-    public RedFeather() {
-        maxStackSize = 1;
-        setCreativeTab(CreativeTabs.tabCombat);
+public class RedFeather extends CustomItem implements ICustomItem {
+
+    @Override
+    public String __getID() {
+        return "red_feather";
     }
 
     @Override
-    public String getID() {
-        return "redFeather";
+    public int __getMaxStackSize() {
+        return 1;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabCombat;
     }
 }

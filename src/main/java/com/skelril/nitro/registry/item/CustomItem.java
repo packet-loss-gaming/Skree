@@ -6,6 +6,15 @@
 
 package com.skelril.nitro.registry.item;
 
-public interface CustomItem {
-    String getID();
+import net.minecraft.item.Item;
+
+public abstract class CustomItem extends Item implements ICustomItem {
+    protected CustomItem() {
+        this.maxStackSize = __getMaxStackSize();
+        this.setCreativeTab(__getCreativeTab());
+
+        if (this instanceof DegradableItem) {
+            this.setMaxDamage(((DegradableItem) this).__getMaxUses());
+        }
+    }
 }

@@ -7,58 +7,43 @@
 package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
-import com.skelril.nitro.generator.Generator;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
-import java.util.Random;
+import java.util.Collections;
+import java.util.function.Function;
 
 public class ItemFountain implements IntegratedRunnable  {
 
-    private static Random random = new Random();
+    private final ItemDropper dropper;
 
-    private Game game;
-    private World world;
-    private Vector3d pos;
-    private Generator<Integer> amplifier;
-    private Collection<ItemStack> options;
+    private final Function<Integer, Integer> amplifier;
+    private final Collection<ItemStack> options;
 
-    public ItemFountain(Game game, World world, Vector3d pos, Generator<Integer> amplifier, Collection<ItemStack> options) {
-        this.game = game;
-        this.world = world;
-        this.pos = pos;
+    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options) {
+        this.dropper = new ItemDropper(location);
+
         this.amplifier = amplifier;
         this.options = options;
     }
 
-    public World getWorld() {
-        return world;
+    public World getExtent() {
+        return dropper.getExtent();
     }
 
     public Vector3d getPos() {
-        return pos;
+        return dropper.getPos();
     }
 
     @Override
     public boolean run(int times) {
-        ItemStackBuilder builder = game.getRegistry().getItemBuilder().fromItemStack(Probability.pickOneOf(options));
-        for (int i = 0; i < amplifier.get() + 1; i++) {
-            Optional<Entity> optEntity = world.createEntity(EntityTypes.DROPPED_ITEM, pos);
-            if (optEntity.isPresent()) {
-                Item item = (Item) optEntity.get();
-                item.offer(item.getItemData().setValue(builder.build()));
-                // item.offer(item.getData(VelocityData.class).get().setValue(new Vector3d(random.nextFloat() % 1, random.nextFloat() % 1, random.nextFloat() % 1)));
-                world.spawnEntity(item);
-            }
+        ItemStack stack = Probability.pickOneOf(options);
+        for (int i = 0; i < amplifier.apply(i) + 1; i++) {
+            dropper.dropItems(Collections.singletonList(stack));
         }
         return true;
     }

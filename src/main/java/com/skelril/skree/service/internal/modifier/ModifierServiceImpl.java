@@ -36,7 +36,8 @@ public abstract class ModifierServiceImpl implements ModifierService {
 
     @Override
     public long expiryOf(String modifier) {
-        return modifiers.get(modifier);
+        Long mod = modifiers.get(modifier);
+        return mod == null ? 0 : mod;
     }
 
     @Override

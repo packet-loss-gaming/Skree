@@ -6,7 +6,7 @@
 
 package com.skelril.skree.service.internal.shutdown;
 
-import com.google.common.base.Optional;
+
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
@@ -21,6 +21,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.sink.MessageSinks;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -34,7 +35,7 @@ public class ShutdownServiceImpl implements ShutdownService {
     private final Game game;
     private final Server server;
 
-    private Optional<TimedRunnable> runnable = Optional.absent();
+    private Optional<TimedRunnable> runnable = Optional.empty();
     private String reopenDate;
 
     public ShutdownServiceImpl(SkreePlugin plugin, Game game) {
@@ -91,11 +92,10 @@ public class ShutdownServiceImpl implements ShutdownService {
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
                     MessageSinks.toAll().sendMessage(
-                            Texts.builder(
-                                    "Sever shutting down in "
-                                            + times + " seconds - for "
-                                            + reopenDate + "."
-                            ).color(TextColors.RED).build()
+                            Texts.of(
+                                    TextColors.RED,
+                                    "Sever shutting down in " + times + " seconds - for " + reopenDate + "."
+                            )
                     );
                 }
                 return true;
@@ -103,21 +103,16 @@ public class ShutdownServiceImpl implements ShutdownService {
 
             @Override
             public void end() {
-                MessageSinks.toAll().sendMessage(Texts.builder("Server shutting down!").color(TextColors.RED).build());
+                MessageSinks.toAll().sendMessage(Texts.of(TextColors.RED, "Server shutting down!"));
                 forceShutdown(message);
             }
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
-        Optional<Task> task = game.getSyncScheduler().runRepeatingTask(plugin, runnable, 20);
+        Task task = game.getScheduler().createTaskBuilder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(plugin);
+        runnable.setTask(task);
 
-        if (!task.isPresent()) {
-            return false;
-        }
-
-        runnable.setTask(task.get());
         this.runnable = Optional.of(runnable);
-
         return true;
     }
 
@@ -135,7 +130,7 @@ public class ShutdownServiceImpl implements ShutdownService {
     public void cancelShutdown() {
         if (runnable.isPresent()) {
             runnable.get().cancel();
-            runnable = Optional.absent();
+            runnable = Optional.empty();
         }
     }
 }

@@ -6,20 +6,31 @@
 
 package com.skelril.skree;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.nitro.item.ItemStackFactory;
+import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
+import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.market.MarketSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
+import com.skelril.skree.system.playerstate.PlayerStateSystem;
+import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
+import com.skelril.skree.system.teleport.TeleportSystem;
+import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
+import com.skelril.skree.system.zone.ZoneSystem;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.state.PreInitializationEvent;
-import org.spongepowered.api.event.state.ServerStartedEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 @Singleton
@@ -35,8 +46,28 @@ public class SkreePlugin {
     public static CustomItemSystem customItemSystem;
     public static CustomBlockSystem customBlockSystem;
 
-    @Subscribe
-    public void onPreInit(PreInitializationEvent event) {
+    private static SkreePlugin inst;
+
+    public static SkreePlugin inst() {
+        return inst;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public SkreePlugin() {
+        inst = this;
+    }
+
+    @Listener
+    public void onPreInit(GamePreInitializationEvent event) {
+        // Handle utility hooks early on
+        new ItemStackFactory(event.getGame());
+
+        // Handle the database connection setup very early on
+        new DatabaseSystem(this, event.getGame());
+
         customItemSystem = new CustomItemSystem(this, game);
         customItemSystem.preInit();
 
@@ -44,13 +75,9 @@ public class SkreePlugin {
         customBlockSystem.preInit();
     }
 
-    @Subscribe
-    public void onServerStart(ServerStartedEvent event) {
-        registerPrimaryHybridSystems();
-        switch (game.getPlatform().getType()) {
-            case CLIENT:
-                registerPrimaryClientSystems();
-                break;
+    @Listener
+    public void onServerStart(GameStartedServerEvent event) {
+        switch (game.getPlatform().getExecutionType()) {
             case SERVER:
                 registerPrimaryServerSystems();
                 break;
@@ -59,34 +86,28 @@ public class SkreePlugin {
         logger.info("Skree Started! Kaw!");
     }
 
-    private void registerPrimaryHybridSystems() {
-
-    }
-
-    private void registerPrimaryClientSystems() {
-
-    }
-
     private void registerPrimaryServerSystems() {
-        try {
-            new DropClearSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new ModifierSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new ShutdownSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            new WorldSystem(this, game);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        ImmutableList<Class> initialized = ImmutableList.of(
+                ArrowFishingSystem.class,
+                DropClearSystem.class,
+                MarketSystem.class,
+                ModifierSystem.class,
+                ProjectileWatcherSystem.class,
+                PlayerStateSystem.class,
+                ShutdownSystem.class,
+                TeleportSystem.class,
+                WorldSystem.class,
+                WeatherCommandSystem.class,
+                ZoneSystem.class
+        );
+
+        for (Class<?> entry : initialized) {
+            try {
+                Constructor<?> constructor = entry.getConstructor(SkreePlugin.class, Game.class);
+                constructor.newInstance(this, game);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

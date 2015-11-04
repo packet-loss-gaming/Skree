@@ -8,7 +8,11 @@ package com.skelril.nitro.droptable;
 
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.Collection;
+
 public interface DropTableEntry {
-    ItemStack getItemStack();
+    void enque(double modifier);
+    Collection<ItemStack> flush();
+
     int getChance();
 }

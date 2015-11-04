@@ -6,16 +6,12 @@
 
 package com.skelril.skree.service.internal.world;
 
-import com.skelril.nitro.extractor.WorldFromExtent;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class WorldEffectWrapperImpl implements WorldEffectWrapper {
-
-    protected static WorldFromExtent toWorld = new WorldFromExtent();
 
     protected String name;
     protected Collection<World> worlds;
@@ -32,11 +28,6 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean isApplicable(Extent extent) {
-        return isApplicable(toWorld.from(extent));
     }
 
     @Override

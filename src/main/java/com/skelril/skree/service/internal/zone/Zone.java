@@ -7,7 +7,7 @@
 package com.skelril.skree.service.internal.zone;
 
 import com.skelril.nitro.Clause;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

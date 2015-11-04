@@ -8,7 +8,7 @@ package com.skelril.skree.system.registry.item;
 
 import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.registry.item.CraftableItem;
-import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.nitro.selector.GameAwareContent;
 import com.skelril.skree.SkreePlugin;
@@ -66,14 +66,14 @@ public class CustomItemSystem {
     // Invoked via reflection
     @SuppressWarnings("unused")
     private void register(Object item) {
-        if (item instanceof Item && item instanceof CustomItem) {
-            ((Item) item).setUnlocalizedName("skree_" + ((CustomItem) item).getID());
+        if (item instanceof Item && item instanceof ICustomItem) {
+            ((Item) item).setUnlocalizedName("skree_" + ((ICustomItem) item).__getID());
 
-            GameRegistry.registerItem((Item) item, ((CustomItem) item).getID(), "skree");
+            GameRegistry.registerItem((Item) item, ((ICustomItem) item).__getID());
 
             // Add selective hooks
             if (item instanceof EventAwareContent) {
-                game.getEventManager().register(plugin, item);
+                game.getEventManager().registerListeners(plugin, item);
             }
 
             if (item instanceof GameAwareContent) {
@@ -95,15 +95,15 @@ public class CustomItemSystem {
     // Invoked via reflection
     @SuppressWarnings("unused")
     private void render(Object item) {
-        if (item instanceof Item && item instanceof CustomItem) {
-            if (game.getPlatform().getType().isClient()) {
+        if (item instanceof Item && item instanceof ICustomItem) {
+            if (game.getPlatform().getExecutionType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
                 mesher.register(
                         (Item) item,
                         0,
                         new ModelResourceLocation(
-                                "skree:" + ((CustomItem) item).getID(),
+                                "skree:" + ((ICustomItem) item).__getID(),
                                 "inventory"
                         )
                 );

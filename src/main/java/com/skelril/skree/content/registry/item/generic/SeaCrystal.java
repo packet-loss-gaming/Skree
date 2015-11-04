@@ -10,20 +10,24 @@ import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class SeaCrystal extends Item implements CustomItem, CraftableItem {
+public class SeaCrystal extends CustomItem implements CraftableItem {
 
-    public SeaCrystal() {
-        maxStackSize = 64;
-        setCreativeTab(CreativeTabs.tabMaterials);
+    @Override
+    public String __getID() {
+        return "sea_crystal";
     }
 
     @Override
-    public String getID() {
-        return "seaCrystal";
+    public int __getMaxStackSize() {
+        return 64;
+    }
+
+    @Override
+    public CreativeTabs __getCreativeTab() {
+        return CreativeTabs.tabMaterials;
     }
 
     @Override

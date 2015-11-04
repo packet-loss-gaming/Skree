@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.shutdown;
 
-import com.google.common.base.Optional;
+
 import com.skelril.skree.service.ShutdownService;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -15,6 +15,8 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
+
+import java.util.Optional;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
