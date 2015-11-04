@@ -28,19 +28,9 @@ public class Tables {
 	public static final ItemAliases ITEM_ALIASES = com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
 
 	/**
-	 * The table mc_db.item_aliases_primary
+	 * The table mc_db.item_data
 	 */
-	public static final ItemAliasesPrimary ITEM_ALIASES_PRIMARY = com.skelril.skree.db.schema.tables.ItemAliasesPrimary.ITEM_ALIASES_PRIMARY;
-
-	/**
-	 * The table mc_db.item_id
-	 */
-	public static final ItemId ITEM_ID = com.skelril.skree.db.schema.tables.ItemId.ITEM_ID;
-
-	/**
-	 * The table mc_db.item_values
-	 */
-	public static final ItemValues ITEM_VALUES = com.skelril.skree.db.schema.tables.ItemValues.ITEM_VALUES;
+	public static final ItemData ITEM_DATA = com.skelril.skree.db.schema.tables.ItemData.ITEM_DATA;
 
 	/**
 	 * The table mc_db.market_transactions

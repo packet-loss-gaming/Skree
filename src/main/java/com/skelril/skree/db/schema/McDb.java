@@ -27,7 +27,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class McDb extends SchemaImpl {
 
-	private static final long serialVersionUID = -1655051833;
+	private static final long serialVersionUID = -258270267;
 
 	/**
 	 * The reference instance of <code>mc_db</code>
@@ -51,9 +51,7 @@ public class McDb extends SchemaImpl {
 	private final List<Table<?>> getTables0() {
 		return Arrays.<Table<?>>asList(
 			ItemAliases.ITEM_ALIASES,
-			ItemAliasesPrimary.ITEM_ALIASES_PRIMARY,
-			ItemId.ITEM_ID,
-			ItemValues.ITEM_VALUES,
+			ItemData.ITEM_DATA,
 			MarketTransactions.MARKET_TRANSACTIONS,
 			Modifiers.MODIFIERS,
 			Players.PLAYERS);

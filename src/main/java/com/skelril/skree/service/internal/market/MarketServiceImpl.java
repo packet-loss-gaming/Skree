@@ -19,9 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
-import static com.skelril.skree.db.schema.tables.ItemAliasesPrimary.ITEM_ALIASES_PRIMARY;
-import static com.skelril.skree.db.schema.tables.ItemId.ITEM_ID;
-import static com.skelril.skree.db.schema.tables.ItemValues.ITEM_VALUES;
+import static com.skelril.skree.db.schema.tables.ItemData.ITEM_DATA;
 
 public class MarketServiceImpl implements MarketService {
 
@@ -37,9 +35,9 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Record2<String, String> result = create.select(ITEM_ID.MC_ID, ITEM_ID.VARIANT)
-                    .from(ITEM_ID)
-                    .where(ITEM_ID.ID.equal(
+            Record2<String, String> result = create.select(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
+                    .from(ITEM_DATA)
+                    .where(ITEM_DATA.ID.equal(
                             create.select(ITEM_ALIASES.ITEM_ID)
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
@@ -48,8 +46,8 @@ public class MarketServiceImpl implements MarketService {
             return result == null ? Optional.empty() : Optional.ofNullable(
                     getItemStack(
                             new Clause<>(
-                                    result.getValue(ITEM_ID.MC_ID),
-                                    result.getValue(ITEM_ID.VARIANT)
+                                    result.getValue(ITEM_DATA.MC_ID),
+                                    result.getValue(ITEM_DATA.VARIANT)
                             )
                     )
             );
@@ -70,14 +68,14 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_VALUES.PRICE).from(ITEM_VALUES).where(
-                    ITEM_VALUES.ITEM_ID.equal(
+            Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
+                    ITEM_DATA.ID.equal(
                             create.select(ITEM_ALIASES.ITEM_ID)
                                     .from(ITEM_ALIASES)
                                     .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     )
             ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_VALUES.PRICE));
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -90,16 +88,10 @@ public class MarketServiceImpl implements MarketService {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_VALUES.PRICE).from(ITEM_VALUES).where(
-                    ITEM_VALUES.ITEM_ID.equal(
-                            create.select(ITEM_ID.ID)
-                                    .from(ITEM_ID)
-                                    .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
-                                            .and(ITEM_ID.VARIANT.equal(idVariant.getValue()))
-                                    )
-                    )
+            Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
+                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
             ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_VALUES.PRICE));
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -112,13 +104,12 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_VALUES)
-                    .columns(ITEM_VALUES.ITEM_ID, ITEM_VALUES.PRICE).select(
-                            create.select(ITEM_ALIASES.ITEM_ID, DSL.val(price))
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    ).onDuplicateKeyUpdate().set(ITEM_VALUES.PRICE, price)
-                    .execute();
+            int changed = create.update(ITEM_DATA).set(ITEM_DATA.VALUE, price).where(
+                    ITEM_DATA.ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    )
+            ).execute();
             return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -132,14 +123,9 @@ public class MarketServiceImpl implements MarketService {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_VALUES)
-                    .columns(ITEM_VALUES.ITEM_ID, ITEM_VALUES.PRICE).select(
-                            create.select(ITEM_ID.ID, DSL.val(price))
-                                    .from(ITEM_ID)
-                                    .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
-                                    .and(ITEM_ID.VARIANT.equal(idVariant.getValue())))
-                    ).onDuplicateKeyUpdate().set(ITEM_VALUES.PRICE, price)
-                    .execute();
+            int changed = create.update(ITEM_DATA).set(ITEM_DATA.VALUE, price).where(
+                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+            ).execute();
             return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -152,8 +138,8 @@ public class MarketServiceImpl implements MarketService {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_ID)
-                    .columns(ITEM_ID.MC_ID, ITEM_ID.VARIANT)
+            int changed = create.insertInto(ITEM_DATA)
+                    .columns(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
                     .values(idVariant.getKey(), idVariant.getValue())
                     .onDuplicateKeyIgnore()
                     .execute();
@@ -170,16 +156,18 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_ALIASES_PRIMARY).columns(ITEM_ALIASES_PRIMARY.ALIAS)
-                    .select(
-                            create.select(ITEM_ALIASES.ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias))
-                    ).onDuplicateKeyUpdate().set(ITEM_ALIASES_PRIMARY.ALIAS,
-                            create.select(ITEM_ALIASES.ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias))
-                    ).execute();
+            int changed = create.update(ITEM_DATA).set(
+                    ITEM_DATA.PRIMARY_ALIAS,
+                    DSL.select(ITEM_ALIASES.ID).from(ITEM_ALIASES).where(
+                            ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+                    )
+            ).where(
+                    ITEM_DATA.ID.equal(
+                            DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
+                                    ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+                            )
+                    )
+            ).execute();
             return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -197,10 +185,10 @@ public class MarketServiceImpl implements MarketService {
             DSLContext create = DSL.using(con);
             int changed = create.insertInto(ITEM_ALIASES)
                     .columns(ITEM_ALIASES.ITEM_ID, ITEM_ALIASES.ALIAS)
-                    .select(create.select(ITEM_ID.ID, DSL.val(alias.toLowerCase()))
-                            .from(ITEM_ID)
-                            .where(ITEM_ID.MC_ID.equal(idVariant.getKey())
-                                            .and(ITEM_ID.VARIANT.equal(idVariant.getValue()))
+                    .select(create.select(ITEM_DATA.ID, DSL.val(alias.toLowerCase()))
+                            .from(ITEM_DATA)
+                            .where(ITEM_DATA.MC_ID.equal(idVariant.getKey())
+                                            .and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
                             )
                     ).onDuplicateKeyIgnore().execute();
             return changed > 0;
@@ -217,11 +205,11 @@ public class MarketServiceImpl implements MarketService {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
-                    ITEM_ALIASES.ITEM_ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    ).and(ITEM_ALIASES.ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
+                    ITEM_ALIASES.ID.equal(
+                            DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
+                                    ITEM_DATA.ID.equal(ITEM_ALIASES.ITEM_ID)
+                            )
+                    )
             ).fetchOne();
             return result == null ? Optional.empty() : Optional.of(result.value1());
         } catch (SQLException e) {
@@ -237,15 +225,11 @@ public class MarketServiceImpl implements MarketService {
 
             DSLContext create = DSL.using(con);
             Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
-                    ITEM_ALIASES.ITEM_ID.equal(
-                            create.select(ITEM_ID.ID)
-                                    .from(ITEM_ID)
-                                    .where(ITEM_ID.MC_ID
-                                                    .equal(idVariant.getKey())
-                                                    .and(ITEM_ID.VARIANT
-                                                            .equal(idVariant.getValue()))
-                                    )
-                    ).and(ITEM_ALIASES.ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
+                    ITEM_ALIASES.ID.equal(
+                            DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
+                                    ITEM_DATA.MC_ID.equal(idVariant.getKey())
+                                            .and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
+                    )
             ).fetchOne();
             return result == null ? Optional.empty() : Optional.of(result.value1());
         } catch (SQLException e) {
@@ -258,10 +242,9 @@ public class MarketServiceImpl implements MarketService {
     public List<Clause<String, BigDecimal>> getPrices() {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_VALUES.PRICE)
-                    .from(ITEM_ALIASES)
-                    .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
-                    .where(ITEM_VALUES.ITEM_ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
+            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
+                    .from(ITEM_DATA)
+                    .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID))
                     .fetch();
 
             return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
@@ -275,11 +258,9 @@ public class MarketServiceImpl implements MarketService {
     public List<Clause<String, BigDecimal>> getPrices(String aliasConstraint) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_VALUES.PRICE)
-                    .from(ITEM_ALIASES)
-                    .innerJoin(ITEM_VALUES).on(ITEM_VALUES.ITEM_ID.equal(ITEM_ALIASES.ITEM_ID))
-                    .where(ITEM_VALUES.ITEM_ID.equal(DSL.any(create.select(ITEM_ALIASES_PRIMARY.ALIAS).from(ITEM_ALIASES_PRIMARY))))
-                    .and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
+            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
+                    .from(ITEM_DATA)
+                    .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID)).and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
                     .fetch();
 
             return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
