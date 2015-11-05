@@ -6,6 +6,7 @@
 
 package com.skelril.skree.service.internal.zone;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.World;
 
@@ -39,6 +40,10 @@ public class ZoneRegion {
 
     public Vector3i getBoundingBox() {
         return boundingBox;
+    }
+
+    public Vector3d getCenter() {
+        return getOrigin().toDouble().add(boundingBox.toDouble().div(2));
     }
 
     public enum State {

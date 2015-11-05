@@ -37,5 +37,6 @@ public interface Zone {
         return players.stream().map(this::remove).collect(Collectors.toList());
     }
 
+    ZoneRegion getRegion();
     Collection<Player> getPlayers();
 }

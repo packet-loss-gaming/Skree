@@ -50,6 +50,11 @@ public class ExampleInstance implements Zone {
     }
 
     @Override
+    public ZoneRegion getRegion() {
+        return region;
+    }
+
+    @Override
     public Collection<Player> getPlayers() {
         return null;
     }
