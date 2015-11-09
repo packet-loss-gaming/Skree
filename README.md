@@ -16,7 +16,7 @@ To build the project you should use the command ````gradle build````.
 
 ### Open Boss
 
-Skree depends on an internal Skelril library 'Open Boss', Open Boss is currently not available in any maven remote repository so you must build and install it manually. You can find instructions on how to do this by reading the Open Boss project's README.
+Skree depends on an internal Skelril library 'Open Boss', Open Boss is currently not available in any maven remote repository so you must build and install it manually. You can find instructions on how to do this by reading the [Open Boss](http://github.com/Skelril/Open-Boss) project's [README](https://github.com/Skelril/Open-Boss/blob/sponge/README.md).
 
 ## Database / jOOQ Schema Generation
 
