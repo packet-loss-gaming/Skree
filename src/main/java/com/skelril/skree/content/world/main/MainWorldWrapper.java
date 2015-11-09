@@ -63,7 +63,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
                 if (optPotionData.isPresent()) {
-                    PotionEffectBuilder builder = game.getRegistry().createPotionEffectBuilder();
+                    PotionEffectBuilder builder = game.getRegistry().createBuilder(PotionEffectBuilder.class);
                     builder.potionType(PotionEffectTypes.SPEED);
                     builder.amplifier(5);
                     builder.duration(3 * 20);

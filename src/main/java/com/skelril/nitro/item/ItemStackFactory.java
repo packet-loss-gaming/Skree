@@ -10,6 +10,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackBuilder;
 
 public class ItemStackFactory {
 
@@ -28,18 +29,18 @@ public class ItemStackFactory {
     }
 
     public static ItemStack newItemStack(ItemType type, int quantity) {
-        return game.getRegistry().createItemBuilder().itemType(type).quantity(quantity).build();
+        return game.getRegistry().createBuilder(ItemStackBuilder.class).itemType(type).quantity(quantity).build();
     }
 
     public static ItemStack newItemStack(ItemType type, DataManipulator<?, ?> data, int quantity) {
-        return game.getRegistry().createItemBuilder().itemType(type).quantity(quantity).itemData(data).build();
+        return game.getRegistry().createBuilder(ItemStackBuilder.class).itemType(type).quantity(quantity).itemData(data).build();
     }
 
     public static ItemStack newItemStack(ItemStack itemStack) {
-        return game.getRegistry().createItemBuilder().fromItemStack(itemStack).build();
+        return game.getRegistry().createBuilder(ItemStackBuilder.class).fromItemStack(itemStack).build();
     }
 
     public static ItemStack newItemStack(ItemStack itemStack, int quantity) {
-        return game.getRegistry().createItemBuilder().fromItemStack(itemStack).quantity(quantity).build();
+        return game.getRegistry().createBuilder(ItemStackBuilder.class).fromItemStack(itemStack).quantity(quantity).build();
     }
 }
