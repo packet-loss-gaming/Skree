@@ -63,11 +63,11 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager;
 
     private Optional<Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>> boss = Optional.empty();
-    private long lastAttack = 0;
-    private int lastAttackNumber = -1;
+    private long lastAttackTime = 0;
+    private Optional<ShnugglesPrimeAttack> lastAttack = Optional.empty();
     private long lastDeath = 0;
     private boolean damageHeals = false;
-    private Set<Integer> activeAttacks = new HashSet<>();
+    private Set<ShnugglesPrimeAttack> activeAttacks = EnumSet.noneOf(ShnugglesPrimeAttack.class);
     private Random random = new Random();
 
     private int emptyTicks = 0;
@@ -133,7 +133,10 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
         if (spawned.isPresent()) {
             getRegion().getExtent().spawnEntity(spawned.get(), Cause.of(this));
-            boss = Optional.of(new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this)));
+
+            Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this));
+            bossManager.bind(boss);
+            this.boss = Optional.of(boss);
         }
     }
 
@@ -170,11 +173,11 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         return damageHeals;
     }
 
-    public int getLastAttack() {
-        return lastAttack + 13000 > System.currentTimeMillis() ? lastAttackNumber : -1;
+    public Optional<ShnugglesPrimeAttack> getLastAttack() {
+        return lastAttackTime + 13000 > System.currentTimeMillis() ? lastAttack : Optional.empty();
     }
 
-    public boolean isActiveAttack(Integer attack) {
+    public boolean isActiveAttack(ShnugglesPrimeAttack attack) {
         return activeAttacks.contains(attack);
     }
 
@@ -226,13 +229,13 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         }
     }
 
-    private enum AttackSeverity {
+    protected enum AttackSeverity {
         INFO,
         NORMAL,
         ULTIMATE
     }
 
-    private void sendAttackBroadcast(String message, AttackSeverity severity) {
+    protected void sendAttackBroadcast(String message, AttackSeverity severity) {
         TextColor color;
         switch (severity) {
             case INFO:
@@ -247,14 +250,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         }
         getPlayerMessageSink(SPECTATOR).sendMessage(Texts.of(color, message));
     }
-
-    private static final int OPTION_COUNT = 9;
     
     public void runRandomAttack() {
-        runAttack(Probability.getRandom(OPTION_COUNT));
+        runAttack(Probability.pickOneOf(ShnugglesPrimeAttack.values()));
     }
 
-    public void runAttack(int attackCase) {
+    public void runAttack(ShnugglesPrimeAttack attackCase) {
         Optional<Giant> optBoss = getBoss();
 
         if (!optBoss.isPresent()) {
@@ -267,7 +268,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         double maxBossHealth = getMaxHealth(boss);
 
         double delay = Math.max(5000, Probability.getRangedRandom(15 * bossHealth, 25 * bossHealth));
-        if (lastAttack != 0 && System.currentTimeMillis() - lastAttack <= delay) {
+        if (lastAttackTime != 0 && System.currentTimeMillis() - lastAttackTime <= delay) {
             return;
         }
 
@@ -276,35 +277,34 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             return;
         }
 
-        if (attackCase < 1 || attackCase > OPTION_COUNT) attackCase = Probability.getRandom(OPTION_COUNT);
         // AI-ish system
-        if ((attackCase == 5 || attackCase == 9) && bossHealth > maxBossHealth * .9) {
-            attackCase = Probability.getChance(2) ? 8 : 2;
+        if ((attackCase == ShnugglesPrimeAttack.EVERLASTING || attackCase == ShnugglesPrimeAttack.MINION_LEECH) && bossHealth > maxBossHealth * .9) {
+            attackCase = Probability.getChance(2) ? ShnugglesPrimeAttack.DOOM : ShnugglesPrimeAttack.CORRUPTION;
         }
         for (Player player : contained) {
             if (player.get(Keys.HEALTH).get() < 4) {
-                attackCase = 2;
+                attackCase = ShnugglesPrimeAttack.CORRUPTION;
                 break;
             }
         }
         Collection<Zombie> zombies = getContained(Zombie.class);
         if (zombies.size() > 200) {
-            attackCase = 7;
+            attackCase = ShnugglesPrimeAttack.DOOM;
         }
         if (bossHealth < maxBossHealth * .4 && Probability.getChance(5)) {
             if (zombies.size() < 100 && bossHealth > 200) {
-                attackCase = 5;
+                attackCase = ShnugglesPrimeAttack.EVERLASTING;
             } else {
-                attackCase = 9;
+                attackCase = ShnugglesPrimeAttack.MINION_LEECH;
             }
         }
-        if ((attackCase == 3 || attackCase == 6) && bossHealth < maxBossHealth * .15) {
+        if ((attackCase == ShnugglesPrimeAttack.BLINDNESS || attackCase == ShnugglesPrimeAttack.FIRE) && bossHealth < maxBossHealth * .15) {
             runRandomAttack();
             return;
         }
 
         switch (attackCase) {
-            case 1:
+            case WRATH:
                 sendAttackBroadcast("Taste my wrath!", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
@@ -316,7 +316,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     ((EntityPlayer) player).setFire(3); // This is in seconds for some reason
                 }
                 break;
-            case 2:
+            case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
                 PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
                         .duration(20 * 12).amplifier(1).potionType(PotionEffectTypes.WITHER).build();
@@ -330,7 +330,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
                 }
                 break;
-            case 3:
+            case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
                 PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
                         .duration(20 * 4).amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
@@ -344,9 +344,9 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
                 }
                 break;
-            case 4:
+            case TANGO_TIME:
                 sendAttackBroadcast("Tango time!", AttackSeverity.ULTIMATE);
-                activeAttacks.add(4);
+                activeAttacks.add(ShnugglesPrimeAttack.TANGO_TIME);
                 SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
                     if (!isBossSpawned()) return;
                     for (Player player : getPlayers(PARTICIPANT)) {
@@ -366,12 +366,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         }
                     }
                     sendAttackBroadcast("Now wasn't that fun?", AttackSeverity.INFO);
-                    activeAttacks.remove(4);
+                    activeAttacks.remove(ShnugglesPrimeAttack.TANGO_TIME);
                 }).submit(SkreePlugin.inst());
                 break;
-            case 5:
+            case EVERLASTING:
                 if (!damageHeals) {
-                    activeAttacks.add(5);
+                    activeAttacks.add(ShnugglesPrimeAttack.EVERLASTING);
                     sendAttackBroadcast("I am everlasting!", AttackSeverity.NORMAL);
                     damageHeals = true;
                     SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(12, TimeUnit.SECONDS).execute(() -> {
@@ -380,23 +380,23 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             if (!isBossSpawned()) return;
                             sendAttackBroadcast("Thank you for your assistance.", AttackSeverity.INFO);
                         }
-                        activeAttacks.remove(5);
+                        activeAttacks.remove(ShnugglesPrimeAttack.EVERLASTING);
                     }).submit(SkreePlugin.inst());
                     break;
                 }
                 runRandomAttack();
                 return;
-            case 6:
+            case FIRE:
                 sendAttackBroadcast("Fire is your friend...", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
                     ((EntityPlayer) player).setFire(30); // This is in seconds for some reason
                 }
                 break;
-            case 7:
+            case BASK_IN_MY_GLORY:
                 if (!damageHeals) {
                     sendAttackBroadcast("Bask in my glory!", AttackSeverity.ULTIMATE);
-                    activeAttacks.add(7);
+                    activeAttacks.add(ShnugglesPrimeAttack.BASK_IN_MY_GLORY);
                     SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
                         if (!isBossSpawned()) return;
 
@@ -431,13 +431,13 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         }
                         // Notify if avoided
                         sendAttackBroadcast("Gah... Afraid are you friends?", AttackSeverity.INFO);
-                        activeAttacks.remove(7);
+                        activeAttacks.remove(ShnugglesPrimeAttack.BASK_IN_MY_GLORY);
                     }).submit(SkreePlugin.inst());
                     break;
                 }
                 runRandomAttack();
                 break;
-            case 8:
+            case DOOM:
                 runRandomAttack();
                 return;
                 /*
@@ -457,9 +457,9 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 }).submit(SkreePlugin.inst());
                 break;
                 */
-            case 9:
+            case MINION_LEECH:
                 sendAttackBroadcast("My minions our time is now!", AttackSeverity.ULTIMATE);
-                activeAttacks.add(9);
+                activeAttacks.add(ShnugglesPrimeAttack.MINION_LEECH);
                 IntegratedRunnable minionEater = new IntegratedRunnable() {
                     @Override
                     public boolean run(int times) {
@@ -497,7 +497,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         toHeal = 0;
                         sendAttackBroadcast("Thank you my minions!", AttackSeverity.INFO);
                         printBossHealth();
-                        activeAttacks.remove(9);
+                        activeAttacks.remove(ShnugglesPrimeAttack.MINION_LEECH);
                     }
                 };
                 TimedRunnable<IntegratedRunnable> minonEatingTask = new TimedRunnable<>(minionEater, 20);
@@ -506,8 +506,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 minonEatingTask.setTask(minionEatingTaskExecutor);
                 break;
         }
-        lastAttack = System.currentTimeMillis();
-        lastAttackNumber = attackCase;
+        lastAttackTime = System.currentTimeMillis();
+        lastAttack = Optional.of(attackCase);
     }
 
     @Override

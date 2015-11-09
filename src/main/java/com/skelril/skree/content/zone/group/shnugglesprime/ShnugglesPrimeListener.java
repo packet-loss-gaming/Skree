@@ -60,32 +60,32 @@ public class ShnugglesPrimeListener {
             inst.healBoss(.33F);
             // TODO inventory protection & removal of drops here
             String deathMessage;
-            switch (inst.getLastAttack()) {
-                case 1:
+            switch (inst.getLastAttack().orElseGet(null)) {
+                case WRATH:
                     deathMessage = " discovered how tasty the boss's wrath is";
                     break;
-                case 2:
+                case CORRUPTION:
                     deathMessage = " embraced the boss's corruption";
                     break;
-                case 3:
+                case BLINDNESS:
                     deathMessage = " did not die seeing";
                     break;
-                case 4:
+                case TANGO_TIME:
                     deathMessage = " found out the boss has two left feet";
                     break;
-                case 5:
+                case EVERLASTING:
                     deathMessage = " needs not pester invincible overlords";
                     break;
-                case 6:
+                case FIRE:
                     deathMessage = " died to a terrible inferno";
                     break;
-                case 7:
+                case BASK_IN_MY_GLORY:
                     deathMessage = " basked in the glory of the boss";
                     break;
-                case 8:
+                case DOOM:
                     deathMessage = " was the victim of a devastating prayer";
                     break;
-                case 9:
+                case MINION_LEECH:
                     deathMessage = " has been consumed by the boss";
                     break;
                 default:

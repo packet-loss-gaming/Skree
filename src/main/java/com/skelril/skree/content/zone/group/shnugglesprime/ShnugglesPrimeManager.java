@@ -7,20 +7,33 @@
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
 import com.skelril.nitro.Clause;
+import com.skelril.nitro.probability.Probability;
+import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossManager;
+import com.skelril.openboss.Instruction;
+import com.skelril.openboss.condition.BindCondition;
+import com.skelril.openboss.condition.DamagedCondition;
+import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneBossDetail;
+import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Giant;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
+
+import static com.skelril.nitro.entity.EntityHealthUtil.*;
 
 public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable {
 
@@ -38,7 +51,86 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     }
 
     private void setupBossManager() {
+        List<Instruction<BindCondition, Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>>> bindProcessor = bossManager.getBindProcessor();
+        bindProcessor.add((condition, boss) -> {
+            boss.getTargetEntity().offer(Keys.DISPLAY_NAME, Texts.of("Shnuggles Prime"));
+            setMaxHealth(boss.getTargetEntity(), 750, true);
+            return Optional.empty();
+        });
+        bindProcessor.add((condition, boss) -> {
+            boss.getTargetEntity().offer(Keys.PERSISTS, true);
+            return Optional.empty();
+        });
+        bindProcessor.add((condition, boss) -> {
+            boss.getDetail().getZone().getPlayerMessageSink(PlayerClassifier.SPECTATOR).sendMessage(Texts.of(TextColors.GOLD, "I live again!"));
+            return Optional.empty();
+        });
 
+        List<Instruction<UnbindCondition, Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>>> unbindProcessor = bossManager.getUnbindProcessor();
+        unbindProcessor.add((condition, boss) -> {
+            ShnugglesPrimeInstance inst = boss.getDetail().getZone();
+
+            // Reset respawn mechanics
+            inst.bossDied();
+            // Buff babies
+            inst.buffBabies();
+
+            return Optional.empty();
+        });
+
+        List<Instruction<DamagedCondition, Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>>> damagedProcessor = bossManager.getDamagedProcessor();
+        damagedProcessor.add((condition, boss) -> {
+            ShnugglesPrimeInstance inst = boss.getDetail().getZone();
+            DamageEntityEvent event = condition.getEvent();
+            // Schedule a task to change the display name to show HP
+            SkreePlugin.inst().getGame().getScheduler().createTaskBuilder()
+                    .execute(inst::printBossHealth).delayTicks(1).submit(SkreePlugin.inst());
+            if (inst.damageHeals()) {
+                if (inst.isActiveAttack(ShnugglesPrimeAttack.BASK_IN_MY_GLORY)) {
+                    toFullHealth(boss.getTargetEntity());
+                } else {
+                    double healedDamage = event.getFinalDamage() * 2;
+                    heal(boss.getTargetEntity(), healedDamage);
+                }
+                event.setBaseDamage(0);
+
+                if (Probability.getChance(3) && event.getCause().first(Player.class).isPresent()) {
+                    int affected = 0;
+                    /* TODO Convert to Sponge
+                    for (Entity e : boss.getNearbyEntities(8, 8, 8)) {
+                        if (e.isValid() && e instanceof Player && inst.contains(e)) {
+                            e.setVelocity(new Vector(
+                                    Math.random() * 3 - 1.5,
+                                    Math.random() * 4,
+                                    Math.random() * 3 - 1.5
+                            ));
+                            e.setFireTicks(ChanceUtil.getRandom(20 * 60));
+                            affected++;
+                        }
+                    }*/
+                    if (affected > 0) {
+                        inst.sendAttackBroadcast("Feel my power!", AttackSeverity.INFO);
+                    }
+                }
+            }
+
+            Optional<Living> attacker = condition.getAttacker();
+
+            if (Probability.getChance(3) && event.getCause().first(Player.class).isPresent()) {
+                inst.spawnMinions(attacker);
+            }
+            if (attacker.isPresent() && attacker.get() instanceof Player) {
+                /* TODO Convert to Sponge
+                if (ItemUtil.hasForgeBook((Player) attacker)) {
+                    boss.setHealth(0);
+                    final Player finalAttacker = (Player) attacker;
+                    if (!finalAttacker.getGameMode().equals(GameMode.CREATIVE)) {
+                        server().getScheduler().runTaskLater(inst(), () -> (finalAttacker).setItemInHand(null), 1);
+                    }
+                }*/
+            }
+            return Optional.empty();
+        });
     }
 
     public Optional<ShnugglesPrimeInstance> getApplicableZone(Entity entity) {

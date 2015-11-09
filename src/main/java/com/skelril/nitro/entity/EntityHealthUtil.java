@@ -24,4 +24,19 @@ public class EntityHealthUtil {
         double maxHealth = getMaxHealth(living);
         living.offer(Keys.HEALTH, Math.min(health + amt, maxHealth));
     }
+
+    public static void toFullHealth(Living living) {
+        living.offer(Keys.HEALTH, living.get(Keys.MAX_HEALTH).get());
+    }
+
+    public static void setMaxHealth(Living living, double amt) {
+        setMaxHealth(living, amt, false);
+    }
+
+    public static void setMaxHealth(Living living, double amt, boolean fill) {
+        living.offer(Keys.MAX_HEALTH, amt);
+        if (fill) {
+            toFullHealth(living);
+        }
+    }
 }
