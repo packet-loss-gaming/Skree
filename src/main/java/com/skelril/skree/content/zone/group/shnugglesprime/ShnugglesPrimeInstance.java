@@ -42,6 +42,7 @@ import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.potion.PotionEffect;
+import org.spongepowered.api.potion.PotionEffectBuilder;
 import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.text.Texts;
@@ -50,6 +51,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
+import org.spongepowered.api.world.explosion.ExplosionBuilder;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -122,7 +124,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void buffBabies() {
-        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
                 .duration(20 * 20).amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
         for (Entity zombie : getContained(Zombie.class)) {
             zombie.offer(Keys.POTION_EFFECTS, Lists.newArrayList(strengthBuff));
@@ -318,7 +320,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
-                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
                         .duration(20 * 12).amplifier(1).potionType(PotionEffectTypes.WITHER).build();
                 for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
@@ -332,7 +334,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
-                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
                         .duration(20 * 4).amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
                 for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
@@ -414,7 +416,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             damageHeals = true;
                             spawnPts.stream().filter(pt -> Probability.getChance(12)).forEach(pt -> {
                                 Explosion explosion = SkreePlugin.inst().getGame().getRegistry()
-                                        .createExplosionBuilder()
+                                        .createBuilder(ExplosionBuilder.class)
                                         .shouldBreakBlocks(false)
                                         .origin(pt.getPosition())
                                         .radius(10)
