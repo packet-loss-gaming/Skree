@@ -251,7 +251,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     private static final int OPTION_COUNT = 9;
     
     public void runRandomAttack() {
-        runRandomAttack();
+        runAttack(Probability.getRandom(OPTION_COUNT));
     }
 
     public void runAttack(int attackCase) {
