@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.group.shnugglesprime;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
+import com.skelril.openboss.BossListener;
 import com.skelril.openboss.BossManager;
 import com.skelril.openboss.Instruction;
 import com.skelril.openboss.condition.BindCondition;
@@ -51,6 +52,11 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     }
 
     private void setupBossManager() {
+        SkreePlugin.inst().getGame().getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new BossListener<>(bossManager, Giant.class)
+        );
+
         List<Instruction<BindCondition, Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>>> bindProcessor = bossManager.getBindProcessor();
         bindProcessor.add((condition, boss) -> {
             boss.getTargetEntity().offer(Keys.DISPLAY_NAME, Texts.of("Shnuggles Prime"));
