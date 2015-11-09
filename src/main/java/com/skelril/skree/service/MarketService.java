@@ -6,15 +6,11 @@
 
 package com.skelril.skree.service;
 
-import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public interface MarketService {
     String VALID_ALIAS_REGEX = "^([A-Za-z-0-9 ]+|)$";
@@ -44,14 +40,14 @@ public interface MarketService {
     List<Clause<String, BigDecimal>> getPrices(String aliasConstraint);
 
     /** Transactions **/
-    default boolean logTransactionByName(UUID user, Clause<String, Integer>... itemQuantity) {
-        return logTransactionByName(user, Lists.newArrayList(itemQuantity));
+    default boolean logTransactionByName(UUID user, Clause<String, Integer> itemQuantity) {
+        return logTransactionByName(user, Collections.singleton(itemQuantity));
     }
 
     boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity);
 
-    default boolean logTransactionByStack(UUID user, Clause<ItemStack, Integer>... itemQuantity) {
-        return logTransactionByStack(user, Lists.newArrayList(itemQuantity));
+    default boolean logTransactionByStack(UUID user, Clause<ItemStack, Integer> itemQuantity) {
+        return logTransactionByStack(user, Collections.singleton(itemQuantity));
     }
 
     boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity);
