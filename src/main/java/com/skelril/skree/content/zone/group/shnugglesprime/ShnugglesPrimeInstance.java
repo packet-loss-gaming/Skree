@@ -7,13 +7,18 @@
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
+import com.skelril.nitro.time.TimeFilter;
 import com.skelril.nitro.time.TimedRunnable;
+import com.skelril.openboss.Boss;
+import com.skelril.openboss.BossManager;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.content.zone.ZoneBossDetail;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -36,7 +41,12 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.potion.PotionEffect;
+import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -44,9 +54,15 @@ import org.spongepowered.api.world.explosion.Explosion;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.skelril.nitro.entity.EntityHealthUtil.*;
+import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
+import static com.skelril.skree.service.internal.zone.PlayerClassifier.SPECTATOR;
+
 public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runnable {
 
-    private Optional<Giant> boss = Optional.empty();
+    private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager;
+
+    private Optional<Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>> boss = Optional.empty();
     private long lastAttack = 0;
     private int lastAttackNumber = -1;
     private long lastDeath = 0;
@@ -54,15 +70,14 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     private Set<Integer> activeAttacks = new HashSet<>();
     private Random random = new Random();
 
-    private long lastUltimateAttack = -1;
-    private boolean flagged = false;
     private int emptyTicks = 0;
 
     private double toHeal = 0;
     private List<Location<World>> spawnPts = new ArrayList<>();
 
-    public ShnugglesPrimeInstance(ZoneRegion region) {
+    public ShnugglesPrimeInstance(ZoneRegion region, BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager) {
         super(region);
+        this.bossManager = bossManager;
     }
 
     public void probeArea() {
@@ -101,15 +116,16 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 ++emptyTicks;
             } else {
                 emptyTicks = 0;
-                requestXPCleanup();
-                runAttack(Probability.getRandom(OPTION_COUNT));
+                runRandomAttack();
             }
         }
     }
 
     public void buffBabies() {
+        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+                .duration(20 * 20).amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
         for (Entity zombie : getContained(Zombie.class)) {
-            // addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 20, 3), true);
+            zombie.offer(Keys.POTION_EFFECTS, Lists.newArrayList(strengthBuff));
         }
     }
 
@@ -117,17 +133,30 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
         if (spawned.isPresent()) {
             getRegion().getExtent().spawnEntity(spawned.get(), Cause.of(this));
-            boss = Optional.of((Giant) spawned.get());
+            boss = Optional.of(new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this)));
         }
     }
-    
+
+
     public boolean isBossSpawned() {
-        return boss.isPresent();
+        getContained(Giant.class).stream().filter(e -> e.isLoaded() && !e.isRemoved()).forEach(e -> {
+            Optional<Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>> b = bossManager.updateLookup(e);
+            if (!b.isPresent()) {
+                e.remove();
+            }
+        });
+        return boss != null;
+    }
+
+    public Optional<Giant> getBoss() {
+        return isBossSpawned() ? Optional.of(boss.get().getTargetEntity()) : Optional.empty();
     }
 
     public void healBoss(float percentHealth) {
-        if (boss.isPresent()) {
-            // EntityUtil.heal(boss, boss.getMaxHealth() * percentHealth);
+        Optional<Giant> optBoss = getBoss();
+        if (optBoss.isPresent()) {
+            Giant boss = optBoss.get();
+            heal(boss, getMaxHealth(boss) * percentHealth);
         }
     }
 
@@ -137,20 +166,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         boss = Optional.empty();
     }
 
-    public void requestXPCleanup() {
-        // getContained(ExperienceOrb.class).stream().filter(e -> e.getTicksLived() > 20 * 13).forEach(Entity::remove);
-    }
-
     public boolean damageHeals() {
         return damageHeals;
-    }
-
-    public boolean canUseUltimate(long time) {
-        return System.currentTimeMillis() - lastUltimateAttack >= time;
-    }
-
-    public void updateLastUltimate() {
-        lastUltimateAttack = System.currentTimeMillis();
     }
 
     public int getLastAttack() {
@@ -162,12 +179,18 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void printBossHealth() {
-        if (!boss.isPresent()) return;
-        Giant boss = this.boss.get();
-        int current = (int) Math.ceil(boss.get(Keys.HEALTH).get());
-        int max = (int) Math.ceil(boss.get(Keys.MAX_HEALTH).get());
-        String message = "Boss Health: " + current + " / " + max;
-        // ChatUtil.send(getContained(Player.class), ChatColor.DARK_AQUA, message);
+        Optional<Giant> optBoss = getBoss();
+        if (!optBoss.isPresent()) {
+            return;
+        }
+
+        Giant boss = optBoss.get();
+        int current = (int) Math.ceil(getHealth(boss));
+        int max = (int) Math.ceil(getMaxHealth(boss));
+
+        getPlayerMessageSink(SPECTATOR).sendMessage(
+                Texts.of(TextColors.DARK_AQUA, "Boss Health: " + current + " / " + max)
+        );
     }
 
     private static final ItemStack weapon = ItemStackFactory.newItemStack(ItemTypes.BONE);
@@ -181,8 +204,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         }
     }
 
-    public void spawnMinions(Living target) {
-        int spawnCount = Math.max(3, getPlayers().size());
+    public void spawnMinions(Optional<Living> target) {
+        int spawnCount = Math.max(3, getPlayers(PARTICIPANT).size());
         for (Location<World> spawnPt : spawnPts) {
             if (Probability.getChance(11)) {
                 for (int i = spawnCount; i > 0; --i) {
@@ -193,33 +216,70 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         ((EntityZombie) zombie).setChild(true);
                         zombie.setItemInHand(weapon.copy());
                         getRegion().getExtent().spawnEntity(zombie, Cause.of(this));
+
+                        if (target.isPresent()) {
+                            zombie.offer(Keys.TARGETS, Lists.newArrayList(target.get()));
+                        }
                     }
                 }
             }
         }
     }
 
-    public static final int OPTION_COUNT = 9;
+    private enum AttackSeverity {
+        INFO,
+        NORMAL,
+        ULTIMATE
+    }
+
+    private void sendAttackBroadcast(String message, AttackSeverity severity) {
+        TextColor color;
+        switch (severity) {
+            case INFO:
+                color = TextColors.YELLOW;
+                break;
+            case ULTIMATE:
+                color = TextColors.DARK_RED;
+                break;
+            default:
+                color = TextColors.RED;
+                break;
+        }
+        getPlayerMessageSink(SPECTATOR).sendMessage(Texts.of(color, message));
+    }
+
+    private static final int OPTION_COUNT = 9;
+    
+    public void runRandomAttack() {
+        runRandomAttack();
+    }
 
     public void runAttack(int attackCase) {
-        Giant boss = this.boss.get();
+        Optional<Giant> optBoss = getBoss();
 
-        double bossHealth = boss.get(Keys.HEALTH).get();
-        double maxBossHealth = boss.get(Keys.MAX_HEALTH).get();
+        if (!optBoss.isPresent()) {
+            return;
+        }
+
+        Giant boss = optBoss.get();
+
+        double bossHealth = getHealth(boss);
+        double maxBossHealth = getMaxHealth(boss);
 
         double delay = Math.max(5000, Probability.getRangedRandom(15 * bossHealth, 25 * bossHealth));
+        if (lastAttack != 0 && System.currentTimeMillis() - lastAttack <= delay) {
+            return;
+        }
 
-        if (lastAttack != 0 && System.currentTimeMillis() - lastAttack <= delay) return;
+        Collection<Player> contained = getPlayers(PARTICIPANT);
+        if (contained.isEmpty()) {
+            return;
+        }
 
-        Collection<Player> contained = getPlayers();
-        if (contained == null || contained.size() <= 0) return;
         if (attackCase < 1 || attackCase > OPTION_COUNT) attackCase = Probability.getRandom(OPTION_COUNT);
         // AI-ish system
         if ((attackCase == 5 || attackCase == 9) && bossHealth > maxBossHealth * .9) {
             attackCase = Probability.getChance(2) ? 8 : 2;
-        }
-        if (flagged && Probability.getChance(4)) {
-            attackCase = Probability.getChance(2) ? 4 : 7;
         }
         for (Player player : contained) {
             if (player.get(Keys.HEALTH).get() < 4) {
@@ -239,12 +299,13 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             }
         }
         if ((attackCase == 3 || attackCase == 6) && bossHealth < maxBossHealth * .15) {
-            runAttack(Probability.getRandom(OPTION_COUNT));
+            runRandomAttack();
             return;
         }
+
         switch (attackCase) {
             case 1:
-                // ChatUtil.sendWarning(spectator, "Taste my wrath!");
+                sendAttackBroadcast("Taste my wrath!", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
                     ((EntityPlayer) player).setVelocity(
@@ -256,27 +317,42 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 }
                 break;
             case 2:
-                // ChatUtil.sendWarning(spectator, "Embrace my corruption!");
+                sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
+                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+                        .duration(20 * 12).amplifier(1).potionType(PotionEffectTypes.WITHER).build();
                 for (Player player : contained) {
-                    // player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 12, 1));
+                    Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
+                    if (!optPotionEffects.isPresent()) {
+                        optPotionEffects = Optional.of(new ArrayList<>(1));
+                    }
+                    List<PotionEffect> potionEffects = optPotionEffects.get();
+                    potionEffects.add(witherEffect);
+                    player.offer(Keys.POTION_EFFECTS, potionEffects);
                 }
                 break;
             case 3:
-                // ChatUtil.sendWarning(spectator, "Are you BLIND? Mwhahahaha!");
+                sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
+                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createPotionEffectBuilder()
+                        .duration(20 * 4).amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
                 for (Player player : contained) {
-                    // player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 4, 0));
+                    Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
+                    if (!optPotionEffects.isPresent()) {
+                        optPotionEffects = Optional.of(new ArrayList<>(1));
+                    }
+                    List<PotionEffect> potionEffects = optPotionEffects.get();
+                    potionEffects.add(blindnessEffect);
+                    player.offer(Keys.POTION_EFFECTS, potionEffects);
                 }
                 break;
             case 4:
-                // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "Tango time!");
+                sendAttackBroadcast("Tango time!", AttackSeverity.ULTIMATE);
                 activeAttacks.add(4);
                 SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
                     if (!isBossSpawned()) return;
-                    Collection<Player> newContained = getContained(Player.class);
-                    for (Player player : newContained) {
+                    for (Player player : getPlayers(PARTICIPANT)) {
                         // TODO Convert to Sponge
                         if (((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) player)) {
-                            // ChatUtil.send(player, "Come closer...");
+                            player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
                             player.damage(100, Cause.of(boss));
                             // TODO convert to Sponge
@@ -286,32 +362,32 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                     random.nextDouble() * 1.7 - 1.5
                             );
                         } else {
-                            // ChatUtil.send(player, "Fine... No tango this time...");
+                            player.sendMessage(Texts.of(TextColors.YELLOW, "Fine... No tango this time..."));
                         }
                     }
-                    // ChatUtil.send(newContained, "Now wasn't that fun?");
+                    sendAttackBroadcast("Now wasn't that fun?", AttackSeverity.INFO);
                     activeAttacks.remove(4);
                 }).submit(SkreePlugin.inst());
                 break;
             case 5:
                 if (!damageHeals) {
                     activeAttacks.add(5);
-                    // ChatUtil.sendWarning(spectator, "I am everlasting!");
+                    sendAttackBroadcast("I am everlasting!", AttackSeverity.NORMAL);
                     damageHeals = true;
                     SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(12, TimeUnit.SECONDS).execute(() -> {
                         if (damageHeals) {
                             damageHeals = false;
                             if (!isBossSpawned()) return;
-                            // ChatUtil.send(getContained(Player.class), "Thank you for your assistance.");
+                            sendAttackBroadcast("Thank you for your assistance.", AttackSeverity.INFO);
                         }
                         activeAttacks.remove(5);
                     }).submit(SkreePlugin.inst());
                     break;
                 }
-                runAttack(Probability.getRandom(OPTION_COUNT));
+                runRandomAttack();
                 return;
             case 6:
-                // ChatUtil.sendWarning(spectator, "Fire is your friend...");
+                sendAttackBroadcast("Fire is your friend...", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
                     ((EntityPlayer) player).setFire(30); // This is in seconds for some reason
@@ -319,21 +395,20 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case 7:
                 if (!damageHeals) {
-                    // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "Bask in my glory!");
+                    sendAttackBroadcast("Bask in my glory!", AttackSeverity.ULTIMATE);
                     activeAttacks.add(7);
                     SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
                         if (!isBossSpawned()) return;
-                        
-                        Collection<Player> newContained = getContained(Player.class);
-                        boolean baskInGlory = newContained.size() == 0;
-                        
-                        for (Player player : newContained) {
+
+                        boolean baskInGlory = false;
+                        for (Player player : getContained(Player.class)) {
                             // TODO Convert to Sponge
                             if (((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) player)) {
-                                // ChatUtil.sendWarning(player, ChatColor.DARK_RED + "You!");
+                                player.sendMessage(Texts.of(TextColors.DARK_RED, "You!"));
                                 baskInGlory = true;
                             }
                         }
+
                         //Attack
                         if (baskInGlory) {
                             damageHeals = true;
@@ -355,14 +430,17 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             return;
                         }
                         // Notify if avoided
-                        // ChatUtil.send(newContained, "Gah... Afraid are you friends?");
+                        sendAttackBroadcast("Gah... Afraid are you friends?", AttackSeverity.INFO);
                         activeAttacks.remove(7);
                     }).submit(SkreePlugin.inst());
                     break;
                 }
-                runAttack(Probability.getRandom(OPTION_COUNT));
+                runRandomAttack();
                 break;
             case 8:
+                runRandomAttack();
+                return;
+                /*
                 // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "I ask thy lord for aid in this all mighty battle...");
                 // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "Heed thy warning, or perish!");
                 activeAttacks.add(8);
@@ -378,8 +456,9 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     activeAttacks.remove(8);
                 }).submit(SkreePlugin.inst());
                 break;
+                */
             case 9:
-                // ChatUtil.send(spectator, ChatColor.DARK_RED, "My minions our time is now!");
+                sendAttackBroadcast("My minions our time is now!", AttackSeverity.ULTIMATE);
                 activeAttacks.add(9);
                 IntegratedRunnable minionEater = new IntegratedRunnable() {
                     @Override
@@ -400,20 +479,23 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             }
                             toHeal += realDamage / 3;
                         }
-                        // TODO Timer Util is dead
-//                        if (TimerUtil.matchesFilter(times + 1, -1, 2)) {
-//                            ChatUtil.send(getContained(Player.class), ChatColor.DARK_AQUA, "The boss has drawn in: " + (int) toHeal + " health.");
-//                        }
+                        if (new TimeFilter(-1, 2).matchesFilter(times + 1)) {
+                            getPlayerMessageSink(SPECTATOR).sendMessage(
+                                    Texts.of(
+                                            TextColors.DARK_AQUA,
+                                            "The boss has drawn in: " + (int) toHeal + " health."
+                                    )
+                            );
+                        }
                         return true;
                     }
 
                     @Override
                     public void end() {
                         if (!isBossSpawned()) return;
-                        // TODO Entity Util is dead
-                        // EntityUtil.heal(boss, toHeal);
+                        heal(boss, toHeal);
                         toHeal = 0;
-                        // ChatUtil.send(getContained(Player.class), "Thank you my minions!");
+                        sendAttackBroadcast("Thank you my minions!", AttackSeverity.INFO);
                         printBossHealth();
                         activeAttacks.remove(9);
                     }
@@ -438,6 +520,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
     @Override
     public void forceEnd() {
+        remove(getPlayers(PARTICIPANT));
         remove();
     }
 

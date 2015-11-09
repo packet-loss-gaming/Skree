@@ -6,8 +6,11 @@
 
 package com.skelril.skree.service.internal.zone;
 
+import com.google.common.collect.Sets;
 import com.skelril.nitro.Clause;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.sink.MessageSinks;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -38,5 +41,8 @@ public interface Zone {
     }
 
     ZoneRegion getRegion();
-    Collection<Player> getPlayers();
+    Collection<Player> getPlayers(PlayerClassifier classifier);
+    default MessageSink getPlayerMessageSink(PlayerClassifier classifier) {
+        return MessageSinks.to(Sets.newHashSet(getPlayers(classifier)));
+    }
 }

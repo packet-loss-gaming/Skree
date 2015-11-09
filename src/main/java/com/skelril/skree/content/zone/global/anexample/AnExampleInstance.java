@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone.global.anexample;
 
 import com.skelril.nitro.Clause;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
@@ -55,7 +56,7 @@ public class AnExampleInstance implements Zone {
     }
 
     @Override
-    public Collection<Player> getPlayers() {
+    public Collection<Player> getPlayers(PlayerClassifier classifier) {
         return null;
     }
 }
