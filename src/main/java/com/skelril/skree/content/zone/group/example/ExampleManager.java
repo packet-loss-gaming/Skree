@@ -12,6 +12,8 @@ import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 
+import java.util.Optional;
+
 @Singleton
 public class ExampleManager extends GroupZoneManager<ExampleInstance> {
 
@@ -22,14 +24,14 @@ public class ExampleManager extends GroupZoneManager<ExampleInstance> {
     }
 
     @Override
-    public ExampleInstance discover(ZoneSpaceAllocator allocator) {
+    public Optional<ExampleInstance> discover(ZoneSpaceAllocator allocator) {
         Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
         ZoneRegion region = result.getKey();
 
         ExampleInstance instance = new ExampleInstance(region);
         instance.init();
 
-        return instance;
+        return Optional.of(instance);
     }
 
     @Override

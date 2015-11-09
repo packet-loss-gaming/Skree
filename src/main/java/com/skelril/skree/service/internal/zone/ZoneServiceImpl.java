@@ -68,19 +68,19 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public Clause<Player, ZoneStatus> requestZone(ZoneManager<?> manager, Player player) {
-        Zone zone = manager.discover(pickAllocator());
-        if (zone != null) {
-            return addToZone(zone, player);
+    public <T extends Zone> Clause<Player, ZoneStatus> requestZone(ZoneManager<T> manager, Player player) {
+        Optional<T> optZone = manager.discover(pickAllocator());
+        if (optZone.isPresent()) {
+            return addToZone(optZone.get(), player);
         }
         return new Clause<>(player, ZoneStatus.CREATION_FAILED);
     }
 
     @Override
-    public Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<?> manager, Collection<Player> players) {
-        Zone zone = manager.discover(pickAllocator());
-        if (zone != null) {
-            return players.stream().map(player -> addToZone(zone, player)).collect(Collectors.toList());
+    public <T extends Zone> Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<T> manager, Collection<Player> players) {
+        Optional<T> optZone = manager.discover(pickAllocator());
+        if (optZone.isPresent()) {
+            return players.stream().map(player -> addToZone(optZone.get(), player)).collect(Collectors.toList());
         }
         return players.stream().map(player -> new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList());
     }

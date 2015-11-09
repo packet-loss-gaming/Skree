@@ -7,10 +7,11 @@
 package com.skelril.skree.service.internal.zone;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ZoneManager<T extends Zone> {
 
-    T discover(ZoneSpaceAllocator allocator);
+    Optional<T> discover(ZoneSpaceAllocator allocator);
     Collection<T> getActiveZones();
 
     String getName();

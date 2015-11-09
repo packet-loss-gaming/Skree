@@ -143,7 +143,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     }
 
     @Override
-    public ShnugglesPrimeInstance discover(ZoneSpaceAllocator allocator) {
+    public Optional<ShnugglesPrimeInstance> discover(ZoneSpaceAllocator allocator) {
         ZoneRegion region = freeRegions.poll();
         if (region == null) {
             Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
@@ -155,7 +155,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
 
         zones.add(instance);
 
-        return instance;
+        return Optional.of(instance);
     }
 
     @Override
