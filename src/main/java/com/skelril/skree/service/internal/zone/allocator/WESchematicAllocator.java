@@ -23,38 +23,36 @@ import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
-    private final File baseDir;
+    private final Path baseDir;
 
-    public WESchematicAllocator(File baseDir) {
+    public WESchematicAllocator(Path baseDir) {
         this.baseDir = baseDir;
     }
 
-    public String getFileName(String managerName) {
+    private String getFileName(String managerName) {
         return managerName.replace(" ", "-");
     }
 
-    public File getFile(String managerName) {
-        return new File(baseDir, getFileName(managerName) + ".schematic");
+    private Path getFile(String managerName) {
+        return baseDir.resolve(getFileName(managerName) + ".schematic");
     }
 
-    public ClipboardHolder getHolder(String managerName, WorldData worldData) throws IOException {
-        try (FileInputStream fis = new FileInputStream(getFile(managerName))) {
-            try (BufferedInputStream bis = new BufferedInputStream(fis)) {
-                ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
-                Clipboard clipboard = reader.read(worldData);
-                return new ClipboardHolder(clipboard, worldData);
-            }
+    private ClipboardHolder getHolder(String managerName, WorldData worldData) throws IOException {
+        try (InputStream bis = Files.newInputStream(getFile(managerName))) {
+            ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
+            Clipboard clipboard = reader.read(worldData);
+            return new ClipboardHolder(clipboard, worldData);
         }
     }
 
-    public ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName) {
+    protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
 
         Operation operation;

@@ -6,6 +6,7 @@
 
 package com.skelril.skree.service.internal.playerstate;
 
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PlayerStateService;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -13,17 +14,25 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.config.ConfigService;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class PlayerStateServiceImpl implements PlayerStateService {
 
-    private File getFile(Player player) {
-        File file = new File("./mods/skree/profiles/");
-        file.mkdirs();
-        file = new File(file, player.getUniqueId() + ".dat");
-        return file;
+    private Path getFile(Player player) throws IOException {
+        Optional<ConfigService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ConfigService.class);
+        if (optService.isPresent()) {
+            ConfigService service = optService.get();
+            Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+            path = Files.createDirectories(path.resolve("profiles"));
+            return path.resolve(player.getUniqueId() + ".dat");
+        }
+        throw new FileNotFoundException();
     }
 
     @Override
@@ -32,13 +41,13 @@ public class PlayerStateServiceImpl implements PlayerStateService {
         ((EntityPlayer) player).inventory.writeToNBT(playerInv);
 
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player));
+            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
             if (compound == null) {
                 compound = new NBTTagCompound();
             }
             compound.setTag(saveName, playerInv);
 
-            CompressedStreamTools.safeWrite(compound, getFile(player));
+            CompressedStreamTools.safeWrite(compound, getFile(player).toFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,7 +56,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
     @Override
     public void load(Player player, String saveName) {
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player));
+            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
             if (compound == null) {
                 return;
             }
