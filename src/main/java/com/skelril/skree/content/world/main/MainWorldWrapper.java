@@ -16,7 +16,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.potion.PotionEffectBuilder;
+import org.spongepowered.api.potion.PotionEffect;
 import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.world.World;
 
@@ -63,7 +63,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
                 if (optPotionData.isPresent()) {
-                    PotionEffectBuilder builder = game.getRegistry().createBuilder(PotionEffectBuilder.class);
+                    PotionEffect.Builder builder = game.getRegistry().createBuilder(PotionEffect.Builder.class);
                     builder.potionType(PotionEffectTypes.SPEED);
                     builder.amplifier(5);
                     builder.duration(3 * 20);

@@ -394,7 +394,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     Vector3d origin = loc.getPosition();
                     World world = loc.getExtent();
                     for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
+                        ParticleEffect effect = game.getRegistry().createBuilder(
+                                ParticleEffect.Builder.class
+                        ).type(
                                 ParticleTypes.CRIT_MAGIC
                         ).motion(
                                 new Vector3d(
