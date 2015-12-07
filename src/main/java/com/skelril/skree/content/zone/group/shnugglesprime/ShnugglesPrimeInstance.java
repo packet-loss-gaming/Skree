@@ -31,6 +31,8 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
@@ -38,20 +40,18 @@ import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.potion.PotionEffect;
-import org.spongepowered.api.potion.PotionEffectBuilder;
-import org.spongepowered.api.potion.PotionEffectTypes;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
-import org.spongepowered.api.world.explosion.ExplosionBuilder;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -124,7 +124,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void buffBabies() {
-        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
+        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
                 .duration(20 * 20).amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
         for (Entity zombie : getContained(Zombie.class)) {
             zombie.offer(Keys.POTION_EFFECTS, Lists.newArrayList(strengthBuff));
@@ -320,7 +320,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
-                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
+                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
                         .duration(20 * 12).amplifier(1).potionType(PotionEffectTypes.WITHER).build();
                 for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
@@ -334,7 +334,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
-                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffectBuilder.class)
+                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
                         .duration(20 * 4).amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
                 for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
@@ -356,7 +356,14 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         if (((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) player)) {
                             player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
-                            player.damage(100, Cause.of(boss));
+
+                            DamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
+                                    DamageSource.Builder.class
+                            ).type(
+                                    DamageTypes.ATTACK
+                            ).build();
+
+                            player.damage(100, source, Cause.of(boss));
                             // TODO convert to Sponge
                             ((EntityPlayer) player).setVelocity(
                                     random.nextDouble() * 1.7 - 1.5,
@@ -416,7 +423,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             damageHeals = true;
                             spawnPts.stream().filter(pt -> Probability.getChance(12)).forEach(pt -> {
                                 Explosion explosion = SkreePlugin.inst().getGame().getRegistry()
-                                        .createBuilder(ExplosionBuilder.class)
+                                        .createBuilder(Explosion.Builder.class)
                                         .shouldBreakBlocks(false)
                                         .origin(pt.getPosition())
                                         .radius(10)
@@ -477,7 +484,13 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
                                 entity.offer(Keys.HEALTH, 0D);
                             } else {
-                                entity.damage(realDamage, Cause.of(boss));
+                                DamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
+                                        DamageSource.Builder.class
+                                ).type(
+                                        DamageTypes.ATTACK
+                                ).build();
+
+                                entity.damage(realDamage, source, Cause.of(boss));
                             }
                             toHeal += realDamage / 3;
                         }

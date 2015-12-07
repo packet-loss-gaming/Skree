@@ -9,7 +9,7 @@ package com.skelril.skree.content.zone;
 import com.skelril.openboss.EntityDetail;
 import com.skelril.skree.service.internal.zone.Zone;
 
-public class ZoneBossDetail<T extends Zone>  implements EntityDetail {
+public class ZoneBossDetail<T extends Zone> implements EntityDetail {
     public final T zone;
 
     public ZoneBossDetail(T zone) {
