@@ -11,26 +11,20 @@ import com.google.gson.GsonBuilder;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.service.config.ConfigService;
+import org.spongepowered.api.config.ConfigManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class DatabaseSystem {
 
     private Path getDatabaseFile() throws IOException {
-        Optional<ConfigService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ConfigService.class);
-        if (optService.isPresent()) {
-            ConfigService service = optService.get();
-            Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-            return path.resolve("database.json");
-        }
-        throw new FileNotFoundException();
+        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        return path.resolve("database.json");
     }
 
     public DatabaseSystem(SkreePlugin plugin, Game game) {

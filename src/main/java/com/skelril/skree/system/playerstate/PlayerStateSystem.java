@@ -12,8 +12,8 @@ import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.PlayerStateServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.service.ProviderExistsException;
-import org.spongepowered.api.service.command.CommandService;
 
 public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
 
@@ -27,7 +27,7 @@ public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
         try {
             game.getServiceManager().setProvider(plugin, PlayerStateService.class, service);
 
-            CommandService cmdDispatcher = game.getCommandDispatcher();
+            CommandManager cmdDispatcher = game.getCommandManager();
 
             cmdDispatcher.removeMapping(cmdDispatcher.get("gamemode").get());
             cmdDispatcher.register(plugin, GameModeCommand.aquireSpec(game, service), "gamemode", "gm");

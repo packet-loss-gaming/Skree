@@ -6,7 +6,7 @@
 
 package com.skelril.nitro.time;
 
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 
 public class TimedRunnable<T extends IntegratedRunnable> implements Runnable {
 

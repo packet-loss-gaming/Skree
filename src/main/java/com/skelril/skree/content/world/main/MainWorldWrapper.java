@@ -11,13 +11,13 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.potion.PotionEffect;
-import org.spongepowered.api.potion.PotionEffectTypes;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;

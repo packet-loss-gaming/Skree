@@ -15,7 +15,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ShutdownService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;

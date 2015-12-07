@@ -28,7 +28,7 @@ public class ModifierSystem implements ServiceProvider<ModifierService> {
         try {
             game.getEventManager().registerListeners(plugin, new ModifierNotifier());
             game.getServiceManager().setProvider(plugin, ModifierService.class, service);
-            game.getCommandDispatcher().register(plugin, ModExtendCommand.aquireSpec(game), "modextend");
+            game.getCommandManager().register(plugin, ModExtendCommand.aquireSpec(game), "modextend");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

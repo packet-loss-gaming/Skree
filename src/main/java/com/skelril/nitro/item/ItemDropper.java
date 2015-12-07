@@ -41,7 +41,7 @@ public class ItemDropper {
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
                 item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot());
-                getExtent().spawnEntity(item, Cause.empty());
+                getExtent().spawnEntity(item, Cause.of());
             }
         }
     }

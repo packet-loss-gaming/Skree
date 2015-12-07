@@ -8,8 +8,8 @@ package com.skelril.skree.content.market;
 
 import com.skelril.skree.content.market.admin.*;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
 public class MarketAdminCommand {
     public static CommandSpec aquireSpec(Game game) {

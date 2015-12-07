@@ -13,26 +13,20 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.config.ConfigService;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class PlayerStateServiceImpl implements PlayerStateService {
 
     private Path getFile(Player player) throws IOException {
-        Optional<ConfigService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ConfigService.class);
-        if (optService.isPresent()) {
-            ConfigService service = optService.get();
-            Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-            path = Files.createDirectories(path.resolve("profiles"));
-            return path.resolve(player.getUniqueId() + ".dat");
-        }
-        throw new FileNotFoundException();
+        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        path = Files.createDirectories(path.resolve("profiles"));
+        return path.resolve(player.getUniqueId() + ".dat");
     }
 
     @Override

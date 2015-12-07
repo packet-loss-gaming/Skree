@@ -8,20 +8,20 @@ package com.skelril.skree.content.world;
 
 
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class WorldCommand implements CommandExecutor {
 

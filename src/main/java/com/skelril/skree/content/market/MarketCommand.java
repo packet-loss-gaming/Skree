@@ -7,8 +7,8 @@
 package com.skelril.skree.content.market;
 
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
 /*
         @Command(aliases = {"enchant"},

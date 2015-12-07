@@ -10,16 +10,16 @@ import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.MarketService;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.market.MarketImplUtil.format;
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class MarketBuyCommand implements CommandExecutor {
 
