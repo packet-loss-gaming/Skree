@@ -84,7 +84,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
                         DecimalFormat df = new DecimalFormat("#,###.##");
 
-                        player.sendMessage(
+                        player.sendMessages(
                             Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
                             Texts.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
                             Texts.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),

@@ -47,8 +47,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Register the service & command
         try {
             game.getServiceManager().setProvider(plugin, WorldService.class, service);
-            game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
-            game.getCommandDispatcher().register(plugin, WorldListCommand.aquireSpec(game), "worlds");
+            game.getCommandManager().register(plugin, WorldCommand.aquireSpec(game), "world");
+            game.getCommandManager().register(plugin, WorldListCommand.aquireSpec(game), "worlds");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

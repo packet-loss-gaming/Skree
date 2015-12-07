@@ -14,7 +14,7 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.projectile.LaunchProjectileEvent;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
 import java.util.*;

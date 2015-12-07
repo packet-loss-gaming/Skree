@@ -19,11 +19,10 @@ import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.service.ProviderExistsException;
-import org.spongepowered.api.service.config.ConfigService;
 import org.spongepowered.api.world.World;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,13 +44,9 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
     }
 
     private Path getWorkingDir() throws IOException {
-        Optional<ConfigService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ConfigService.class);
-        if (optService.isPresent()) {
-            ConfigService service = optService.get();
-            Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-            return Files.createDirectories(path.resolve("zones"));
-        }
-        throw new FileNotFoundException();
+        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        return Files.createDirectories(path.resolve("zones"));
     }
 
     private void initialize(SkreePlugin plugin, Game game) {
@@ -75,7 +70,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
             for (String name : Arrays.asList("Catacombs", "FreakyFour", "GoldRush", "PatientX", "ShnugglesPrime")) {
                 service.registerManager(new ExampleManager(name));
             }
-            game.getCommandDispatcher().register(plugin, ZoneMeCommand.aquireSpec(service), "zoneme");
+            game.getCommandManager().register(plugin, ZoneMeCommand.aquireSpec(service), "zoneme");
 
             try {
                 game.getServiceManager().setProvider(plugin, ZoneService.class, service);

@@ -10,15 +10,15 @@ import com.skelril.nitro.text.PrettyText;
 import com.skelril.skree.service.ModifierService;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.sink.MessageSinks;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ModExtendCommand implements CommandExecutor {
     private Game game;

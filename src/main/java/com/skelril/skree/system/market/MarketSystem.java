@@ -27,7 +27,7 @@ public class MarketSystem implements ServiceProvider<MarketService> {
         try {
             game.getEventManager().registerListeners(plugin, new ModifierNotifier());
             game.getServiceManager().setProvider(plugin, MarketService.class, service);
-            game.getCommandDispatcher().register(plugin, MarketCommand.aquireSpec(game), "market", "mk");
+            game.getCommandManager().register(plugin, MarketCommand.aquireSpec(game), "market", "mk");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

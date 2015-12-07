@@ -64,7 +64,7 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.TitleBuilder;
@@ -333,7 +333,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (Probability.getChance(3)) {
                     Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
                     if (optEntity.isPresent()) {
-                        world.spawnEntity(optEntity.get(), Cause.empty());
+                        world.spawnEntity(optEntity.get(), Cause.of());
                     }
                 }
 
@@ -394,7 +394,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     Vector3d origin = loc.getPosition();
                     World world = loc.getExtent();
                     for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().createParticleEffectBuilder(
+                        ParticleEffect effect = game.getRegistry().createBuilder(
+                                ParticleEffect.Builder.class
+                        ).type(
                                 ParticleTypes.CRIT_MAGIC
                         ).motion(
                                 new Vector3d(

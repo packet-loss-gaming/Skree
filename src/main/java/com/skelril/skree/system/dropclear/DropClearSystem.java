@@ -24,7 +24,7 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
         // Register the service & command
         try {
             game.getServiceManager().setProvider(plugin, DropClearService.class, service);
-            game.getCommandDispatcher().register(plugin, DropClearCommand.aquireSpec(game, service, 120), "dropclear", "dc");
+            game.getCommandManager().register(plugin, DropClearCommand.aquireSpec(game, service, 120), "dropclear", "dc");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

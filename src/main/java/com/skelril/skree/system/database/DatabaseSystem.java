@@ -7,27 +7,24 @@
 package com.skelril.skree.system.database;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.service.config.ConfigService;
+import org.spongepowered.api.config.ConfigManager;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class DatabaseSystem {
 
     private Path getDatabaseFile() throws IOException {
-        Optional<ConfigService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ConfigService.class);
-        if (optService.isPresent()) {
-            ConfigService service = optService.get();
-            Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-            return path.resolve("database.json");
-        }
-        throw new FileNotFoundException();
+        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        return path.resolve("database.json");
     }
 
     public DatabaseSystem(SkreePlugin plugin, Game game) {
@@ -41,21 +38,25 @@ public class DatabaseSystem {
         // Insert ugly configuration code
         try {
             Path targetFile = getDatabaseFile();
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
             if (Files.exists(targetFile)) {
-                DatabaseConfig config = gson.fromJson(Files.newBufferedReader(targetFile), DatabaseConfig.class);
+                try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+                    DatabaseConfig config = gson.fromJson(reader, DatabaseConfig.class);
 
-                if (config == null) {
-                    return;
+                    if (config == null) {
+                        return;
+                    }
+
+                    SQLHandle.setDatabase(config.getDatabase());
+                    SQLHandle.setUsername(config.getUsername());
+                    SQLHandle.setPassword(config.getPassword());
                 }
-
-                SQLHandle.setDatabase(config.getDatabase());
-                SQLHandle.setUsername(config.getUsername());
-                SQLHandle.setPassword(config.getPassword());
             } else {
                 Files.createFile(targetFile);
-                Files.newBufferedWriter(targetFile).write(gson.toJson(new DatabaseConfig()));
+                try (BufferedWriter writer = Files.newBufferedWriter(targetFile)) {
+                    writer.write(gson.toJson(new DatabaseConfig()));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
