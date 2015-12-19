@@ -96,9 +96,9 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
             BlockType replacementType = finalReplacement.getState().getType();
             if (ore().contains(replacementType)) {
-                Optional<?> rootCause = event.getCause().root();
-                if (rootCause.isPresent() && rootCause.get() instanceof Player) {
-                    Player player = (Player) rootCause.get();
+                Optional<Player> optPlayer = event.getCause().first(Player.class);
+                if (optPlayer.isPresent()) {
+                    Player player = optPlayer.get();
 
                     // Allow creative mode players to still place blocks
                     if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {

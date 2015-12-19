@@ -72,7 +72,7 @@ public class BringCommand implements CommandExecutor {
                 .permission("skree.teleport.bring")
                 .arguments(
                         onlyOne(
-                                player(Texts.of("target"), game)
+                                player(Texts.of("target"))
                         )
                 ).executor(new BringCommand(game)).build();
     }

@@ -249,7 +249,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             ItemDropper dropper = new ItemDropper(loc);
             for (int i = 0; i < times; ++i) {
-                dropper.dropItems(drops);
+                dropper.dropItems(drops, Cause.of(this));
             }
         }
         GRAVE_STONE.createGraveFromDeath(event);
@@ -258,12 +258,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
 
-        Entity entity = null;
-
-        Optional<?> rootCause = event.getCause().root();
-        if (rootCause.isPresent() && rootCause.get() instanceof Entity) {
-            entity = (Entity) rootCause.get();
-        }
+        Entity entity = event.getCause().first(Entity.class).orElse(null);
 
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
         for (Transaction<BlockSnapshot> block : transactions) {
@@ -333,7 +328,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (Probability.getChance(3)) {
                     Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
                     if (optEntity.isPresent()) {
-                        world.spawnEntity(optEntity.get(), Cause.of());
+                        world.spawnEntity(optEntity.get(), Cause.of(this));
                     }
                 }
 
@@ -381,9 +376,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             }
 
             Location<World> loc = optLoc.get();
-            Optional<?> rootCause = event.getCause().root();
-            if (rootCause.isPresent() && rootCause.get() instanceof Player && ore().contains(loc.getBlockType())) {
-                Player player = (Player) rootCause.get();
+            Optional<Player> optPlayer = event.getCause().first(Player.class);
+            if (optPlayer.isPresent() && ore().contains(loc.getBlockType())) {
+                Player player = optPlayer.get();
 
                 // Allow creative mode players to still place blocks
                 if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
@@ -487,7 +482,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         ItemFountain fountain = new ItemFountain(
                 new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
                 (a) -> finalFortune,
-                generalDrop
+                generalDrop,
+                Cause.of(this)
         ) {
             @Override
             public boolean run(int timesL) {

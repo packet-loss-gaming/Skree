@@ -10,6 +10,7 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
@@ -59,7 +60,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
     @Listener
     public void onRightClick(InteractBlockEvent.Secondary event) {
-        if (event.getGame().getPlatform().getExecutionType().isClient()) return;
+        if (SkreePlugin.inst().getGame().getPlatform().getExecutionType().isClient()) return;
 
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
@@ -74,7 +75,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
             if (this.equals(optHeldItem.get().getItem())) {
                 Location<World> pLoc = player.getLocation();
 
-                Optional<WorldService> optWorldService = event.getGame().getServiceManager().provide(WorldService.class);
+                Optional<WorldService> optWorldService = SkreePlugin.inst().getGame().getServiceManager().provide(WorldService.class);
                 if (optWorldService.isPresent()) {
                     WorldService worldService = optWorldService.get();
                     WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");

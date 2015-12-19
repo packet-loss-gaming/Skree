@@ -63,7 +63,7 @@ public class GameModeCommand implements CommandExecutor {
                 .arguments(
                         seq(
                                 onlyOne(choices(Texts.of("mode"), map)),
-                                onlyOne(playerOrSource(Texts.of("target"), game))
+                                onlyOne(playerOrSource(Texts.of("target")))
                         )
                 ).executor(new GameModeCommand(service)).build();
     }

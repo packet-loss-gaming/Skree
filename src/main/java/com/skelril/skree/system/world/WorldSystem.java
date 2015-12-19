@@ -23,7 +23,7 @@ import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBuilder;
+import org.spongepowered.api.world.WorldCreationSettings;
 
 import java.util.Optional;
 import java.util.Random;
@@ -84,7 +84,10 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = game.getServer().getWorld(BUILD);
         if (!curWorld.isPresent()) {
-            curWorld = obtainOverworld(game).name(BUILD).seed(randy.nextLong()).usesMapFeatures(false).build();
+            curWorld = instantiate(
+                    game,
+                    obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -102,7 +105,10 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = game.getServer().getWorld(INSTANCE);
         if (!curWorld.isPresent()) {
-            curWorld = obtainFlatworld(game).name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false).build();
+            curWorld = instantiate(
+                    game,
+                    obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -120,7 +126,10 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = game.getServer().getWorld(WILDERNESS);
         if (!curWorld.isPresent()) {
-            curWorld = obtainOverworld(game).name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true).build();
+            curWorld = instantiate(
+                    game,
+                    obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -130,7 +139,10 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Wilderness Nether World
         curWorld = game.getServer().getWorld(WILDERNESS_NETHER);
         if (!curWorld.isPresent()) {
-            curWorld = obtainNetherworld(game).name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build();
+            curWorld = instantiate(
+                    game,
+                    obtainNetherworld().name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -142,21 +154,29 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         service.registerEffectWrapper(wrapper);
     }
 
-    private WorldBuilder obtainOverworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.OVERWORLD).generator(GeneratorTypes.OVERWORLD);
+    private WorldCreationSettings.Builder obtainOverworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.OVERWORLD);
     }
 
-    private WorldBuilder obtainFlatworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.OVERWORLD).generator(GeneratorTypes.FLAT);
+    private WorldCreationSettings.Builder obtainFlatworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.FLAT);
     }
 
-    public WorldBuilder obtainNetherworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.NETHER).generator(GeneratorTypes.NETHER);
+    public WorldCreationSettings.Builder obtainNetherworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.NETHER).generator(GeneratorTypes.NETHER);
     }
 
-    private WorldBuilder obtainAutoloadingWorld(Game game) {
-        WorldBuilder builder = game.getRegistry().createBuilder(WorldBuilder.class).reset();
+    private WorldCreationSettings.Builder obtainAutoloadingWorld() {
+        WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
         return builder.enabled(true).loadsOnStartup(true);
+    }
+
+    private Optional<World> instantiate(Game game, WorldCreationSettings settings) {
+        try {
+            return game.getServer().loadWorld(game.getServer().createWorldProperties(settings).get());
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -45,7 +45,7 @@ public class DropRegistry {
             } else if (type.equals(BlockTypes.COAL_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.COAL));
             } else if (type.equals(BlockTypes.LAPIS_ORE)) {
-                DyeableData data = game.getManipulatorRegistry().getBuilder(DyeableData.class).get().create();
+                DyeableData data = game.getDataManager().getManipulatorBuilder(DyeableData.class).get().create();
                 data.set(Keys.DYE_COLOR, DyeColors.BLUE);
                 return Lists.newArrayList(newItemStack(ItemTypes.DYE, data, Probability.getRangedRandom(4, 8)));
             } else if (MultiTypeRegistry.isRedstoneOre(type)) {

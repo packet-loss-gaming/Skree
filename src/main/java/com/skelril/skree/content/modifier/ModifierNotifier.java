@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class ModifierNotifier {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event) {
-        Optional<ModifierService> optService = event.getGame().getServiceManager().provide(ModifierService.class);
+        Optional<ModifierService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ModifierService.class);
         if (!optService.isPresent()) {
             return;
         }
@@ -41,7 +41,7 @@ public class ModifierNotifier {
         messages.add(0, "\n\nThe following donation perks are enabled:");
 
         Player player = event.getTargetEntity();
-        event.getGame().getScheduler().createTaskBuilder().execute(() -> {
+        SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().execute(() -> {
             for (String message : messages) {
                 player.sendMessage(Texts.of(TextColors.GOLD, message));
             }

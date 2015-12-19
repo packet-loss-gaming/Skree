@@ -98,7 +98,7 @@ public class WeatherCommand implements CommandExecutor {
                                 onlyOne(choices(Texts.of("type"), map)),
                                 // TODO should be onlyOne(catalogedElement(Texts.of("type"), game, Weather.class)),
                                 onlyOne(optionalWeak(integer(Texts.of("duration")))),
-                                onlyOne(optional(world(Texts.of("world"), game)))
+                                onlyOne(optional(world(Texts.of("world"))))
                         )
                 )
                 .executor(new WeatherCommand(game)).build();

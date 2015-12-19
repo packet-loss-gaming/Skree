@@ -30,7 +30,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 minecraft {
-    version = "11.14.3.1552"
+    version = "11.14.4.1577"
     runDir = "run"
     mappings = "snapshot_20151031"
 }

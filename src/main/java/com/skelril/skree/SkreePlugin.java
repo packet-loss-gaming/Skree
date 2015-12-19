@@ -63,10 +63,10 @@ public class SkreePlugin {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         // Handle utility hooks early on
-        new ItemStackFactory(event.getGame());
+        new ItemStackFactory(game);
 
         // Handle the database connection setup very early on
-        new DatabaseSystem(this, event.getGame());
+        new DatabaseSystem(this, game);
 
         customItemSystem = new CustomItemSystem(this, game);
         customItemSystem.preInit();

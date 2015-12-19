@@ -15,6 +15,7 @@ import com.skelril.skree.service.MarketService;
 import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -112,7 +113,7 @@ public class MarketImplUtil {
         return transactions;
     }
 
-    public static boolean setBalanceTo(Game game, Player player, BigDecimal decimal) {
+    public static boolean setBalanceTo(Game game, Player player, BigDecimal decimal, Cause cause) {
         EntityPlayer playerEnt = (EntityPlayer) player;
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
 
@@ -133,11 +134,11 @@ public class MarketImplUtil {
         }
 
         // Add remaining currency
-        new ItemDropper(player.getLocation()).dropItems(results);
+        new ItemDropper(player.getLocation()).dropItems(results, cause);
         return true;
     }
 
-    public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Game game, Player player, Collection<ItemStack> stacks) {
+    public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Game game, Player player, Collection<ItemStack> stacks, Cause cause) {
         EntityPlayer playerEnt = (EntityPlayer) player;
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
 
@@ -161,7 +162,7 @@ public class MarketImplUtil {
 
         // Add remaining transactions
         transactions.addAll(stacks.stream().map(stack -> new Clause<>(stack, stack.getQuantity())).collect(Collectors.toList()));
-        new ItemDropper(player.getLocation()).dropItems(stacks);
+        new ItemDropper(player.getLocation()).dropItems(stacks, cause);
 
         return new Clause<>(true, transactions);
     }

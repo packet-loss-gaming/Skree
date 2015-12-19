@@ -8,27 +8,17 @@ package com.skelril.skree.service.internal.projectilewatcher;
 
 
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.entity.projectile.source.ProjectileSource;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Location;
-
-import java.util.Optional;
 
 public class TrackedProjectileInfoImpl implements TrackedProjectileInfo {
     private final Projectile projectile;
-    private final Optional<ProjectileSource> source;
+    private final Cause cause;
     private Location location;
 
-    public TrackedProjectileInfoImpl(Projectile projectile) {
-        this(projectile, Optional.empty());
-    }
-
-    public TrackedProjectileInfoImpl(Projectile projectile, ProjectileSource source) {
-        this(projectile, Optional.of(source));
-    }
-
-    protected TrackedProjectileInfoImpl(Projectile projectile, Optional<ProjectileSource> source) {
+    public TrackedProjectileInfoImpl(Projectile projectile, Cause cause) {
         this.projectile = projectile;
-        this.source = source;
+        this.cause = cause;
         updateLocation();
     }
 
@@ -38,8 +28,8 @@ public class TrackedProjectileInfoImpl implements TrackedProjectileInfo {
     }
 
     @Override
-    public Optional<ProjectileSource> getProjectileSource() {
-        return source;
+    public Cause getCause() {
+        return cause;
     }
 
     @Override

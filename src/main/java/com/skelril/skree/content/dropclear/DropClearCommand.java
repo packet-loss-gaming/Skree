@@ -74,7 +74,7 @@ public class DropClearCommand implements CommandExecutor {
                 .arguments(
                         seq(
                                 onlyOne(optionalWeak(integer(Texts.of("seconds")), 10)),
-                                onlyOne(optional(world(Texts.of("world"), game)))
+                                onlyOne(optional(world(Texts.of("world"))))
                         )
                 ).executor(new DropClearCommand(game, service, maxDelay)).build();
     }

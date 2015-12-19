@@ -11,8 +11,8 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ProjectileWatcherService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.projectile.LaunchProjectileEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
@@ -33,7 +33,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
 
     @Listener
     public void onProjectileLaunch(LaunchProjectileEvent event) {
-        track(event.getTargetEntity(), event.getCause().first(ProjectileSource.class));
+        track(event.getTargetEntity(), event.getCause());
     }
 
     public boolean hasChanged(TrackedProjectileInfo info) {
@@ -43,8 +43,8 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
     }
 
     @Override
-    public void track(Projectile projectile, Optional<ProjectileSource> source) {
-        watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, source));
+    public void track(Projectile projectile, Cause cause) {
+        watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, cause));
         if (!task.isPresent()) {
             task = Optional.of(game.getScheduler().createTaskBuilder().execute(this).delayTicks(1).intervalTicks(1).submit(plugin));
         }
@@ -62,7 +62,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
                 entry.updateLocation();
                 updated = true;
 
-                game.getEventManager().post(new ProjectileTickEvent(entry, game));
+                game.getEventManager().post(new ProjectileTickEvent(entry));
             } else {
                 it.remove();
             }

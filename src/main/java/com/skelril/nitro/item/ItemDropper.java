@@ -35,13 +35,13 @@ public class ItemDropper {
         return location.getPosition();
     }
 
-    public void dropItems(Collection<ItemStack> stacks) {
+    public void dropItems(Collection<ItemStack> stacks, Cause cause) {
         for (ItemStack stack : stacks) {
             Optional<Entity> optEntity = getExtent().createEntity(EntityTypes.ITEM, getPos());
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
                 item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot());
-                getExtent().spawnEntity(item, Cause.of());
+                getExtent().spawnEntity(item, cause);
             }
         }
     }

@@ -79,7 +79,7 @@ public class TeleportCommand implements CommandExecutor {
                 .arguments(
                         onlyOne(
                                 firstParsing(
-                                        player(Texts.of("dest-player"), game),
+                                        player(Texts.of("dest-player")),
                                         vector3d(Texts.of("dest"))
                                 )
                         )

@@ -8,10 +8,8 @@ package com.skelril.skree.service;
 
 
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.entity.projectile.source.ProjectileSource;
-
-import java.util.Optional;
+import org.spongepowered.api.event.cause.Cause;
 
 public interface ProjectileWatcherService {
-    void track(Projectile projectile, Optional<ProjectileSource> source);
+    void track(Projectile projectile, Cause cause);
 }
