@@ -58,7 +58,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.Enchantments;
@@ -350,19 +349,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }).submit(plugin);
             }
         }
-    }
-
-    @Listener
-    public void onEntityHarvest(HarvestEntityEvent event) {
-        Location<World> entityLoc = event.getTargetEntity().getLocation();
-
-        Optional<Integer> optLevel = getLevel(entityLoc);
-        if (!optLevel.isPresent()) {
-            return;
-        }
-        int level = optLevel.get();
-
-        event.setExperience(Math.max(event.getExperience(), event.getOriginalExperience() * level));
     }
 
     @Listener
