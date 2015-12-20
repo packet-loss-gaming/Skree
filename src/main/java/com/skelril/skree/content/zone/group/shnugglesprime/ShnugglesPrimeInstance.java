@@ -287,7 +287,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         }
         Collection<Zombie> zombies = getContained(Zombie.class);
         if (zombies.size() > 200) {
-            attackCase = ShnugglesPrimeAttack.DOOM;
+            attackCase = ShnugglesPrimeAttack.BASK_IN_MY_GLORY;
         }
         if (bossHealth < maxBossHealth * .4 && Probability.getChance(5)) {
             if (zombies.size() < 100 && bossHealth > 200) {
