@@ -24,9 +24,10 @@ import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -119,21 +120,28 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
                 }
             }
 
-            Optional<Living> attacker = condition.getAttacker();
+            Optional<DamageSource> optDmgSource = condition.getDamageSource();
+            if (optDmgSource.isPresent()) {
+                DamageSource dmgSource = optDmgSource.get();
 
-            if (Probability.getChance(3) && event.getCause().containsType(Player.class)) {
-                inst.spawnMinions(attacker);
-            }
-            if (attacker.isPresent() && attacker.get() instanceof Player) {
-                /* TODO Convert to Sponge
-                if (ItemUtil.hasForgeBook((Player) attacker)) {
-                    boss.setHealth(0);
-                    final Player finalAttacker = (Player) attacker;
-                    if (!finalAttacker.getGameMode().equals(GameMode.CREATIVE)) {
-                        server().getScheduler().runTaskLater(inst(), () -> (finalAttacker).setItemInHand(null), 1);
+                if (dmgSource instanceof EntityDamageSource) {
+                    Entity attacker = ((EntityDamageSource) dmgSource).getSource();
+                    if (Probability.getChance(3) && attacker instanceof Player) {
+                        inst.spawnMinions(Optional.of((Player) attacker));
                     }
-                }*/
+                    if (attacker instanceof Player) {
+                    /* TODO Convert to Sponge
+                    if (ItemUtil.hasForgeBook((Player) attacker)) {
+                        boss.setHealth(0);
+                        final Player finalAttacker = (Player) attacker;
+                        if (!finalAttacker.getGameMode().equals(GameMode.CREATIVE)) {
+                            server().getScheduler().runTaskLater(inst(), () -> (finalAttacker).setItemInHand(null), 1);
+                        }
+                    }*/
+                    }
+                }
             }
+
             return Optional.empty();
         });
     }
