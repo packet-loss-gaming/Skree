@@ -6,14 +6,13 @@
 
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
-import com.skelril.nitro.probability.Probability;
-import net.minecraft.entity.monster.EntityZombie;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.HarvestEntityEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.text.Texts;
 
 import java.util.Optional;
@@ -27,22 +26,18 @@ public class ShnugglesPrimeListener {
     }
 
     @Listener
-    public void onEntityDeath(HarvestEntityEvent event) {
-        Entity entity = event.getTargetEntity();
-        Optional<ShnugglesPrimeInstance> inst = manager.getApplicableZone(entity);
-
-        if (!inst.isPresent()) {
-            return;
+    public void onBlockBreak(ChangeBlockEvent event) {
+        Optional<Player> player = event.getCause().first(Player.class);
+        if (player.isPresent() && manager.getApplicableZone(player.get()).isPresent()) {
+            event.setCancelled(true);
         }
+    }
 
-        // TODO clear drops
-        // TODO convert to Sponge
-        if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
-            if (Probability.getChance(28)) {
-                // TODO add to drops
-                // .add(newItemStack(ItemTypes.GOLD_NUGGET, Probability.getRandom(3)));
-            }
-            event.setExperience(0);
+    @Listener
+    public void onEntityDrop(DropItemEvent.Destruct event) {
+        Optional<Zombie> zombie = event.getCause().first(Zombie.class);
+        if (zombie.isPresent() && manager.getApplicableZone(zombie.get()).isPresent()) {
+            event.setCancelled(true);
         }
     }
 
