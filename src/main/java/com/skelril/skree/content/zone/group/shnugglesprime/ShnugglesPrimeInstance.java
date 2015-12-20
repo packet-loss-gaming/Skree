@@ -151,11 +151,11 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 e.remove();
             }
         });
-        return boss.isPresent();
+        return boss.isPresent() && boss.get().getTargetEntity().isPresent();
     }
 
     public Optional<Giant> getBoss() {
-        return isBossSpawned() ? Optional.of(boss.get().getTargetEntity()) : Optional.empty();
+        return isBossSpawned() ? boss.get().getTargetEntity() : Optional.empty();
     }
 
     public void healBoss(float percentHealth) {

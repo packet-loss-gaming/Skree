@@ -59,12 +59,19 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
 
         List<Instruction<BindCondition, Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>>> bindProcessor = bossManager.getBindProcessor();
         bindProcessor.add((condition, boss) -> {
-            boss.getTargetEntity().offer(Keys.DISPLAY_NAME, Texts.of("Shnuggles Prime"));
-            setMaxHealth(boss.getTargetEntity(), 750, true);
+            Optional<Giant> optBossEnt = boss.getTargetEntity();
+            if (optBossEnt.isPresent()) {
+                Giant bossEnt = optBossEnt.get();
+                bossEnt.offer(Keys.DISPLAY_NAME, Texts.of("Shnuggles Prime"));
+                setMaxHealth(bossEnt, 750, true);
+            }
             return Optional.empty();
         });
         bindProcessor.add((condition, boss) -> {
-            boss.getTargetEntity().offer(Keys.PERSISTS, true);
+            Optional<Giant> optBoss = boss.getTargetEntity();
+            if (optBoss.isPresent()) {
+                optBoss.get().offer(Keys.PERSISTS, true);
+            }
             return Optional.empty();
         });
         bindProcessor.add((condition, boss) -> {
@@ -93,10 +100,14 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
                     .execute(inst::printBossHealth).delayTicks(1).submit(SkreePlugin.inst());
             if (inst.damageHeals()) {
                 if (inst.isActiveAttack(ShnugglesPrimeAttack.BASK_IN_MY_GLORY)) {
-                    toFullHealth(boss.getTargetEntity());
+                    if (boss.getTargetEntity().isPresent()) {
+                        toFullHealth(boss.getTargetEntity().get());
+                    }
                 } else {
                     double healedDamage = event.getFinalDamage() * 2;
-                    heal(boss.getTargetEntity(), healedDamage);
+                    if (boss.getTargetEntity().isPresent()) {
+                        heal(boss.getTargetEntity().get(), healedDamage);
+                    }
                 }
                 event.setBaseDamage(0);
 
