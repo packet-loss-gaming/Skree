@@ -11,14 +11,14 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import com.skelril.skree.service.internal.zone.Zone;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.Agent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 
 public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
@@ -44,12 +44,11 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
             return;
         }
 
-        Optional<Zone> manager = event.getCause().first(Zone.class);
-        if (manager.isPresent()) {
+        if (event.getCause().containsType(Zone.class)) {
             return;
         }
 
-        // Remove every entity that is an agent not spawned by a Zone
-        event.filterEntities(e -> !(e instanceof Agent));
+        // Remove every entity that is not an entity spawned by a Zone or a projectile
+        event.filterEntities(e -> e instanceof Player || e instanceof Projectile);
     }
 }

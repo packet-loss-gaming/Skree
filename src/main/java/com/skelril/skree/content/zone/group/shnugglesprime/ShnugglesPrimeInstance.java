@@ -42,6 +42,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -150,7 +151,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 e.remove();
             }
         });
-        return boss != null;
+        return boss.isPresent();
     }
 
     public Optional<Giant> getBoss() {
@@ -201,12 +202,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     private static final ItemStack weapon = ItemStackFactory.newItemStack(ItemTypes.BONE);
 
     static {
-        Optional<List<ItemEnchantment>> optEnchantments = weapon.get(Keys.ITEM_ENCHANTMENTS);
-        if (optEnchantments.isPresent()) {
-            List<ItemEnchantment> enchantments = optEnchantments.get();
-            enchantments.add(new ItemEnchantment(Enchantments.SHARPNESS, 2));
-            weapon.offer(Keys.ITEM_ENCHANTMENTS, enchantments);
-        }
+        weapon.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(new ItemEnchantment(Enchantments.SHARPNESS, 2)));
     }
 
     public void spawnMinions(Optional<Living> target) {
@@ -310,7 +306,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 sendAttackBroadcast("Taste my wrath!", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
-                    ((EntityPlayer) player).setVelocity(
+                    ((EntityPlayer) player).addVelocity(
                             random.nextDouble() * 3 - 1.5,
                             random.nextDouble() * 1 + 1.3,
                             random.nextDouble() * 3 - 1.5
@@ -320,9 +316,9 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
-                PotionEffect witherEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
-                        .duration(20 * 12).amplifier(1).potionType(PotionEffectTypes.WITHER).build();
-                for (Player player : contained) {
+                PotionEffect witherEffect = PotionEffect.builder().duration(20 * 12)
+                        .amplifier(1).potionType(PotionEffectTypes.WITHER).build();
+                /*for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
                     if (!optPotionEffects.isPresent()) {
                         optPotionEffects = Optional.of(new ArrayList<>(1));
@@ -330,13 +326,14 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     List<PotionEffect> potionEffects = optPotionEffects.get();
                     potionEffects.add(witherEffect);
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
-                }
+                }*/
                 break;
             case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
-                PotionEffect blindnessEffect = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
-                        .duration(20 * 4).amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
-                for (Player player : contained) {
+                PotionEffect blindnessEffect = PotionEffect.builder().duration(20 * 4)
+                        .amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
+
+                /*for (Player player : contained) {
                     Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
                     if (!optPotionEffects.isPresent()) {
                         optPotionEffects = Optional.of(new ArrayList<>(1));
@@ -344,7 +341,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     List<PotionEffect> potionEffects = optPotionEffects.get();
                     potionEffects.add(blindnessEffect);
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
-                }
+                }*/
                 break;
             case TANGO_TIME:
                 sendAttackBroadcast("Tango time!", AttackSeverity.ULTIMATE);
@@ -357,15 +354,17 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
 
-                            DamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
-                                    DamageSource.Builder.class
+                            EntityDamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
+                                    EntityDamageSource.Builder.class
+                            ).entity(
+                                    boss
                             ).type(
                                     DamageTypes.ATTACK
                             ).build();
 
                             player.damage(100, source, Cause.of(boss));
                             // TODO convert to Sponge
-                            ((EntityPlayer) player).setVelocity(
+                            ((EntityPlayer) player).addVelocity(
                                     random.nextDouble() * 1.7 - 1.5,
                                     random.nextDouble() * 2,
                                     random.nextDouble() * 1.7 - 1.5

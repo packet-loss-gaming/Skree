@@ -121,7 +121,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
 
             Optional<Living> attacker = condition.getAttacker();
 
-            if (Probability.getChance(3) && event.getCause().first(Player.class).isPresent()) {
+            if (Probability.getChance(3) && event.getCause().containsType(Player.class)) {
                 inst.spawnMinions(attacker);
             }
             if (attacker.isPresent() && attacker.get() instanceof Player) {
@@ -151,7 +151,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     public Optional<ShnugglesPrimeInstance> discover(ZoneSpaceAllocator allocator) {
         ZoneRegion region = freeRegions.poll();
         if (region == null) {
-            Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
+            Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
             region = result.getKey();
         }
 

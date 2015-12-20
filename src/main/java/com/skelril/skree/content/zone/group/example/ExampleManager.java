@@ -25,7 +25,7 @@ public class ExampleManager extends GroupZoneManager<ExampleInstance> {
 
     @Override
     public Optional<ExampleInstance> discover(ZoneSpaceAllocator allocator) {
-        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
+        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
         ZoneRegion region = result.getKey();
 
         ExampleInstance instance = new ExampleInstance(region);

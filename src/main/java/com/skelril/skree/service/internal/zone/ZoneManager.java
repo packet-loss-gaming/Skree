@@ -15,4 +15,7 @@ public interface ZoneManager<T extends Zone> {
     Collection<T> getActiveZones();
 
     String getName();
+    default String getSystemName() {
+        return getName().toLowerCase().replace(" ", "");
+    }
 }

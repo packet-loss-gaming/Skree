@@ -40,7 +40,7 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Override
     public void registerManager(ZoneManager<?> manager) {
-        managers.put(manager.getName().toLowerCase(), manager);
+        managers.put(manager.getSystemName(), manager);
     }
 
     @Override
