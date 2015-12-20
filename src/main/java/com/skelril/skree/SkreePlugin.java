@@ -34,7 +34,7 @@ import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 @Singleton
-@Plugin(id = "Skree", name = "Skree", version = "1.0")
+@Plugin(id = "Sponge Skree", name = "Skree", version = "1.0")
 public class SkreePlugin {
 
     @Inject
@@ -43,13 +43,17 @@ public class SkreePlugin {
     @Inject
     private Logger logger;
 
-    public static CustomItemSystem customItemSystem;
-    public static CustomBlockSystem customBlockSystem;
+    protected static CustomItemSystem customItemSystem;
+    protected static CustomBlockSystem customBlockSystem;
 
     private static SkreePlugin inst;
 
     public static SkreePlugin inst() {
         return inst;
+    }
+
+    public static Game game() {
+        return inst().getGame();
     }
 
     public Game getGame() {
@@ -67,12 +71,6 @@ public class SkreePlugin {
 
         // Handle the database connection setup very early on
         new DatabaseSystem(this, game);
-
-        customItemSystem = new CustomItemSystem(this, game);
-        customItemSystem.preInit();
-
-        customBlockSystem = new CustomBlockSystem(this, game);
-        customBlockSystem.preInit();
     }
 
     @Listener
