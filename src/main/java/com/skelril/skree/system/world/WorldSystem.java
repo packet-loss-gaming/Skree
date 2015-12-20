@@ -14,6 +14,7 @@ import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
@@ -128,7 +129,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
                     game,
-                    obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true).build()
+                    obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true)
+                            .generatorModifiers(new WildernessWorldGeneratorModifier()).build()
             );
         }
 

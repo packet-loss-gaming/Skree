@@ -11,8 +11,7 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import com.skelril.skree.service.internal.zone.Zone;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.world.World;
@@ -37,6 +36,7 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
+
         // Item Expires shouldn't be filtered anyways, but this is added
         // due to getTargetWorld being unimplemented for the ItemExpireEvent
         // at the time of writing
@@ -48,7 +48,7 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
             return;
         }
 
-        // Remove every entity that is not an entity spawned by a Zone or a projectile
-        event.filterEntities(e -> e instanceof Player || e instanceof Projectile);
+        // Remove every entity that is an agent not spawned by a Zone
+        event.getEntities().removeAll(event.filterEntities(e -> !(e instanceof Agent)));
     }
 }
