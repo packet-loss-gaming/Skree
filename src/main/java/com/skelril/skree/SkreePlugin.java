@@ -9,6 +9,9 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
+import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
+import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
@@ -69,6 +72,10 @@ public class SkreePlugin {
 
         customBlockSystem = new CustomBlockSystem(this, game);
         customBlockSystem.preInit();
+
+        game.getRegistry().registerWorldGeneratorModifier(new VoidWorldGeneratorModifier());
+        game.getRegistry().registerWorldGeneratorModifier(new NoOreWorldGeneratorModifier());
+        game.getRegistry().registerWorldGeneratorModifier(new WildernessWorldGeneratorModifier());
     }
 
     @Listener

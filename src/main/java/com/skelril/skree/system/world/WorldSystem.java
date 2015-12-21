@@ -9,6 +9,8 @@ package com.skelril.skree.system.world;
 
 import com.google.inject.Inject;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
+import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
 import com.skelril.skree.content.world.WorldCommand;
 import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
@@ -87,7 +89,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
                     game,
-                    obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false).build()
+                    obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false)
+                            .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
             );
         }
 
@@ -108,7 +111,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
                     game,
-                    obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false).build()
+                    obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false)
+                            .generatorModifiers(new VoidWorldGeneratorModifier()).build()
             );
         }
 
