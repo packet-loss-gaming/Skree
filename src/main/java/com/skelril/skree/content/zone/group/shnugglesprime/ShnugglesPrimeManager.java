@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -48,7 +49,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
         );
 
         setupBossManager();
-        SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
     }
 
     private void setupBossManager() {
@@ -96,8 +97,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
             ShnugglesPrimeInstance inst = boss.getDetail().getZone();
             DamageEntityEvent event = condition.getEvent();
             // Schedule a task to change the display name to show HP
-            SkreePlugin.inst().getGame().getScheduler().createTaskBuilder()
-                    .execute(inst::printBossHealth).delayTicks(1).submit(SkreePlugin.inst());
+            Task.builder().execute(inst::printBossHealth).delayTicks(1).submit(SkreePlugin.inst());
             if (inst.damageHeals()) {
                 if (inst.isActiveAttack(ShnugglesPrimeAttack.BASK_IN_MY_GLORY)) {
                     if (boss.getTargetEntity().isPresent()) {

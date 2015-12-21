@@ -125,8 +125,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void buffBabies() {
-        PotionEffect strengthBuff = SkreePlugin.inst().getGame().getRegistry().createBuilder(PotionEffect.Builder.class)
-                .duration(20 * 20).amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
+        PotionEffect strengthBuff = PotionEffect.builder().duration(20 * 20)
+                .amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
         for (Entity zombie : getContained(Zombie.class)) {
             zombie.offer(Keys.POTION_EFFECTS, Lists.newArrayList(strengthBuff));
         }
@@ -346,7 +346,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             case TANGO_TIME:
                 sendAttackBroadcast("Tango time!", AttackSeverity.ULTIMATE);
                 activeAttacks.add(ShnugglesPrimeAttack.TANGO_TIME);
-                SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
+                Task.builder().delay(7, TimeUnit.SECONDS).execute(() -> {
                     if (!isBossSpawned()) return;
                     for (Player player : getPlayers(PARTICIPANT)) {
                         // TODO Convert to Sponge
@@ -382,7 +382,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     activeAttacks.add(ShnugglesPrimeAttack.EVERLASTING);
                     sendAttackBroadcast("I am everlasting!", AttackSeverity.NORMAL);
                     damageHeals = true;
-                    SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(12, TimeUnit.SECONDS).execute(() -> {
+                    Task.builder().delay(12, TimeUnit.SECONDS).execute(() -> {
                         if (damageHeals) {
                             damageHeals = false;
                             if (!isBossSpawned()) return;
@@ -405,7 +405,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 if (!damageHeals) {
                     sendAttackBroadcast("Bask in my glory!", AttackSeverity.ULTIMATE);
                     activeAttacks.add(ShnugglesPrimeAttack.BASK_IN_MY_GLORY);
-                    SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
+                    Task.builder().delay(7, TimeUnit.SECONDS).execute(() -> {
                         if (!isBossSpawned()) return;
 
                         boolean baskInGlory = false;
@@ -421,8 +421,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         if (baskInGlory) {
                             damageHeals = true;
                             spawnPts.stream().filter(pt -> Probability.getChance(12)).forEach(pt -> {
-                                Explosion explosion = SkreePlugin.inst().getGame().getRegistry()
-                                        .createBuilder(Explosion.Builder.class)
+                                Explosion explosion = Explosion.builder()
                                         .shouldBreakBlocks(false)
                                         .origin(pt.getPosition())
                                         .radius(10)
@@ -432,7 +431,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                 getRegion().getExtent().triggerExplosion(explosion);
                             });
                             //Schedule Reset
-                            SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
+                            Task.builder().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
                                 damageHeals = false;
                             }).submit(SkreePlugin.inst());
                             return;
@@ -452,7 +451,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "I ask thy lord for aid in this all mighty battle...");
                 // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "Heed thy warning, or perish!");
                 activeAttacks.add(8);
-                SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().delay(7, TimeUnit.SECONDS).execute(() -> {
+                Task.builder().delay(7, TimeUnit.SECONDS).execute(() -> {
                     if (!isBossSpawned()) return;
                     Collection<Player> newContained = getContained(Player.class);
                     // ChatUtil.sendWarning(newContained, "May those who appose me die a death like no other...");
@@ -515,8 +514,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     }
                 };
                 TimedRunnable<IntegratedRunnable> minonEatingTask = new TimedRunnable<>(minionEater, 20);
-                Task minionEatingTaskExecutor = SkreePlugin.inst().getGame().getScheduler().createTaskBuilder()
-                        .interval(500, TimeUnit.MILLISECONDS).execute(minonEatingTask).submit(SkreePlugin.inst());
+                Task minionEatingTaskExecutor = Task.builder().interval(500, TimeUnit.MILLISECONDS)
+                        .execute(minonEatingTask).submit(SkreePlugin.inst());
                 minonEatingTask.setTask(minionEatingTaskExecutor);
                 break;
         }

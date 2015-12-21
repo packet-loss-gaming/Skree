@@ -74,7 +74,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                 continue;
             }
 
-            if (ore().contains(block.getFinal().getState().getType())) {
+            if (ore().contains(block.getOriginal().getState().getType())) {
                 block.setCustom(block.getOriginal().withState(BlockTypes.STONE.getDefaultState()));
             }
         }
@@ -109,9 +109,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
                         Vector3d origin = loc.getPosition();
                         World world = loc.getExtent();
                         for (int i = 0; i < 40; ++i) {
-                            ParticleEffect effect = game.getRegistry().createBuilder(
-                                    ParticleEffect.Builder.class
-                            ).type(
+                            ParticleEffect effect = ParticleEffect.builder().type(
                                     ParticleTypes.CRIT_MAGIC
                             ).motion(
                                     new Vector3d(

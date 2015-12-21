@@ -18,6 +18,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
         this.plugin = plugin;
         this.game = game;
 
-        game.getScheduler().createTaskBuilder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
+        Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
     }
 
     @Listener
@@ -63,7 +64,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
                 if (optPotionData.isPresent()) {
-                    PotionEffect.Builder builder = game.getRegistry().createBuilder(PotionEffect.Builder.class);
+                    PotionEffect.Builder builder = PotionEffect.builder();
                     builder.potionType(PotionEffectTypes.SPEED);
                     builder.amplifier(5);
                     builder.duration(3 * 20);

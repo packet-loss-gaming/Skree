@@ -123,7 +123,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 )
         );
 
-        game.getScheduler().createTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
+        Task.builder().execute(this).interval(1, SECONDS).submit(plugin);
     }
 
     @Listener
@@ -332,7 +332,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 // Do this one tick later to guarantee no collision with transaction data
-                game.getScheduler().createTaskBuilder().delayTicks(1).execute(() -> {
+                Task.builder().delayTicks(1).execute(() -> {
                     for (int x = min.getFloorX(); x <= max.getFloorX(); ++x) {
                         for (int z = min.getFloorZ(); z <= max.getFloorZ(); ++z) {
                             for (int y = min.getFloorY(); y <= max.getFloorY(); ++y) {
@@ -375,9 +375,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     Vector3d origin = loc.getPosition();
                     World world = loc.getExtent();
                     for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().createBuilder(
-                                ParticleEffect.Builder.class
-                        ).type(
+                        ParticleEffect effect = ParticleEffect.builder().type(
                                 ParticleTypes.CRIT_MAGIC
                         ).motion(
                                 new Vector3d(
@@ -492,7 +490,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
-        Task task = game.getScheduler().createTaskBuilder().execute(runnable).delay(1, SECONDS).interval(
+        Task task = Task.builder().execute(runnable).delay(1, SECONDS).interval(
                 1,
                 SECONDS
         ).submit(plugin);

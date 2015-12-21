@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
             ((EntityPlayer) target).inventory.clear();
 
-            SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().execute(() -> {
+            Task.builder().execute(() -> {
                 createGraveDropExcess(items, target.getLocation());
             }).delayTicks(1).submit(SkreePlugin.inst());
         }

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -41,7 +42,8 @@ public class ModifierNotifier {
         messages.add(0, "\n\nThe following donation perks are enabled:");
 
         Player player = event.getTargetEntity();
-        SkreePlugin.inst().getGame().getScheduler().createTaskBuilder().execute(() -> {
+
+        Task.builder().execute(() -> {
             for (String message : messages) {
                 player.sendMessage(Texts.of(TextColors.GOLD, message));
             }

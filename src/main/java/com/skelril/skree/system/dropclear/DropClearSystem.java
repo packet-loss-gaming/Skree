@@ -12,6 +12,7 @@ import com.skelril.skree.service.DropClearService;
 import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderExistsException;
 
 public class DropClearSystem implements ServiceProvider<DropClearService> {
@@ -30,7 +31,7 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
             return;
         }
 
-        game.getScheduler().createTaskBuilder().execute(
+        Task.builder().execute(
                 () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
         ).intervalTicks(10).submit(plugin);
     }

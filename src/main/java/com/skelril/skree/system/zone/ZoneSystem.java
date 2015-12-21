@@ -21,6 +21,7 @@ import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigManager;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.World;
 
@@ -36,7 +37,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
     private ZoneService service;
 
     public ZoneSystem(SkreePlugin plugin, Game game) {
-        game.getScheduler().createTaskBuilder().delay(3, TimeUnit.SECONDS).execute(
+        Task.builder().delay(3, TimeUnit.SECONDS).execute(
                 () -> {
                     System.out.println("Starting zone system...");
                     initialize(plugin, game);
@@ -54,7 +55,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
         // TODO this is a very dumb way of doing this
         Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
         if (!optService.isPresent()) {
-            game.getScheduler().createTaskBuilder().delayTicks(1).execute(() -> initialize(plugin, game)).submit(plugin);
+            Task.builder().delayTicks(1).execute(() -> initialize(plugin, game)).submit(plugin);
             return;
         }
 

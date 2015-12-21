@@ -9,7 +9,6 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
@@ -62,9 +61,6 @@ public class SkreePlugin {
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
-        // Handle utility hooks early on
-        new ItemStackFactory(game);
-
         // Handle the database connection setup very early on
         new DatabaseSystem(this, game);
 
