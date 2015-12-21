@@ -13,6 +13,7 @@ import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
 import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
+import com.skelril.skree.system.command.CommandSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.market.MarketSystem;
@@ -45,6 +46,8 @@ public class SkreePlugin {
     @Inject
     private Logger logger;
 
+    private CommandSystem commandSys;
+
     public static CustomItemSystem customItemSystem;
     public static CustomBlockSystem customBlockSystem;
 
@@ -67,6 +70,8 @@ public class SkreePlugin {
         // Handle the database connection setup very early on
         new DatabaseSystem(this, game);
 
+        commandSys = new CommandSystem(this, game);
+
         customItemSystem = new CustomItemSystem(this, game);
         customItemSystem.preInit();
 
@@ -85,6 +90,8 @@ public class SkreePlugin {
                 registerPrimaryServerSystems();
                 break;
         }
+
+        commandSys.getService().registerCommands();
 
         logger.info("Skree Started! Kaw!");
     }
@@ -112,5 +119,6 @@ public class SkreePlugin {
                 ex.printStackTrace();
             }
         }
+
     }
 }
