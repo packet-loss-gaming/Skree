@@ -15,6 +15,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.Collection;
 
 public interface ZoneService {
+    static String mangleManagerName(String managerName) {
+        return managerName.toLowerCase().replace(" ", "");
+    }
+
     void registerManager(ZoneManager<?> manager);
 
     Clause<Player, ZoneStatus> requestZone(String managerName, Player player);

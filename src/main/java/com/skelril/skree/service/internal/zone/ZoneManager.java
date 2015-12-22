@@ -6,16 +6,17 @@
 
 package com.skelril.skree.service.internal.zone;
 
+import com.skelril.skree.service.ZoneService;
+
 import java.util.Collection;
 import java.util.Optional;
 
 public interface ZoneManager<T extends Zone> {
-
     Optional<T> discover(ZoneSpaceAllocator allocator);
     Collection<T> getActiveZones();
 
     String getName();
     default String getSystemName() {
-        return getName().toLowerCase().replace(" ", "");
+        return ZoneService.mangleManagerName(getName());
     }
 }

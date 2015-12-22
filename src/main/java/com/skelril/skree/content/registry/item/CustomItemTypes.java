@@ -13,6 +13,7 @@ import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.BloodDiamond;
+import com.skelril.skree.content.registry.item.generic.FairyDust;
 import com.skelril.skree.content.registry.item.generic.RedShard;
 import com.skelril.skree.content.registry.item.generic.SeaCrystal;
 import com.skelril.skree.content.registry.item.tool.Luminositor;
@@ -23,6 +24,8 @@ import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
 import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
+import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
+import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 
 public class CustomItemTypes {
     /* ** Admin ** */
@@ -51,6 +54,7 @@ public class CustomItemTypes {
 
     /* Resources */
     public static final RedShard RED_SHARD = new RedShard();
+    public static final FairyDust FAIRY_DUST = new FairyDust();
 
     /* Food */
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();
@@ -61,6 +65,10 @@ public class CustomItemTypes {
 
     /* Combat Items */
     public static final RedFeather RED_FEATHER = new RedFeather();
+
+    /* Zone Items */
+    public static final ZoneMasterOrb ZONE_MASTER_ORB = new ZoneMasterOrb();
+    public static final ZoneSlaveOrb ZONE_SLAVE_ORB = new ZoneSlaveOrb();
 
     /* Tools */
     public static final CrystalAxe CRYSTAL_AXE = new CrystalAxe();

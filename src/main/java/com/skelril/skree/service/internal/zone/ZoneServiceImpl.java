@@ -45,13 +45,13 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Override
     public Clause<Player, ZoneStatus> requestZone(String managerName, Player player) {
-        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
+        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         return manager != null ? requestZone(manager, player) : null;
     }
 
     @Override
     public Collection<Clause<Player, ZoneStatus>> requestZone(String managerName, Collection<Player> players) {
-        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
+        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         return manager != null ? requestZone(manager, players) : null;
     }
 

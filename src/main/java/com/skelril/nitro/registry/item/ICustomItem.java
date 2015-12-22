@@ -6,11 +6,17 @@
 
 package com.skelril.nitro.registry.item;
 
+import com.google.common.collect.Lists;
 import net.minecraft.creativetab.CreativeTabs;
+
+import java.util.List;
 
 public interface ICustomItem {
     String __getID();
 
+    default List<String> __getMeshDefinitions() {
+        return Lists.newArrayList(__getID());
+    }
     int __getMaxStackSize();
     CreativeTabs __getCreativeTab();
 }

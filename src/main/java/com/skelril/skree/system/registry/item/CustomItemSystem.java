@@ -23,6 +23,7 @@ import org.spongepowered.api.Game;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class CustomItemSystem {
 
@@ -99,14 +100,17 @@ public class CustomItemSystem {
             if (game.getPlatform().getExecutionType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
-                mesher.register(
-                        (Item) item,
-                        0,
-                        new ModelResourceLocation(
-                                "skree:" + ((ICustomItem) item).__getID(),
-                                "inventory"
-                        )
-                );
+                List<String> variants = ((ICustomItem) item).__getMeshDefinitions();
+                for (int i = 0; i < variants.size(); ++i) {
+                    mesher.register(
+                            (Item) item,
+                            i,
+                            new ModelResourceLocation(
+                                    "skree:" + variants.get(i),
+                                    "inventory"
+                            )
+                    );
+                }
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");
