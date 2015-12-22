@@ -7,7 +7,7 @@
 package com.skelril.skree.content.registry.item.tool;
 
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
@@ -29,7 +29,7 @@ import org.spongepowered.api.world.World;
 import java.text.DecimalFormat;
 import java.util.Optional;
 
-public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
+public class SkullOfTheFallen extends CustomItem implements EventAwareContent, Craftable {
 
     @Override
     public void registerRecipes() {

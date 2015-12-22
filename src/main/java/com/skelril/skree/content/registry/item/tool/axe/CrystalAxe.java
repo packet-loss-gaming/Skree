@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.registry.item.tool.axe;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.HarvestTier;
-import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.HarvestTiers;
 import com.skelril.nitro.registry.item.axe.CustomAxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
@@ -15,7 +15,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalAxe extends CustomAxe implements CraftableItem {
+public class CrystalAxe extends CustomAxe implements Craftable {
     @Override
     public String __getType() {
         return "crystal";

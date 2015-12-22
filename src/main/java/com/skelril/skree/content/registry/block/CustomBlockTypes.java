@@ -7,8 +7,12 @@
 package com.skelril.skree.content.registry.block;
 
 import com.skelril.skree.content.registry.block.container.GraveStone;
+import com.skelril.skree.content.registry.block.mushroom.MagicMushroom;
+import com.skelril.skree.content.registry.block.terrain.MagicStone;
 
 public class CustomBlockTypes {
     /* ** Wilderness ** */
     public static final GraveStone GRAVE_STONE = new GraveStone();
+    public static final MagicMushroom MAGIC_MUSHROOM = new MagicMushroom();
+    public static final MagicStone MAGIC_STONE = new MagicStone();
 }

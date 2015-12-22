@@ -6,8 +6,8 @@
 
 package com.skelril.skree.system.registry.item;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CookedItem;
-import com.skelril.nitro.registry.item.CraftableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.nitro.selector.GameAwareContent;
@@ -81,8 +81,8 @@ public class CustomItemSystem {
                 ((GameAwareContent) item).supplyGame(game);
             }
 
-            if (item instanceof CraftableItem) {
-                ((CraftableItem) item).registerRecipes();
+            if (item instanceof Craftable) {
+                ((Craftable) item).registerRecipes();
             }
 
             if (item instanceof CookedItem) {

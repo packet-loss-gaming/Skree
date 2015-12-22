@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.item;
+package com.skelril.nitro.registry;
 
-public interface CraftableItem {
+public interface Craftable {
     void registerRecipes();
 }

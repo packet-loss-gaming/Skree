@@ -6,10 +6,14 @@
 
 package com.skelril.skree.content.registry.item.generic;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class FairyDust extends CustomItem {
+public class FairyDust extends CustomItem implements Craftable {
 
     @Override
     public String __getID() {
@@ -24,5 +28,13 @@ public class FairyDust extends CustomItem {
     @Override
     public CreativeTabs __getCreativeTab() {
         return CreativeTabs.tabMaterials;
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addShapelessRecipe(
+                new ItemStack(this),
+                new ItemStack(CustomBlockTypes.MAGIC_MUSHROOM)
+        );
     }
 }

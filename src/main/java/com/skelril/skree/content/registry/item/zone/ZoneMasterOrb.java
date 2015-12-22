@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.registry.item.zone;
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
@@ -35,7 +35,7 @@ import java.util.Optional;
 
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.*;
 
-public class ZoneMasterOrb extends CustomItem implements EventAwareContent, CraftableItem {
+public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craftable {
 
     @Override
     public String __getID() {

@@ -6,14 +6,14 @@
 
 package com.skelril.skree.content.registry.item.generic;
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class SeaCrystal extends CustomItem implements CraftableItem {
+public class SeaCrystal extends CustomItem implements Craftable {
 
     @Override
     public String __getID() {

@@ -8,7 +8,7 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.data.util.LightLevelUtil;
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
@@ -28,7 +28,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class Luminositor extends CustomItem implements EventAwareContent, CraftableItem {
+public class Luminositor extends CustomItem implements EventAwareContent, Craftable {
 
     @Override
     public String __getID() {
