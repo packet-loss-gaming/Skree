@@ -45,7 +45,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     @Override
     public List<String> __getMeshDefinitions() {
         List<String> baseList = super.__getMeshDefinitions();
-        baseList.add("red_feather");
+        baseList.add("zone_master_orb_active");
         return baseList;
     }
 

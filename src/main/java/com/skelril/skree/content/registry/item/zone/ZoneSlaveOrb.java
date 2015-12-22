@@ -35,7 +35,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
     @Override
     public List<String> __getMeshDefinitions() {
         List<String> baseList = super.__getMeshDefinitions();
-        baseList.add("red_feather");
+        baseList.add("zone_slave_orb_active");
         return baseList;
     }
 

@@ -16,6 +16,7 @@ import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -24,6 +25,7 @@ import org.spongepowered.api.Game;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomItemSystem {
 
@@ -111,6 +113,8 @@ public class CustomItemSystem {
                             )
                     );
                 }
+                List<String> collect = variants.stream().map(e -> "skree:" + e).collect(Collectors.toList());
+                ModelBakery.addVariantName((Item) item, collect.toArray(new String[collect.size()]));
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");

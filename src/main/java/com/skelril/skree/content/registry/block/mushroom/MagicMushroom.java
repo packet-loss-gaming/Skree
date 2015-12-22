@@ -72,12 +72,12 @@ public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock 
 
     @Override
     public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
-        if (pos.getY() >= 0 && pos.getY() < 256) {
-            IBlockState iblockstate1 = worldIn.getBlockState(pos.down());
-            return worldIn.getLight(pos) < 9 && iblockstate1.getBlock() == CustomBlockTypes.MAGIC_STONE;
-        } else {
-            return false;
-        }
+        IBlockState iblockstate1 = worldIn.getBlockState(pos.down());
+        return canBlockStayGen(worldIn, pos, state) && iblockstate1.getBlock() == CustomBlockTypes.MAGIC_STONE;
+    }
+
+    public boolean canBlockStayGen(World worldIn, BlockPos pos, IBlockState state) {
+        return pos.getY() >= 0 && pos.getY() < 40 && worldIn.getLight(pos) < 9;
     }
 
     @Override

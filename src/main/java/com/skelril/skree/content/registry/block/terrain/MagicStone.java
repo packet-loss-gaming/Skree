@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ public class MagicStone extends Block implements ICustomBlock, Craftable {
 
     public MagicStone() {
         super(new Material(MapColor.stoneColor));
+        setCreativeTab(CreativeTabs.tabBlock);
     }
 
     @Override
