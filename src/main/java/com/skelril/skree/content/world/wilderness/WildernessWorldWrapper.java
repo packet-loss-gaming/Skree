@@ -105,7 +105,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
-                                        new DropTableEntryImpl(new CofferResolver(10), 12)
+                                        new DropTableEntryImpl(new CofferResolver(50), 12)
                                 )
                         ),
                         new DropTableImpl(
