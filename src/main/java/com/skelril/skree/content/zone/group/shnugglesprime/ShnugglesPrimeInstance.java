@@ -186,7 +186,15 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            Optional.of(Texts.of(TextColors.DARK_AQUA, "Boss Health: $health int$ / $max health int$")),
+            Optional.of(
+                    Texts.of(
+                            TextColors.DARK_AQUA,
+                            "Boss Health: ",
+                            Texts.placeholder("health int"),
+                            " / ",
+                            Texts.placeholder("max health int")
+                    )
+            ),
             Optional.empty()
     );
 

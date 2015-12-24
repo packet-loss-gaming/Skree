@@ -54,6 +54,8 @@ import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -184,9 +186,20 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
 
         int level = optLevel.get();
-        Optional<Living> optLiving = event.getCause().first(Living.class);
-        if (optLiving.isPresent()) {
-            Living living = optLiving.get();
+        Optional<EntityDamageSource> optDamageSouce = event.getCause().first(EntityDamageSource.class);
+        if (optDamageSouce.isPresent()) {
+            Entity srcEntity;
+            if (optDamageSouce.isPresent() && optDamageSouce.get() instanceof IndirectEntityDamageSource) {
+                srcEntity = ((IndirectEntityDamageSource) optDamageSouce.get()).getIndirectSource();
+            } else {
+                srcEntity = optDamageSouce.get().getSource();
+            }
+
+            if (!(srcEntity instanceof Living)) {
+                return;
+            }
+
+            Living living = (Living) srcEntity;
             if (entity instanceof Player && living instanceof Player) {
                 processPvP(level, (Player) living, (Player) entity, event);
             } else if (entity instanceof Player) {
@@ -210,7 +223,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            Optional.of(Texts.of(TextColors.DARK_AQUA, "Entity Health: $health int$ / $max health int$")),
+            Optional.of(
+                    Texts.of(
+                            TextColors.DARK_AQUA,
+                            "Entity Health: ",
+                            Texts.placeholder("health int"),
+                            " / ",
+                            Texts.placeholder("max health int")
+                    )
+            ),
             Optional.of(Texts.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
     );
 

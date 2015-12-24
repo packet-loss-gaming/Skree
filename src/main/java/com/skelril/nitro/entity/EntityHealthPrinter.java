@@ -39,10 +39,10 @@ public class EntityHealthPrinter {
         Double maxHealth = living.get(Keys.MAX_HEALTH).get();
 
         Map<String, Object> map = new HashMap<>();
-        map.put("$health$", health);
-        map.put("$max health$", maxHealth);
-        map.put("$health int$", (int) Math.ceil(health));
-        map.put("$max health int$", (int) Math.ceil(maxHealth));
+        map.put("health", health);
+        map.put("max health", maxHealth);
+        map.put("health int", (int) Math.ceil(health));
+        map.put("max health int", (int) Math.ceil(maxHealth));
 
         return map;
     }
