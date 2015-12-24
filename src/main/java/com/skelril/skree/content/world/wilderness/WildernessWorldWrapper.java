@@ -8,7 +8,6 @@ package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
-import com.skelril.nitro.data.util.AttributeUtil;
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
@@ -29,7 +28,6 @@ import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.Item;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Game;
@@ -47,18 +45,16 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.entity.projectile.Arrow;
-import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
-import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
@@ -152,18 +148,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                         entity.offer(healthData);
                     }
-
-                    if (AttributeUtil.respectsGenericAttackDamage(entity)) {
-                        AttributeUtil.setGenericAttackDamage(
-                                entity,
-                                getDamageMod(level) + AttributeUtil.getGenericAttackDamage(entity)
-                        );
-                    }
-                } else if (entity instanceof Arrow) {
-                    // Handles cases of both blocks and entities
-                    if (!(((Arrow) entity).getShooter() instanceof Player)) {
-                        ((EntityArrow) entity).setDamage(((EntityArrow) entity).getDamage() + getDamageMod(level));
-                    }
                 }
             }
 
@@ -186,33 +170,45 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onEntityAttack(InteractEntityEvent event) {
+    public void onPlayerCombat(DamageEntityEvent event) {
         Entity entity = event.getTargetEntity();
+        if (!(entity instanceof Living)) {
+            return;
+        }
 
         Optional<Integer> optLevel = getLevel(entity.getLocation());
-
         if (!optLevel.isPresent()) {
             return;
         }
 
         int level = optLevel.get();
-        if (!allowsPvP(level)) {
-            return;
-        }
-
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (optProjectile.isPresent()) {
-            ProjectileSource source = optProjectile.get().getShooter();
-            if (source instanceof Player) {
-                event.setCancelled(true);
+        Optional<Living> optLiving = event.getCause().first(Living.class);
+        if (optLiving.isPresent()) {
+            Living living = optLiving.get();
+            if (entity instanceof Player && living instanceof Player) {
+                processPvP(level, (Player) living, (Player) entity, event);
+            } else if (entity instanceof Player) {
+                processMonsterAttack(level, living, (Player) entity, event);
+            } else if (living instanceof Player) {
+                processPlayerAttack(level, (Player) living, (Living) entity, event);
             }
         }
+    }
+
+    private void processPvP(int level, Player attacker, Player defender, DamageEntityEvent event) {
+        if (allowsPvP(level)) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    private void processMonsterAttack(int level, Living attacker, Player defender, DamageEntityEvent event) {
+        event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
+    }
+
+    private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
+
     }
 
     @Listener
