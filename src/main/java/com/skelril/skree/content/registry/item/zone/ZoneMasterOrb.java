@@ -80,44 +80,45 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
             Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
-                if (isZoneMasterItem(itemStack) && isAttuned(itemStack)) {
-                    Optional<ZoneService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ZoneService.class);
-                    if (optService.isPresent()) {
-                        ZoneService service = optService.get();
-                        Collection<Player> group = new ArrayList<>();
-                        group.add(player);
-                        for (Player aPlayer : SkreePlugin.inst().getGame().getServer().getOnlinePlayers()) {
-                            ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
-                            for (ItemStack aStack : itemStacks) {
-                                if (!isZoneSlaveItem(aStack)) {
-                                    continue;
-                                }
-                                if (!isAttuned(aStack)) {
-                                    continue;
-                                }
-                                Optional<Player> optZoneOwner = getGroupOwner(aStack);
-                                if (optZoneOwner.isPresent() && optZoneOwner.get().equals(player)) {
-                                    group.add(aPlayer);
-                                    break;
-                                }
-                            }
-                        }
-
-                        for (Player aPlayer : group) {
-                            ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
-                            for (int i = 0; i < itemStacks.length; ++i) {
-                                if (isZoneItem(itemStacks[i])) {
-                                    itemStacks[i] = null;
+                if (isZoneMasterItem(itemStack)) {
+                    if (isAttuned(itemStack)) {
+                        Optional<ZoneService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ZoneService.class);
+                        if (optService.isPresent()) {
+                            ZoneService service = optService.get();
+                            Collection<Player> group = new ArrayList<>();
+                            group.add(player);
+                            for (Player aPlayer : SkreePlugin.inst().getGame().getServer().getOnlinePlayers()) {
+                                ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
+                                for (ItemStack aStack : itemStacks) {
+                                    if (!isZoneSlaveItem(aStack)) {
+                                        continue;
+                                    }
+                                    if (!isAttuned(aStack)) {
+                                        continue;
+                                    }
+                                    Optional<Player> optZoneOwner = getGroupOwner(aStack);
+                                    if (optZoneOwner.isPresent() && optZoneOwner.get().equals(player)) {
+                                        group.add(aPlayer);
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                        service.requestZone(getZone(itemStack).get(), group);
+                            for (Player aPlayer : group) {
+                                ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
+                                for (int i = 0; i < itemStacks.length; ++i) {
+                                    if (isZoneItem(itemStacks[i])) {
+                                        itemStacks[i] = null;
+                                    }
+                                }
+                            }
+
+                            service.requestZone(getZone(itemStack).get(), group);
+                        }
+                    } else {
+                        setMasterToZone(itemStack, "Shnuggles Prime");
+                        player.setItemInHand(itemStack);
                     }
-                    event.setCancelled(true);
-                } else {
-                    setMasterToZone(itemStack, "Shnuggles Prime");
-                    player.setItemInHand(itemStack);
                     event.setCancelled(true);
                 }
             }
