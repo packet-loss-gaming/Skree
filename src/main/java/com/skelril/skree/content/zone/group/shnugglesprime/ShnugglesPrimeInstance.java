@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.group.shnugglesprime;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
+import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
@@ -184,19 +185,18 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         return activeAttacks.contains(attack);
     }
 
+    private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
+            Optional.of(Texts.of(TextColors.DARK_AQUA, "Boss Health: $health int$ / $max health int$")),
+            Optional.empty()
+    );
+
     public void printBossHealth() {
         Optional<Giant> optBoss = getBoss();
         if (!optBoss.isPresent()) {
             return;
         }
 
-        Giant boss = optBoss.get();
-        int current = (int) Math.ceil(getHealth(boss));
-        int max = (int) Math.ceil(getMaxHealth(boss));
-
-        getPlayerMessageSink(SPECTATOR).sendMessage(
-                Texts.of(TextColors.DARK_AQUA, "Boss Health: " + current + " / " + max)
-        );
+        healthPrinter.print(getPlayerMessageSink(SPECTATOR), optBoss.get());
     }
 
     private static final ItemStack weapon = ItemStackFactory.newItemStack(ItemTypes.BONE);

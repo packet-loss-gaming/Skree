@@ -15,6 +15,7 @@ import com.skelril.nitro.droptable.DropTableImpl;
 import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
+import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.probability.Probability;
@@ -62,6 +63,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.TitleBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -207,8 +209,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
     }
 
-    private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
+    private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
+            Optional.of(Texts.of(TextColors.DARK_AQUA, "Entity Health: $health int$ / $max health int$")),
+            Optional.of(Texts.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
+    );
 
+    private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
+        Task.builder().delayTicks(1).execute(
+                () -> healthPrinter.print(attacker.getMessageSink(), defender)
+        ).submit(SkreePlugin.inst());
     }
 
     @Listener
