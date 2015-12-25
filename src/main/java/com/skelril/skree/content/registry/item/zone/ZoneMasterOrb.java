@@ -176,7 +176,8 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Optional<String> optZoneName = getZone((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
-            tooltip.add("Players: " + getGroupSize(stack) + " / " + getMaxGroupSize(stack));
+            Optional<Integer> maxPlayerCount = getMaxGroupSize(stack);
+            tooltip.add("Players: " + getGroupSize(stack) + " / " + (maxPlayerCount.isPresent() ? "Unlimited" : maxPlayerCount.get()));
         }
     }
 }
