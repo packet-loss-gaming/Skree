@@ -44,6 +44,11 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    public Optional<Integer> getMaxGroupSize(String managerName) {
+        return managers.get(ZoneService.mangleManagerName(managerName)).getMaxGroupSize();
+    }
+
+    @Override
     public Clause<Player, ZoneStatus> requestZone(String managerName, Player player) {
         ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         return manager != null ? requestZone(manager, player) : null;
@@ -67,6 +72,12 @@ public class ZoneServiceImpl implements ZoneService {
         return result;
     }
 
+
+    @Override
+    public <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager) {
+        return manager.getMaxGroupSize();
+    }
+
     @Override
     public <T extends Zone> Clause<Player, ZoneStatus> requestZone(ZoneManager<T> manager, Player player) {
         Optional<T> optZone = manager.discover(pickAllocator());
@@ -78,6 +89,11 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Override
     public <T extends Zone> Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<T> manager, Collection<Player> players) {
+        Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
+        if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
+            return players.stream().map(player -> new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList());
+        }
+
         Optional<T> optZone = manager.discover(pickAllocator());
         if (optZone.isPresent()) {
             return players.stream().map(player -> addToZone(optZone.get(), player)).collect(Collectors.toList());

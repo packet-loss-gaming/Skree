@@ -15,6 +15,10 @@ public interface ZoneManager<T extends Zone> {
     Optional<T> discover(ZoneSpaceAllocator allocator);
     Collection<T> getActiveZones();
 
+    default Optional<Integer> getMaxGroupSize() {
+        return Optional.empty();
+    }
+
     String getName();
     default String getSystemName() {
         return ZoneService.mangleManagerName(getName());

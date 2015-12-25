@@ -13,6 +13,7 @@ import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ZoneService {
     static String mangleManagerName(String managerName) {
@@ -21,9 +22,11 @@ public interface ZoneService {
 
     void registerManager(ZoneManager<?> manager);
 
+    Optional<Integer> getMaxGroupSize(String managerName);
     Clause<Player, ZoneStatus> requestZone(String managerName, Player player);
     Collection<Clause<Player, ZoneStatus>> requestZone(String managerName, Collection<Player> players);
 
+    <T extends Zone>Optional<Integer> getMaxGroupSize(ZoneManager<T> manager);
     <T extends Zone> Clause<Player, ZoneStatus> requestZone(ZoneManager<T> manager, Player player);
     <T extends Zone> Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<T> manager, Collection<Player> players);
 

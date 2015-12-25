@@ -52,7 +52,14 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
     @Listener
     public void onDropItem(DropItemEvent.Dispense event) {
         event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {
-            if (isZoneSlaveItem(((EntityItem) entity).getEntityItem())) {
+            ItemStack stack = ((EntityItem) entity).getEntityItem();
+            if (isZoneSlaveItem(stack)) {
+                Optional<Player> optPlayer = event.getCause().first(Player.class);
+                if (optPlayer.isPresent()) {
+                    if (!notifyGroupOwner(stack, optPlayer.get(), false)) {
+                        // TODO Log this, as it shouldn't happen
+                    }
+                }
                 entity.remove();
             }
         });
@@ -67,7 +74,9 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
-                    attune(itemStack);
+                    if (notifyGroupOwner(itemStack, player, true)) {
+                        attune(itemStack);
+                    }
                     event.setCancelled(true);
                 }
             }

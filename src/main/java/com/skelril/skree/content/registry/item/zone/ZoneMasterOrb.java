@@ -27,9 +27,11 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +73,15 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         );
     }
 
+    @Listener
+    public void onLogin(ClientConnectionEvent.Join event) {
+        purgeZoneItems(event.getTargetEntity(), Optional.empty());
+    }
+
+    @Listener
+    public void onLogout(ClientConnectionEvent.Disconnect event) {
+        purgeZoneItems(event.getTargetEntity(), Optional.empty());
+    }
 
     @Listener
     public void onBlockInteract(InteractBlockEvent.Primary event) {
@@ -79,45 +90,41 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
             Player player = optPlayer.get();
             Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
             if (optItemStack.isPresent()) {
-                org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
+                ItemStack itemStack = (ItemStack) (Object) optItemStack.get();
                 if (isZoneMasterItem(itemStack)) {
                     if (isAttuned(itemStack)) {
                         Optional<ZoneService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ZoneService.class);
                         if (optService.isPresent()) {
                             ZoneService service = optService.get();
-                            Collection<Player> group = new ArrayList<>();
+                            List<Player> group = new ArrayList<>();
                             group.add(player);
                             for (Player aPlayer : SkreePlugin.inst().getGame().getServer().getOnlinePlayers()) {
                                 ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
                                 for (ItemStack aStack : itemStacks) {
-                                    if (!isZoneSlaveItem(aStack)) {
+                                    if (!hasSameZoneID(itemStack, aStack)) {
                                         continue;
                                     }
-                                    if (!isAttuned(aStack)) {
-                                        continue;
-                                    }
-                                    Optional<Player> optZoneOwner = getGroupOwner(aStack);
-                                    if (optZoneOwner.isPresent() && optZoneOwner.get().equals(player)) {
-                                        group.add(aPlayer);
-                                        break;
+
+                                    if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
+                                        Optional<Player> optZoneOwner = getGroupOwner(aStack);
+                                        if (optZoneOwner.isPresent() && optZoneOwner.get().equals(player)) {
+                                            group.add(aPlayer);
+                                            break;
+                                        }
                                     }
                                 }
                             }
 
-                            for (Player aPlayer : group) {
-                                ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
-                                for (int i = 0; i < itemStacks.length; ++i) {
-                                    if (isZoneItem(itemStacks[i])) {
-                                        itemStacks[i] = null;
-                                    }
-                                }
+                            for (int i = 1; i < group.size(); ++i) {
+                                purgeZoneItems(group.get(i), Optional.of(itemStack));
                             }
+                            purgeZoneItems(group.get(0), Optional.of(itemStack));
 
                             service.requestZone(getZone(itemStack).get(), group);
                         }
                     } else {
                         setMasterToZone(itemStack, "Shnuggles Prime");
-                        player.setItemInHand(itemStack);
+                        player.setItemInHand((org.spongepowered.api.item.inventory.ItemStack) (Object) itemStack);
                     }
                     event.setCancelled(true);
                 }
@@ -136,8 +143,14 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (this.equals(itemStack.getItem()) && isAttuned(itemStack)) {
                     Player targetPlayer = (Player) targetEntity;
-                    org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
-                    ((EntityPlayer) targetPlayer).inventory.addItemStackToInventory((ItemStack) (Object) newStack);
+                    if (!playerAlreadyHasInvite(itemStack, targetPlayer)) {
+                        player.sendMessage(
+                                Texts.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
+                        );
+                    } else {
+                        org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
+                        ((EntityPlayer) targetPlayer).inventory.addItemStackToInventory((ItemStack) (Object) newStack);
+                    }
                     event.setCancelled(true);
                 }
             }
@@ -147,7 +160,9 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     @Listener
     public void onDropItem(DropItemEvent.Dispense event) {
         event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {
-            if (isZoneMasterItem(((EntityItem) entity).getEntityItem())) {
+            ItemStack stack = ((EntityItem) entity).getEntityItem();
+            if (isZoneMasterItem(stack)) {
+                rescindGroupInvite(stack);
                 entity.remove();
             }
         });
@@ -161,6 +176,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Optional<String> optZoneName = getZone((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
+            tooltip.add("Players: " + getGroupSize(stack) + " / " + getMaxGroupSize(stack));
         }
     }
 }
