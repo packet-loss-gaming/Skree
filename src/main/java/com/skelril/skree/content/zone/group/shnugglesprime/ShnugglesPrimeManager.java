@@ -175,7 +175,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
         }
 
         ShnugglesPrimeInstance instance = new ShnugglesPrimeInstance(region, bossManager);
-        Task.builder().delayTicks(1).execute(instance::init).submit(SkreePlugin.inst());
+        instance.init();
 
         zones.add(instance);
 
