@@ -220,7 +220,7 @@ public class ZoneItemUtil {
     public static Optional<Integer> getMaxGroupSize(ItemStack stack) {
         if (isZoneMasterItem(stack) && hasZoneData(stack)) {
             NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_zone_data");
-            int val = Integer.valueOf(tag.getString("zone_max_players"));
+            int val = tag.getInteger("zone_max_players");
             return val == -1 ? Optional.empty() : Optional.of(val);
         }
         throw new IllegalArgumentException("Invalid ItemStack provided");

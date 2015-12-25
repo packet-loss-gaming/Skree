@@ -177,7 +177,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
             Optional<Integer> maxPlayerCount = getMaxGroupSize(stack);
-            tooltip.add("Players: " + getGroupSize(stack) + " / " + (maxPlayerCount.isPresent() ? "Unlimited" : maxPlayerCount.get()));
+            tooltip.add("Players: " + getGroupSize(stack) + " / " + (!maxPlayerCount.isPresent() ? "Unlimited" : maxPlayerCount.get()));
         }
     }
 }
