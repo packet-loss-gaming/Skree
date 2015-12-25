@@ -535,7 +535,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     public boolean init() {
         probeArea();
         remove();
-        spawnBoss();
+        Task.builder().delayTicks(1).execute(this::spawnBoss).submit(SkreePlugin.inst());
         return true;
     }
 
