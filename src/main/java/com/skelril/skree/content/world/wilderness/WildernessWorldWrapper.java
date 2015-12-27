@@ -345,7 +345,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 addPool(loc, type, fortuneMod, silkTouch);
-            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 1000 - Math.pow(level, 3)))) {
+            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
