@@ -13,6 +13,7 @@ import com.skelril.skree.service.internal.zone.Zone;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.Agent;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -39,10 +40,13 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onLogin(ClientConnectionEvent.Join event) {
-        Optional<WorldService> optWorldService = SkreePlugin.inst().getGame().getServiceManager().provide(WorldService.class);
-        if (optWorldService.isPresent()) {
-            Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
-            event.getTargetEntity().setLocation(worlds.iterator().next().getSpawnLocation());
+        Player player = event.getTargetEntity();
+        if (isApplicable(player)) {
+            Optional<WorldService> optWorldService = SkreePlugin.inst().getGame().getServiceManager().provide(WorldService.class);
+            if (optWorldService.isPresent()) {
+                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                player.setLocation(worlds.iterator().next().getSpawnLocation());
+            }
         }
     }
 
