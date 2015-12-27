@@ -6,6 +6,7 @@
 
 package com.skelril.skree.system.registry.block;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.nitro.selector.GameAwareContent;
@@ -76,6 +77,10 @@ public class CustomBlockSystem {
 
             if (block instanceof GameAwareContent) {
                 ((GameAwareContent) block).supplyGame(game);
+            }
+
+            if (block instanceof Craftable) {
+                ((Craftable) block).registerRecipes();
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");
