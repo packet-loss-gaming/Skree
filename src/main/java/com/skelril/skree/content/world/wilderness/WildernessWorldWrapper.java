@@ -66,6 +66,7 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.TitleBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -237,7 +238,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
         Task.builder().delayTicks(1).execute(
-                () -> healthPrinter.print(attacker.getMessageSink(), defender)
+                () -> healthPrinter.print(MessageSinks.to(Collections.singleton(attacker)), defender)
         ).submit(SkreePlugin.inst());
     }
 
