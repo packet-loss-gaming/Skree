@@ -25,7 +25,12 @@ public class MagicStone extends Block implements ICustomBlock, Craftable {
 
     public MagicStone() {
         super(new Material(MapColor.stoneColor));
-        setCreativeTab(CreativeTabs.tabBlock);
+        this.setCreativeTab(CreativeTabs.tabBlock);
+
+        // Data applied for Vanilla blocks in net.minecraft.block.Block
+        this.setHardness(1.5F);
+        this.setResistance(10.0F);
+        this.setStepSound(soundTypePiston);
     }
 
     @Override

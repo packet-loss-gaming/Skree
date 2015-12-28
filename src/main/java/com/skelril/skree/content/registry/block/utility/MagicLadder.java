@@ -38,6 +38,14 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStackCollection;
 
 public class MagicLadder extends BlockLadder implements ICustomBlock, EventAwareContent, Craftable {
 
+    public MagicLadder() {
+        super();
+
+        // Data applied for Vanilla blocks in net.minecraft.block.Block
+        this.setHardness(0.4F);
+        this.setStepSound(soundTypeLadder);
+    }
+
     @Override
     public String __getID() {
         return "magic_ladder";

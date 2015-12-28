@@ -24,6 +24,10 @@ public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock 
         float f = 0.2F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
         this.setTickRandomly(true);
+
+        // Data applied for Vanilla blocks in net.minecraft.block.Block
+        this.setLightLevel(0.3F);
+        this.setStepSound(soundTypeGrass);
     }
 
     @Override

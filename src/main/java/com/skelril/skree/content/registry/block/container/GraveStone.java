@@ -40,9 +40,11 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
     public GraveStone() {
         super(new Material(MapColor.stoneColor)); // Create a new non-burnable stone like block
-        this.setLightLevel(0.3F);
         this.setBlockBounds(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING_PROP, EnumFacing.NORTH));
+
+        // Data applied for Vanilla blocks in net.minecraft.block.Block
+        this.setLightLevel(0.3F);
     }
 
     @Override
