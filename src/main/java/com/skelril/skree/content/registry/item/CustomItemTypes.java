@@ -12,10 +12,7 @@ import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
-import com.skelril.skree.content.registry.item.generic.BloodDiamond;
-import com.skelril.skree.content.registry.item.generic.FairyDust;
-import com.skelril.skree.content.registry.item.generic.RedShard;
-import com.skelril.skree.content.registry.item.generic.SeaCrystal;
+import com.skelril.skree.content.registry.item.generic.*;
 import com.skelril.skree.content.registry.item.tool.Luminositor;
 import com.skelril.skree.content.registry.item.tool.SkullOfTheFallen;
 import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
@@ -65,6 +62,9 @@ public class CustomItemTypes {
 
     /* Combat Items */
     public static final RedFeather RED_FEATHER = new RedFeather();
+
+    /* Convenience Items */
+    public static final BrokenGlass BROKEN_GLASS = new BrokenGlass();
 
     /* Zone Items */
     public static final ZoneMasterOrb ZONE_MASTER_ORB = new ZoneMasterOrb();
