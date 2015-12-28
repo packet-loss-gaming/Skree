@@ -88,9 +88,9 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
 
         for (Transaction<BlockSnapshot> block : event.getTransactions()) {
             BlockType originalType = block.getOriginal().getState().getType();
-            if (originalType == BlockTypes.GLASS) {
+            if (originalType == BlockTypes.GLASS || originalType == BlockTypes.STAINED_GLASS) {
                 dropBrokenGlass(block, event.getCause(), 0);
-            } else if (originalType == BlockTypes.GLASS_PANE) {
+            } else if (originalType == BlockTypes.GLASS_PANE || originalType == BlockTypes.STAINED_GLASS_PANE) {
                 dropBrokenGlass(block, event.getCause(), 1);
             }
         }
