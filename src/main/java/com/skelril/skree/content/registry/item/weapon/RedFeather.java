@@ -6,11 +6,24 @@
 
 package com.skelril.skree.content.registry.item.weapon;
 
+import com.skelril.nitro.Clause;
 import com.skelril.nitro.registry.item.CustomItem;
+import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
+import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public class RedFeather extends CustomItem implements ICustomItem {
+import java.util.Optional;
+
+public class RedFeather extends CustomItem implements ICustomItem, DegradableItem, EventAwareContent {
 
     @Override
     public String __getID() {
@@ -25,5 +38,106 @@ public class RedFeather extends CustomItem implements ICustomItem {
     @Override
     public CreativeTabs __getCreativeTab() {
         return CreativeTabs.tabCombat;
+    }
+
+    @Override
+    public int __getMaxUses() {
+        return 10000;
+    }
+
+    @Listener(order = Order.LATE)
+    public void onEntityDamage(DamageEntityEvent event) {
+        Entity target = event.getTargetEntity();
+        if (target instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) target;
+            Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
+            if (!optFeatherDetail.isPresent()) {
+                return;
+            }
+
+            Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>> featherDetail = optFeatherDetail.get();
+
+            int redQ = featherDetail.getValue().getValue().getKey();
+            final double dmg = event.getBaseDamage();
+            final int k = (dmg > 80 ? 16 : dmg > 40 ? 8 : dmg > 20 ? 4 : 2);
+
+            final double blockable = redQ * k;
+            final double blocked = blockable - (blockable - dmg);
+
+            event.setBaseDamage(Math.max(0, dmg - blocked));
+
+            redQ = (int) ((blockable - blocked) / k);
+            updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
+            player.inventory.mainInventory[featherDetail.getKey()] = (net.minecraft.item.ItemStack) (Object) featherDetail.getValue().getKey();
+        }
+    }
+
+    public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {
+        return getHighestPoweredFeather((EntityPlayer) player);
+    }
+
+    public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(EntityPlayer player) {
+        net.minecraft.item.ItemStack[] itemStacks = player.inventory.mainInventory;
+
+        int index = -1;
+        ItemStack stack = null;
+        Clause<Integer, Long> details = new Clause<>(0, 0L);
+
+        for (int i = 0; i < itemStacks.length; ++i) {
+            ItemStack curStack = (ItemStack) (Object) itemStacks[i];
+            Clause<Integer, Long> powerCooldown = getFeatherPower(curStack);
+            if (powerCooldown.getValue() > System.currentTimeMillis()) {
+                return Optional.empty();
+            }
+
+            if (powerCooldown.getKey() > details.getKey()) {
+                index = i;
+                details = powerCooldown;
+                stack = curStack;
+            }
+        }
+
+        return index != -1 ? Optional.of(new Clause<>(index, new Clause<>(stack, details))) : Optional.empty();
+    }
+
+    public Clause<Integer, Long> getFeatherPower(net.minecraft.item.ItemStack stack) {
+        if (stack != null && stack.getItem() == this) {
+            long coolDown = 0;
+
+            if (stack.getTagCompound() == null) {
+                stack.setTagCompound(new NBTTagCompound());
+            }
+
+            if (stack.getTagCompound().hasKey("skree_feather_data")) {
+                NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
+                coolDown = tag.getLong("cool_down");
+            }
+
+            return new Clause<>((__getMaxUses() - stack.getItemDamage()) - 1, coolDown);
+        }
+        return new Clause<>(0, 0L);
+    }
+
+    public Clause<Integer, Long> getFeatherPower(ItemStack stack) {
+        return getFeatherPower((net.minecraft.item.ItemStack) (Object) stack);
+    }
+
+    public void updateFeatherPower(net.minecraft.item.ItemStack stack, int newPower, long coolDown) {
+        stack.setItemDamage(__getMaxUses() - (newPower + 1));
+
+        if (stack.getTagCompound() == null) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+
+        if (!stack.getTagCompound().hasKey("skree_feather_data")) {
+            stack.getTagCompound().setTag("skree_feather_data", new NBTTagCompound());
+        }
+
+        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
+        tag.setLong("cool_down", System.currentTimeMillis() + coolDown);
+    }
+
+    public void updateFeatherPower(ItemStack stack, int newPower, long coolDown) {
+        updateFeatherPower((net.minecraft.item.ItemStack) (Object) stack, newPower, coolDown);
     }
 }
