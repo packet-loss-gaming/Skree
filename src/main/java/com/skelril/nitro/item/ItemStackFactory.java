@@ -10,6 +10,10 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class ItemStackFactory {
 
     public static ItemStack newItemStack(ItemType type) {
@@ -34,5 +38,15 @@ public class ItemStackFactory {
 
     public static ItemStack newItemStack(ItemStack itemStack, int quantity) {
         return ItemStack.builder().fromItemStack(itemStack).quantity(quantity).build();
+    }
+
+    public static Collection<ItemStack> newItemStackCollection(ItemStack itemStack, int quantity) {
+        List<ItemStack> itemStacks = new ArrayList<>();
+        for (int i = quantity; i > 0;) {
+            int diff = Math.min(i, itemStack.getMaxStackQuantity());
+            i -= diff;
+            itemStacks.add(newItemStack(itemStack, quantity));
+        }
+        return itemStacks;
     }
 }
