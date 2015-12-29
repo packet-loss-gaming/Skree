@@ -33,11 +33,13 @@ public class ItemStackFactory {
     }
 
     public static ItemStack newItemStack(ItemStack itemStack) {
-        return ItemStack.builder().fromItemStack(itemStack).build();
+        return itemStack.copy();
     }
 
     public static ItemStack newItemStack(ItemStack itemStack, int quantity) {
-        return ItemStack.builder().fromItemStack(itemStack).quantity(quantity).build();
+        ItemStack stack = itemStack.copy();
+        stack.setQuantity(quantity);
+        return stack;
     }
 
     public static Collection<ItemStack> newItemStackCollection(ItemStack itemStack, int quantity) {
