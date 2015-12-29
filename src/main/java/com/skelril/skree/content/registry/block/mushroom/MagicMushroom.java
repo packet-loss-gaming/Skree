@@ -15,7 +15,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
 import java.util.Random;
 
 public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock {
@@ -33,20 +32,6 @@ public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock 
     @Override
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
         if (rand.nextInt(25) == 0) {
-            Iterator iterator = BlockPos.getAllInBoxMutable(pos.add(-4, -1, -4), pos.add(4, 1, 4)).iterator();
-
-            for (int i = 0; iterator.hasNext();) {
-                BlockPos blockpos1 = (BlockPos)iterator.next();
-
-                if (worldIn.getBlockState(blockpos1).getBlock() == this) {
-                    --i;
-
-                    if (i <= 0) {
-                        return;
-                    }
-                }
-            }
-
             BlockPos blockpos2 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
 
             for (int j = 0; j < 4; ++j)  {
