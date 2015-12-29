@@ -19,6 +19,7 @@ import com.skelril.skree.system.market.MarketSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
+import com.skelril.skree.system.pvp.PvPSystem;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
@@ -95,8 +96,9 @@ public class SkreePlugin {
                 DropClearSystem.class,
                 MarketSystem.class,
                 ModifierSystem.class,
-                ProjectileWatcherSystem.class,
                 PlayerStateSystem.class,
+                ProjectileWatcherSystem.class,
+                PvPSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
                 WorldSystem.class,

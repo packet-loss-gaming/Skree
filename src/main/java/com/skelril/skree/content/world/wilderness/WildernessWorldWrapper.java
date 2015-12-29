@@ -27,6 +27,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
+import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -193,13 +194,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
 
         int level = optLevel.get();
-        Optional<EntityDamageSource> optDamageSouce = event.getCause().first(EntityDamageSource.class);
-        if (optDamageSouce.isPresent()) {
+        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
+        if (optDamageSource.isPresent()) {
             Entity srcEntity;
-            if (optDamageSouce.isPresent() && optDamageSouce.get() instanceof IndirectEntityDamageSource) {
-                srcEntity = ((IndirectEntityDamageSource) optDamageSouce.get()).getIndirectSource();
+            if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
             } else {
-                srcEntity = optDamageSouce.get().getSource();
+                srcEntity = optDamageSource.get().getSource();
             }
 
             if (!(srcEntity instanceof Living)) {
@@ -221,6 +222,17 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (allowsPvP(level)) {
             return;
         }
+
+        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        if (optService.isPresent()) {
+            PvPService service = optService.get();
+            if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
+                return;
+            }
+        }
+
+        attacker.sendMessage(Texts.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
+        attacker.sendMessage(Texts.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
 
         event.setCancelled(true);
     }
@@ -446,8 +458,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return Optional.of(Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1);
     }
 
+    public int getFirstPvPLevel() {
+        return 6;
+    }
+
     public boolean allowsPvP(int level) {
-        return level > 5;
+        return level >= getFirstPvPLevel();
     }
 
     public double getDropMod(int level, double mobHealth) {

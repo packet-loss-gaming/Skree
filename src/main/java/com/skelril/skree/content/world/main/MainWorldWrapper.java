@@ -8,6 +8,7 @@ package com.skelril.skree.content.world.main;
 
 
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
@@ -15,11 +16,18 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -69,6 +77,47 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
                 return;
             }
         }
+    }
+
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        Entity entity = event.getTargetEntity();
+        if (!(entity instanceof Living) || !isApplicable(entity)) {
+            return;
+        }
+
+        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
+        if (optDamageSource.isPresent()) {
+            Entity srcEntity;
+            if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
+            } else {
+                srcEntity = optDamageSource.get().getSource();
+            }
+
+            if (!(srcEntity instanceof Living)) {
+                return;
+            }
+
+            Living living = (Living) srcEntity;
+            if (entity instanceof Player && living instanceof Player) {
+                processPvP((Player) living, (Player) entity, event);
+            }
+        }
+    }
+
+    private void processPvP(Player attacker, Player defender, DamageEntityEvent event) {
+        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        if (optService.isPresent()) {
+            PvPService service = optService.get();
+            if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
+                return;
+            }
+        }
+
+        attacker.sendMessage(Texts.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+
+        event.setCancelled(true);
     }
 
     @Override
