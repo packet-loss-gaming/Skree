@@ -35,6 +35,7 @@ public class ItemCompactor {
                     output[i] = null;
                     countBuckets[k] += input[i].getQuantity();
                     pointBuckets[k] = pointBuckets[k].add(value.get());
+                    break;
                 }
             }
         }
@@ -65,7 +66,9 @@ public class ItemCompactor {
                     output[i] = collectedStacks.poll();
                 }
             }
-            return Optional.of(output);
+            // Cover a very rare case where items may be lost
+            // TODO do this better
+            return collectedStacks.isEmpty() ? Optional.of(output) : Optional.empty();
         }
         return Optional.empty();
     }
