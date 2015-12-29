@@ -60,8 +60,6 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
     @Listener
     public void onRightClick(InteractBlockEvent.Secondary event) {
-        if (SkreePlugin.inst().getGame().getPlatform().getExecutionType().isClient()) return;
-
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;

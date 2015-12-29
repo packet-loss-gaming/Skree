@@ -11,7 +11,6 @@ import com.skelril.nitro.data.util.LightLevelUtil;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.SkreePlugin;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -47,8 +46,6 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
     @Listener
     public void onRightClick(InteractBlockEvent.Secondary event) {
-        if (SkreePlugin.inst().getGame().getPlatform().getExecutionType().isClient()) return;
-
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;
