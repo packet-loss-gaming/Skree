@@ -77,8 +77,7 @@ import java.util.*;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static com.skelril.skree.content.registry.block.CustomBlockTypes.GRAVE_STONE;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_SHARD;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
@@ -112,6 +111,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack((ItemType) SCROLL_OF_SUMMATION)
+                                                        )
+                                                ), 2000
+                                        ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
