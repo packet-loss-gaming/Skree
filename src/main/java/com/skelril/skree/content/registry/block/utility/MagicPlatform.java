@@ -10,11 +10,14 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import net.minecraft.block.BlockLadder;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
@@ -31,27 +34,45 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-public class MagicLadder extends BlockLadder implements ICustomBlock, EventAwareContent, Craftable {
-
-    public MagicLadder() {
-        super();
+public class MagicPlatform extends Block implements ICustomBlock, EventAwareContent, Craftable {
+    public MagicPlatform() {
+        super(Material.wood);
+        this.setBlockBounds(0F, .9F, 0F, 1F, 1F, 1F);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.4F);
-        this.setStepSound(soundTypeLadder);
+        this.setStepSound(soundTypeWood);
+    }
+
+    @Override
+    public boolean isFullCube() {
+        return false;
+    }
+
+    @Override
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
     }
 
     @Override
     public String __getID() {
-        return "magic_ladder";
+        return "magic_platform";
     }
 
     @Override
     public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
+        GameRegistry.addRecipe(
                 new ItemStack(this),
-                new ItemStack(Blocks.ladder),
-                new ItemStack(CustomItemTypes.FAIRY_DUST)
+                "AAA",
+                " B ",
+                "   ",
+                'A', new ItemStack(Items.stick),
+                'B', new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
     }
 
@@ -77,7 +98,7 @@ public class MagicLadder extends BlockLadder implements ICustomBlock, EventAware
                 Optional<Location<World>> optLoc = block.getOriginal().getLocation();
                 if (optLoc.isPresent()) {
                     Location<World> loc = optLoc.get();
-                    MagicBlockStateHelper.startLadder(loc);
+                    MagicBlockStateHelper.startPlatform(loc);
 
                     if (!survival) {
                         continue;
