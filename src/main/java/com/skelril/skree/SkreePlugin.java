@@ -74,6 +74,9 @@ public class SkreePlugin {
         customBlockSystem = new CustomBlockSystem(this, game);
         customBlockSystem.preInit();
 
+        customItemSystem.associate();
+        customBlockSystem.associate();
+
         game.getRegistry().registerWorldGeneratorModifier(new VoidWorldGeneratorModifier());
         game.getRegistry().registerWorldGeneratorModifier(new NoOreWorldGeneratorModifier());
         game.getRegistry().registerWorldGeneratorModifier(new WildernessWorldGeneratorModifier());

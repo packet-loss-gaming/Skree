@@ -8,6 +8,7 @@ package com.skelril.skree.system.registry.block;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
+import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.nitro.selector.GameAwareContent;
 import com.skelril.skree.SkreePlugin;
@@ -40,6 +41,15 @@ public class CustomBlockSystem {
             ex.printStackTrace();
         }
     }
+
+    public void associate() {
+        try {
+            iterate(CustomBlockSystem.class.getDeclaredMethod("registerAssociates", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 
     public void init() {
         try {
@@ -78,9 +88,20 @@ public class CustomBlockSystem {
             if (block instanceof GameAwareContent) {
                 ((GameAwareContent) block).supplyGame(game);
             }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
 
+    @SuppressWarnings("unused")
+    private void registerAssociates(Object block) {
+        if (block instanceof Block && block instanceof ICustomBlock) {
             if (block instanceof Craftable) {
                 ((Craftable) block).registerRecipes();
+            }
+
+            if (block instanceof CookedItem) {
+                ((CookedItem) block).registerIngredients();
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");

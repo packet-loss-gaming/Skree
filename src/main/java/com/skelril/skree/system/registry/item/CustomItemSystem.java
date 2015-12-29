@@ -45,6 +45,14 @@ public class CustomItemSystem {
         }
     }
 
+    public void associate() {
+        try {
+            iterate(CustomItemSystem.class.getDeclaredMethod("registerAssociates", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public void init() {
         try {
             iterate(CustomItemSystem.class.getDeclaredMethod("render", Object.class));
@@ -83,6 +91,22 @@ public class CustomItemSystem {
                 ((GameAwareContent) item).supplyGame(game);
             }
 
+            if (item instanceof Craftable) {
+                ((Craftable) item).registerRecipes();
+            }
+
+            if (item instanceof CookedItem) {
+                ((CookedItem) item).registerIngredients();
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void registerAssociates(Object item) {
+        if (item instanceof Item && item instanceof ICustomItem) {
+            // Add selective hooks
             if (item instanceof Craftable) {
                 ((Craftable) item).registerRecipes();
             }
