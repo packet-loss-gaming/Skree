@@ -13,6 +13,7 @@ import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,8 @@ import java.util.Random;
 public class MagicPlatform extends Block implements ICustomBlock, EventAwareContent, Craftable {
     public MagicPlatform() {
         super(Material.wood);
-        this.setBlockBounds(0F, .9F, 0F, 1F, 1F, 1F);
+        this.setBlockBounds(0F, .9375F, 0F, 1F, 1F, 1F);
+        this.setCreativeTab(CreativeTabs.tabDecorations);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.4F);
