@@ -36,7 +36,7 @@ public class EnderFocus extends CustomItem implements Craftable {
                 new ItemStack(this),
                 " A ",
                 "BCB",
-                " B",
+                " B ",
                 'A', new ItemStack(Items.ghast_tear),
                 'B', new ItemStack(Items.gold_ingot),
                 'c', new ItemStack(Items.ender_eye)
