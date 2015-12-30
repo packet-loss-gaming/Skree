@@ -18,6 +18,7 @@ import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
 import com.skelril.skree.content.registry.item.tool.hoe.CrystalHoe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
 import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
+import com.skelril.skree.content.registry.item.tool.terragu.*;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
 import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
@@ -71,10 +72,18 @@ public class CustomItemTypes {
     public static final ZoneSlaveOrb ZONE_SLAVE_ORB = new ZoneSlaveOrb();
 
     /* Tools */
+    public static final WoodTerragu WOOD_TERRAGU = new WoodTerragu();
+    public static final StoneTerragu STONE_TERRAGU = new StoneTerragu();
+    public static final IronTerragu IRON_TERRAGU = new IronTerragu();
+    public static final GoldTerragu GOLD_TERRAGU = new GoldTerragu();
+    public static final DiamondTerragu DIAMOND_TERRAGU = new DiamondTerragu();
+    public static final CrystalTerragu CRYSTAL_TERRAGU = new CrystalTerragu();
+
     public static final CrystalAxe CRYSTAL_AXE = new CrystalAxe();
     public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
     public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
     public static final CrystalShovel CRYSTAL_SHOVEL = new CrystalShovel();
+
     public static final FocusTeleporter FOCUS_TELEPORTER = new FocusTeleporter();
     public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
     public static final Luminositor LUMINOSITOR = new Luminositor();
