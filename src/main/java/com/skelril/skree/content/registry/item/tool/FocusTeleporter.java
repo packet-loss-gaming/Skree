@@ -54,7 +54,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 "BBB",
                 'A', new ItemStack(CustomItemTypes.RED_SHARD),
                 'B', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'c', new ItemStack(CustomItemTypes.ENDER_FOCUS)
+                'C', new ItemStack(CustomItemTypes.ENDER_FOCUS)
         );
     }
 
