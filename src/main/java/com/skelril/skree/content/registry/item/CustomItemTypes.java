@@ -13,10 +13,7 @@ import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.*;
-import com.skelril.skree.content.registry.item.tool.HymnOfSummation;
-import com.skelril.skree.content.registry.item.tool.Luminositor;
-import com.skelril.skree.content.registry.item.tool.ScrollOfSummation;
-import com.skelril.skree.content.registry.item.tool.SkullOfTheFallen;
+import com.skelril.skree.content.registry.item.tool.*;
 import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
 import com.skelril.skree.content.registry.item.tool.hoe.CrystalHoe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
@@ -52,6 +49,7 @@ public class CustomItemTypes {
     public static final SeaCrystal SEA_CRYSTAL = new SeaCrystal();
 
     /* Resources */
+    public static final EnderFocus ENDER_FOCUS = new EnderFocus();
     public static final RedShard RED_SHARD = new RedShard();
     public static final FairyDust FAIRY_DUST = new FairyDust();
 
@@ -77,6 +75,7 @@ public class CustomItemTypes {
     public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
     public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
     public static final CrystalShovel CRYSTAL_SHOVEL = new CrystalShovel();
+    public static final FocusTeleporter FOCUS_TELEPORTER = new FocusTeleporter();
     public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
     public static final Luminositor LUMINOSITOR = new Luminositor();
     public static final ScrollOfSummation SCROLL_OF_SUMMATION = new ScrollOfSummation();
