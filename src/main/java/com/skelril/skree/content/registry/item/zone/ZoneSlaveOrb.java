@@ -88,14 +88,14 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optZoneName = getZone((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+        Optional<String> optZoneName = getZone(stack);
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
         }
 
         // If there's an invalid item stack don't crash the client
         try {
-            tooltip.add("Group owner: " + getGroupOwnerName((org.spongepowered.api.item.inventory.ItemStack) (Object) stack));
+            tooltip.add("Group owner: " + getGroupOwnerName(stack));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

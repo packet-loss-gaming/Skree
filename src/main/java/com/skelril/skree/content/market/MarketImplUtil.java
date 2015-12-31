@@ -23,6 +23,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class MarketImplUtil {
     public static String format(BigDecimal decimal) {
         DecimalFormat df = new DecimalFormat("#,###.##");
@@ -30,10 +32,10 @@ public class MarketImplUtil {
     }
 
     public static BigDecimal getMoney(Player player) {
-        EntityPlayer playerEnt = (EntityPlayer) player;
+        EntityPlayer playerEnt = tf(player);
         BigInteger totalValue = BigInteger.ZERO;
         for (net.minecraft.item.ItemStack stack : playerEnt.inventory.mainInventory) {
-            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) stack));
+            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(stack)));
             if (value.isPresent()) {
                 totalValue = totalValue.add(value.get());
             }
@@ -48,7 +50,7 @@ public class MarketImplUtil {
     }
 
     public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, Optional<ItemStack> filter) {
-        EntityPlayer playerEnt = (EntityPlayer) player;
+        EntityPlayer playerEnt = tf(player);
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         List<Integer> ints = new ArrayList<>();
@@ -78,12 +80,12 @@ public class MarketImplUtil {
             }
 
             if (filter.isPresent()) {
-                if (!ItemComparisonUtil.isSimilar(filter.get(), (ItemStack) (Object) stack)) {
+                if (!ItemComparisonUtil.isSimilar(filter.get(), tf(stack))) {
                     continue;
                 }
             }
 
-            Optional<BigDecimal> optPrice = service.getPrice((ItemStack) (Object) stack);
+            Optional<BigDecimal> optPrice = service.getPrice(tf(stack));
             if (optPrice.isPresent()) {
                 double percentageSale = 1;
                 if (stack.isItemStackDamageable()) {
@@ -102,18 +104,18 @@ public class MarketImplUtil {
     }
 
     public static List<Clause<ItemStack, Integer>> removeAtPos(Player player, List<Integer> ints) {
-        EntityPlayer playerEnt = (EntityPlayer) player;
+        EntityPlayer playerEnt = tf(player);
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
         for (int i : ints) {
-            transactions.add(new Clause<>((ItemStack) (Object) mainInv[i], -(mainInv[i].stackSize)));
+            transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
             mainInv[i] = null;
         }
         return transactions;
     }
 
     public static boolean setBalanceTo(Player player, BigDecimal decimal, Cause cause) {
-        EntityPlayer playerEnt = (EntityPlayer) player;
+        EntityPlayer playerEnt = tf(player);
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
 
         Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.toBigInteger());
@@ -121,13 +123,13 @@ public class MarketImplUtil {
 
         // Loop through replacing empty slots and the old coffers with the new balance
         for (int i = 0; i < mainInv.length; ++i) {
-            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList((ItemStack) (Object) mainInv[i]));
+            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(mainInv[i])));
             if (value.isPresent()) {
                 mainInv[i] = null;
             }
 
             if (mainInv[i] == null && resultIt.hasNext()) {
-                mainInv[i] = (net.minecraft.item.ItemStack) (Object) resultIt.next();
+                mainInv[i] = tf(resultIt.next());
                 resultIt.remove();
             }
         }
@@ -138,7 +140,7 @@ public class MarketImplUtil {
     }
 
     public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
-        EntityPlayer playerEnt = (EntityPlayer) player;
+        EntityPlayer playerEnt = tf(player);
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
 
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
@@ -152,7 +154,7 @@ public class MarketImplUtil {
                 }
 
                 ItemStack next = stackIt.next();
-                mainInv[i] = (net.minecraft.item.ItemStack) (Object) next;
+                mainInv[i] = tf(next);
                 transactions.add(new Clause<>(next, next.getQuantity()));
 
                 stackIt.remove();

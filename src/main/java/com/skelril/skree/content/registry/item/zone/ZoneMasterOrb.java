@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.*;
 
 public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craftable {
@@ -90,7 +91,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
             Player player = optPlayer.get();
             Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
             if (optItemStack.isPresent()) {
-                ItemStack itemStack = (ItemStack) (Object) optItemStack.get();
+                ItemStack itemStack = tf(optItemStack.get());
                 if (isZoneMasterItem(itemStack)) {
                     if (isAttuned(itemStack)) {
                         Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
@@ -99,7 +100,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             List<Player> group = new ArrayList<>();
                             group.add(player);
                             for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
-                                ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
+                                ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
                                 for (ItemStack aStack : itemStacks) {
                                     if (!hasSameZoneID(itemStack, aStack)) {
                                         continue;
@@ -124,7 +125,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                         }
                     } else {
                         setMasterToZone(itemStack, "Shnuggles Prime");
-                        player.setItemInHand((org.spongepowered.api.item.inventory.ItemStack) (Object) itemStack);
+                        player.setItemInHand(tf(itemStack));
                     }
                     event.setCancelled(true);
                 }
@@ -149,7 +150,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                         );
                     } else {
                         org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
-                        ((EntityPlayer) targetPlayer).inventory.addItemStackToInventory((ItemStack) (Object) newStack);
+                        tf(targetPlayer).inventory.addItemStackToInventory(tf(newStack));
                     }
                     event.setCancelled(true);
                 }
@@ -173,7 +174,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optZoneName = getZone((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+        Optional<String> optZoneName = getZone(tf(stack));
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
             Optional<Integer> maxPlayerCount = getMaxGroupSize(stack);

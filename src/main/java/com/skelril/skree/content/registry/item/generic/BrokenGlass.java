@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class BrokenGlass extends CustomItem implements CookedItem, EventAwareContent {
 
     @Override
@@ -66,9 +68,7 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
         Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
         if (optOrigin.isPresent()) {
             new ItemDropper(optOrigin.get()).dropItems(
-                    Collections.singleton(
-                            (org.spongepowered.api.item.inventory.ItemStack) (Object) new ItemStack(this, 1, variant)
-                    ),
+                    Collections.singleton(tf(new ItemStack(this, 1, variant))),
                     cause
             );
         }

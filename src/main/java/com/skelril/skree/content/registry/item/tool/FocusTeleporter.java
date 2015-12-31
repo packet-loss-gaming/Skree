@@ -28,6 +28,8 @@ import org.spongepowered.api.world.World;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class FocusTeleporter extends CustomItem implements Craftable, EventAwareContent {
 
     @Override
@@ -91,10 +93,10 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
                 Optional<Location<World>> optDestination = getDestination(held);
-                InventoryPlayer playerInv = ((EntityPlayer) player).inventory;
+                InventoryPlayer playerInv = tf(player).inventory;
                 if (optDestination.isPresent() && playerInv.hasItem(CustomItemTypes.ENDER_FOCUS)) {
                     playerInv.consumeInventoryItem(CustomItemTypes.ENDER_FOCUS);
-                    ((EntityPlayer) player).inventoryContainer.detectAndSendChanges();
+                    tf(player).inventoryContainer.detectAndSendChanges();
                     player.setLocation(optDestination.get());
                 }
             }
@@ -102,7 +104,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     private void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
-        setDestination((ItemStack) (Object) stack, target);
+        setDestination(tf(stack), target);
     }
 
     private void setDestination(ItemStack stack, Location<World> target) {
@@ -122,7 +124,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     private Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getDestination((ItemStack) (Object) stack);
+        return getDestination(tf(stack));
     }
 
     private Optional<Location<World>> getDestination(ItemStack stack) {
@@ -143,7 +145,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     private Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getClientDestination((ItemStack) (Object) stack);
+        return getClientDestination(tf(stack));
     }
 
     private Optional<String> getClientDestination(ItemStack stack) {

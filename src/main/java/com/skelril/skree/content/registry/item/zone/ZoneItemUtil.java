@@ -20,10 +20,12 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class ZoneItemUtil {
 
     public static void purgeZoneItems(Player player, Optional<ItemStack> activating) {
-        purgeZoneItems((EntityPlayer) player, activating);
+        purgeZoneItems(tf(player), activating);
     }
 
     public static void purgeZoneItems(EntityPlayer player, Optional<ItemStack> activating) {
@@ -43,7 +45,7 @@ public class ZoneItemUtil {
     }
 
     public static boolean notifyGroupOwner(org.spongepowered.api.item.inventory.ItemStack stack, Player holder, boolean joined) {
-        return notifyGroupOwner((ItemStack) (Object) stack, holder, joined);
+        return notifyGroupOwner(tf(stack), holder, joined);
     }
 
     public static boolean notifyGroupOwner(ItemStack stack, Player holder, boolean joined) {
@@ -64,7 +66,7 @@ public class ZoneItemUtil {
     }
 
     private static void incrementCount(ItemStack slaveStack, Player player) {
-        ItemStack[] itemStacks = ((EntityPlayer) player).inventory.mainInventory;
+        ItemStack[] itemStacks = tf(player).inventory.mainInventory;
         for (ItemStack itemStack : itemStacks) {
             if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
                 incrementCount(itemStack);
@@ -73,7 +75,7 @@ public class ZoneItemUtil {
     }
 
     private static void decrementCount(ItemStack slaveStack, Player player) {
-        ItemStack[] itemStacks = ((EntityPlayer) player).inventory.mainInventory;
+        ItemStack[] itemStacks = tf(player).inventory.mainInventory;
         for (ItemStack itemStack : itemStacks) {
             if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
                 decrementCount(itemStack);
@@ -94,7 +96,7 @@ public class ZoneItemUtil {
     public static void rescindGroupInvite(ItemStack stack) {
         Optional<String> zone = getZone(stack);
         for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
-            ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
+            ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
             for (int i = 0; i < itemStacks.length; ++i) {
                 if (!hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
                     if (!zone.isPresent()) {
@@ -108,12 +110,12 @@ public class ZoneItemUtil {
     }
 
     public static boolean playerAlreadyHasInvite(org.spongepowered.api.item.inventory.ItemStack stack, Player target) {
-        return playerAlreadyHasInvite((ItemStack) (Object) stack, target);
+        return playerAlreadyHasInvite(tf(stack), target);
     }
 
     public static boolean playerAlreadyHasInvite(ItemStack stack, Player target) {
         UUID zoneID = getZoneID(stack).orElseThrow(() -> new IllegalArgumentException("Illegal zone ItemStack"));
-        ItemStack[] inv = ((EntityPlayer) target).inventory.mainInventory;
+        ItemStack[] inv = tf(target).inventory.mainInventory;
         for (ItemStack aStack : inv) {
             Optional<UUID> optZoneID = getZoneID(aStack);
             if (optZoneID.isPresent()) {
@@ -126,7 +128,7 @@ public class ZoneItemUtil {
     }
 
     public static Optional<String> getZone(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getZone((ItemStack) (Object) stack);
+        return getZone(tf(stack));
     }
 
     public static Optional<String> getZone(ItemStack stack) {
@@ -138,7 +140,7 @@ public class ZoneItemUtil {
     }
 
     public static Optional<UUID> getZoneID(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getZoneID((ItemStack) (Object) stack);
+        return getZoneID(tf(stack));
     }
 
     public static Optional<UUID> getZoneID(ItemStack stack) {
@@ -154,7 +156,7 @@ public class ZoneItemUtil {
     }
 
     public static boolean isZoneItem(ItemStack stack) {
-        return isZoneItem((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+        return isZoneItem(tf(stack));
     }
 
     public static boolean isZoneMasterItem(org.spongepowered.api.item.inventory.ItemStack stack) {
@@ -167,7 +169,7 @@ public class ZoneItemUtil {
     }
 
     public static boolean isZoneMasterItem(ItemStack stack) {
-        return isZoneMasterItem((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+        return isZoneMasterItem(tf(stack));
     }
 
     public static boolean isZoneSlaveItem(org.spongepowered.api.item.inventory.ItemStack stack) {
@@ -180,11 +182,11 @@ public class ZoneItemUtil {
     }
 
     public static boolean isZoneSlaveItem(ItemStack stack) {
-        return isZoneSlaveItem((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+        return isZoneSlaveItem(tf(stack));
     }
 
     public static boolean isAttuned(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return isAttuned((ItemStack) (Object) stack);
+        return isAttuned(tf(stack));
     }
 
     public static boolean isAttuned(ItemStack stack) {
@@ -192,7 +194,7 @@ public class ZoneItemUtil {
     }
 
     public static void attune(org.spongepowered.api.item.inventory.ItemStack stack) {
-        attune((ItemStack) (Object) stack);
+        attune(tf(stack));
     }
 
     public static void attune(ItemStack stack) {
@@ -202,7 +204,7 @@ public class ZoneItemUtil {
     }
 
     public static int getGroupSize(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getGroupSize((ItemStack) (Object) stack);
+        return getGroupSize(tf(stack));
     }
 
     public static int getGroupSize(ItemStack stack) {
@@ -214,7 +216,7 @@ public class ZoneItemUtil {
     }
 
     public static Optional<Integer> getMaxGroupSize(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getMaxGroupSize((ItemStack) (Object) stack);
+        return getMaxGroupSize(tf(stack));
     }
 
     public static Optional<Integer> getMaxGroupSize(ItemStack stack) {
@@ -227,7 +229,7 @@ public class ZoneItemUtil {
     }
 
     public static Optional<Player> getGroupOwner(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getGroupOwner((ItemStack) (Object) stack);
+        return getGroupOwner(tf(stack));
     }
 
     public static Optional<Player> getGroupOwner(ItemStack stack) {
@@ -240,7 +242,7 @@ public class ZoneItemUtil {
     }
 
     public static String getGroupOwnerName(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getGroupOwnerName((ItemStack) (Object) stack);
+        return getGroupOwnerName(tf(stack));
     }
 
     public static String getGroupOwnerName(ItemStack stack) {
@@ -252,7 +254,7 @@ public class ZoneItemUtil {
     }
 
     public static void setMasterToZone(org.spongepowered.api.item.inventory.ItemStack stack, String zone) {
-        setMasterToZone((ItemStack) (Object) stack, zone);
+        setMasterToZone(tf(stack), zone);
     }
 
     public static void setMasterToZone(ItemStack stack, String zone) {
@@ -280,7 +282,7 @@ public class ZoneItemUtil {
     }
 
     public static boolean hasSameZoneID(org.spongepowered.api.item.inventory.ItemStack stackA, org.spongepowered.api.item.inventory.ItemStack stackB) {
-        return hasSameZoneID((ItemStack) (Object) stackA, (ItemStack) (Object) stackB);
+        return hasSameZoneID(tf(stackA), tf(stackB));
     }
 
     public static boolean hasSameZoneID(ItemStack stackA, ItemStack stackB) {
@@ -313,11 +315,11 @@ public class ZoneItemUtil {
         tag.setString("zone_id", getZoneID(inStack).get().toString());
         tag.setString("owner_name", zoneOwner.getName());
         tag.setString("owner", zoneOwner.getUniqueId().toString());
-        return (org.spongepowered.api.item.inventory.ItemStack) (Object) stack;
+        return tf(stack);
     }
 
     public static org.spongepowered.api.item.inventory.ItemStack createForMaster(ItemStack stack, Player player) {
-        return createForMaster((org.spongepowered.api.item.inventory.ItemStack) (Object) stack, player);
+        return createForMaster(tf(stack), player);
     }
 
 }

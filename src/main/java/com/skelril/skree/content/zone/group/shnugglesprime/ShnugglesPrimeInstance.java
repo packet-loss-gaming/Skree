@@ -27,7 +27,6 @@ import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -60,6 +59,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.SPECTATOR;
 
@@ -315,12 +315,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 sendAttackBroadcast("Taste my wrath!", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
-                    ((EntityPlayer) player).addVelocity(
+                    tf(player).addVelocity(
                             random.nextDouble() * 3 - 1.5,
                             random.nextDouble() * 1 + 1.3,
                             random.nextDouble() * 3 - 1.5
                     );
-                    ((EntityPlayer) player).setFire(3); // This is in seconds for some reason
+                    tf(player).setFire(3); // This is in seconds for some reason
                 }
                 break;
             case CORRUPTION:
@@ -359,7 +359,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     if (!isBossSpawned()) return;
                     for (Player player : getPlayers(PARTICIPANT)) {
                         // TODO Convert to Sponge
-                        if (((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) player)) {
+                        if (((EntityGiantZombie) boss).canEntityBeSeen(tf(player))) {
                             player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
 
@@ -372,7 +372,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
                             player.damage(100, source, Cause.of(boss));
                             // TODO convert to Sponge
-                            ((EntityPlayer) player).addVelocity(
+                            tf(player).addVelocity(
                                     random.nextDouble() * 1.7 - 1.5,
                                     random.nextDouble() * 2,
                                     random.nextDouble() * 1.7 - 1.5
@@ -406,7 +406,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 sendAttackBroadcast("Fire is your friend...", AttackSeverity.NORMAL);
                 for (Player player : contained) {
                     // TODO convert to Sponge
-                    ((EntityPlayer) player).setFire(30); // This is in seconds for some reason
+                    tf(player).setFire(30); // This is in seconds for some reason
                 }
                 break;
             case BASK_IN_MY_GLORY:
@@ -419,7 +419,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         boolean baskInGlory = false;
                         for (Player player : getContained(Player.class)) {
                             // TODO Convert to Sponge
-                            if (((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) player)) {
+                            if (((EntityGiantZombie) boss).canEntityBeSeen(tf(player))) {
                                 player.sendMessage(Texts.of(TextColors.DARK_RED, "You!"));
                                 baskInGlory = true;
                             }
@@ -464,7 +464,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     Collection<Player> newContained = getContained(Player.class);
                     // ChatUtil.sendWarning(newContained, "May those who appose me die a death like no other...");
                     // TODO convert to Sponge
-                    newContained.stream().filter(e -> ((EntityGiantZombie) boss).canEntityBeSeen((EntityPlayer) e)).forEach(player -> {
+                    newContained.stream().filter(e -> ((EntityGiantZombie) boss).canEntityBeSeen(tf(e))).forEach(player -> {
                         // ChatUtil.sendWarning(newContained, "Perish " + player.getName() + "!");
                         // TODO Doom Prayer was used previously
                     });

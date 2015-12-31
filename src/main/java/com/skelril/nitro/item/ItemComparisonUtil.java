@@ -8,13 +8,14 @@ package com.skelril.nitro.item;
 
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static net.minecraft.item.ItemStack.areItemStackTagsEqual;
 import static net.minecraft.item.ItemStack.areItemsEqual;
 
 public class ItemComparisonUtil {
     public static boolean isSimilar(ItemStack a, ItemStack b) {
-        net.minecraft.item.ItemStack stackA = (net.minecraft.item.ItemStack) (Object) a;
-        net.minecraft.item.ItemStack stackB = (net.minecraft.item.ItemStack) (Object) b;
+        net.minecraft.item.ItemStack stackA = tf(a);
+        net.minecraft.item.ItemStack stackB = tf(b);
 
         if (stackA.isItemStackDamageable()) {
             return a.getItem() == b.getItem() && areItemStackTagsEqual(stackA, stackB);

@@ -25,6 +25,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class GraveStone extends BlockContainer implements ICustomBlock {
     public static final PropertyDirection FACING_PROP = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -125,10 +128,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
         if (tileEntity instanceof IInventory) {
             remnants = Math.min(items.size(), ((IInventory) tileEntity).getSizeInventory());
             for (int i = 0; i < remnants; ++i) {
-                ((IInventory) tileEntity).setInventorySlotContents(
-                        i,
-                        (net.minecraft.item.ItemStack) (Object) items.get(i)
-                );
+                ((IInventory) tileEntity).setInventorySlotContents(i, tf(items.get(i)));
             }
         }
 
@@ -140,22 +140,17 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
         World world = (World) pos.getExtent();
         for (ItemStack stack : excess) {
             world.spawnEntityInWorld(
-                    new EntityItem(
-                            world,
-                            pos.getX(),
-                            pos.getY(),
-                            pos.getZ(),
-                            (net.minecraft.item.ItemStack) (Object) stack
-                    )
+                    new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), tf(stack))
             );
         }
     }
 
     public void createGraveFromDeath(DestructEntityEvent.Death event) {
         Entity target = event.getTargetEntity();
-        if (target instanceof EntityPlayer) {
-            net.minecraft.item.ItemStack[] mainInv = ((EntityPlayer) target).inventory.mainInventory;
-            net.minecraft.item.ItemStack[] armInv = ((EntityPlayer) target).inventory.armorInventory;
+        if (target instanceof Player) {
+            EntityPlayer player = tf((Player) target);
+            net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
+            net.minecraft.item.ItemStack[] armInv = player.inventory.armorInventory;
 
             List<ItemStack> items = new ArrayList<>();
 
@@ -164,7 +159,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
             items.removeAll(Collections.singleton(null));
 
-            ((EntityPlayer) target).inventory.clear();
+            player.inventory.clear();
 
             Task.builder().execute(() -> {
                 createGraveDropExcess(items, target.getLocation());

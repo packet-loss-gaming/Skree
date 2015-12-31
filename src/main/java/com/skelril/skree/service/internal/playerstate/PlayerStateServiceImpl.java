@@ -8,7 +8,6 @@ package com.skelril.skree.service.internal.playerstate;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PlayerStateService;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,6 +19,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class PlayerStateServiceImpl implements PlayerStateService {
 
@@ -33,7 +34,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
     @Override
     public void save(Player player, String saveName) {
         NBTTagList playerInv = new NBTTagList();
-        ((EntityPlayer) player).inventory.writeToNBT(playerInv);
+        tf(player).inventory.writeToNBT(playerInv);
 
         try {
             NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
@@ -58,7 +59,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
 
             NBTBase tag = compound.getTag(saveName);
             if (tag instanceof NBTTagList) {
-                ((EntityPlayer) player).inventory.readFromNBT((NBTTagList) tag);
+                tf(player).inventory.readFromNBT((NBTTagList) tag);
             }
         } catch (IOException e) {
             e.printStackTrace();

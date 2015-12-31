@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public abstract class CustomTerragu extends CustomPickaxe implements ICustomPickaxe, EventAwareContent {
     @Override
     public String __getToolClass() {
@@ -78,7 +80,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
             Optional<org.spongepowered.api.item.inventory.ItemStack> optStack = player.getItemInHand();
             if (optStack.isPresent() && optClickedDir.isPresent()) {
                 if (optStack.get().getItem() == this) {
-                    ItemStack stack = (ItemStack) (Object) optStack.get();
+                    ItemStack stack = tf(optStack.get());
                     for (Transaction<BlockSnapshot> snapshot : event.getTransactions()) {
                         if (!snapshot.getOriginal().getLocation().isPresent()) {
                             return;
@@ -86,8 +88,8 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
 
                         int maxDist = getMaxEditDist(stack);
                         int dmg = destroyLine(optClickedDir.get(), maxDist - 1, snapshot.getOriginal());
-                        stack.damageItem(dmg, (EntityPlayer) player);
-                        player.setItemInHand((org.spongepowered.api.item.inventory.ItemStack) (Object) stack);
+                        stack.damageItem(dmg, tf(player));
+                        player.setItemInHand(tf(stack));
                     }
                 }
             }
@@ -95,7 +97,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
     }
 
     protected int getMaxEditDist(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getMaxEditDist((ItemStack) (Object) stack);
+        return getMaxEditDist(tf(stack));
     }
 
     protected int getMaxEditDist(ItemStack stack) {
@@ -105,7 +107,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
     }
 
     protected int getSetEditDist(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getSetEditDist((ItemStack) (Object) stack);
+        return getSetEditDist(tf(stack));
     }
 
     protected int getSetEditDist(ItemStack stack) {
@@ -118,7 +120,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
     }
 
     protected void setMaxEditDist(org.spongepowered.api.item.inventory.ItemStack stack, int dist) {
-        setMaxEditDist((ItemStack) (Object) stack, dist);
+        setMaxEditDist(tf(stack), dist);
     }
 
     protected void setMaxEditDist(ItemStack stack, int dist) {

@@ -23,6 +23,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class RedFeather extends CustomItem implements ICustomItem, DegradableItem, EventAwareContent {
 
     @Override
@@ -48,8 +50,8 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     @Listener(order = Order.LATE)
     public void onEntityDamage(DamageEntityEvent event) {
         Entity target = event.getTargetEntity();
-        if (target instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) target;
+        if (target instanceof Player) {
+            EntityPlayer player = tf((Player) target);
             Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
             if (!optFeatherDetail.isPresent()) {
                 return;
@@ -68,12 +70,12 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
 
             redQ = (int) ((blockable - blocked) / k);
             updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
-            player.inventory.mainInventory[featherDetail.getKey()] = (net.minecraft.item.ItemStack) (Object) featherDetail.getValue().getKey();
+            player.inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
         }
     }
 
     public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {
-        return getHighestPoweredFeather((EntityPlayer) player);
+        return getHighestPoweredFeather(tf(player));
     }
 
     public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(EntityPlayer player) {
@@ -84,7 +86,7 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
         Clause<Integer, Long> details = new Clause<>(0, 0L);
 
         for (int i = 0; i < itemStacks.length; ++i) {
-            ItemStack curStack = (ItemStack) (Object) itemStacks[i];
+            ItemStack curStack = tf(itemStacks[i]);
             Clause<Integer, Long> powerCooldown = getFeatherPower(curStack);
             if (powerCooldown.getValue() > System.currentTimeMillis()) {
                 return Optional.empty();
@@ -119,7 +121,7 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     }
 
     public Clause<Integer, Long> getFeatherPower(ItemStack stack) {
-        return getFeatherPower((net.minecraft.item.ItemStack) (Object) stack);
+        return getFeatherPower(tf(stack));
     }
 
     public void updateFeatherPower(net.minecraft.item.ItemStack stack, int newPower, long coolDown) {
@@ -138,6 +140,6 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     }
 
     public void updateFeatherPower(ItemStack stack, int newPower, long coolDown) {
-        updateFeatherPower((net.minecraft.item.ItemStack) (Object) stack, newPower, coolDown);
+        updateFeatherPower(tf(stack), newPower, coolDown);
     }
 }

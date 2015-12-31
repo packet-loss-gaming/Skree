@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static org.spongepowered.api.command.args.GenericArguments.optional;
 import static org.spongepowered.api.command.args.GenericArguments.remainingJoinedStrings;
 
@@ -56,7 +57,7 @@ public class MarketLookupCommand implements CommandExecutor {
             if (held.isPresent()) {
                 optPrice = service.getPrice(held.get());
                 optAlias = service.getAlias(held.get());
-                net.minecraft.item.ItemStack stack = ((net.minecraft.item.ItemStack) (Object) held.get());
+                net.minecraft.item.ItemStack stack = tf(held.get());
                 if (stack.isItemStackDamageable()) {
                     percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
                 }
