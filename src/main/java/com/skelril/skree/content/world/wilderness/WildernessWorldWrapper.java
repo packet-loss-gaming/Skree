@@ -55,6 +55,7 @@ import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -301,8 +302,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
-
-        Entity entity = event.getCause().first(Entity.class).orElse(null);
+        Object srcObj = event.getCause().get(NamedCause.SOURCE).orElse(null);
+        if (!(srcObj instanceof Entity)) {
+            return;
+        }
 
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
         for (Transaction<BlockSnapshot> block : transactions) {
@@ -327,8 +330,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
-                if (entity instanceof ArmorEquipable) {
-                    Optional<ItemStack> held = ((ArmorEquipable) entity).getItemInHand();
+                if (srcObj instanceof ArmorEquipable) {
+                    Optional<ItemStack> held = ((ArmorEquipable) srcObj).getItemInHand();
                     if (held.isPresent()) {
                         ItemStack stack = held.get();
 
@@ -357,13 +360,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         if (optSilkTouch.isPresent()) {
                             silkTouch = true;
                         }
-                    } else if (entity instanceof Player) {
+                    } else if (srcObj instanceof Player) {
                         continue;
                     }
                 }
-
+                
                 addPool(loc, type, fortuneMod, silkTouch);
-            } else if (entity instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
+            } else if (srcObj instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
@@ -399,6 +402,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+
+        // Workaround for SpongeCommon#374
+        if (transactions.size() > 1) {
+            return;
+        }
+
         for (Transaction<BlockSnapshot> block : transactions) {
             Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
