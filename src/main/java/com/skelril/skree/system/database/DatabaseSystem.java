@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 
 import java.io.BufferedReader;
@@ -22,12 +22,12 @@ import java.nio.file.Path;
 public class DatabaseSystem {
 
     private Path getDatabaseFile() throws IOException {
-        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        ConfigManager service = Sponge.getGame().getConfigManager();
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         return path.resolve("database.json");
     }
 
-    public DatabaseSystem(SkreePlugin plugin, Game game) {
+    public DatabaseSystem() {
 
         try {
             Class.forName("org.mariadb.jdbc.Driver").newInstance();

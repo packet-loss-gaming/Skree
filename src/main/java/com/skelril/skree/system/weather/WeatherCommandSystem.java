@@ -8,15 +8,12 @@ package com.skelril.skree.system.weather;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.weather.WeatherCommand;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.Sponge;
 
 public class WeatherCommandSystem {
-    public WeatherCommandSystem(SkreePlugin plugin, Game game) {
-        CommandManager cmdDispatcher = game.getCommandManager();
-
-        cmdDispatcher.removeMapping(cmdDispatcher.get("weather").get());
-        cmdDispatcher.register(plugin, WeatherCommand.aquireSpec(game), "weather");
+    public WeatherCommandSystem() {
+        Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("weather").get());
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WeatherCommand.aquireSpec(), "weather");
     }
 }
 

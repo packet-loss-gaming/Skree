@@ -32,7 +32,7 @@ import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import org.apache.commons.lang3.Validate;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -84,21 +84,16 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
-    private SkreePlugin plugin;
-    private Game game;
-
     private DropTable dropTable;
 
     private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
-    public WildernessWorldWrapper(SkreePlugin plugin, Game game) {
-        this(plugin, game, new ArrayList<>());
+    public WildernessWorldWrapper() {
+        this(new ArrayList<>());
     }
 
-    public WildernessWorldWrapper(SkreePlugin plugin, Game game, Collection<World> worlds) {
+    public WildernessWorldWrapper(Collection<World> worlds) {
         super("Wilderness", worlds);
-        this.plugin = plugin;
-        this.game = game;
 
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
         dropTable = new MasterDropTable(
@@ -132,7 +127,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 )
         );
 
-        Task.builder().execute(this).interval(1, SECONDS).submit(plugin);
+        Task.builder().execute(this).interval(1, SECONDS).submit(SkreePlugin.inst());
     }
 
     @Listener
@@ -224,7 +219,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             return;
         }
 
-        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
         if (optService.isPresent()) {
             PvPService service = optService.get();
             if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
@@ -284,7 +279,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             int times = 1;
 
-            Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+            Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
             if (optService.isPresent()) {
                 ModifierService service = optService.get();
                 if (service.isActive(Modifiers.DOUBLE_WILD_DROPS)) {
@@ -364,7 +359,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         continue;
                     }
                 }
-                
+
                 addPool(loc, type, fortuneMod, silkTouch);
             } else if (srcObj instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
@@ -394,7 +389,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                             }
                         }
                     }
-                }).submit(plugin);
+                }).submit(SkreePlugin.inst());
             }
         }
     }
@@ -490,7 +485,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public int getOreMod(int level) {
         int modifier = Math.max(1, level * 3);
 
-        Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
             ModifierService service = optService.get();
             if (service.isActive(Modifiers.DOUBLE_WILD_ORES)) {
@@ -505,7 +500,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
             return Lists.newArrayList(newItemStack((ItemType) RED_SHARD));
         }
-        return DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
+        return DropRegistry.createDropsFor(blockType, hasSilkTouch);
     }
 
     private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
@@ -551,7 +546,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Task task = Task.builder().execute(runnable).delay(1, SECONDS).interval(
                 1,
                 SECONDS
-        ).submit(plugin);
+        ).submit(SkreePlugin.inst());
         runnable.setTask(task);
     }
 

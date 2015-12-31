@@ -9,7 +9,7 @@ package com.skelril.skree.content.market;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.content.market.MarketImplUtil.QueryMode;
 import com.skelril.skree.service.MarketService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -31,12 +31,6 @@ import static org.spongepowered.api.command.args.GenericArguments.none;
 
 public class MarketSellCommand implements CommandExecutor {
 
-    private Game game;
-
-    public MarketSellCommand(Game game) {
-        this.game = game;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -45,7 +39,7 @@ public class MarketSellCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<MarketService> optService = game.getServiceManager().provide(MarketService.class);
+        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
@@ -89,7 +83,7 @@ public class MarketSellCommand implements CommandExecutor {
         }
 
         BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
-        if (!MarketImplUtil.setBalanceTo(game, player, newBalance, Cause.of(this))) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(this))) {
             // TODO Auto reporting
             src.sendMessage(Texts.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
@@ -100,11 +94,11 @@ public class MarketSellCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Sell an item"))
                 .arguments(flags().flag("h").flag("a").flag("u").buildWith(none()))
-                .executor(new MarketSellCommand(game))
+                .executor(new MarketSellCommand())
                 .build();
     }
 }

@@ -13,7 +13,7 @@ import com.skelril.skree.content.modifier.ModifierNotifier;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.modifier.LazyMySQLModifierService;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.ProviderExistsException;
 
 public class ModifierSystem implements ServiceProvider<ModifierService> {
@@ -21,14 +21,14 @@ public class ModifierSystem implements ServiceProvider<ModifierService> {
     private ModifierService service;
 
     @Inject
-    public ModifierSystem(SkreePlugin plugin, Game game) {
+    public ModifierSystem() {
         service = new LazyMySQLModifierService();
 
         // Register the service
         try {
-            game.getEventManager().registerListeners(plugin, new ModifierNotifier());
-            game.getServiceManager().setProvider(plugin, ModifierService.class, service);
-            game.getCommandManager().register(plugin, ModExtendCommand.aquireSpec(game), "modextend");
+            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ModifierService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), ModExtendCommand.aquireSpec(), "modextend");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

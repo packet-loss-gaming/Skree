@@ -7,20 +7,19 @@
 package com.skelril.skree.content.market;
 
 import com.skelril.skree.content.market.admin.*;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
 
 public class MarketAdminCommand {
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Administrative commands for the market"))
                 .permission("skree.market.admin")
-                .child(MarketQuickAddCommand.aquireSpec(game), "quickadd")
-                .child(MarketAddAliasCommand.aquireSpec(game), "addalias")
-                .child(MarketSetPriceCommand.aquireSpec(game), "setprice")
-                .child(MarketSetPrimaryAliasCommand.aquireSpec(game), "setprimaryalias", "setpalias")
-                .child(MarketTrackItemCommand.aquireSpec(game), "track")
+                .child(MarketQuickAddCommand.aquireSpec(), "quickadd")
+                .child(MarketAddAliasCommand.aquireSpec(), "addalias")
+                .child(MarketSetPriceCommand.aquireSpec(), "setprice")
+                .child(MarketSetPrimaryAliasCommand.aquireSpec(), "setprimaryalias", "setpalias")
+                .child(MarketTrackItemCommand.aquireSpec(), "track")
                 .build();
     }
 }

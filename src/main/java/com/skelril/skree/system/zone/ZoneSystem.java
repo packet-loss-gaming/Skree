@@ -19,7 +19,7 @@ import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderExistsException;
@@ -36,26 +36,26 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
 
     private ZoneService service;
 
-    public ZoneSystem(SkreePlugin plugin, Game game) {
+    public ZoneSystem() {
         Task.builder().delay(3, TimeUnit.SECONDS).execute(
                 () -> {
                     System.out.println("Starting zone system...");
-                    initialize(plugin, game);
+                    initialize();
                 }
-        ).submit(plugin);
+        ).submit(SkreePlugin.inst());
     }
 
     private Path getWorkingDir() throws IOException {
-        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        ConfigManager service = Sponge.getGame().getConfigManager();
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         return Files.createDirectories(path.resolve("zones"));
     }
 
-    private void initialize(SkreePlugin plugin, Game game) {
+    private void initialize() {
         // TODO this is a very dumb way of doing this
-        Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
+        Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
         if (!optService.isPresent()) {
-            Task.builder().delayTicks(1).execute(() -> initialize(plugin, game)).submit(plugin);
+            Task.builder().delayTicks(1).execute(this::initialize).submit(SkreePlugin.inst());
             return;
         }
 
@@ -75,10 +75,10 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
 
             service.registerManager(new ShnugglesPrimeManager());
 
-            game.getCommandManager().register(plugin, ZoneMeCommand.aquireSpec(service), "zoneme");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
 
             try {
-                game.getServiceManager().setProvider(plugin, ZoneService.class, service);
+                Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
             } catch (ProviderExistsException e) {
                 e.printStackTrace();
             }

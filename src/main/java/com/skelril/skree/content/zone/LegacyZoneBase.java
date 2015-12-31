@@ -7,10 +7,10 @@
 package com.skelril.skree.content.zone;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
@@ -42,7 +42,7 @@ public abstract class LegacyZoneBase implements Zone {
 
     @Override
     public Collection<Player> getPlayers(PlayerClassifier classifier) {
-        return SkreePlugin.inst().getGame().getServer().getOnlinePlayers().stream().filter(this::contains).collect(Collectors.toList());
+        return Sponge.getServer().getOnlinePlayers().stream().filter(this::contains).collect(Collectors.toList());
     }
 
     public Collection<Entity> getContained() {

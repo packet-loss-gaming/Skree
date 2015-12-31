@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -23,7 +24,7 @@ import java.nio.file.Path;
 public class PlayerStateServiceImpl implements PlayerStateService {
 
     private Path getFile(Player player) throws IOException {
-        ConfigManager service = SkreePlugin.inst().getGame().getConfigManager();
+        ConfigManager service = Sponge.getGame().getConfigManager();
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         path = Files.createDirectories(path.resolve("profiles"));
         return path.resolve(player.getUniqueId() + ".dat");

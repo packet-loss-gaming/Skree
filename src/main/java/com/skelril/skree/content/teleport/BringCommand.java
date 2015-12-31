@@ -7,7 +7,6 @@
 package com.skelril.skree.content.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -28,11 +27,6 @@ import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.player;
 
 public class BringCommand implements CommandExecutor {
-    private final Game game;
-
-    public BringCommand(Game game) {
-        this.game = game;
-    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -66,7 +60,7 @@ public class BringCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Bring a player to your current location"))
                 .permission("skree.teleport.bring")
@@ -74,6 +68,6 @@ public class BringCommand implements CommandExecutor {
                         onlyOne(
                                 player(Texts.of("target"))
                         )
-                ).executor(new BringCommand(game)).build();
+                ).executor(new BringCommand()).build();
     }
 }

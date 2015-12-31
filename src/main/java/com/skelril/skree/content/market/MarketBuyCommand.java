@@ -9,7 +9,7 @@ package com.skelril.skree.content.market;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.MarketService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -33,12 +33,6 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class MarketBuyCommand implements CommandExecutor {
 
-    private Game game;
-
-    public MarketBuyCommand(Game game) {
-        this.game = game;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -47,7 +41,7 @@ public class MarketBuyCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<MarketService> optService = game.getServiceManager().provide(MarketService.class);
+        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
@@ -112,13 +106,13 @@ public class MarketBuyCommand implements CommandExecutor {
         }
 
         // Alright, all items have been found
-        if (!MarketImplUtil.setBalanceTo(game, player, newBalance, Cause.of(this))) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(this))) {
             // TODO Auto reporting
             src.sendMessage(Texts.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
         }
 
-        Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(game, player, itemStacks, Cause.of(this));
+        Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(player, itemStacks, Cause.of(this));
 
         if (!transactions.getKey()) {
             // TODO Auto reporting
@@ -137,11 +131,11 @@ public class MarketBuyCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Purchase an item"))
                 .arguments(flags().valueFlag(integer(Texts.of("amount")), "a").buildWith(remainingJoinedStrings(Texts.of("item"))))
-                .executor(new MarketBuyCommand(game))
+                .executor(new MarketBuyCommand())
                 .build();
     }
 }

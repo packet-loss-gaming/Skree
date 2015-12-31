@@ -7,7 +7,7 @@
 package com.skelril.skree.content.market.admin;
 
 import com.skelril.skree.service.MarketService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -23,12 +23,6 @@ import java.util.Optional;
 
 public class MarketTrackItemCommand implements CommandExecutor {
 
-    private Game game;
-
-    public MarketTrackItemCommand(Game game) {
-        this.game = game;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -37,7 +31,7 @@ public class MarketTrackItemCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<MarketService> optService = game.getServiceManager().provide(MarketService.class);
+        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
@@ -63,10 +57,10 @@ public class MarketTrackItemCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Introduce an item to the market"))
-                .executor(new MarketTrackItemCommand(game))
+                .executor(new MarketTrackItemCommand())
                 .build();
     }
 }

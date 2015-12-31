@@ -9,7 +9,7 @@ package com.skelril.skree.service.internal.projectilewatcher;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ProjectileWatcherService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
@@ -20,16 +20,9 @@ import org.spongepowered.api.world.Location;
 import java.util.*;
 
 public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, Runnable {
-    private final SkreePlugin plugin;
-    private final Game game;
 
     private Map<UUID, TrackedProjectileInfo> watched = new HashMap<>();
     private Optional<Task> task = Optional.empty();
-
-    public ProjectileWatcherServiceImpl(SkreePlugin plugin, Game game) {
-        this.plugin = plugin;
-        this.game = game;
-    }
 
     @Listener
     public void onProjectileLaunch(LaunchProjectileEvent event) {
@@ -46,7 +39,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
     public void track(Projectile projectile, Cause cause) {
         watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, cause));
         if (!task.isPresent()) {
-            task = Optional.of(Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(plugin));
+            task = Optional.of(Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(SkreePlugin.inst()));
         }
     }
 
@@ -62,7 +55,7 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
                 entry.updateLocation();
                 updated = true;
 
-                game.getEventManager().post(new ProjectileTickEvent(entry));
+                Sponge.getEventManager().post(new ProjectileTickEvent(entry));
             } else {
                 it.remove();
             }

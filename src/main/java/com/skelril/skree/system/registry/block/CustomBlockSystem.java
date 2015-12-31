@@ -10,7 +10,6 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.nitro.selector.GameAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.block.Block;
@@ -19,20 +18,12 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class CustomBlockSystem {
-
-    private final SkreePlugin plugin;
-    private final Game game;
-
-    public CustomBlockSystem(SkreePlugin plugin, Game game) {
-        this.plugin = plugin;
-        this.game = game;
-    }
 
     public void preInit() {
         try {
@@ -82,11 +73,7 @@ public class CustomBlockSystem {
 
             // Add selective hooks
             if (block instanceof EventAwareContent) {
-                game.getEventManager().registerListeners(plugin, block);
-            }
-
-            if (block instanceof GameAwareContent) {
-                ((GameAwareContent) block).supplyGame(game);
+                Sponge.getEventManager().registerListeners(SkreePlugin.inst(), block);
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");
@@ -112,7 +99,7 @@ public class CustomBlockSystem {
     @SuppressWarnings("unused")
     private void render(Object block) {
         if (block instanceof Block && block instanceof ICustomBlock) {
-            if (game.getPlatform().getExecutionType().isClient()) {
+            if (Sponge.getPlatform().getExecutionType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
                 renderItem.getItemModelMesher().register(

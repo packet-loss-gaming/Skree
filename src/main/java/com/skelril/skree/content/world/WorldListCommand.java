@@ -9,7 +9,7 @@ package com.skelril.skree.content.world;
 
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -26,18 +26,12 @@ import java.util.Optional;
 
 public class WorldListCommand implements CommandExecutor {
 
-    private Game game;
-
-    public WorldListCommand(Game game) {
-        this.game = game;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         src.sendMessage(Texts.of(TextColors.GOLD, "Available worlds (click to teleport):"));
 
-        Optional<WorldService> service = game.getServiceManager().provide(WorldService.class);
+        Optional<WorldService> service = Sponge.getServiceManager().provide(WorldService.class);
 
         for (WorldEffectWrapper wrapper : service.get().getEffectWrappers()) {
             String worldType = wrapper.getName();
@@ -54,10 +48,10 @@ public class WorldListCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
             .description(Texts.of("List available worlds"))
             .permission("skree.world")
-            .executor(new WorldListCommand(game)).build();
+            .executor(new WorldListCommand()).build();
     }
 }

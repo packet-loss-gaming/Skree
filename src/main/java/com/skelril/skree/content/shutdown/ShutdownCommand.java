@@ -8,6 +8,7 @@ package com.skelril.skree.content.shutdown;
 
 
 import com.skelril.skree.service.ShutdownService;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -15,6 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
@@ -22,14 +24,16 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ShutdownCommand implements CommandExecutor {
 
-    private ShutdownService service;
-
-    public ShutdownCommand(ShutdownService service) {
-        this.service = service;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        Optional<ShutdownService> optService = Sponge.getServiceManager().provide(ShutdownService.class);
+        if (!optService.isPresent()) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "The shutdown service is not currently running."));
+            return CommandResult.empty();
+        }
+
+        ShutdownService service = optService.get();
+
         Integer seconds = args.<Integer>getOne("seconds").get();
         Optional<String> message = args.<String>getOne("message");
 
@@ -52,7 +56,7 @@ public class ShutdownCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(ShutdownService service) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Shut the server off"))
                 .permission("skree.shutdown")
@@ -63,6 +67,6 @@ public class ShutdownCommand implements CommandExecutor {
                                         optional(remainingJoinedStrings(Texts.of("message")))
                                 )
                         )
-                ).executor(new ShutdownCommand(service)).build();
+                ).executor(new ShutdownCommand()).build();
     }
 }

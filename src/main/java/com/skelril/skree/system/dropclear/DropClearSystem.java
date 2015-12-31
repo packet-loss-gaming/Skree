@@ -11,7 +11,7 @@ import com.skelril.skree.content.dropclear.DropClearCommand;
 import com.skelril.skree.service.DropClearService;
 import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderExistsException;
 
@@ -19,21 +19,21 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
 
     private DropClearService service;
 
-    public DropClearSystem(SkreePlugin plugin, Game game) {
-        service = new DropClearServiceImpl(plugin, game, 1000, 3);
+    public DropClearSystem() {
+        service = new DropClearServiceImpl(1000, 3);
 
         // Register the service & command
         try {
-            game.getServiceManager().setProvider(plugin, DropClearService.class, service);
-            game.getCommandManager().register(plugin, DropClearCommand.aquireSpec(game, service, 120), "dropclear", "dc");
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;
         }
 
         Task.builder().execute(
-                () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
-        ).intervalTicks(10).submit(plugin);
+                () -> Sponge.getServer().getWorlds().stream().forEach(service::checkedCleanup)
+        ).intervalTicks(10).submit(SkreePlugin.inst());
     }
 
     @Override

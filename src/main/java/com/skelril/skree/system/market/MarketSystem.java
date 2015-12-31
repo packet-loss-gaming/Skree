@@ -13,21 +13,21 @@ import com.skelril.skree.content.modifier.ModifierNotifier;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.internal.market.MarketServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.ProviderExistsException;
 
 public class MarketSystem implements ServiceProvider<MarketService> {
     private MarketService service;
 
     @Inject
-    public MarketSystem(SkreePlugin plugin, Game game) {
+    public MarketSystem() {
         service = new MarketServiceImpl();
 
         // Register the service
         try {
-            game.getEventManager().registerListeners(plugin, new ModifierNotifier());
-            game.getServiceManager().setProvider(plugin, MarketService.class, service);
-            game.getCommandManager().register(plugin, MarketCommand.aquireSpec(game), "market", "mk");
+            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

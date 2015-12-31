@@ -6,9 +6,9 @@
 
 package com.skelril.skree.content.pvp;
 
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.pvp.PvPState;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -39,7 +39,7 @@ public class PvPCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
         if (!optService.isPresent()) {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "The PvP service is not currently running."));
             return CommandResult.empty();

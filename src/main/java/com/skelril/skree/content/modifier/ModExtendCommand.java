@@ -9,7 +9,7 @@ package com.skelril.skree.content.modifier;
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.skree.service.ModifierService;
 import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -29,24 +29,19 @@ import java.util.concurrent.TimeUnit;
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ModExtendCommand implements CommandExecutor {
-    private Game game;
-
-    public ModExtendCommand(Game game) {
-        this.game = game;
-    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (!optService.isPresent()) {
             src.sendMessage(Texts.of(TextColors.DARK_RED, "Modifier service not found."));
             return CommandResult.empty();
         }
+        ModifierService service = optService.get();
 
         String modifier = args.<String>getOne("modifier").get();
         int minutes = args.<Integer>getOne("minutes").get();
 
-        ModifierService service = optService.get();
         boolean wasActive = service.isActive(modifier);
 
         service.extend(modifier, TimeUnit.MINUTES.toMillis(minutes));
@@ -64,7 +59,7 @@ public class ModExtendCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         Map<String, String> choices = new HashMap<>();
         for (Field field : Modifiers.class.getFields()) {
             try {
@@ -76,10 +71,11 @@ public class ModExtendCommand implements CommandExecutor {
                 ex.printStackTrace();
             }
         }
+
         return CommandSpec.builder()
                 .description(Texts.of("Extend modifiers"))
                 .permission("skree.modifier")
                 .arguments(seq(onlyOne(choices(Texts.of("modifier"), choices)), onlyOne(integer(Texts.of("minutes")))))
-                .executor(new ModExtendCommand(game)).build();
+                .executor(new ModExtendCommand()).build();
     }
 }

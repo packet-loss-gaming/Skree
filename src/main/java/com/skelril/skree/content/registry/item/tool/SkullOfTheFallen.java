@@ -10,13 +10,13 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -73,7 +73,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
             if (this.equals(optHeldItem.get().getItem())) {
                 Location<World> pLoc = player.getLocation();
 
-                Optional<WorldService> optWorldService = SkreePlugin.inst().getGame().getServiceManager().provide(WorldService.class);
+                Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
                 if (optWorldService.isPresent()) {
                     WorldService worldService = optWorldService.get();
                     WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");

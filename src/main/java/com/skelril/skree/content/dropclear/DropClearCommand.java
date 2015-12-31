@@ -8,7 +8,7 @@ package com.skelril.skree.content.dropclear;
 
 
 import com.skelril.skree.service.DropClearService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -26,19 +26,22 @@ import java.util.Optional;
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class DropClearCommand implements CommandExecutor {
-
-    private Game game;
-    private DropClearService service;
     private int maxDelay;
 
-    public DropClearCommand(Game game, DropClearService service, int maxDelay) {
-        this.game = game;
-        this.service = service;
+    public DropClearCommand(int maxDelay) {
         this.maxDelay = maxDelay;
     }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        Optional<DropClearService> optService = Sponge.getServiceManager().provide(DropClearService.class);
+        if (!optService.isPresent()) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "The drop clear service is not currently running."));
+            return CommandResult.empty();
+        }
+
+        DropClearService service = optService.get();
+
         // World resolution
         Optional<WorldProperties> optWorldProps = args.getOne("world");
         Optional<World> optWorld;
@@ -50,7 +53,7 @@ public class DropClearCommand implements CommandExecutor {
             }
             optWorld = Optional.of(((Player) src).getWorld());
         } else {
-            optWorld = game.getServer().getWorld(optWorldProps.get().getUniqueId());
+            optWorld = Sponge.getServer().getWorld(optWorldProps.get().getUniqueId());
         }
 
         // Handled by command spec, so always provided
@@ -67,7 +70,7 @@ public class DropClearCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game, DropClearService service, int maxDelay) {
+    public static CommandSpec aquireSpec(int maxDelay) {
         return CommandSpec.builder()
                 .description(Texts.of("Trigger a drop clear"))
                 .permission("skree.dropclear")
@@ -76,6 +79,6 @@ public class DropClearCommand implements CommandExecutor {
                                 onlyOne(optionalWeak(integer(Texts.of("seconds")), 10)),
                                 onlyOne(optional(world(Texts.of("world"))))
                         )
-                ).executor(new DropClearCommand(game, service, maxDelay)).build();
+                ).executor(new DropClearCommand(maxDelay)).build();
     }
 }

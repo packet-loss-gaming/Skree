@@ -6,10 +6,9 @@
 
 package com.skelril.skree.content.world.build;
 
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
@@ -31,17 +30,12 @@ import java.util.Optional;
 
 public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
-    private SkreePlugin plugin;
-    private Game game;
-
-    public BuildWorldWrapper(SkreePlugin plugin, Game game) {
-        this(plugin, game, new ArrayList<>());
+    public BuildWorldWrapper() {
+        this(new ArrayList<>());
     }
 
-    public BuildWorldWrapper(SkreePlugin plugin, Game game, Collection<World> worlds) {
+    public BuildWorldWrapper(Collection<World> worlds) {
         super("Build", worlds);
-        this.plugin = plugin;
-        this.game = game;
     }
 
     @Listener
@@ -98,7 +92,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     private void processPvP(Player attacker, Player defender, DamageEntityEvent event) {
-        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
         if (optService.isPresent()) {
             PvPService service = optService.get();
             if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {

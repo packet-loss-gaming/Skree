@@ -7,7 +7,7 @@
 package com.skelril.skree.content.playerstate;
 
 import com.skelril.skree.service.PlayerStateService;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -24,19 +24,21 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class GameModeCommand implements CommandExecutor {
 
-    private final PlayerStateService service;
-
-    public GameModeCommand(PlayerStateService service) {
-        this.service = service;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (!optService.isPresent()) {
+            src.sendMessage(Texts.of(TextColors.DARK_RED, "The player state service is not currently running."));
+            return CommandResult.empty();
+        }
+        PlayerStateService service = optService.get();
+
         GameMode mode = args.<GameMode>getOne("mode").get();
         Player target = args.<Player>getOne("target").get();
 
@@ -49,7 +51,7 @@ public class GameModeCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game, PlayerStateService service) {
+    public static CommandSpec aquireSpec() {
         Map<String, GameMode> map = new HashMap<>();
 
         map.put("survival", GameModes.SURVIVAL);
@@ -65,6 +67,6 @@ public class GameModeCommand implements CommandExecutor {
                                 onlyOne(choices(Texts.of("mode"), map)),
                                 onlyOne(playerOrSource(Texts.of("target")))
                         )
-                ).executor(new GameModeCommand(service)).build();
+                ).executor(new GameModeCommand()).build();
     }
 }

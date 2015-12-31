@@ -22,6 +22,7 @@ import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Giant;
@@ -43,7 +44,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager = new BossManager<>();
 
     public ShnugglesPrimeManager() {
-        SkreePlugin.inst().getGame().getEventManager().registerListeners(
+        Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ShnugglesPrimeListener(this)
         );
@@ -53,7 +54,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
     }
 
     private void setupBossManager() {
-        SkreePlugin.inst().getGame().getEventManager().registerListeners(
+        Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new BossListener<>(bossManager, Giant.class)
         );

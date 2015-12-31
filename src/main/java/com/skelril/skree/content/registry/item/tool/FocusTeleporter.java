@@ -9,7 +9,6 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -135,7 +135,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
         double x = tag.getDouble("x");
         double y = tag.getDouble("y");
         double z = tag.getDouble("z");
-        Optional<World> optWorld = SkreePlugin.inst().getGame().getServer().getWorld(worldName);
+        Optional<World> optWorld = Sponge.getServer().getWorld(worldName);
         if (optWorld.isPresent()) {
             return Optional.of(new Location<>(optWorld.get(), x, y, z));
         }

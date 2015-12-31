@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.world;
 
-import com.skelril.skree.SkreePlugin;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
@@ -20,7 +20,7 @@ import java.util.List;
 public class NoOreWorldGeneratorModifier implements WorldGeneratorModifier {
     @Override
     public void modifyWorldGenerator(WorldCreationSettings world, DataContainer settings, WorldGenerator worldGenerator) {
-        for (BiomeType biomeType : SkreePlugin.inst().getGame().getRegistry().getAllOf(BiomeType.class)) {
+        for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
             BiomeGenerationSettings biomeData = worldGenerator.getBiomeSettings(biomeType);
             List<Ore> populators = biomeData.getPopulators(Ore.class);
             biomeData.getPopulators().removeAll(populators);

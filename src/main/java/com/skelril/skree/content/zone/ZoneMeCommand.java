@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone;
 
 import com.skelril.skree.service.ZoneService;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -21,22 +22,17 @@ import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class ZoneMeCommand implements CommandExecutor {
 
-    private ZoneService service;
-
-    public ZoneMeCommand(ZoneService service) {
-        this.service = service;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
         service.requestZone(args.<String>getOne("zone").get(), (Player) src);
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(ZoneService service) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Texts.of("Create a zone"))
                 .permission("skree.zone.zoneme")
-                .arguments(onlyOne(string(Texts.of("zone")))).executor(new ZoneMeCommand(service)).build();
+                .arguments(onlyOne(string(Texts.of("zone")))).executor(new ZoneMeCommand()).build();
     }
 }

@@ -10,7 +10,7 @@ package com.skelril.skree.content.world.main;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -38,19 +38,14 @@ import java.util.concurrent.TimeUnit;
 
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
-    private SkreePlugin plugin;
-    private Game game;
-
-    public MainWorldWrapper(SkreePlugin plugin, Game game) {
-        this(plugin, game, new ArrayList<>());
+    public MainWorldWrapper() {
+        this(new ArrayList<>());
     }
 
-    public MainWorldWrapper(SkreePlugin plugin, Game game, Collection<World> worlds) {
+    public MainWorldWrapper(Collection<World> worlds) {
         super("Main", worlds);
-        this.plugin = plugin;
-        this.game = game;
 
-        Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(plugin);
+        Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
     }
 
     @Listener
@@ -107,7 +102,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     }
 
     private void processPvP(Player attacker, Player defender, DamageEntityEvent event) {
-        Optional<PvPService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(PvPService.class);
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
         if (optService.isPresent()) {
             PvPService service = optService.get();
             if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {

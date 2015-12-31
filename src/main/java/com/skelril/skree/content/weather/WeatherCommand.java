@@ -8,7 +8,7 @@ package com.skelril.skree.content.weather;
 
 
 import com.skelril.nitro.probability.Probability;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -30,11 +30,6 @@ import java.util.Optional;
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class WeatherCommand implements CommandExecutor {
-    private final Game game;
-
-    public WeatherCommand(Game game) {
-        this.game = game;
-    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -49,7 +44,7 @@ public class WeatherCommand implements CommandExecutor {
             }
             optWorld = Optional.of(((Player) src).getWorld());
         } else {
-            optWorld = game.getServer().getWorld(optWorldProps.get().getUniqueId());
+            optWorld = Sponge.getServer().getWorld(optWorldProps.get().getUniqueId());
         }
 
         // Handled by command spec, so always provided
@@ -83,7 +78,7 @@ public class WeatherCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(Game game) {
+    public static CommandSpec aquireSpec() {
         Map<String, Weather> map = new HashMap<>();
 
         map.put("clear", Weathers.CLEAR);
@@ -101,6 +96,6 @@ public class WeatherCommand implements CommandExecutor {
                                 onlyOne(optional(world(Texts.of("world"))))
                         )
                 )
-                .executor(new WeatherCommand(game)).build();
+                .executor(new WeatherCommand()).build();
     }
 }

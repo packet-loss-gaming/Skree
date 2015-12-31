@@ -27,21 +27,17 @@ import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import com.skelril.skree.system.zone.ZoneSystem;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
-import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 @Singleton
 @Plugin(id = "Skree", name = "Skree", version = "1.0")
 public class SkreePlugin {
-
-    @Inject
-    private Game game;
 
     @Inject
     private Logger logger;
@@ -55,10 +51,6 @@ public class SkreePlugin {
         return inst;
     }
 
-    public Game getGame() {
-        return game;
-    }
-
     public SkreePlugin() {
         inst = this;
     }
@@ -66,25 +58,25 @@ public class SkreePlugin {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         // Handle the database connection setup very early on
-        new DatabaseSystem(this, game);
+        new DatabaseSystem();
 
-        customItemSystem = new CustomItemSystem(this, game);
+        customItemSystem = new CustomItemSystem();
         customItemSystem.preInit();
 
-        customBlockSystem = new CustomBlockSystem(this, game);
+        customBlockSystem = new CustomBlockSystem();
         customBlockSystem.preInit();
 
         customItemSystem.associate();
         customBlockSystem.associate();
 
-        game.getRegistry().registerWorldGeneratorModifier(new VoidWorldGeneratorModifier());
-        game.getRegistry().registerWorldGeneratorModifier(new NoOreWorldGeneratorModifier());
-        game.getRegistry().registerWorldGeneratorModifier(new WildernessWorldGeneratorModifier());
+        Sponge.getRegistry().registerWorldGeneratorModifier(new VoidWorldGeneratorModifier());
+        Sponge.getRegistry().registerWorldGeneratorModifier(new NoOreWorldGeneratorModifier());
+        Sponge.getRegistry().registerWorldGeneratorModifier(new WildernessWorldGeneratorModifier());
     }
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        switch (game.getPlatform().getExecutionType()) {
+        switch (Sponge.getPlatform().getExecutionType()) {
             case SERVER:
                 registerPrimaryServerSystems();
                 break;
@@ -111,8 +103,7 @@ public class SkreePlugin {
 
         for (Class<?> entry : initialized) {
             try {
-                Constructor<?> constructor = entry.getConstructor(SkreePlugin.class, Game.class);
-                constructor.newInstance(this, game);
+                entry.newInstance();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

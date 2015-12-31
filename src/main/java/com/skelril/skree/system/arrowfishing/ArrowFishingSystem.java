@@ -8,11 +8,11 @@ package com.skelril.skree.system.arrowfishing;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.arrowfishing.ArrowFishingHandler;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 
 public class ArrowFishingSystem {
-    public ArrowFishingSystem(SkreePlugin plugin, Game game) {
+    public ArrowFishingSystem() {
         ArrowFishingHandler fishing = new ArrowFishingHandler();
-        game.getEventManager().registerListeners(plugin, fishing);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), fishing);
     }
 }

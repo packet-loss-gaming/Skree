@@ -16,10 +16,10 @@ import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.projectilewatcher.ProjectileTickEvent;
 import com.skelril.skree.service.internal.projectilewatcher.TrackedProjectileInfo;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.projectile.Arrow;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
@@ -80,7 +80,7 @@ public class ArrowFishingHandler {
             double modifier = 1;
 
             if (source instanceof Living) {
-                Optional<ModifierService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ModifierService.class);
+                Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
 
                 if (optService.isPresent() && optService.get().isActive(UBER_ARROW_FISHING)) {
                     modifier *= 2;

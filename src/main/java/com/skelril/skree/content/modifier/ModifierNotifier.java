@@ -10,6 +10,7 @@ import com.skelril.nitro.text.PrettyText;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ModifierService;
 import org.apache.commons.lang3.StringUtils;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class ModifierNotifier {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event) {
-        Optional<ModifierService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ModifierService.class);
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (!optService.isPresent()) {
             return;
         }

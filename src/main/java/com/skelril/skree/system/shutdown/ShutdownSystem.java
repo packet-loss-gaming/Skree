@@ -12,7 +12,7 @@ import com.skelril.skree.content.shutdown.ShutdownCommand;
 import com.skelril.skree.service.ShutdownService;
 import com.skelril.skree.service.internal.shutdown.ShutdownServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.ProviderExistsException;
 
 public class ShutdownSystem implements ServiceProvider<ShutdownService> {
@@ -20,14 +20,14 @@ public class ShutdownSystem implements ServiceProvider<ShutdownService> {
     private ShutdownService service;
 
     @Inject
-    public ShutdownSystem(SkreePlugin plugin, Game game) {
+    public ShutdownSystem() {
 
-        service = new ShutdownServiceImpl(plugin, game);
+        service = new ShutdownServiceImpl();
 
         // Register the service & command
         try {
-            game.getServiceManager().setProvider(plugin, ShutdownService.class, service);
-            game.getCommandManager().register(plugin, ShutdownCommand.aquireSpec(service), "shutdown");
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ShutdownService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), ShutdownCommand.aquireSpec(), "shutdown");
         } catch (ProviderExistsException e) {
             e.printStackTrace();
             return;

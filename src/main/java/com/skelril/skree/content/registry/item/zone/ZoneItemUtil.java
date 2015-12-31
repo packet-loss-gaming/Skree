@@ -6,13 +6,13 @@
 
 package com.skelril.skree.content.registry.item.zone;
 
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.ZoneService;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang3.Validate;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -93,7 +93,7 @@ public class ZoneItemUtil {
 
     public static void rescindGroupInvite(ItemStack stack) {
         Optional<String> zone = getZone(stack);
-        for (Player aPlayer : SkreePlugin.inst().getGame().getServer().getOnlinePlayers()) {
+        for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
             ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
             for (int i = 0; i < itemStacks.length; ++i) {
                 if (!hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
@@ -234,7 +234,7 @@ public class ZoneItemUtil {
         if (isZoneSlaveItem(stack) && hasZoneData(stack)) {
             NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_zone_data");
             UUID ownerID = UUID.fromString(tag.getString("owner"));
-            return SkreePlugin.inst().getGame().getServer().getPlayer(ownerID);
+            return Sponge.getServer().getPlayer(ownerID);
         }
         throw new IllegalArgumentException("Invalid ItemStack provided");
     }
@@ -256,7 +256,7 @@ public class ZoneItemUtil {
     }
 
     public static void setMasterToZone(ItemStack stack, String zone) {
-        Optional<ZoneService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ZoneService.class);
+        Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
 
         if (optService.isPresent()) {
             ZoneService service = optService.get();

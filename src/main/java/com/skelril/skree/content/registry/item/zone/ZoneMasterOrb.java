@@ -9,7 +9,6 @@ package com.skelril.skree.content.registry.item.zone;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.ZoneService;
 import net.minecraft.creativetab.CreativeTabs;
@@ -20,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -93,12 +93,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 ItemStack itemStack = (ItemStack) (Object) optItemStack.get();
                 if (isZoneMasterItem(itemStack)) {
                     if (isAttuned(itemStack)) {
-                        Optional<ZoneService> optService = SkreePlugin.inst().getGame().getServiceManager().provide(ZoneService.class);
+                        Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
                         if (optService.isPresent()) {
                             ZoneService service = optService.get();
                             List<Player> group = new ArrayList<>();
                             group.add(player);
-                            for (Player aPlayer : SkreePlugin.inst().getGame().getServer().getOnlinePlayers()) {
+                            for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
                                 ItemStack[] itemStacks = ((EntityPlayer) aPlayer).inventory.mainInventory;
                                 for (ItemStack aStack : itemStacks) {
                                     if (!hasSameZoneID(itemStack, aStack)) {

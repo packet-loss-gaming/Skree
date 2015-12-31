@@ -11,7 +11,6 @@ import com.skelril.nitro.entity.EntityCleanupTask;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.DropClearService;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -31,18 +30,13 @@ import java.util.concurrent.TimeUnit;
 
 public class DropClearServiceImpl implements DropClearService {
 
-    private final SkreePlugin plugin;
-    private final Game game;
-
     private int autoAmt;
     private float panicMod;
 
     private Map<Extent, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
     private Map<Extent, Map<Vector3i, ? extends DropClearStats>> lastClear = new HashMap<>();
 
-    public DropClearServiceImpl(SkreePlugin plugin, Game game, int autoAmt, float panicMod) {
-        this.plugin = plugin;
-        this.game = game;
+    public DropClearServiceImpl(int autoAmt, float panicMod) {
         this.autoAmt = autoAmt;
         this.panicMod = panicMod;
     }
@@ -198,7 +192,7 @@ public class DropClearServiceImpl implements DropClearService {
         Task task = Task.builder().execute(runnable).delayTicks(1).interval(
                 1,
                 TimeUnit.SECONDS
-        ).submit(plugin);
+        ).submit(SkreePlugin.inst());
 
         runnable.setTask(task);
         timers.put(extent, runnable);

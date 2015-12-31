@@ -28,6 +28,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -362,9 +363,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
 
-                            EntityDamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
-                                    EntityDamageSource.Builder.class
-                            ).entity(
+
+                            EntityDamageSource source = EntityDamageSource.builder().entity(
                                     boss
                             ).type(
                                     DamageTypes.ATTACK
@@ -490,9 +490,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
                                 entity.offer(Keys.HEALTH, 0D);
                             } else {
-                                DamageSource source = SkreePlugin.inst().getGame().getRegistry().createBuilder(
-                                        DamageSource.Builder.class
-                                ).type(
+                                DamageSource source = DamageSource.builder().type(
                                         DamageTypes.ATTACK
                                 ).build();
 
@@ -553,7 +551,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = SkreePlugin.inst().getGame().getServiceManager().provideUnchecked(WorldService.class);
+        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
         player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
         return new Clause<>(player, ZoneStatus.REMOVED);
     }
