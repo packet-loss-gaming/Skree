@@ -8,12 +8,12 @@ package com.skelril.skree.content.market;
 
 import com.skelril.skree.content.market.admin.*;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 public class MarketAdminCommand {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Administrative commands for the market"))
+                .description(Text.of("Administrative commands for the market"))
                 .permission("skree.market.admin")
                 .child(MarketQuickAddCommand.aquireSpec(), "quickadd")
                 .child(MarketAddAliasCommand.aquireSpec(), "addalias")

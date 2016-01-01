@@ -19,7 +19,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -35,13 +35,13 @@ public class MarketSellCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of("You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -62,7 +62,7 @@ public class MarketSellCommand implements CommandExecutor {
         if (mode != QueryMode.HELD && !args.hasAny("u")) {
             filter = player.getItemInHand();
             if (!filter.isPresent()) {
-                src.sendMessage(Texts.of(TextColors.DARK_RED, "You're not holding an item to filter with!"));
+                src.sendMessage(Text.of(TextColors.DARK_RED, "You're not holding an item to filter with!"));
                 return CommandResult.empty();
             }
         }
@@ -70,7 +70,7 @@ public class MarketSellCommand implements CommandExecutor {
         Clause<BigDecimal, List<Integer>> changes = MarketImplUtil.getChanges(player, service, mode, filter);
 
         if (changes.getValue().isEmpty()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "No sellable items found" + (filter.isPresent() ? " that matched the filter" : "") + "!"));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "No sellable items found" + (filter.isPresent() ? " that matched the filter" : "") + "!"));
             return CommandResult.empty();
         }
 
@@ -79,24 +79,24 @@ public class MarketSellCommand implements CommandExecutor {
         if (!service.logTransactionByStack(player.getUniqueId(), transactions)) {
             // TODO Auto reporting
             // Not critical, continue
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
         }
 
         BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
         if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(this))) {
             // TODO Auto reporting
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
         }
 
-        player.sendMessage(Texts.of(TextColors.YELLOW, "Item(s) sold for: ", TextColors.WHITE, MarketImplUtil.format(changes.getKey()), TextColors.YELLOW, "!"));
+        player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) sold for: ", TextColors.WHITE, MarketImplUtil.format(changes.getKey()), TextColors.YELLOW, "!"));
 
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Sell an item"))
+                .description(Text.of("Sell an item"))
                 .arguments(flags().flag("h").flag("a").flag("u").buildWith(none()))
                 .executor(new MarketSellCommand())
                 .build();

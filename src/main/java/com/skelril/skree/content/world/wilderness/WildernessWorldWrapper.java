@@ -21,6 +21,8 @@ import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
+import com.skelril.nitro.text.CombinedText;
+import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
@@ -65,11 +67,11 @@ import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.sink.MessageSinks;
-import org.spongepowered.api.text.title.TitleBuilder;
+import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -227,8 +229,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             }
         }
 
-        attacker.sendMessage(Texts.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
-        attacker.sendMessage(Texts.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
+        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
+        attacker.sendMessage(Text.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
 
         event.setCancelled(true);
     }
@@ -239,20 +241,20 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
             Optional.of(
-                    Texts.of(
+                    CombinedText.of(
                             TextColors.DARK_AQUA,
                             "Entity Health: ",
-                            Texts.placeholder("health int"),
+                            new PlaceHolderText("health int"),
                             " / ",
-                            Texts.placeholder("max health int")
+                            new PlaceHolderText("max health int")
                     )
             ),
-            Optional.of(Texts.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
+            Optional.of(CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
     );
 
     private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
         Task.builder().delayTicks(1).execute(
-                () -> healthPrinter.print(MessageSinks.to(Collections.singleton(attacker)), defender)
+                () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
         ).submit(SkreePlugin.inst());
     }
 
@@ -297,10 +299,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
-        Object srcObj = event.getCause().get(NamedCause.SOURCE).orElse(null);
-        if (!(srcObj instanceof Entity)) {
+        Optional<Entity> optSrcEnt = event.getCause().get(NamedCause.SOURCE, Entity.class);
+        if (!optSrcEnt.isPresent()) {
             return;
         }
+
+        Entity srcEnt = optSrcEnt.get();
 
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
         for (Transaction<BlockSnapshot> block : transactions) {
@@ -325,8 +329,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
-                if (srcObj instanceof ArmorEquipable) {
-                    Optional<ItemStack> held = ((ArmorEquipable) srcObj).getItemInHand();
+                if (srcEnt instanceof ArmorEquipable) {
+                    Optional<ItemStack> held = ((ArmorEquipable) srcEnt).getItemInHand();
                     if (held.isPresent()) {
                         ItemStack stack = held.get();
 
@@ -355,13 +359,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         if (optSilkTouch.isPresent()) {
                             silkTouch = true;
                         }
-                    } else if (srcObj instanceof Player) {
+                    } else if (srcEnt instanceof Player) {
                         continue;
                     }
                 }
 
                 addPool(loc, type, fortuneMod, silkTouch);
-            } else if (srcObj instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
+            } else if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
@@ -439,7 +443,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 } catch (Exception ex) {
                     player.sendMessage(
                             /* ChatTypes.SYSTEM, */
-                            Texts.of(
+                            Text.of(
                                     TextColors.RED,
                                     "You find yourself unable to place that block."
                             )
@@ -558,9 +562,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {
                     ((Player) entity).sendTitle(
-                            new TitleBuilder()
-                                    .title(Texts.of("Wilderness Level"))
-                                    .subtitle(Texts.of(currentLevel))
+                            Title.builder()
+                                    .title(Text.of("Wilderness Level"))
+                                    .subtitle(Text.of(currentLevel))
                                     .fadeIn(20)
                                     .fadeOut(20)
                                     .build()

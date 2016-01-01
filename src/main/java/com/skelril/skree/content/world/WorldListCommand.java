@@ -16,8 +16,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -29,19 +28,19 @@ public class WorldListCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        src.sendMessage(Texts.of(TextColors.GOLD, "Available worlds (click to teleport):"));
+        src.sendMessage(Text.of(TextColors.GOLD, "Available worlds (click to teleport):"));
 
         Optional<WorldService> service = Sponge.getServiceManager().provide(WorldService.class);
 
         for (WorldEffectWrapper wrapper : service.get().getEffectWrappers()) {
             String worldType = wrapper.getName();
             for (World world : wrapper.getWorlds()) {
-                TextBuilder builder = Texts.builder();
+                Text.Builder builder = Text.builder();
                 String worldName = world.getName();
-                builder.append(Texts.of(worldName + " [" + worldType + "]"));
+                builder.append(Text.of(worldName + " [" + worldType + "]"));
                 builder.color(TextColors.GREEN);
                 builder.onClick(TextActions.runCommand("/world " + worldName));
-                builder.onHover(TextActions.showText(Texts.of("Teleport to " + worldName)));
+                builder.onHover(TextActions.showText(Text.of("Teleport to " + worldName)));
                 src.sendMessage(builder.build());
             }
         }
@@ -50,7 +49,7 @@ public class WorldListCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-            .description(Texts.of("List available worlds"))
+            .description(Text.of("List available worlds"))
             .permission("skree.world")
             .executor(new WorldListCommand()).build();
     }

@@ -8,22 +8,23 @@ package com.skelril.nitro.data.util;
 
 
 import com.google.common.collect.Lists;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.item.Enchantment;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public class EnchantmentUtil {
     public static List<ItemEnchantment> getEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
-        /* Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
+        Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
         if (results.isPresent()) {
             List<ItemEnchantment> enchantments = results.get();
             return enchantments.stream().filter(e -> e.getEnchantment().equals(enchantment)).collect(Collectors.toList());
         }
-        */
         return Lists.newArrayList();
     }
 

@@ -12,6 +12,8 @@ import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.text.CombinedText;
+import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
 import com.skelril.nitro.time.TimedRunnable;
@@ -48,7 +50,7 @@ import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -188,12 +190,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
             Optional.of(
-                    Texts.of(
+                    CombinedText.of(
                             TextColors.DARK_AQUA,
                             "Boss Health: ",
-                            Texts.placeholder("health int"),
+                            new PlaceHolderText("health int"),
                             " / ",
-                            Texts.placeholder("max health int")
+                            new PlaceHolderText("max health int")
                     )
             ),
             Optional.empty()
@@ -205,7 +207,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             return;
         }
 
-        healthPrinter.print(getPlayerMessageSink(SPECTATOR), optBoss.get());
+        healthPrinter.print(getPlayerMessageChannel(SPECTATOR), optBoss.get());
     }
 
     private static final ItemStack weapon = ItemStackFactory.newItemStack(ItemTypes.BONE);
@@ -228,7 +230,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         getRegion().getExtent().spawnEntity(zombie, Cause.of(this));
 
                         if (target.isPresent()) {
-                            zombie.offer(Keys.TARGETS, Lists.newArrayList(target.get()));
+                            zombie.setTarget(target.get());
                         }
                     }
                 }
@@ -255,7 +257,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 color = TextColors.RED;
                 break;
         }
-        getPlayerMessageSink(SPECTATOR).sendMessage(Texts.of(color, message));
+        getPlayerMessageChannel(SPECTATOR).send(Text.of(color, message));
     }
     
     public void runRandomAttack() {
@@ -360,7 +362,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     for (Player player : getPlayers(PARTICIPANT)) {
                         // TODO Convert to Sponge
                         if (((EntityGiantZombie) boss).canEntityBeSeen(tf(player))) {
-                            player.sendMessage(Texts.of(TextColors.YELLOW, "Come closer..."));
+                            player.sendMessage(Text.of(TextColors.YELLOW, "Come closer..."));
                             player.setLocation(boss.getLocation());
 
 
@@ -378,7 +380,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                     random.nextDouble() * 1.7 - 1.5
                             );
                         } else {
-                            player.sendMessage(Texts.of(TextColors.YELLOW, "Fine... No tango this time..."));
+                            player.sendMessage(Text.of(TextColors.YELLOW, "Fine... No tango this time..."));
                         }
                     }
                     sendAttackBroadcast("Now wasn't that fun?", AttackSeverity.INFO);
@@ -420,7 +422,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         for (Player player : getContained(Player.class)) {
                             // TODO Convert to Sponge
                             if (((EntityGiantZombie) boss).canEntityBeSeen(tf(player))) {
-                                player.sendMessage(Texts.of(TextColors.DARK_RED, "You!"));
+                                player.sendMessage(Text.of(TextColors.DARK_RED, "You!"));
                                 baskInGlory = true;
                             }
                         }
@@ -499,8 +501,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             toHeal += realDamage / 3;
                         }
                         if (new TimeFilter(-1, 2).matchesFilter(times + 1)) {
-                            getPlayerMessageSink(SPECTATOR).sendMessage(
-                                    Texts.of(
+                            getPlayerMessageChannel(SPECTATOR).send(
+                                    Text.of(
                                             TextColors.DARK_AQUA,
                                             "The boss has drawn in: " + (int) toHeal + " health."
                                     )

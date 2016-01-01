@@ -15,7 +15,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.*;
@@ -46,7 +46,7 @@ public class ModifierNotifier {
 
         Task.builder().execute(() -> {
             for (String message : messages) {
-                player.sendMessage(Texts.of(TextColors.GOLD, message));
+                player.sendMessage(Text.of(TextColors.GOLD, message));
             }
         }).delay(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
     }

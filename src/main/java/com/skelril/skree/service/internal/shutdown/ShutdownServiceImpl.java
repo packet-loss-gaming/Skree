@@ -16,9 +16,8 @@ import com.skelril.skree.service.ShutdownService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.sink.MessageSinks;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class ShutdownServiceImpl implements ShutdownService {
 
     private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
-    private static final Text DEFAULT_REASON = Texts.of("Shutting down!");
+    private static final Text DEFAULT_REASON = Text.of("Shutting down!");
 
     private Optional<TimedRunnable> runnable = Optional.empty();
     private String reopenDate;
@@ -80,8 +79,8 @@ public class ShutdownServiceImpl implements ShutdownService {
             @Override
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
-                    MessageSinks.toAll().sendMessage(
-                            Texts.of(
+                    MessageChannel.TO_ALL.send(
+                            Text.of(
                                     TextColors.RED,
                                     "Sever shutting down in " + times + " seconds - for " + reopenDate + "."
                             )
@@ -92,7 +91,7 @@ public class ShutdownServiceImpl implements ShutdownService {
 
             @Override
             public void end() {
-                MessageSinks.toAll().sendMessage(Texts.of(TextColors.RED, "Server shutting down!"));
+                MessageChannel.TO_ALL.send(Text.of(TextColors.RED, "Server shutting down!"));
                 forceShutdown(message);
             }
         };

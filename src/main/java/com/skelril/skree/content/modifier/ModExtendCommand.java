@@ -16,9 +16,9 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.sink.MessageSinks;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class ModExtendCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Modifier service not found."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Modifier service not found."));
             return CommandResult.empty();
         }
         ModifierService service = optService.get();
@@ -50,8 +50,8 @@ public class ModExtendCommand implements CommandExecutor {
         String friendlyTime = PrettyText.date(service.expiryOf(modifier));
 
         String change = wasActive ? " extended" : " enabled";
-        MessageSinks.toAll().sendMessage(
-                Texts.of(
+        MessageChannel.TO_ALL.send(
+                Text.of(
                         TextColors.GOLD,
                         friendlyName + change + " till " + friendlyTime + "!"
                 )
@@ -73,9 +73,9 @@ public class ModExtendCommand implements CommandExecutor {
         }
 
         return CommandSpec.builder()
-                .description(Texts.of("Extend modifiers"))
+                .description(Text.of("Extend modifiers"))
                 .permission("skree.modifier")
-                .arguments(seq(onlyOne(choices(Texts.of("modifier"), choices)), onlyOne(integer(Texts.of("minutes")))))
+                .arguments(seq(onlyOne(choices(Text.of("modifier"), choices)), onlyOne(integer(Text.of("minutes")))))
                 .executor(new ModExtendCommand()).build();
     }
 }

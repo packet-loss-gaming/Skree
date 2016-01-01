@@ -20,7 +20,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -63,7 +63,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
                 int newDist = getMaxEditDist(held) % 9 + 1;
                 setMaxEditDist(held, newDist);
                 player.setItemInHand(held);
-                player.sendMessage(Texts.of(TextColors.YELLOW, "Distance set to: " + newDist));
+                player.sendMessage(Text.of(TextColors.YELLOW, "Distance set to: " + newDist));
             }
         }
     }

@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -31,13 +31,13 @@ public class MarketQuickAddCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of("You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -45,7 +45,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -55,7 +55,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
         try {
             price = new BigDecimal(args.<String>getOne("price").get());
         } catch (NumberFormatException ex) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid price specified"));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid price specified"));
             return CommandResult.empty();
         }
 
@@ -63,25 +63,25 @@ public class MarketQuickAddCommand implements CommandExecutor {
             if (service.addAlias(alias, item)) {
                 if (service.setPrice(alias, price)) {
                     if (service.setPrimaryAlias(alias)) {
-                        src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
+                        src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
                         return CommandResult.success();
                     }
                     // Same error, fall through
                 }
-                src.sendMessage(Texts.of(TextColors.DARK_RED, alias + " is not a valid alias"));
+                src.sendMessage(Text.of(TextColors.DARK_RED, alias + " is not a valid alias"));
                 return CommandResult.empty();
             }
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
             return CommandResult.empty();
         }
-        src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is already tracked."));
+        src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is already tracked."));
         return CommandResult.empty();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Add an item to the market"))
-                .arguments(seq(string(Texts.of("price")), remainingJoinedStrings(Texts.of("alias"))))
+                .description(Text.of("Add an item to the market"))
+                .arguments(seq(string(Text.of("price")), remainingJoinedStrings(Text.of("alias"))))
                 .executor(new MarketQuickAddCommand())
                 .build();
     }

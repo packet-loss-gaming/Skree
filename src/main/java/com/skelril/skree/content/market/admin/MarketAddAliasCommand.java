@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -29,13 +29,13 @@ public class MarketAddAliasCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of("You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -43,7 +43,7 @@ public class MarketAddAliasCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -51,9 +51,9 @@ public class MarketAddAliasCommand implements CommandExecutor {
         String alias = args.<String>getOne("alias").get();
 
         if (service.addAlias(alias, item)) {
-            src.sendMessage(Texts.of(TextColors.YELLOW, alias + " added to the market."));
+            src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market."));
         } else {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
             return CommandResult.empty();
         }
 
@@ -62,8 +62,8 @@ public class MarketAddAliasCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Add an alias for an item"))
-                .arguments(remainingJoinedStrings(Texts.of("alias")))
+                .description(Text.of("Add an alias for an item"))
+                .arguments(remainingJoinedStrings(Text.of("alias")))
                 .executor(new MarketAddAliasCommand())
                 .build();
     }

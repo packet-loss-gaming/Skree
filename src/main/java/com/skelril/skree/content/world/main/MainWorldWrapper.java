@@ -26,7 +26,7 @@ import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
@@ -110,7 +110,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             }
         }
 
-        attacker.sendMessage(Texts.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
 
         event.setCancelled(true);
     }

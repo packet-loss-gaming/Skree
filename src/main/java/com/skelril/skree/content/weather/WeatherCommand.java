@@ -16,7 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -39,7 +39,7 @@ public class WeatherCommand implements CommandExecutor {
 
         if (!optWorldProps.isPresent()) {
             if (!(src instanceof Player)) {
-                src.sendMessage(Texts.of(TextColors.RED, "You are not a player and need to specify a world!"));
+                src.sendMessage(Text.of(TextColors.RED, "You are not a player and need to specify a world!"));
                 return CommandResult.empty();
             }
             optWorld = Optional.of(((Player) src).getWorld());
@@ -56,20 +56,20 @@ public class WeatherCommand implements CommandExecutor {
         }
 
         if (duration.get() < 1) {
-            src.sendMessage(Texts.of(TextColors.RED, "Weather duration must be at least 1 second!"));
+            src.sendMessage(Text.of(TextColors.RED, "Weather duration must be at least 1 second!"));
             return CommandResult.empty();
         }
 
         World world = optWorld.get();
         if (!world.isLoaded()) {
-            src.sendMessage(Texts.of(TextColors.RED, "The specified world was not loaded!"));
+            src.sendMessage(Text.of(TextColors.RED, "The specified world was not loaded!"));
             return CommandResult.empty();
         }
 
         world.forecast(weather, duration.get() * 20);
 
         src.sendMessage(
-                Texts.of(
+                Text.of(
                         TextColors.YELLOW,
                         "Changed weather state in " + world.getName() + " to: " + weather.getName() + '.'
                 )
@@ -86,14 +86,14 @@ public class WeatherCommand implements CommandExecutor {
         map.put("thunder", Weathers.THUNDER_STORM);
 
         return CommandSpec.builder()
-                .description(Texts.of("Change the weather"))
+                .description(Text.of("Change the weather"))
                 .permission("skree.weathercommand")
                 .arguments(
                         seq(
-                                onlyOne(choices(Texts.of("type"), map)),
-                                // TODO should be onlyOne(catalogedElement(Texts.of("type"), game, Weather.class)),
-                                onlyOne(optionalWeak(integer(Texts.of("duration")))),
-                                onlyOne(optional(world(Texts.of("world"))))
+                                onlyOne(choices(Text.of("type"), map)),
+                                // TODO should be onlyOne(catalogedElement(Text.of("type"), game, Weather.class)),
+                                onlyOne(optionalWeak(integer(Text.of("duration")))),
+                                onlyOne(optional(world(Text.of("world"))))
                         )
                 )
                 .executor(new WeatherCommand()).build();

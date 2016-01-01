@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -40,7 +40,7 @@ public class BringCommand implements CommandExecutor {
             rotation = srcPlayer.getRotation();
             targetExtent = loc.getExtent();
         } else {
-            src.sendMessage(Texts.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
+            src.sendMessage(Text.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
             return CommandResult.empty();
         }
 
@@ -55,18 +55,18 @@ public class BringCommand implements CommandExecutor {
         }
         target.setLocationAndRotation(new Location<>(targetExtent, dest.add(0, 1, 0)), rotation);
 
-        src.sendMessage(Texts.of(TextColors.YELLOW, "Player brought to you, my lord."));
+        src.sendMessage(Text.of(TextColors.YELLOW, "Player brought to you, my lord."));
 
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Bring a player to your current location"))
+                .description(Text.of("Bring a player to your current location"))
                 .permission("skree.teleport.bring")
                 .arguments(
                         onlyOne(
-                                player(Texts.of("target"))
+                                player(Text.of("target"))
                         )
                 ).executor(new BringCommand()).build();
     }

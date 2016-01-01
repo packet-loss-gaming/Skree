@@ -14,7 +14,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -29,7 +29,7 @@ public class MarketSetPrimaryAliasCommand implements CommandExecutor {
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -37,9 +37,9 @@ public class MarketSetPrimaryAliasCommand implements CommandExecutor {
 
         String alias = args.<String>getOne("alias").get();
         if (service.setPrimaryAlias(alias)) {
-            src.sendMessage(Texts.of(TextColors.YELLOW, alias + " set as a primary alias."));
+            src.sendMessage(Text.of(TextColors.YELLOW, alias + " set as a primary alias."));
         } else {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, alias + " is not a valid alias."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, alias + " is not a valid alias."));
         }
 
         return CommandResult.success();
@@ -47,8 +47,8 @@ public class MarketSetPrimaryAliasCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Set the primary alias (name) of an item"))
-                .arguments(onlyOne(remainingJoinedStrings(Texts.of("alias"))))
+                .description(Text.of("Set the primary alias (name) of an item"))
+                .arguments(onlyOne(remainingJoinedStrings(Text.of("alias"))))
                 .executor(new MarketSetPrimaryAliasCommand())
                 .build();
     }

@@ -13,7 +13,6 @@ import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class DropClearSystem implements ServiceProvider<DropClearService> {
 
@@ -23,13 +22,8 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
         service = new DropClearServiceImpl(1000, 3);
 
         // Register the service & command
-        try {
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
 
         Task.builder().execute(
                 () -> Sponge.getServer().getWorlds().stream().forEach(service::checkedCleanup)

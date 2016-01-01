@@ -17,7 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -72,7 +72,7 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
                         pInv[i] = tf(nInv[i]);
                     }
                     tf(player).inventoryContainer.detectAndSendChanges();
-                    player.sendMessage(Texts.of(TextColors.GOLD, "The hymn glows brightly..."));
+                    player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
                 }
             }
         }

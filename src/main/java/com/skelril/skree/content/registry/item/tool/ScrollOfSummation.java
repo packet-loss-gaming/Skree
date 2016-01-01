@@ -17,7 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -73,7 +73,7 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
                     }
                     tf(player).inventoryContainer.detectAndSendChanges();
                     tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                    player.sendMessage(Texts.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
+                    player.sendMessage(Text.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
                 }
             }
         }

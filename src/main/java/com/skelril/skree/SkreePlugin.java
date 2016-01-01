@@ -32,6 +32,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.util.logging.Logger;
 
@@ -69,9 +70,9 @@ public class SkreePlugin {
         customItemSystem.associate();
         customBlockSystem.associate();
 
-        Sponge.getRegistry().registerWorldGeneratorModifier(new VoidWorldGeneratorModifier());
-        Sponge.getRegistry().registerWorldGeneratorModifier(new NoOreWorldGeneratorModifier());
-        Sponge.getRegistry().registerWorldGeneratorModifier(new WildernessWorldGeneratorModifier());
+        Sponge.getRegistry().register(WorldGeneratorModifier.class, new VoidWorldGeneratorModifier());
+        Sponge.getRegistry().register(WorldGeneratorModifier.class, new NoOreWorldGeneratorModifier());
+        Sponge.getRegistry().register(WorldGeneratorModifier.class, new WildernessWorldGeneratorModifier());
     }
 
     @Listener

@@ -31,7 +31,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.*;
@@ -64,7 +64,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
             Optional<Giant> optBossEnt = boss.getTargetEntity();
             if (optBossEnt.isPresent()) {
                 Giant bossEnt = optBossEnt.get();
-                bossEnt.offer(Keys.DISPLAY_NAME, Texts.of("Shnuggles Prime"));
+                bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Shnuggles Prime"));
                 setMaxHealth(bossEnt, 750, true);
             }
             return Optional.empty();
@@ -77,7 +77,7 @@ public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInsta
             return Optional.empty();
         });
         bindProcessor.add((condition, boss) -> {
-            boss.getDetail().getZone().getPlayerMessageSink(PlayerClassifier.SPECTATOR).sendMessage(Texts.of(TextColors.GOLD, "I live again!"));
+            boss.getDetail().getZone().getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.GOLD, "I live again!"));
             return Optional.empty();
         });
 

@@ -15,10 +15,10 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
@@ -96,7 +96,7 @@ public class DropClearServiceImpl implements DropClearService {
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.CHAT,
-                                Texts.of(TextColors.RED, "Clearing drops in " + times + " seconds!")
+                                Text.of(TextColors.RED, "Clearing drops in " + times + " seconds!")
                         )
                 );
             }
@@ -106,7 +106,7 @@ public class DropClearServiceImpl implements DropClearService {
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.CHAT,
-                                Texts.of(TextColors.RED, "Clearing drops!")
+                                Text.of(TextColors.RED, "Clearing drops!")
                         )
                 );
             }
@@ -116,7 +116,7 @@ public class DropClearServiceImpl implements DropClearService {
                 extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
                         player -> player.sendMessage(
                                 ChatTypes.CHAT,
-                                Texts.of(TextColors.GREEN, getLastProfile().getEntities().size() + " drops cleared!")
+                                Text.of(TextColors.GREEN, getLastProfile().getEntities().size() + " drops cleared!")
                         )
                 );
             }
@@ -127,8 +127,8 @@ public class DropClearServiceImpl implements DropClearService {
         return new EntityCleanupTask(world, checkedEntities) {
             @Override
             public void notifyCleanProgress(int times) {
-                MessageSinks.toAll().sendMessage(
-                        Texts.of(
+                MessageChannel.TO_ALL.send(
+                        Text.of(
                                 TextColors.RED,
                                 "Clearing drops of " + world.getName() + " in " + times + " seconds!"
                         )
@@ -137,8 +137,8 @@ public class DropClearServiceImpl implements DropClearService {
 
             @Override
             public void notifyCleanBeginning() {
-                MessageSinks.toAll().sendMessage(
-                        Texts.of(
+                MessageChannel.TO_ALL.send(
+                        Text.of(
                                 TextColors.RED,
                                 "Clearing drops of " + world.getName() + "!"
                         )
@@ -147,8 +147,8 @@ public class DropClearServiceImpl implements DropClearService {
 
             @Override
             public void notifyCleanEnding() {
-                MessageSinks.toAll().sendMessage(
-                        Texts.of(
+                MessageChannel.TO_ALL.send(
+                        Text.of(
                                 TextColors.GREEN,
                                 getLastProfile().getEntities().size() + " drops cleared!"
                         )

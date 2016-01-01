@@ -21,7 +21,6 @@ import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
@@ -46,14 +45,9 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         service = new WorldServiceImpl();
 
         // Register the service & command
-        try {
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
-            Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
 
         // Handle main world
         initMain();

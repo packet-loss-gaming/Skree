@@ -18,7 +18,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
@@ -79,7 +79,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
                 }
 
                 // TODO system message.color(color)
-                player.sendMessage(Texts.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
+                player.sendMessage(Text.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
             }
         }
     }

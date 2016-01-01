@@ -15,7 +15,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.string;
@@ -31,8 +31,8 @@ public class ZoneMeCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Create a zone"))
+                .description(Text.of("Create a zone"))
                 .permission("skree.zone.zoneme")
-                .arguments(onlyOne(string(Texts.of("zone")))).executor(new ZoneMeCommand()).build();
+                .arguments(onlyOne(string(Text.of("zone")))).executor(new ZoneMeCommand()).build();
     }
 }

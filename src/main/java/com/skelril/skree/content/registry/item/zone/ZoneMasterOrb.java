@@ -28,7 +28,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
@@ -146,7 +146,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                     Player targetPlayer = (Player) targetEntity;
                     if (!playerAlreadyHasInvite(itemStack, targetPlayer)) {
                         player.sendMessage(
-                                Texts.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
+                                Text.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
                         );
                     } else {
                         org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);

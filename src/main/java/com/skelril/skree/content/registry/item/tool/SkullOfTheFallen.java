@@ -21,7 +21,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -84,15 +84,15 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                         DecimalFormat df = new DecimalFormat("#,###.##");
 
                         player.sendMessages(
-                            Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
-                            Texts.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
-                            Texts.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
-                            Texts.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
-                            Texts.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
-                            Texts.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level, 0)))
+                            Text.of(TextColors.YELLOW, "Wilderness level: " + level),
+                            Text.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
+                            Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
+                            Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
+                            Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
+                            Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level, 0)))
                         );
                     } else {
-                        player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
+                        player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));
                     }
                 }
             }

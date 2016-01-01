@@ -12,7 +12,6 @@ import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.pvp.PvPServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class PvPSystem implements ServiceProvider<PvPService> {
 
@@ -22,14 +21,9 @@ public class PvPSystem implements ServiceProvider<PvPService> {
         service = new PvPServiceImpl();
 
         // Register the service & command
-        try {
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PvPService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), PvPCommand.aquireSpec(), "pvp");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PvPService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), PvPCommand.aquireSpec(), "pvp");
     }
 
     @Override

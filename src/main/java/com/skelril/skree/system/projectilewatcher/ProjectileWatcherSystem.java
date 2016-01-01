@@ -11,7 +11,6 @@ import com.skelril.skree.service.ProjectileWatcherService;
 import com.skelril.skree.service.internal.projectilewatcher.ProjectileWatcherServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class ProjectileWatcherSystem implements ServiceProvider<ProjectileWatcherService> {
     private ProjectileWatcherService service;
@@ -21,13 +20,8 @@ public class ProjectileWatcherSystem implements ServiceProvider<ProjectileWatche
         service = new ProjectileWatcherServiceImpl();
 
         // Register the service & command
-        try {
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ProjectileWatcherService.class, service);
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ProjectileWatcherService.class, service);
     }
 
     @Override

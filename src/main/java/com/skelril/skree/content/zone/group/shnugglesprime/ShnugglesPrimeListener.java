@@ -16,7 +16,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
@@ -104,7 +104,7 @@ public class ShnugglesPrimeListener {
                     deathMessage = " died while attempting to slay the boss";
                     break;
             }
-            event.setMessage(Texts.of(player.getName() + deathMessage));
+            event.setMessage(Text.of(player.getName() + deathMessage));
         }
     }
 }

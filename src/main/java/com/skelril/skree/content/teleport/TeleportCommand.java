@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -33,7 +33,7 @@ public class TeleportCommand implements CommandExecutor {
             if (src instanceof Player) {
             target = (Player) src;
         } else {
-            src.sendMessage(Texts.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
+            src.sendMessage(Text.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
             return CommandResult.empty();
         }
 
@@ -61,20 +61,20 @@ public class TeleportCommand implements CommandExecutor {
 
         target.setLocationAndRotation(new Location<>(targetExtent, dest.get().add(0, 1, 0)), rotation);
 
-        src.sendMessage(Texts.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
+        src.sendMessage(Text.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
 
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Teleport to a player or destination"))
+                .description(Text.of("Teleport to a player or destination"))
                 .permission("skree.teleport.teleport")
                 .arguments(
                         onlyOne(
                                 firstParsing(
-                                        player(Texts.of("dest-player")),
-                                        vector3d(Texts.of("dest"))
+                                        player(Text.of("dest-player")),
+                                        vector3d(Text.of("dest"))
                                 )
                         )
                 ).executor(new TeleportCommand()).build();

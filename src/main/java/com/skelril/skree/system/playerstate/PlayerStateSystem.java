@@ -12,7 +12,6 @@ import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.PlayerStateServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
 
@@ -23,15 +22,10 @@ public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
         service = new PlayerStateServiceImpl();
 
         // Register the service & command
-        try {
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PlayerStateService.class, service);
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PlayerStateService.class, service);
 
-            Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("gamemode").get());
-            Sponge.getCommandManager().register(SkreePlugin.inst(), GameModeCommand.aquireSpec(), "gamemode", "gm");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("gamemode").get());
+        Sponge.getCommandManager().register(SkreePlugin.inst(), GameModeCommand.aquireSpec(), "gamemode", "gm");
     }
 
     @Override

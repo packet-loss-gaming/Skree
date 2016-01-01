@@ -17,7 +17,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -35,10 +34,10 @@ public class MarketListCommand implements CommandExecutor {
         String buy = format(entry.getValue());
         String sell = format(entry.getValue().multiply(service.getSellFactor(entry.getValue())));
 
-        Text buyText = Texts.of(TextColors.WHITE, buy);
-        Text sellText = Texts.of(TextColors.WHITE, sell);
+        Text buyText = Text.of(TextColors.WHITE, buy);
+        Text sellText = Text.of(TextColors.WHITE, sell);
 
-        return Texts.of(
+        return Text.of(
                 TextColors.BLUE, entry.getKey().toUpperCase(),
                 TextColors.YELLOW, " (Quick Price: ", buyText, " - ", sellText, ")"
         );
@@ -48,7 +47,7 @@ public class MarketListCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -59,7 +58,7 @@ public class MarketListCommand implements CommandExecutor {
         String filter = optFilter.isPresent() ? optFilter.get() : "";
 
         if (!filter.matches(MarketService.VALID_ALIAS_REGEX)) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid filter supplied."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid filter supplied."));
             return CommandResult.empty();
         }
 
@@ -67,7 +66,7 @@ public class MarketListCommand implements CommandExecutor {
                                                                    : service.getPrices(filter + "%");
 
         if (prices.isEmpty()) {
-            src.sendMessage(Texts.of(TextColors.YELLOW, "No items matched."));
+            src.sendMessage(Text.of(TextColors.YELLOW, "No items matched."));
             return CommandResult.success();
         }
 
@@ -79,7 +78,7 @@ public class MarketListCommand implements CommandExecutor {
 
         pagination.builder()
                 .contents(result)
-                .title(Texts.of(TextColors.GOLD, "Item List"))
+                .title(Text.of(TextColors.GOLD, "Item List"))
                 .paddingString(" ")
                 .sendTo(src);
 
@@ -88,8 +87,8 @@ public class MarketListCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Manipulate the market"))
-                .arguments(optional(remainingJoinedStrings(Texts.of("name"))))
+                .description(Text.of("Manipulate the market"))
+                .arguments(optional(remainingJoinedStrings(Text.of("name"))))
                 .executor(new MarketListCommand())
                 .build();
     }

@@ -19,7 +19,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class GameModeCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The player state service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The player state service is not currently running."));
             return CommandResult.empty();
         }
         PlayerStateService service = optService.get();
@@ -47,7 +47,7 @@ public class GameModeCommand implements CommandExecutor {
         target.offer(current.set(Keys.GAME_MODE, mode));
         service.load(target, current.type().get().getId());
 
-        target.sendMessage(Texts.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
+        target.sendMessage(Text.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
         return CommandResult.success();
     }
 
@@ -60,12 +60,12 @@ public class GameModeCommand implements CommandExecutor {
         map.put("spectator", GameModes.SPECTATOR);
 
         return CommandSpec.builder()
-                .description(Texts.of("Change gamemode"))
+                .description(Text.of("Change gamemode"))
                 .permission("skree.gamemode")
                 .arguments(
                         seq(
-                                onlyOne(choices(Texts.of("mode"), map)),
-                                onlyOne(playerOrSource(Texts.of("target")))
+                                onlyOne(choices(Text.of("mode"), map)),
+                                onlyOne(playerOrSource(Text.of("target")))
                         )
                 ).executor(new GameModeCommand()).build();
     }

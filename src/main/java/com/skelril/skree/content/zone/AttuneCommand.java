@@ -14,7 +14,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.string;
@@ -35,8 +35,8 @@ public class AttuneCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec(ZoneService service) {
         return CommandSpec.builder()
-                .description(Texts.of("Attune an orb to a Zone"))
+                .description(Text.of("Attune an orb to a Zone"))
                 .permission("skree.zone.zoneme")
-                .arguments(onlyOne(string(Texts.of("zone")))).executor(new AttuneCommand(service)).build();
+                .arguments(onlyOne(string(Text.of("zone")))).executor(new AttuneCommand(service)).build();
     }
 }

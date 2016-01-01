@@ -7,7 +7,7 @@
 package com.skelril.skree.content.market;
 
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 /*
         @Command(aliases = {"enchant"},
@@ -197,7 +197,7 @@ import org.spongepowered.api.text.Texts;
 public class MarketCommand {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Manipulate the market"))
+                .description(Text.of("Manipulate the market"))
                 .child(MarketBuyCommand.aquireSpec(), "buy", "b")
                 .child(MarketSellCommand.aquireSpec(), "sell", "s")
                 .child(MarketListCommand.aquireSpec(), "list", "l")

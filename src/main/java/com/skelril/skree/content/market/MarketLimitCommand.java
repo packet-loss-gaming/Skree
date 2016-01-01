@@ -14,7 +14,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -29,18 +29,18 @@ public class MarketLimitCommand implements CommandExecutor {
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
-        src.sendMessage(Texts.of(TextColors.DARK_RED, "Feature not yet implemented."));
+        src.sendMessage(Text.of(TextColors.DARK_RED, "Feature not yet implemented."));
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("View a player's limits"))
-                .arguments(optional(string(Texts.of("player"))))
+                .description(Text.of("View a player's limits"))
+                .arguments(optional(string(Text.of("player"))))
                 .executor(new MarketLimitCommand())
                 .build();
     }

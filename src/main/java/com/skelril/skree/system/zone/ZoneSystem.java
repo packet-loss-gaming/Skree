@@ -22,7 +22,6 @@ import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.world.World;
 
 import java.io.IOException;
@@ -76,12 +75,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
             service.registerManager(new ShnugglesPrimeManager());
 
             Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
-
-            try {
-                Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
-            } catch (ProviderExistsException e) {
-                e.printStackTrace();
-            }
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
         } catch (IOException e) {
             e.printStackTrace();
         }

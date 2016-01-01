@@ -6,26 +6,26 @@
 
 package com.skelril.nitro.entity;
 
+import com.skelril.nitro.text.CombinedText;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class EntityHealthPrinter {
-    private Optional<Text> living;
-    private Optional<Text> dead;
+    private Optional<CombinedText> living;
+    private Optional<CombinedText> dead;
 
-    public EntityHealthPrinter(Optional<Text> living, Optional<Text> dead) {
+    public EntityHealthPrinter(Optional<CombinedText> living, Optional<CombinedText> dead) {
         this.living = living;
         this.dead = dead;
     }
 
-    public void print(MessageSink sink, Living entity) {
+    public void print(MessageChannel sink, Living entity) {
         Double health = entity.get(Keys.HEALTH).get();
         if (health > 0) {
             printLiving(sink, entity);
@@ -47,23 +47,23 @@ public class EntityHealthPrinter {
         return map;
     }
 
-    private Text format(Text formatStr, Living living) {
-        return Texts.format(formatStr, getFormatMap(living));
+    private Text format(CombinedText formatStr, Living living) {
+        return formatStr.substitue(getFormatMap(living));
     }
 
-    private void printLiving(MessageSink sink, Living entity) {
+    private void printLiving(MessageChannel channel, Living entity) {
         if (!living.isPresent()) {
             return;
         }
 
-        sink.sendMessage(format(living.get(), entity));
+        channel.send(format(living.get(), entity));
     }
 
-    private void printDead(MessageSink sink, Living entity) {
+    private void printDead(MessageChannel channel, Living entity) {
         if (!dead.isPresent()) {
             return;
         }
 
-        sink.sendMessage(format(dead.get(), entity));
+        channel.send(format(dead.get(), entity));
     }
 }

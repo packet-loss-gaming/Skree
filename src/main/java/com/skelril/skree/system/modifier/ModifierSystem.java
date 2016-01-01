@@ -14,7 +14,6 @@ import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.modifier.LazyMySQLModifierService;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class ModifierSystem implements ServiceProvider<ModifierService> {
 
@@ -25,14 +24,9 @@ public class ModifierSystem implements ServiceProvider<ModifierService> {
         service = new LazyMySQLModifierService();
 
         // Register the service
-        try {
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ModifierService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), ModExtendCommand.aquireSpec(), "modextend");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ModifierService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), ModExtendCommand.aquireSpec(), "modextend");
     }
 
     @Override

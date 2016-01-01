@@ -19,7 +19,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDama
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
@@ -100,7 +100,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
             }
         }
 
-        attacker.sendMessage(Texts.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
+        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
 
         event.setCancelled(true);
     }

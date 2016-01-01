@@ -14,7 +14,6 @@ import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.internal.market.MarketServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.ProviderExistsException;
 
 public class MarketSystem implements ServiceProvider<MarketService> {
     private MarketService service;
@@ -24,14 +23,9 @@ public class MarketSystem implements ServiceProvider<MarketService> {
         service = new MarketServiceImpl();
 
         // Register the service
-        try {
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
     }
 
     @Override

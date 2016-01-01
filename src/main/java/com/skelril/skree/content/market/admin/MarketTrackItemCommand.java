@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -27,13 +27,13 @@ public class MarketTrackItemCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of("You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -41,16 +41,16 @@ public class MarketTrackItemCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
         ItemStack item = held.get();
 
         if (service.addItem(item)) {
-            src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item is now being tracked."));
+            src.sendMessage(Text.of(TextColors.YELLOW, "Your held item is now being tracked."));
         } else {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Your held item is already tracked."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is already tracked."));
             return CommandResult.empty();
         }
 
@@ -59,7 +59,7 @@ public class MarketTrackItemCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Introduce an item to the market"))
+                .description(Text.of("Introduce an item to the market"))
                 .executor(new MarketTrackItemCommand())
                 .build();
     }

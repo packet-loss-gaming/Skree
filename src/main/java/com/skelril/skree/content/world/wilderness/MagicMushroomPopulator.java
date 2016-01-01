@@ -13,6 +13,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.gen.Populator;
+import org.spongepowered.api.world.gen.PopulatorType;
+import org.spongepowered.api.world.gen.PopulatorTypes;
 
 import java.util.Random;
 
@@ -22,6 +24,11 @@ public class MagicMushroomPopulator implements Populator {
 
     public MagicMushroomPopulator(int mushroomCount) {
         this.mushroomCount = mushroomCount;
+    }
+
+    @Override
+    public PopulatorType getType() {
+        return PopulatorTypes.MUSHROOM;
     }
 
     @Override

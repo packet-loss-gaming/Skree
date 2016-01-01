@@ -16,7 +16,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -42,7 +42,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
         try {
             price = new BigDecimal(args.<String>getOne("price").get());
         } catch (NumberFormatException ex) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "Invalid price specified"));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid price specified"));
             return CommandResult.empty();
         }
 
@@ -51,24 +51,24 @@ public class MarketSetPriceCommand implements CommandExecutor {
         if (optAlias.isPresent()) {
             String alias = optAlias.get();
             if (service.setPrice(alias, price)) {
-                src.sendMessage(Texts.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
+                src.sendMessage(Text.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
                 return CommandResult.success();
             }
         } else if (held.isPresent()) {
             if (service.setPrice(held.get(), price)) {
-                src.sendMessage(Texts.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
+                src.sendMessage(Text.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
                 return CommandResult.success();
             }
         }
 
-        src.sendMessage(Texts.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
+        src.sendMessage(Text.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
         return CommandResult.empty();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Set the price of an item"))
-                .arguments(seq(onlyOne(string(Texts.of("price"))), optional(remainingJoinedStrings(Texts.of("alias")))))
+                .description(Text.of("Set the price of an item"))
+                .arguments(seq(onlyOne(string(Text.of("price"))), optional(remainingJoinedStrings(Text.of("alias")))))
                 .executor(new MarketSetPriceCommand())
                 .build();
     }

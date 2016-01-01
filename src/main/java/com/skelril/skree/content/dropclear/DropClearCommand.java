@@ -16,7 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -36,7 +36,7 @@ public class DropClearCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Optional<DropClearService> optService = Sponge.getServiceManager().provide(DropClearService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The drop clear service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The drop clear service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -48,7 +48,7 @@ public class DropClearCommand implements CommandExecutor {
 
         if (!optWorldProps.isPresent()) {
             if (!(src instanceof Player)) {
-                src.sendMessage(Texts.of(TextColors.RED, "You are not a player and need to specify a world!"));
+                src.sendMessage(Text.of(TextColors.RED, "You are not a player and need to specify a world!"));
                 return CommandResult.empty();
             }
             optWorld = Optional.of(((Player) src).getWorld());
@@ -61,7 +61,7 @@ public class DropClearCommand implements CommandExecutor {
 
         World world = optWorld.get();
         if (!world.isLoaded()) {
-            src.sendMessage(Texts.of(TextColors.RED, "The specified world was not loaded!"));
+            src.sendMessage(Text.of(TextColors.RED, "The specified world was not loaded!"));
             return CommandResult.empty();
         }
 
@@ -72,12 +72,12 @@ public class DropClearCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec(int maxDelay) {
         return CommandSpec.builder()
-                .description(Texts.of("Trigger a drop clear"))
+                .description(Text.of("Trigger a drop clear"))
                 .permission("skree.dropclear")
                 .arguments(
                         seq(
-                                onlyOne(optionalWeak(integer(Texts.of("seconds")), 10)),
-                                onlyOne(optional(world(Texts.of("world"))))
+                                onlyOne(optionalWeak(integer(Text.of("seconds")), 10)),
+                                onlyOne(optional(world(Text.of("world"))))
                         )
                 ).executor(new DropClearCommand(maxDelay)).build();
     }

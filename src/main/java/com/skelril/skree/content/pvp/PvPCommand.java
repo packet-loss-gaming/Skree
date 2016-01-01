@@ -16,7 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -35,13 +35,13 @@ public class PvPCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            src.sendMessage(Texts.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of("You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The PvP service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The PvP service is not currently running."));
             return CommandResult.empty();
         }
         PvPService service = optService.get();
@@ -51,17 +51,17 @@ public class PvPCommand implements CommandExecutor {
         PvPState state = stateArg.orElse(service.getPvPState(player));
         service.setPvPState(player, state);
 
-        player.sendMessage(Texts.of(
+        player.sendMessage(Text.of(
                 TextColors.BLUE,
                 "Your Opt-in PvP Settings", (stateArg.isPresent() ? " Changed!" : "")
         ));
-        player.sendMessage(Texts.of(
+        player.sendMessage(Text.of(
                 TextColors.YELLOW,
                 "  Currently: ", getColor(state), state.toString()
         ));
 
         PvPState defaultState = service.getDefaultState(player);
-        player.sendMessage(Texts.of(
+        player.sendMessage(Text.of(
                 TextColors.YELLOW,
                 "  Upon disconnect: ", getColor(defaultState), defaultState.toString()
         ));
@@ -76,9 +76,9 @@ public class PvPCommand implements CommandExecutor {
         map.put("deny", PvPState.DENIED);
 
         return CommandSpec.builder()
-                .description(Texts.of("Change your opt-in PvP status"))
+                .description(Text.of("Change your opt-in PvP status"))
                 .permission("skree.pvp")
-                .arguments(optional(onlyOne(choices(Texts.of("status"), map))))
+                .arguments(optional(onlyOne(choices(Text.of("status"), map))))
                 .executor(new PvPCommand()).build();
     }
 }

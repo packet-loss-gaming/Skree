@@ -14,7 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -54,10 +54,10 @@ public class ZoneItemUtil {
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             if (joined) {
-                player.sendMessage(Texts.of(TextColors.GOLD, holder.getName() + " has accepted your invitation."));
+                player.sendMessage(Text.of(TextColors.GOLD, holder.getName() + " has accepted your invitation."));
                 incrementCount(stack, player);
             } else {
-                player.sendMessage(Texts.of(TextColors.RED, holder.getName() + " has declined your invitation."));
+                player.sendMessage(Text.of(TextColors.RED, holder.getName() + " has declined your invitation."));
                 decrementCount(stack, player);
             }
             return true;
@@ -100,9 +100,9 @@ public class ZoneItemUtil {
             for (int i = 0; i < itemStacks.length; ++i) {
                 if (!hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
                     if (!zone.isPresent()) {
-                        aPlayer.sendMessage(Texts.of(TextColors.RED, "A group you were invited to has been destroyed."));
+                        aPlayer.sendMessage(Text.of(TextColors.RED, "A group you were invited to has been destroyed."));
                     } else {
-                        aPlayer.sendMessage(Texts.of(TextColors.RED, "A " + zone.get() + " group you were invited to has been destroyed."));
+                        aPlayer.sendMessage(Text.of(TextColors.RED, "A " + zone.get() + " group you were invited to has been destroyed."));
                     }
                 }
             }

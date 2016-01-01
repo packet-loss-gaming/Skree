@@ -18,7 +18,6 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -39,7 +38,7 @@ public class MarketLookupCommand implements CommandExecutor {
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
         if (!optService.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "The market service is not currently running."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
             return CommandResult.empty();
         }
 
@@ -65,7 +64,7 @@ public class MarketLookupCommand implements CommandExecutor {
         }
 
         if (!optPrice.isPresent()) {
-            src.sendMessage(Texts.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
             return CommandResult.empty();
         }
 
@@ -81,16 +80,16 @@ public class MarketLookupCommand implements CommandExecutor {
         List<Text> information = new ArrayList<>(6);
         Collections.addAll(
                 information,
-                Texts.of(TextColors.GOLD, "Price information for: ", TextColors.BLUE, optAlias.get().toUpperCase()),
-                Texts.of(TextColors.YELLOW, "When you buy it you pay:"),
-                Texts.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
-                Texts.of(TextColors.YELLOW, "When you sell it you get:"),
-                Texts.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each.")
+                Text.of(TextColors.GOLD, "Price information for: ", TextColors.BLUE, optAlias.get().toUpperCase()),
+                Text.of(TextColors.YELLOW, "When you buy it you pay:"),
+                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
+                Text.of(TextColors.YELLOW, "When you sell it you get:"),
+                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each.")
         );
 
         if (percentageSale != 1) {
             information.add(
-                    Texts.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellNewPrice, TextColors.YELLOW, " each when new.")
+                    Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellNewPrice, TextColors.YELLOW, " each when new.")
             );
         }
 
@@ -100,8 +99,8 @@ public class MarketLookupCommand implements CommandExecutor {
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Lookup the price information for an item"))
-                .arguments(optional(remainingJoinedStrings(Texts.of("alias"))))
+                .description(Text.of("Lookup the price information for an item"))
+                .arguments(optional(remainingJoinedStrings(Text.of("alias"))))
                 .executor(new MarketLookupCommand())
                 .build();
     }
