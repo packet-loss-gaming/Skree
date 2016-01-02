@@ -400,57 +400,52 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
-        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
 
-        // Workaround for SpongeCommon#374
-        if (transactions.size() > 1) {
-            return;
-        }
+            for (Transaction<BlockSnapshot> block :  event.getTransactions()) {
+                Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
-        for (Transaction<BlockSnapshot> block : transactions) {
-            Optional<Location<World>> optLoc = block.getFinal().getLocation();
-
-            if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
-                continue;
-            }
-
-            Location<World> loc = optLoc.get();
-            Optional<Player> optPlayer = event.getCause().first(Player.class);
-            if (optPlayer.isPresent() && ore().contains(loc.getBlockType())) {
-                Player player = optPlayer.get();
-
-                // Allow creative mode players to still place blocks
-                if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
+                if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
                     continue;
                 }
 
-                try {
-                    Vector3d origin = loc.getPosition();
-                    World world = loc.getExtent();
-                    for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = ParticleEffect.builder().type(
-                                ParticleTypes.CRIT_MAGIC
-                        ).motion(
-                                new Vector3d(
-                                        Probability.getRangedRandom(-1, 1),
-                                        Probability.getRangedRandom(-.7, .7),
-                                        Probability.getRangedRandom(-1, 1)
-                                )
-                        ).count(1).build();
-
-                        world.spawnParticles(effect, origin.add(.5, .5, .5));
+                Location<World> loc = optLoc.get();
+                if (ore().contains(loc.getBlockType())) {
+                    // Allow creative mode players to still place blocks
+                    if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
+                        continue;
                     }
-                } catch (Exception ex) {
-                    player.sendMessage(
-                            /* ChatTypes.SYSTEM, */
-                            Text.of(
-                                    TextColors.RED,
-                                    "You find yourself unable to place that block."
-                            )
-                    );
-                }
 
-                block.setValid(false);
+                    try {
+                        Vector3d origin = loc.getPosition();
+                        World world = loc.getExtent();
+                        for (int i = 0; i < 40; ++i) {
+                            ParticleEffect effect = ParticleEffect.builder().type(
+                                    ParticleTypes.CRIT_MAGIC
+                            ).motion(
+                                    new Vector3d(
+                                            Probability.getRangedRandom(-1, 1),
+                                            Probability.getRangedRandom(-.7, .7),
+                                            Probability.getRangedRandom(-1, 1)
+                                    )
+                            ).count(1).build();
+
+                            world.spawnParticles(effect, origin.add(.5, .5, .5));
+                        }
+                    } catch (Exception ex) {
+                        player.sendMessage(
+                            /* ChatTypes.SYSTEM, */
+                                Text.of(
+                                        TextColors.RED,
+                                        "You find yourself unable to place that block."
+                                )
+                        );
+                    }
+
+                    block.setValid(false);
+                }
             }
         }
     }
