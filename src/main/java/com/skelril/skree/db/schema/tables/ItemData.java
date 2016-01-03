@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ItemData extends TableImpl<ItemDataRecord> {
 
-	private static final long serialVersionUID = 1701639668;
+	private static final long serialVersionUID = -1181613991;
 
 	/**
 	 * The reference instance of <code>mc_db.item_data</code>
@@ -62,7 +62,7 @@ public class ItemData extends TableImpl<ItemDataRecord> {
 	/**
 	 * The column <code>mc_db.item_data.value</code>.
 	 */
-	public final TableField<ItemDataRecord, BigDecimal> VALUE = createField("value", org.jooq.impl.SQLDataType.DECIMAL.precision(22, 2).nullable(false), this, "");
+	public final TableField<ItemDataRecord, BigDecimal> VALUE = createField("value", org.jooq.impl.SQLDataType.DECIMAL.precision(22, 2), this, "");
 
 	/**
 	 * The column <code>mc_db.item_data.primary alias</code>.
@@ -120,7 +120,7 @@ public class ItemData extends TableImpl<ItemDataRecord> {
 	 */
 	@Override
 	public List<ForeignKey<ItemDataRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<ItemDataRecord, ?>>asList(Keys.FK_ITEM_ID_1);
+		return Arrays.<ForeignKey<ItemDataRecord, ?>>asList(Keys.ITEM_DATA_IBFK_1);
 	}
 
 	/**

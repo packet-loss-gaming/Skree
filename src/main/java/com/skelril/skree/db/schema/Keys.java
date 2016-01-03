@@ -4,8 +4,12 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.*;
-import com.skelril.skree.db.schema.tables.records.*;
+import com.skelril.skree.db.schema.tables.ItemAliases;
+import com.skelril.skree.db.schema.tables.ItemData;
+import com.skelril.skree.db.schema.tables.Modifiers;
+import com.skelril.skree.db.schema.tables.records.ItemAliasesRecord;
+import com.skelril.skree.db.schema.tables.records.ItemDataRecord;
+import com.skelril.skree.db.schema.tables.records.ModifiersRecord;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
@@ -34,9 +38,7 @@ public class Keys {
 
 	public static final Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = Identities0.IDENTITY_ITEM_ALIASES;
 	public static final Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = Identities0.IDENTITY_ITEM_DATA;
-	public static final Identity<MarketTransactionsRecord, Integer> IDENTITY_MARKET_TRANSACTIONS = Identities0.IDENTITY_MARKET_TRANSACTIONS;
 	public static final Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = Identities0.IDENTITY_MODIFIERS;
-	public static final Identity<PlayersRecord, Integer> IDENTITY_PLAYERS = Identities0.IDENTITY_PLAYERS;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -47,20 +49,15 @@ public class Keys {
 	public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY = UniqueKeys0.KEY_ITEM_DATA_PRIMARY;
 	public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_ITEM = UniqueKeys0.KEY_ITEM_DATA_ITEM;
 	public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE = UniqueKeys0.KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE;
-	public static final UniqueKey<MarketTransactionsRecord> KEY_MARKET_TRANSACTIONS_PRIMARY = UniqueKeys0.KEY_MARKET_TRANSACTIONS_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = UniqueKeys0.KEY_MODIFIERS_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = UniqueKeys0.KEY_MODIFIERS_NAME_UNIQUE;
-	public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PRIMARY = UniqueKeys0.KEY_PLAYERS_PRIMARY;
-	public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PLAYERSCOL_UNIQUE = UniqueKeys0.KEY_PLAYERS_PLAYERSCOL_UNIQUE;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
-	public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ID = ForeignKeys0.ITEM_ID;
-	public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> FK_ITEM_ID_1 = ForeignKeys0.FK_ITEM_ID_1;
-	public static final ForeignKey<MarketTransactionsRecord, PlayersRecord> PLAYER_KEY = ForeignKeys0.PLAYER_KEY;
-	public static final ForeignKey<MarketTransactionsRecord, ItemDataRecord> ITEM_KEY = ForeignKeys0.ITEM_KEY;
+	public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = ForeignKeys0.ITEM_ALIASES_IBFK_1;
+	public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = ForeignKeys0.ITEM_DATA_IBFK_1;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -69,9 +66,7 @@ public class Keys {
 	private static class Identities0 extends AbstractKeys {
 		public static Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = createIdentity(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
 		public static Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = createIdentity(ItemData.ITEM_DATA, ItemData.ITEM_DATA.ID);
-		public static Identity<MarketTransactionsRecord, Integer> IDENTITY_MARKET_TRANSACTIONS = createIdentity(MarketTransactions.MARKET_TRANSACTIONS, MarketTransactions.MARKET_TRANSACTIONS.ID);
 		public static Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = createIdentity(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
-		public static Identity<PlayersRecord, Integer> IDENTITY_PLAYERS = createIdentity(Players.PLAYERS, Players.PLAYERS.ID);
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
@@ -80,17 +75,12 @@ public class Keys {
 		public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY = createUniqueKey(ItemData.ITEM_DATA, ItemData.ITEM_DATA.ID);
 		public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_ITEM = createUniqueKey(ItemData.ITEM_DATA, ItemData.ITEM_DATA.MC_ID, ItemData.ITEM_DATA.VARIANT);
 		public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE = createUniqueKey(ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
-		public static final UniqueKey<MarketTransactionsRecord> KEY_MARKET_TRANSACTIONS_PRIMARY = createUniqueKey(MarketTransactions.MARKET_TRANSACTIONS, MarketTransactions.MARKET_TRANSACTIONS.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.NAME);
-		public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PRIMARY = createUniqueKey(Players.PLAYERS, Players.PLAYERS.ID);
-		public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PLAYERSCOL_UNIQUE = createUniqueKey(Players.PLAYERS, Players.PLAYERS.UUID);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
-		public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ID = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_DATA_PRIMARY, ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ITEM_ID);
-		public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> FK_ITEM_ID_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ALIASES_PRIMARY, ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
-		public static final ForeignKey<MarketTransactionsRecord, PlayersRecord> PLAYER_KEY = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_PLAYERS_PRIMARY, MarketTransactions.MARKET_TRANSACTIONS, MarketTransactions.MARKET_TRANSACTIONS.PLAYER_ID);
-		public static final ForeignKey<MarketTransactionsRecord, ItemDataRecord> ITEM_KEY = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_DATA_PRIMARY, MarketTransactions.MARKET_TRANSACTIONS, MarketTransactions.MARKET_TRANSACTIONS.ITEM_ID);
+		public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_DATA_PRIMARY, ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ITEM_ID);
+		public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ALIASES_PRIMARY, ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
 	}
 }

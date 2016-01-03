@@ -4,7 +4,9 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.*;
+import com.skelril.skree.db.schema.tables.ItemAliases;
+import com.skelril.skree.db.schema.tables.ItemData;
+import com.skelril.skree.db.schema.tables.Modifiers;
 
 import javax.annotation.Generated;
 
@@ -33,17 +35,7 @@ public class Tables {
 	public static final ItemData ITEM_DATA = com.skelril.skree.db.schema.tables.ItemData.ITEM_DATA;
 
 	/**
-	 * The table mc_db.market_transactions
-	 */
-	public static final MarketTransactions MARKET_TRANSACTIONS = com.skelril.skree.db.schema.tables.MarketTransactions.MARKET_TRANSACTIONS;
-
-	/**
 	 * The table mc_db.modifiers
 	 */
 	public static final Modifiers MODIFIERS = com.skelril.skree.db.schema.tables.Modifiers.MODIFIERS;
-
-	/**
-	 * The table mc_db.players
-	 */
-	public static final Players PLAYERS = com.skelril.skree.db.schema.tables.Players.PLAYERS;
 }
