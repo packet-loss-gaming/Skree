@@ -18,7 +18,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class FMLSkree {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
-        SkreePlugin.customItemSystem.init();
-        SkreePlugin.customBlockSystem.init();
+        SkreePlugin.inst().manager.trigger("FMLInitializationEvent");
     }
 }

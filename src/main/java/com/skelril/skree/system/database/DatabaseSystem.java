@@ -8,6 +8,8 @@ package com.skelril.skree.system.database;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import org.spongepowered.api.Sponge;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@NModule(name = "Database System")
 public class DatabaseSystem {
 
     private Path getDatabaseFile() throws IOException {
@@ -27,8 +30,8 @@ public class DatabaseSystem {
         return path.resolve("database.json");
     }
 
-    public DatabaseSystem() {
-
+    @NModuleTrigger(trigger = "PRE_INITIALIZATION")
+    public void init() {
         try {
             Class.forName("org.mariadb.jdbc.Driver").newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {

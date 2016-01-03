@@ -6,6 +6,8 @@
 
 package com.skelril.skree.system.playerstate;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.playerstate.GameModeCommand;
 import com.skelril.skree.service.PlayerStateService;
@@ -13,12 +15,13 @@ import com.skelril.skree.service.internal.playerstate.PlayerStateServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 
+@NModule(name = "Player State System")
 public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
 
     private PlayerStateService service;
 
-    public PlayerStateSystem() {
-
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new PlayerStateServiceImpl();
 
         // Register the service & command

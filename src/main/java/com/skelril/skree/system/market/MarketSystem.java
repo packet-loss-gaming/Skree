@@ -6,7 +6,8 @@
 
 package com.skelril.skree.system.market;
 
-import com.google.inject.Inject;
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.market.MarketCommand;
 import com.skelril.skree.content.modifier.ModifierNotifier;
@@ -15,11 +16,12 @@ import com.skelril.skree.service.internal.market.MarketServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 
+@NModule(name = "Market System")
 public class MarketSystem implements ServiceProvider<MarketService> {
     private MarketService service;
 
-    @Inject
-    public MarketSystem() {
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new MarketServiceImpl();
 
         // Register the service

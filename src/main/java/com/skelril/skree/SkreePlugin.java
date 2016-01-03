@@ -9,9 +9,7 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
-import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
-import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
+import com.skelril.nitro.module.NitroModuleManager;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
@@ -20,19 +18,16 @@ import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
 import com.skelril.skree.system.pvp.PvPSystem;
-import com.skelril.skree.system.registry.block.CustomBlockSystem;
-import com.skelril.skree.system.registry.item.CustomItemSystem;
+import com.skelril.skree.system.registry.CustomRegisterySystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
+import com.skelril.skree.system.world.WorldGeneratorSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import com.skelril.skree.system.zone.ZoneSystem;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.util.logging.Logger;
 
@@ -43,8 +38,7 @@ public class SkreePlugin {
     @Inject
     private Logger logger;
 
-    public static CustomItemSystem customItemSystem;
-    public static CustomBlockSystem customBlockSystem;
+    protected NitroModuleManager manager = new NitroModuleManager();
 
     private static SkreePlugin inst;
 
@@ -54,41 +48,20 @@ public class SkreePlugin {
 
     public SkreePlugin() {
         inst = this;
+        registerModules();
+        manager.discover();
     }
 
     @Listener
-    public void onPreInit(GamePreInitializationEvent event) {
-        // Handle the database connection setup very early on
-        new DatabaseSystem();
-
-        customItemSystem = new CustomItemSystem();
-        customItemSystem.preInit();
-
-        customBlockSystem = new CustomBlockSystem();
-        customBlockSystem.preInit();
-
-        customItemSystem.associate();
-        customBlockSystem.associate();
-
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new VoidWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new NoOreWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new WildernessWorldGeneratorModifier());
+    public void onGameStateChange(GameStateEvent event) {
+        manager.trigger(event.getState().toString());
     }
 
-    @Listener
-    public void onServerStart(GameStartedServerEvent event) {
-        switch (Sponge.getPlatform().getExecutionType()) {
-            case SERVER:
-                registerPrimaryServerSystems();
-                break;
-        }
-
-        logger.info("Skree Started! Kaw!");
-    }
-
-    private void registerPrimaryServerSystems() {
+    private void registerModules() {
         ImmutableList<Class> initialized = ImmutableList.of(
                 ArrowFishingSystem.class,
+                CustomRegisterySystem.class,
+                DatabaseSystem.class,
                 DropClearSystem.class,
                 MarketSystem.class,
                 ModifierSystem.class,
@@ -97,6 +70,7 @@ public class SkreePlugin {
                 PvPSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
+                WorldGeneratorSystem.class,
                 WorldSystem.class,
                 WeatherCommandSystem.class,
                 ZoneSystem.class
@@ -104,7 +78,7 @@ public class SkreePlugin {
 
         for (Class<?> entry : initialized) {
             try {
-                entry.newInstance();
+                manager.registerModule(entry.newInstance());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

@@ -6,6 +6,8 @@
 
 package com.skelril.skree.system.dropclear;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.dropclear.DropClearCommand;
 import com.skelril.skree.service.DropClearService;
@@ -14,11 +16,13 @@ import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
+@NModule(name = "Drop Clear System")
 public class DropClearSystem implements ServiceProvider<DropClearService> {
 
     private DropClearService service;
 
-    public DropClearSystem() {
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new DropClearServiceImpl(1000, 3);
 
         // Register the service & command

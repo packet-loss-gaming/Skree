@@ -7,6 +7,8 @@
 package com.skelril.skree.system.world;
 
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
 import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
@@ -29,6 +31,7 @@ import org.spongepowered.api.world.WorldCreationSettings;
 import java.util.Optional;
 import java.util.Random;
 
+@NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
 
     private static final String MAIN = "Main";
@@ -41,7 +44,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
     private WorldService service;
 
-    public WorldSystem() {
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new WorldServiceImpl();
 
         // Register the service & command

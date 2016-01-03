@@ -6,17 +6,20 @@
 
 package com.skelril.skree.system.projectilewatcher;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ProjectileWatcherService;
 import com.skelril.skree.service.internal.projectilewatcher.ProjectileWatcherServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 
+@NModule(name = "Projectile Watcher System")
 public class ProjectileWatcherSystem implements ServiceProvider<ProjectileWatcherService> {
     private ProjectileWatcherService service;
 
-    public ProjectileWatcherSystem() {
-
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new ProjectileWatcherServiceImpl();
 
         // Register the service & command
