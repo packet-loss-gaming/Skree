@@ -10,7 +10,6 @@ import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.market.MarketCommand;
-import com.skelril.skree.content.modifier.ModifierNotifier;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.internal.market.MarketServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
@@ -25,7 +24,6 @@ public class MarketSystem implements ServiceProvider<MarketService> {
         service = new MarketServiceImpl();
 
         // Register the service
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
         Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
     }
