@@ -75,6 +75,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
             if (held.getItem() == this) {
                 setDestination(held, player.getLocation());
                 player.setItemInHand(held);
+                event.setCancelled(true);
             }
         }
     }
@@ -98,6 +99,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                     playerInv.consumeInventoryItem(CustomItemTypes.ENDER_FOCUS);
                     tf(player).inventoryContainer.detectAndSendChanges();
                     player.setLocation(optDestination.get());
+                    event.setCancelled(true);
                 }
             }
         }
