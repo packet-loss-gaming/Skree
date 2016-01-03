@@ -15,11 +15,13 @@ public class MarketAdminCommand {
         return CommandSpec.builder()
                 .description(Text.of("Administrative commands for the market"))
                 .permission("skree.market.admin")
-                .child(MarketQuickAddCommand.aquireSpec(), "quickadd")
+                .child(MarketQuickAddCommand.aquireSpec(), "quickadd", "add")
                 .child(MarketAddAliasCommand.aquireSpec(), "addalias")
+                .child(MarketRemoveAliasCommand.aquireSpec(), "remalias")
                 .child(MarketSetPriceCommand.aquireSpec(), "setprice")
                 .child(MarketSetPrimaryAliasCommand.aquireSpec(), "setprimaryalias", "setpalias")
                 .child(MarketTrackItemCommand.aquireSpec(), "track")
+                .child(MarketUntrackItemComand.aquireSpec(), "untrack", "remove")
                 .build();
     }
 }

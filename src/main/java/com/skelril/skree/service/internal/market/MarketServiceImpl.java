@@ -151,6 +151,22 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
+    public boolean remItem(ItemStack stack) {
+        try (Connection con = SQLHandle.getConnection()) {
+            Clause<String, String> idVariant = getIDVariant(stack);
+
+            DSLContext create = DSL.using(con);
+            int changed = create.deleteFrom(ITEM_DATA)
+                    .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
+                    .execute();
+            return changed > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public boolean setPrimaryAlias(String alias) {
         validateAlias(alias);
 
@@ -191,6 +207,22 @@ public class MarketServiceImpl implements MarketService {
                                             .and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
                             )
                     ).onDuplicateKeyIgnore().execute();
+            return changed > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean remAlias(String alias) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            int changed = create.deleteFrom(ITEM_ALIASES)
+                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    .execute();
             return changed > 0;
         } catch (SQLException e) {
             e.printStackTrace();

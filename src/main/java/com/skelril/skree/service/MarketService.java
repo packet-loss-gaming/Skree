@@ -25,9 +25,11 @@ public interface MarketService {
     boolean setPrice(ItemStack stack, BigDecimal price);
 
     boolean addItem(ItemStack stack);
+    boolean remItem(ItemStack stack);
 
     boolean setPrimaryAlias(String alias);
     boolean addAlias(String alias, ItemStack stack);
+    boolean remAlias(String alias);
 
     Optional<String> getAlias(String alias);
     Optional<String> getAlias(ItemStack stack);
