@@ -6,35 +6,33 @@
 
 package com.skelril.skree.service.internal.dropclear;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.entity.EntityCleanupTask;
+import com.skelril.nitro.predicate.EntityTypePredicate;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.DropClearService;
+import com.skelril.skree.service.internal.entitystats.WorldStatisticsEntityCollection;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public class DropClearServiceImpl implements DropClearService {
 
     private int autoAmt;
     private float panicMod;
 
-    private Map<Extent, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
-    private Map<Extent, Map<Vector3i, ? extends DropClearStats>> lastClear = new HashMap<>();
+    private Map<World, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
 
     public DropClearServiceImpl(int autoAmt, float panicMod) {
         this.autoAmt = autoAmt;
@@ -42,19 +40,19 @@ public class DropClearServiceImpl implements DropClearService {
     }
 
     @Override
-    public boolean cleanup(Extent extent, int seconds) {
+    public boolean cleanup(World extent, int seconds) {
         return dropClear(extent, seconds, true);
     }
 
     @Override
-    public boolean checkedCleanup(Extent extent) {
-        CheckProfile profile = CheckProfile.createFor(extent, checkedEntities);
+    public boolean checkedCleanup(World world) {
+        WorldStatisticsEntityCollection profile = WorldStatisticsEntityCollection.createFor(world, checkPredicate);
         int itemCount = profile.getEntities().size();
         if (itemCount >= autoAmt) {
             if (itemCount >= autoAmt * panicMod) {
-                forceCleanup(extent);
-            } else if (!isActiveFor(extent)) {
-                cleanup(extent);
+                forceCleanup(world);
+            } else if (!isActiveFor(world)) {
+                cleanup(world);
             }
             return true;
         }
@@ -62,12 +60,12 @@ public class DropClearServiceImpl implements DropClearService {
     }
 
     @Override
-    public boolean isActiveFor(Extent extent) {
+    public boolean isActiveFor(World extent) {
         return getActiveTask(extent) != null;
     }
 
-    private TimedRunnable<EntityCleanupTask> getActiveTask(Extent extent) {
-        TimedRunnable<EntityCleanupTask> runnable = timers.get(extent);
+    private TimedRunnable<EntityCleanupTask> getActiveTask(World world) {
+        TimedRunnable<EntityCleanupTask> runnable = timers.get(world);
 
         // Check for old task, and overwrite if allowed
         if (runnable != null && !runnable.isComplete()) {
@@ -77,54 +75,23 @@ public class DropClearServiceImpl implements DropClearService {
     }
 
     @Override
-    public void forceCleanup(Extent extent) {
-        dropClear(extent, 0, true);
+    public void forceCleanup(World world) {
+        dropClear(world, 0, true);
     }
 
-    private static Set<EntityType> checkedEntities = new HashSet<>();
+    private static Predicate<Entity> checkPredicate;
 
     static {
+        HashSet<EntityType> checkedEntities = new HashSet<>();
         checkedEntities.add(EntityTypes.ITEM);
         checkedEntities.add(EntityTypes.ARROW);
         checkedEntities.add(EntityTypes.EXPERIENCE_ORB);
-    }
 
-    private EntityCleanupTask pickDropClear(Extent extent) {
-        return new EntityCleanupTask(extent, checkedEntities) {
-            @Override
-            public void notifyCleanProgress(int times) {
-                extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.CHAT,
-                                Text.of(TextColors.RED, "Clearing drops in " + times + " seconds!")
-                        )
-                );
-            }
-
-            @Override
-            public void notifyCleanBeginning() {
-                extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.CHAT,
-                                Text.of(TextColors.RED, "Clearing drops!")
-                        )
-                );
-            }
-
-            @Override
-            public void notifyCleanEnding() {
-                extent.getEntities(input -> input instanceof Player).stream().map(p -> (Player) p).forEach(
-                        player -> player.sendMessage(
-                                ChatTypes.CHAT,
-                                Text.of(TextColors.GREEN, getLastProfile().getEntities().size() + " drops cleared!")
-                        )
-                );
-            }
-        };
+        checkPredicate = new EntityTypePredicate(checkedEntities);
     }
 
     private EntityCleanupTask pickDropClear(World world) {
-        return new EntityCleanupTask(world, checkedEntities) {
+        return new EntityCleanupTask(world, checkPredicate) {
             @Override
             public void notifyCleanProgress(int times) {
                 MessageChannel.TO_ALL.send(
@@ -157,8 +124,8 @@ public class DropClearServiceImpl implements DropClearService {
         };
     }
 
-    private boolean dropClear(Extent extent, int seconds, boolean overwrite) {
-        TimedRunnable<EntityCleanupTask> runnable = getActiveTask(extent);
+    private boolean dropClear(World world, int seconds, boolean overwrite) {
+        TimedRunnable<EntityCleanupTask> runnable = getActiveTask(world);
 
         // Check for old task, and overwrite if allowed
         if (runnable != null) {
@@ -169,12 +136,7 @@ public class DropClearServiceImpl implements DropClearService {
             return false;
         }
 
-        EntityCleanupTask cleanupTask;
-        if (extent instanceof World) {
-            cleanupTask = pickDropClear((World) extent);
-        } else {
-            cleanupTask = pickDropClear(extent);
-        }
+        EntityCleanupTask cleanupTask = pickDropClear(world);
 
         // Setup new task
         runnable = new TimedRunnable<EntityCleanupTask>(cleanupTask, seconds) {
@@ -182,9 +144,10 @@ public class DropClearServiceImpl implements DropClearService {
             public void cancel(boolean withEnd) {
                 super.cancel(withEnd);
                 if (withEnd) {
-                    lastClear.put(extent, getBaseTask().getLastProfile().getStats());
+                    // TODO send to the yet to be made, Entity Stats service
+                    // lastClear.put(world, getBaseTask().getLastProfile());
                 }
-                timers.remove(extent);
+                timers.remove(world);
             }
         };
 
@@ -195,7 +158,7 @@ public class DropClearServiceImpl implements DropClearService {
         ).submit(SkreePlugin.inst());
 
         runnable.setTask(task);
-        timers.put(extent, runnable);
+        timers.put(world, runnable);
         return true;
     }
 }

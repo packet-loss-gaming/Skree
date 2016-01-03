@@ -6,17 +6,17 @@
 
 package com.skelril.skree.service;
 
-import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.World;
 
 public interface DropClearService {
-    default boolean cleanup(Extent extent) {
+    default boolean cleanup(World extent) {
         return cleanup(extent, 10);
     }
-    boolean cleanup(Extent extent, int seconds);
+    boolean cleanup(World extent, int seconds);
 
-    boolean checkedCleanup(Extent extent);
+    boolean checkedCleanup(World extent);
 
-    boolean isActiveFor(Extent extent);
+    boolean isActiveFor(World extent);
 
-    void forceCleanup(Extent extent);
+    void forceCleanup(World extent);
 }
