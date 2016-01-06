@@ -30,6 +30,7 @@ import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
+import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -49,6 +50,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
@@ -63,6 +65,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDama
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -175,6 +178,17 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                 Math.max(min, (min + level) / 2)
                         )
                 );
+            }
+        }
+    }
+
+    @Listener
+    public void onRespawn(RespawnPlayerEvent event) {
+        if (isApplicable(event.getToTransform().getExtent())) {
+            Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+            if (optWorldService.isPresent()) {
+                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
             }
         }
     }
