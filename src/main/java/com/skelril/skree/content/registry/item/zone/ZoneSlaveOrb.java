@@ -74,7 +74,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
-                    if (notifyGroupOwner(itemStack, player, true)) {
+                    if (!isAttuned(itemStack) && notifyGroupOwner(itemStack, player, true)) {
                         attune(itemStack);
                     }
                     event.setCancelled(true);

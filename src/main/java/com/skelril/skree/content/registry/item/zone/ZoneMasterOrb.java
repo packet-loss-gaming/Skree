@@ -144,7 +144,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (this.equals(itemStack.getItem()) && isAttuned(itemStack)) {
                     Player targetPlayer = (Player) targetEntity;
-                    if (!playerAlreadyHasInvite(itemStack, targetPlayer)) {
+                    if (playerAlreadyHasInvite(itemStack, targetPlayer)) {
                         player.sendMessage(
                                 Text.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
                         );
