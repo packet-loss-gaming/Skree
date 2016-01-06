@@ -72,6 +72,6 @@ public class TwoTailedSword extends CustomSword implements EventAwareContent {
                     target.offer(Keys.HEALTH, Math.max(0, optHealth.get() - 16));
                 }
             }
-        };
+        }.parse(event);
     }
 }

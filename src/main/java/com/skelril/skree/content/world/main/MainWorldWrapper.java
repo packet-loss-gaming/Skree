@@ -89,7 +89,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
                 event.setCancelled(true);
             }
-        };
+        }.parse(event);
     }
 
     @Override

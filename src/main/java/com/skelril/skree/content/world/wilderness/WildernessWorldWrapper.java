@@ -246,7 +246,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 ).submit(SkreePlugin.inst());
 
             }
-        };
+        }.parse(event);
     }
 
     @Listener

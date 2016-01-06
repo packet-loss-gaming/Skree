@@ -79,6 +79,6 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
                 event.setCancelled(true);
             }
-        };
+        }.parse(event);
     }
 }
