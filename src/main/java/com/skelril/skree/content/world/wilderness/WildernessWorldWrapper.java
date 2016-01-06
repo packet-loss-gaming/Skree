@@ -8,6 +8,7 @@ package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
+import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
@@ -60,8 +61,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -193,66 +192,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
     }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Living)) {
-            return;
-        }
-
-        Optional<Integer> optLevel = getLevel(entity.getLocation());
-        if (!optLevel.isPresent()) {
-            return;
-        }
-
-        int level = optLevel.get();
-        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
-        if (optDamageSource.isPresent()) {
-            Entity srcEntity;
-            if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
-                srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
-            } else {
-                srcEntity = optDamageSource.get().getSource();
-            }
-
-            if (!(srcEntity instanceof Living)) {
-                return;
-            }
-
-            Living living = (Living) srcEntity;
-            if (entity instanceof Player && living instanceof Player) {
-                processPvP(level, (Player) living, (Player) entity, event);
-            } else if (entity instanceof Player) {
-                processMonsterAttack(level, living, (Player) entity, event);
-            } else if (living instanceof Player) {
-                processPlayerAttack(level, (Player) living, (Living) entity, event);
-            }
-        }
-    }
-
-    private void processPvP(int level, Player attacker, Player defender, DamageEntityEvent event) {
-        if (allowsPvP(level)) {
-            return;
-        }
-
-        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-        if (optService.isPresent()) {
-            PvPService service = optService.get();
-            if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
-                return;
-            }
-        }
-
-        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
-        attacker.sendMessage(Text.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
-
-        event.setCancelled(true);
-    }
-
-    private void processMonsterAttack(int level, Living attacker, Player defender, DamageEntityEvent event) {
-        event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
-    }
-
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
             Optional.of(
                     CombinedText.of(
@@ -266,10 +205,48 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             Optional.of(CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
     );
 
-    private void processPlayerAttack(int level, Player attacker, Living defender, DamageEntityEvent event) {
-        Task.builder().delayTicks(1).execute(
-                () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
-        ).submit(SkreePlugin.inst());
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        Optional<Integer> optLevel = getLevel(event.getTargetEntity().getLocation());
+        if (!optLevel.isPresent()) {
+            return;
+        }
+
+        int level = optLevel.get();
+        new PlayerCombatParser() {
+            @Override
+            public void processPvP(Player attacker, Player defender) {
+                if (allowsPvP(level)) {
+                    return;
+                }
+
+                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+                if (optService.isPresent()) {
+                    PvPService service = optService.get();
+                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
+                        return;
+                    }
+                }
+
+                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
+                attacker.sendMessage(Text.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
+
+                event.setCancelled(true);
+            }
+
+            @Override
+            public void processMonsterAttack(Living attacker, Player defender) {
+                event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
+            }
+
+            @Override
+            public void processPlayerAttack(Player attacker, Living defender) {
+                Task.builder().delayTicks(1).execute(
+                        () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
+                ).submit(SkreePlugin.inst());
+
+            }
+        };
     }
 
     @Listener

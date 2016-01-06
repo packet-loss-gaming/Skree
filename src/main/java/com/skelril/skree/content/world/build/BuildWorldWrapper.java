@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.world.build;
 
+import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
@@ -14,8 +15,6 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -66,42 +65,27 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onPlayerCombat(DamageEntityEvent event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Living) || !isApplicable(entity)) {
-            return;
-        }
+        new PlayerCombatParser() {
+            @Override
+            public void processPvP(Player attacker, Player defender) {
+                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+                if (optService.isPresent()) {
+                    PvPService service = optService.get();
+                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
+                        return;
+                    }
+                }
 
-        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
-        if (optDamageSource.isPresent()) {
-            Entity srcEntity;
-            if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
-                srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
-            } else {
-                srcEntity = optDamageSource.get().getSource();
+                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
+
+                event.setCancelled(true);
             }
 
-            if (!(srcEntity instanceof Living)) {
-                return;
-            }
+            @Override
+            public void processMonsterAttack(Living attacker, Player defender) { }
 
-            Living living = (Living) srcEntity;
-            if (entity instanceof Player && living instanceof Player) {
-                processPvP((Player) living, (Player) entity, event);
-            }
-        }
-    }
-
-    private void processPvP(Player attacker, Player defender, DamageEntityEvent event) {
-        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-        if (optService.isPresent()) {
-            PvPService service = optService.get();
-            if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
-                return;
-            }
-        }
-
-        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
-
-        event.setCancelled(true);
+            @Override
+            public void processPlayerAttack(Player attacker, Living defender) { }
+        };
     }
 }
