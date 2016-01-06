@@ -17,7 +17,6 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -90,12 +89,6 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
                 event.setCancelled(true);
             }
-
-            @Override
-            public void processMonsterAttack(Living attacker, Player defender) { }
-
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) { }
         };
     }
 

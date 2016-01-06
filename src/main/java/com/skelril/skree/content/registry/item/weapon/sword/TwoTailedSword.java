@@ -72,12 +72,6 @@ public class TwoTailedSword extends CustomSword implements EventAwareContent {
                     target.offer(Keys.HEALTH, Math.max(0, optHealth.get() - 16));
                 }
             }
-
-            @Override
-            public void processMonsterAttack(Living attacker, Player defender) { }
-
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) { }
         };
     }
 }

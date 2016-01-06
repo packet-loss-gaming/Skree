@@ -52,9 +52,9 @@ public interface PlayerCombatParser extends CombatParser {
         return true;
     }
 
-    void processPvP(Player attacker, Player defender);
+    default void processPvP(Player attacker, Player defender) { }
 
-    void processMonsterAttack(Living attacker, Player defender);
+    default void processMonsterAttack(Living attacker, Player defender) { }
 
-    void processPlayerAttack(Player attacker, Living defender);
+    default void processPlayerAttack(Player attacker, Living defender) { }
 }

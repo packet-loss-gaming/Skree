@@ -11,7 +11,6 @@ import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -80,12 +79,6 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
                 event.setCancelled(true);
             }
-
-            @Override
-            public void processMonsterAttack(Living attacker, Player defender) { }
-
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) { }
         };
     }
 }
