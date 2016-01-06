@@ -12,7 +12,7 @@ import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class ChainPlacementAllocator extends WESchematicAllocator {
 
@@ -20,7 +20,7 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
 
     private Vector2i lastEnd = new Vector2i(0, 0);
 
-    public ChainPlacementAllocator(File baseDir, WorldResolver worldResolver) {
+    public ChainPlacementAllocator(Path baseDir, WorldResolver worldResolver) {
         super(baseDir);
         this.worldResolver = worldResolver;
     }

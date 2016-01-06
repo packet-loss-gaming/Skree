@@ -8,55 +8,54 @@ package com.skelril.nitro.registry.block;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.probability.Probability;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.manipulator.DyeableData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.DyeableData;
+import org.spongepowered.api.data.property.block.HeldItemProperty;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
 
 import java.util.Collection;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+
 public class DropRegistry {
     public static boolean dropsSelf(BlockType type) {
-        return type == BlockTypes.IRON_ORE || type == BlockTypes.GOLD_ORE;
+        return type.equals(BlockTypes.IRON_ORE) || type.equals(BlockTypes.GOLD_ORE);
     }
 
-    public static Collection<ItemStack> createDropsFor(Game game, BlockType type) {
-        return createDropsFor(game, type, false);
+    public static Collection<ItemStack> createDropsFor(BlockType type) {
+        return createDropsFor(type, false);
     }
 
-    public static Collection<ItemStack> createDropsFor(Game game, BlockType type, boolean silkTouch) {
-        ItemStackBuilder builder = game.getRegistry().getItemBuilder();
+    public static Collection<ItemStack> createDropsFor(BlockType type, boolean silkTouch) {
         // TODO incomplete logic
         if (silkTouch) {
-            if (type == BlockTypes.LIT_REDSTONE_ORE) {
-                return Lists.newArrayList(builder.itemType(BlockTypes.REDSTONE_ORE.getHeldItem().get()).build());
+            if (type.equals(BlockTypes.LIT_REDSTONE_ORE)) {
+                return Lists.newArrayList(newItemStack(BlockTypes.REDSTONE_ORE.getProperty(HeldItemProperty.class).get().getValue()));
             } else {
-                return Lists.newArrayList(builder.itemType(type.getHeldItem().get()).build());
+                return Lists.newArrayList(newItemStack(type.getProperty(HeldItemProperty.class).get().getValue()));
             }
         } else {
             if (dropsSelf(type)) {
-                return Lists.newArrayList(builder.itemType(type.getHeldItem().get()).build());
-            } else if (type == BlockTypes.COAL_ORE) {
-                return Lists.newArrayList(builder.itemType(ItemTypes.COAL).build());
-            } else if (type == BlockTypes.LAPIS_ORE) {
-                DyeableData data = game.getRegistry().getManipulatorRegistry().getBuilder(DyeableData.class).get().create().setValue(
-                        DyeColors.BLUE
-                );
-                return Lists.newArrayList(builder.itemType(ItemTypes.DYE).itemData(data).quantity(
-                                                  Probability.getRangedRandom(4, 8)
-                                          ).build());
-            } else if (type == BlockTypes.REDSTONE_ORE || type == BlockTypes.LIT_REDSTONE_ORE) {
-                return Lists.newArrayList(builder.itemType(ItemTypes.REDSTONE).quantity(Probability.getRangedRandom(4, 5)).build());
-            } else if (type == BlockTypes.DIAMOND_ORE) {
-                return Lists.newArrayList(builder.itemType(ItemTypes.DIAMOND).build());
-            } else if (type == BlockTypes.EMERALD_ORE) {
-                return Lists.newArrayList(builder.itemType(ItemTypes.EMERALD).build());
-            } else if (type == BlockTypes.QUARTZ_ORE) {
-                return Lists.newArrayList(builder.itemType(ItemTypes.QUARTZ).build());
+                return Lists.newArrayList(newItemStack(type.getProperty(HeldItemProperty.class).get().getValue()));
+            } else if (type.equals(BlockTypes.COAL_ORE)) {
+                return Lists.newArrayList(newItemStack(ItemTypes.COAL));
+            } else if (type.equals(BlockTypes.LAPIS_ORE)) {
+                DyeableData data = Sponge.getDataManager().getManipulatorBuilder(DyeableData.class).get().create();
+                data.set(Keys.DYE_COLOR, DyeColors.BLUE);
+                return Lists.newArrayList(newItemStack(ItemTypes.DYE, data, Probability.getRangedRandom(4, 8)));
+            } else if (MultiTypeRegistry.isRedstoneOre(type)) {
+                return Lists.newArrayList(newItemStack(ItemTypes.REDSTONE, Probability.getRangedRandom(4, 5)));
+            } else if (type.equals(BlockTypes.DIAMOND_ORE)) {
+                return Lists.newArrayList(newItemStack(ItemTypes.DIAMOND));
+            } else if (type.equals(BlockTypes.EMERALD_ORE)) {
+                return Lists.newArrayList(newItemStack(ItemTypes.EMERALD));
+            } else if (type.equals(BlockTypes.QUARTZ_ORE)) {
+                return Lists.newArrayList(newItemStack(ItemTypes.QUARTZ));
             }
         }
         return null;

@@ -6,75 +6,18 @@
 
 package com.skelril.skree.content.droptable;
 
-import com.google.common.collect.Lists;
 import com.skelril.nitro.droptable.resolver.point.SimplePointDropResolver;
-import com.skelril.nitro.droptable.resolver.point.SimplePointValue;
-import com.skelril.nitro.modifier.ModifierFunction;
-import com.skelril.nitro.modifier.ModifierFunctions;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.item.ItemType;
+import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 
-import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
+import java.math.BigInteger;
+import java.util.function.BiFunction;
 
-public class CofferResolver extends SimplePointDropResolver {
-    public CofferResolver(Game game, int maxCoffers) {
-        this(game, maxCoffers, ModifierFunctions.MULTI);
+public class CofferResolver extends SimplePointDropResolver<BigInteger> {
+    public CofferResolver(int maxCoffers) {
+        this(maxCoffers, (a, b) -> (int) (a * b));
     }
 
-    public CofferResolver(Game game, int maxCoffers, ModifierFunction modifierFunction) {
-        super(
-                Lists.newArrayList(
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) TESTRIL).build()
-                                ),
-                                TESTRIL.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) AQUIS).build()
-                                ),
-                                AQUIS.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) MARSINCO).build()
-                                ),
-                                MARSINCO.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) POSTRE).build()
-                                ),
-                                POSTRE.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) EQESTA).build()
-                                ),
-                                EQESTA.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) REDISTRAL).build()
-                                ),
-                                REDISTRAL.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) RETESRUM).build()
-                                ),
-                                RETESRUM.getCofferValue()
-                        ),
-                        new SimplePointValue(
-                                Lists.newArrayList(
-                                        game.getRegistry().getItemBuilder().itemType((ItemType) MESARDITH).build()
-                                ),
-                                MESARDITH.getCofferValue()
-                        )
-                ),
-                maxCoffers,
-                modifierFunction
-        );
+    public CofferResolver(int maxCoffers, BiFunction<Integer, Double, Integer> modifierFunction) {
+        super(CofferValueMap.inst(), BigInteger::valueOf, maxCoffers, modifierFunction);
     }
 }

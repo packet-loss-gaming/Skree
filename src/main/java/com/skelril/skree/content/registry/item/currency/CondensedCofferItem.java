@@ -6,11 +6,11 @@
 
 package com.skelril.skree.content.registry.item.currency;
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CondensedCofferItem extends CofferItem implements CraftableItem {
+public class CondensedCofferItem extends CofferItem implements Craftable {
 
     private CofferItem parent;
 

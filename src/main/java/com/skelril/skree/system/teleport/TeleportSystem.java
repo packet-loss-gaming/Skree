@@ -6,18 +6,19 @@
 
 package com.skelril.skree.system.teleport;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.teleport.BringCommand;
 import com.skelril.skree.content.teleport.TeleportCommand;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.command.CommandService;
+import org.spongepowered.api.Sponge;
 
+@NModule(name = "Teleport System")
 public class TeleportSystem {
-    public TeleportSystem(SkreePlugin plugin, Game game) {
-        CommandService cmdDispatcher = game.getCommandDispatcher();
-
-        cmdDispatcher.removeMapping(cmdDispatcher.get("tp").get());
-        cmdDispatcher.register(plugin, TeleportCommand.aquireSpec(game), "teleport", "tp");
-        cmdDispatcher.register(plugin, BringCommand.aquireSpec(game), "bring", "br");
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
+        Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("tp").get());
+        Sponge.getCommandManager().register(SkreePlugin.inst(), TeleportCommand.aquireSpec(), "teleport", "tp");
+        Sponge.getCommandManager().register(SkreePlugin.inst(), BringCommand.aquireSpec(), "bring", "br");
     }
 }

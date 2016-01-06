@@ -6,67 +6,68 @@
 
 package com.skelril.skree.system.zone;
 
-import com.google.common.base.Optional;
+
 import com.sk89q.worldedit.WorldEdit;
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.anexample.AnExampleManager;
 import com.skelril.skree.content.zone.group.example.ExampleManager;
+import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeManager;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.config.ConfigManager;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 
+@NModule(name = "Zone System")
 public class ZoneSystem implements ServiceProvider<ZoneService> {
 
     private ZoneService service;
 
-    public ZoneSystem(SkreePlugin plugin, Game game) {
-        game.getScheduler().getTaskBuilder().delay(15 * 20).execute(
-                () -> {
-                    System.out.println("Starting zone system...");
-                    initialize(plugin, game);
-                }
-        ).submit(plugin);
+    private Path getWorkingDir() throws IOException {
+        ConfigManager service = Sponge.getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        return Files.createDirectories(path.resolve("zones"));
     }
 
-    private void initialize(SkreePlugin plugin, Game game) {
-        // TODO this is a very dumb way of doing this
-        Optional<WorldService> optService = game.getServiceManager().provide(WorldService.class);
-        if (!optService.isPresent()) {
-            game.getScheduler().getTaskBuilder().delay(1).execute(() -> initialize(plugin, game)).submit(plugin);
-            return;
-        }
-
-
+    @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
+    public void init() {
+        Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
         World world = optService.get().getEffectWrapper("Instance").getWorlds().iterator().next();
-        WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
+        Task.builder().execute(() -> {
+            WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
 
-        File targetDir = new File("./mods/skree/zones/");
-        targetDir.mkdirs();
+            try {
+                service = new ZoneServiceImpl(new ChainPlacementAllocator(getWorkingDir(), instWorldResolver));
 
-        service = new ZoneServiceImpl(new ChainPlacementAllocator(targetDir, instWorldResolver));
-        for (String name : Arrays.asList("CursedMine")) {
-            service.registerManager(new AnExampleManager(name));
-        }
-        for (String name : Arrays.asList("Catacombs", "FreakyFour", "GoldRush", "PatientX", "ShnugglesPrime")) {
-            service.registerManager(new ExampleManager(name));
-        }
-        game.getCommandDispatcher().register(plugin, ZoneMeCommand.aquireSpec(service), "zoneme");
+                for (String name : Arrays.asList("CursedMine")) {
+                    service.registerManager(new AnExampleManager(name));
+                }
+                for (String name : Arrays.asList("Catacombs", "FreakyFour", "GoldRush", "PatientX")) {
+                    service.registerManager(new ExampleManager(name));
+                }
 
-        try {
-            game.getServiceManager().setProvider(plugin, ZoneService.class, service);
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-        }
+                service.registerManager(new ShnugglesPrimeManager());
+
+                Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
+                Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).delayTicks(1).submit(SkreePlugin.inst());
     }
 
     @Override

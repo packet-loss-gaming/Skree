@@ -6,27 +6,32 @@
 
 package com.skelril.skree.system.world;
 
-import com.google.common.base.Optional;
-import com.google.inject.Inject;
+
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
+import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
 import com.skelril.skree.content.world.WorldCommand;
 import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBuilder;
+import org.spongepowered.api.world.WorldCreationSettings;
 
+import java.util.Optional;
 import java.util.Random;
 
+@NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
 
     private static final String MAIN = "Main";
@@ -39,51 +44,49 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
     private WorldService service;
 
-    @Inject
-    public WorldSystem(SkreePlugin plugin, Game game) {
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
         service = new WorldServiceImpl();
 
         // Register the service & command
-        try {
-            game.getServiceManager().setProvider(plugin, WorldService.class, service);
-            game.getCommandDispatcher().register(plugin, WorldCommand.aquireSpec(game), "world");
-            game.getCommandDispatcher().register(plugin, WorldListCommand.aquireSpec(game), "worlds");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
 
         // Handle main world
-        initMain(plugin, game);
+        initMain();
 
         // Create worlds
-        initBuild(plugin, game);
-        initInstance(plugin, game);
-        initWilderness(plugin, game);
+        initBuild();
+        initInstance();
+        initWilderness();
     }
 
-    private void initMain(SkreePlugin plugin, Game game) {
+    private void initMain() {
         // Main World
-        MainWorldWrapper wrapper = new MainWorldWrapper(plugin, game);
+        MainWorldWrapper wrapper = new MainWorldWrapper();
 
-        Optional<World> curWorld = game.getServer().getWorld(MAIN);
+        Optional<World> curWorld = Sponge.getServer().getWorld(MAIN);
 
         if (curWorld.isPresent()) {
             wrapper.addWorld(curWorld.get());
         }
 
         // Main wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
-    private void initBuild(SkreePlugin plugin, Game game) {
+    private void initBuild() {
         // Build World
-        BuildWorldWrapper wrapper = new BuildWorldWrapper(plugin, game);
+        BuildWorldWrapper wrapper = new BuildWorldWrapper();
 
-        Optional<World> curWorld = game.getServer().getWorld(BUILD);
+        Optional<World> curWorld = Sponge.getServer().getWorld(BUILD);
         if (!curWorld.isPresent()) {
-            curWorld = obtainOverworld(game).name(BUILD).seed(randy.nextLong()).usesMapFeatures(false).build();
+            curWorld = instantiate(
+                    obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false)
+                            .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -91,17 +94,20 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Build wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
-    private void initInstance(SkreePlugin plugin, Game game) {
+    private void initInstance() {
         // Instance World
-        InstanceWorldWrapper wrapper = new InstanceWorldWrapper(plugin, game);
+        InstanceWorldWrapper wrapper = new InstanceWorldWrapper();
 
-        Optional<World> curWorld = game.getServer().getWorld(INSTANCE);
+        Optional<World> curWorld = Sponge.getServer().getWorld(INSTANCE);
         if (!curWorld.isPresent()) {
-            curWorld = obtainFlatworld(game).name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false).build();
+            curWorld = instantiate(
+                    obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false)
+                            .generatorModifiers(new VoidWorldGeneratorModifier()).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -109,17 +115,20 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Instance wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
-    private void initWilderness(SkreePlugin plugin, Game game) {
+    private void initWilderness() {
         // Wilderness World
-        WildernessWorldWrapper wrapper = new WildernessWorldWrapper(plugin, game);
+        WildernessWorldWrapper wrapper = new WildernessWorldWrapper();
 
-        Optional<World> curWorld = game.getServer().getWorld(WILDERNESS);
+        Optional<World> curWorld = Sponge.getServer().getWorld(WILDERNESS);
         if (!curWorld.isPresent()) {
-            curWorld = obtainOverworld(game).name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true).build();
+            curWorld = instantiate(
+                    obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true)
+                            .generatorModifiers(new WildernessWorldGeneratorModifier()).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -127,9 +136,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Wilderness Nether World
-        curWorld = game.getServer().getWorld(WILDERNESS_NETHER);
+        curWorld = Sponge.getServer().getWorld(WILDERNESS_NETHER);
         if (!curWorld.isPresent()) {
-            curWorld = obtainNetherworld(game).name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build();
+            curWorld = instantiate(
+                    obtainNetherworld().name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build()
+            );
         }
 
         if (curWorld.isPresent()) {
@@ -137,25 +148,33 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
 
         // Wilderness wrapper reg
-        game.getEventManager().register(plugin, wrapper);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
         service.registerEffectWrapper(wrapper);
     }
 
-    private WorldBuilder obtainOverworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.OVERWORLD).generator(GeneratorTypes.OVERWORLD);
+    private WorldCreationSettings.Builder obtainOverworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.OVERWORLD);
     }
 
-    private WorldBuilder obtainFlatworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.OVERWORLD).generator(GeneratorTypes.FLAT);
+    private WorldCreationSettings.Builder obtainFlatworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.FLAT);
     }
 
-    public WorldBuilder obtainNetherworld(Game game) {
-        return obtainAutoloadingWorld(game).dimensionType(DimensionTypes.NETHER).generator(GeneratorTypes.NETHER);
+    public WorldCreationSettings.Builder obtainNetherworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.NETHER).generator(GeneratorTypes.NETHER);
     }
 
-    private WorldBuilder obtainAutoloadingWorld(Game game) {
-        WorldBuilder builder = game.getRegistry().getWorldBuilder().reset();
+    private WorldCreationSettings.Builder obtainAutoloadingWorld() {
+        WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
         return builder.enabled(true).loadsOnStartup(true);
+    }
+
+    private Optional<World> instantiate(WorldCreationSettings settings) {
+        try {
+            return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(settings).get());
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -9,23 +9,26 @@ package com.skelril.skree;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.skelril.nitro.module.NitroModuleManager;
+import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
+import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.market.MarketSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
-import com.skelril.skree.system.registry.block.CustomBlockSystem;
-import com.skelril.skree.system.registry.item.CustomItemSystem;
+import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
+import com.skelril.skree.system.pvp.PvPSystem;
+import com.skelril.skree.system.registry.CustomRegisterySystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
+import com.skelril.skree.system.world.WorldGeneratorSystem;
 import com.skelril.skree.system.world.WorldSystem;
 import com.skelril.skree.system.zone.ZoneSystem;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.state.PreInitializationEvent;
-import org.spongepowered.api.event.state.ServerStartedEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
 
-import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 @Singleton
@@ -33,54 +36,41 @@ import java.util.logging.Logger;
 public class SkreePlugin {
 
     @Inject
-    private Game game;
-
-    @Inject
     private Logger logger;
 
-    public static CustomItemSystem customItemSystem;
-    public static CustomBlockSystem customBlockSystem;
+    protected NitroModuleManager manager = new NitroModuleManager();
 
-    @Subscribe
-    public void onPreInit(PreInitializationEvent event) {
-        customItemSystem = new CustomItemSystem(this, game);
-        customItemSystem.preInit();
+    private static SkreePlugin inst;
 
-        customBlockSystem = new CustomBlockSystem(this, game);
-        customBlockSystem.preInit();
+    public static SkreePlugin inst() {
+        return inst;
     }
 
-    @Subscribe
-    public void onServerStart(ServerStartedEvent event) {
-        registerPrimaryHybridSystems();
-        System.out.println(game.getPlatform().getExecutionType());
-        switch (game.getPlatform().getExecutionType()) {
-            case CLIENT:
-                registerPrimaryClientSystems();
-                break;
-            case SERVER:
-                registerPrimaryServerSystems();
-                break;
-        }
-
-        logger.info("Skree Started! Kaw!");
+    public SkreePlugin() {
+        inst = this;
+        registerModules();
+        manager.discover();
     }
 
-    private void registerPrimaryHybridSystems() {
-
+    @Listener
+    public void onGameStateChange(GameStateEvent event) {
+        manager.trigger(event.getState().toString());
     }
 
-    private void registerPrimaryClientSystems() {
-
-    }
-
-    private void registerPrimaryServerSystems() {
+    private void registerModules() {
         ImmutableList<Class> initialized = ImmutableList.of(
+                ArrowFishingSystem.class,
+                CustomRegisterySystem.class,
+                DatabaseSystem.class,
                 DropClearSystem.class,
+                MarketSystem.class,
                 ModifierSystem.class,
                 PlayerStateSystem.class,
+                ProjectileWatcherSystem.class,
+                PvPSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
+                WorldGeneratorSystem.class,
                 WorldSystem.class,
                 WeatherCommandSystem.class,
                 ZoneSystem.class
@@ -88,8 +78,7 @@ public class SkreePlugin {
 
         for (Class<?> entry : initialized) {
             try {
-                Constructor<?> constructor = entry.getConstructor(SkreePlugin.class, Game.class);
-                constructor.newInstance(this, game);
+                manager.registerModule(entry.newInstance());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

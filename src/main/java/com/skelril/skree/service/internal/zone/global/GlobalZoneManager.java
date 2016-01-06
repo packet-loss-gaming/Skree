@@ -12,6 +12,7 @@ import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T> {
     protected T zone;
@@ -23,8 +24,8 @@ public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T
     }
 
     @Override
-    public T discover(ZoneSpaceAllocator allocator) {
-        return !isActive() ? zone = init(allocator) : zone;
+    public Optional<T> discover(ZoneSpaceAllocator allocator) {
+        return Optional.of(!isActive() ? zone = init(allocator) : zone);
     }
 
     @Override

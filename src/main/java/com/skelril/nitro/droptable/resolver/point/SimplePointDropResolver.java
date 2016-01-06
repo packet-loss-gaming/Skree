@@ -4,35 +4,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
 package com.skelril.nitro.droptable.resolver.point;
 
-import com.skelril.nitro.modifier.ModifierFunction;
-import com.skelril.nitro.modifier.ModifierFunctions;
+import com.skelril.nitro.point.ItemStackValueMapping;
 
-import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-public class SimplePointDropResolver extends AbstractSlipperyPointResolver implements PointDropResolver {
+public class SimplePointDropResolver<PointType extends Comparable<PointType>> extends AbstractSlipperyPointResolver<PointType> implements PointDropResolver {
     private final int maxPoints;
-    private final ModifierFunction modiFunc;
+    private final BiFunction<Integer, Double, Integer> modiFunc;
 
-    public SimplePointDropResolver(List<PointValue> choices, int maxPoints) {
-        this(choices, maxPoints, ModifierFunctions.MULTI);
+    public SimplePointDropResolver(ItemStackValueMapping<PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints) {
+        this(choices, pointTypeFromInt, maxPoints, (a, b) -> (int) (a * b));
     }
 
-    public SimplePointDropResolver(List<PointValue> choices, int maxPoints, ModifierFunction modiFunc) {
-        super(choices);
+    public SimplePointDropResolver(ItemStackValueMapping<PointType> choices, Function<Integer, PointType> pointTypeFromInt, int maxPoints,
+                                   BiFunction<Integer, Double, Integer> modiFunc) {
+        super(choices, pointTypeFromInt);
         this.maxPoints = maxPoints;
         this.modiFunc = modiFunc;
     }
 
     @Override
     public int getMaxPoints(double modifier) {
-        return (int) this.modiFunc.apply(maxPoints, modifier);
+        return modiFunc.apply(maxPoints, modifier);
     }
 }

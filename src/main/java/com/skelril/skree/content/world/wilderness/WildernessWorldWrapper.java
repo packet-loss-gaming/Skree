@@ -7,100 +7,106 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.skelril.nitro.combat.PlayerCombatParser;
+import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
 import com.skelril.nitro.droptable.DropTableImpl;
 import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
-import com.skelril.nitro.generator.FixedIntGenerator;
+import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
-import com.skelril.nitro.modifier.ModifierFunctions;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
+import com.skelril.nitro.registry.block.MultiTypeRegistry;
+import com.skelril.nitro.text.CombinedText;
+import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.service.ModifierService;
+import com.skelril.skree.service.PvPService;
+import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.attribute.Attributes;
+import org.apache.commons.lang3.Validate;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.manipulator.AttributeData;
-import org.spongepowered.api.data.manipulator.entity.ExplosiveRadiusData;
-import org.spongepowered.api.data.manipulator.entity.HealthData;
-import org.spongepowered.api.data.manipulator.item.EnchantmentData;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.block.BlockPlaceEvent;
-import org.spongepowered.api.event.entity.EntityBreakBlockEvent;
-import org.spongepowered.api.event.entity.EntityExplosionEvent;
-import org.spongepowered.api.event.entity.EntitySpawnEvent;
-import org.spongepowered.api.event.entity.living.LivingDeathEvent;
-import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
-import org.spongepowered.api.service.scheduler.Task;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.RED_FEATHER;
+import static com.skelril.skree.content.registry.block.CustomBlockTypes.GRAVE_STONE;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
-
-    private SkreePlugin plugin;
-    private Game game;
 
     private DropTable dropTable;
 
     private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
-    public WildernessWorldWrapper(SkreePlugin plugin, Game game) {
-        this(plugin, game, new ArrayList<>());
+    public WildernessWorldWrapper() {
+        this(new ArrayList<>());
     }
 
-    public WildernessWorldWrapper(SkreePlugin plugin, Game game, Collection<World> worlds) {
+    public WildernessWorldWrapper(Collection<World> worlds) {
         super("Wilderness", worlds);
-        this.plugin = plugin;
-        this.game = game;
 
-        ItemStackBuilder builder = game.getRegistry().getItemBuilder();
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller(ModifierFunctions.ADD);
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
         dropTable = new MasterDropTable(
                 slipRoller,
                 Lists.newArrayList(
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
-                                        new DropTableEntryImpl(new CofferResolver(game, 10), 12)
+                                        new DropTableEntryImpl(new CofferResolver(50), 12)
                                 )
                         ),
                         new DropTableImpl(
@@ -109,7 +115,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                builder.reset().itemType((ItemType) RED_FEATHER).quantity(1).build()
+                                                                newItemStack((ItemType) SCROLL_OF_SUMMATION)
+                                                        )
+                                                ), 2000
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack((ItemType) RED_FEATHER)
                                                         )
                                                 ), 100000
                                         )
@@ -118,80 +131,148 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 )
         );
 
-        game.getScheduler().getTaskBuilder().execute(this).interval(1, SECONDS).submit(plugin);
+        Task.builder().execute(this).interval(1, SECONDS).submit(SkreePlugin.inst());
     }
 
-    @Subscribe
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        if (!isApplicable(event.getLocation().getExtent())) return;
+    @Listener
+    public void onEntitySpawn(SpawnEntityEvent event) {
+        List<Entity> entities = event.getEntities();
 
-        Entity entity = event.getEntity();
-        Location loc = event.getLocation();
+        for (Entity entity : entities) {
+            Location<World> loc = entity.getLocation();
+            Optional<Integer> optLevel = getLevel(loc);
 
-        final int level = getLevel(loc);
+            if (!optLevel.isPresent()) continue;
+            int level = optLevel.get();
 
-        if (entity instanceof Monster && level > 1) {
-            Optional<HealthData> healthData = entity.getData(HealthData.class);
-            if (healthData.isPresent()) {
-                HealthData health = healthData.get();
-                final double max = health.getMaxHealth();
+            if (level > 1) {
+                // TODO move damage modification
+                if (entity instanceof Monster) {
+                    HealthData healthData = ((Monster) entity).getHealthData();
+                    double curMax = healthData.maxHealth().get();
 
-                if (max <= 80) { // TODO do this a better way, but for now it prevents super mobs
+                    if (curMax <= 80) { // TODO do this a better way, but for now it prevents super mobs
 
-                    double newMax = max * getHealthMod(level);
+                        double newMax = curMax * getHealthMod(level);
 
-                    health.setMaxHealth(newMax);
-                    health.setHealth(newMax);
+                        healthData.set(Keys.MAX_HEALTH, newMax);
+                        healthData.set(Keys.HEALTH, newMax);
 
-                    entity.offer(health);
+                        entity.offer(healthData);
+                    }
                 }
             }
 
-            Optional<AttributeData> attributeData = entity.getData(AttributeData.class);
-            if (attributeData.isPresent()) {
-                AttributeData attributes = attributeData.get();
-                attributes.setBase(Attributes.GENERIC_ATTACK_DAMAGE, getDamageMod(level));
+            Optional<Value<Integer>> optExplosiveRadius = Optional.empty();
+            // Optional<Value<Integer>> optExplosiveRadius = event.getEntity().getValue(Keys.EXPLOSIVE_RADIUS);
 
-                entity.offer(attributes);
+            if (optExplosiveRadius.isPresent()) {
+                Value<Integer> explosiveRadius = optExplosiveRadius.get();
+                int min = explosiveRadius.get();
+
+                entity.offer(
+                        Keys.EXPLOSIVE_RADIUS,
+                        Math.min(
+                                entity instanceof Fireball ? 4 : 9,
+                                Math.max(min, (min + level) / 2)
+                        )
+                );
             }
-        }
-
-        Optional<ExplosiveRadiusData> explosiveData = event.getEntity().getData(ExplosiveRadiusData.class);
-
-        if (explosiveData.isPresent()) {
-            ExplosiveRadiusData explosive = explosiveData.get();
-            float min = explosive.getExplosionRadius();
-            explosive.setExplosionRadius(
-                    (int) Math.min(
-                            entity instanceof Fireball ? 4 : 9,
-                            Math.max(min, (min + level) / 2)
-                    )
-            );
-            entity.offer(explosive);
         }
     }
 
-    @Subscribe
-    public void onEntityDeath(LivingDeathEvent event) {
-        if (!isApplicable(event.getLocation().getExtent())) return;
+    @Listener
+    public void onRespawn(RespawnPlayerEvent event) {
+        if (isApplicable(event.getToTransform().getExtent())) {
+            Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+            if (optWorldService.isPresent()) {
+                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
+            }
+        }
+    }
 
-        Entity entity = event.getEntity();
-        Location loc = event.getLocation();
+    private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
+            Optional.of(
+                    CombinedText.of(
+                            TextColors.DARK_AQUA,
+                            "Entity Health: ",
+                            new PlaceHolderText("health int"),
+                            " / ",
+                            new PlaceHolderText("max health int")
+                    )
+            ),
+            Optional.of(CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
+    );
+
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        Optional<Integer> optLevel = getLevel(event.getTargetEntity().getLocation());
+        if (!optLevel.isPresent()) {
+            return;
+        }
+
+        int level = optLevel.get();
+        new PlayerCombatParser() {
+            @Override
+            public void processPvP(Player attacker, Player defender) {
+                if (allowsPvP(level)) {
+                    return;
+                }
+
+                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+                if (optService.isPresent()) {
+                    PvPService service = optService.get();
+                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
+                        return;
+                    }
+                }
+
+                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this part of the Wilderness!"));
+                attacker.sendMessage(Text.of(TextColors.RED, "Mandatory PvP is from level ", getFirstPvPLevel(), " and on."));
+
+                event.setCancelled(true);
+            }
+
+            @Override
+            public void processMonsterAttack(Living attacker, Player defender) {
+                event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
+            }
+
+            @Override
+            public void processPlayerAttack(Player attacker, Living defender) {
+                Task.builder().delayTicks(1).execute(
+                        () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
+                ).submit(SkreePlugin.inst());
+
+            }
+        };
+    }
+
+    @Listener
+    public void onEntityDeath(DestructEntityEvent.Death event) {
+        Entity entity = event.getTargetEntity();
+
+        Location<World> loc = entity.getLocation();
+        Optional<Integer> optLevel = getLevel(loc);
+
+        if (!optLevel.isPresent()) {
+            return;
+        }
+        int level = optLevel.get();
 
         if (entity instanceof Monster) {
-            int level = getLevel(loc);
-
             Collection<ItemStack> drops = dropTable.getDrops(
                     level,
                     getDropMod(
                             level,
-                            ((Monster) entity).getHealthData().getMaxHealth()
+                            ((Monster) entity).getHealthData().maxHealth().get()
                     )
             );
 
             int times = 1;
 
-            Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+            Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
             if (optService.isPresent()) {
                 ModifierService service = optService.get();
                 if (service.isActive(Modifiers.DOUBLE_WILD_DROPS)) {
@@ -199,138 +280,184 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
             }
 
-            ItemDropper dropper = new ItemDropper(game, toWorld.from(loc.getExtent()), loc.getPosition());
+            ItemDropper dropper = new ItemDropper(loc);
             for (int i = 0; i < times; ++i) {
-                dropper.dropItems(drops);
+                dropper.dropItems(drops, Cause.of(this));
             }
-
-            // TODO needs updated XP API
-            // event.setExp(event.getExp() * level);
         }
+        GRAVE_STONE.createGraveFromDeath(event);
     }
 
-    @Subscribe
-    public void onBlockBreak(EntityBreakBlockEvent event) {
-        Location loc = event.getBlock();
-        if (!isApplicable(loc.getExtent())) return;
+    @Listener
+    public void onBlockBreak(ChangeBlockEvent.Break event) {
+        Optional<Entity> optSrcEnt = event.getCause().get(NamedCause.SOURCE, Entity.class);
+        if (!optSrcEnt.isPresent()) {
+            return;
+        }
 
-        BlockType type = loc.getBlockType();
-        if (ore().contains(type)) {
-            orePool:
-            {
-                Entity entity = event.getEntity();
+        Entity srcEnt = optSrcEnt.get();
 
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+        for (Transaction<BlockSnapshot> block : transactions) {
+            BlockSnapshot original = block.getOriginal();
+            Optional<Location<World>> optLoc = original.getLocation();
+
+            if (!optLoc.isPresent()) {
+                continue;
+            }
+
+            Optional<Integer> optLevel = getLevel(optLoc.get());
+
+            if (!optLevel.isPresent()) {
+                continue;
+            }
+
+            int level = optLevel.get();
+            Location<World> loc = optLoc.get();
+
+            BlockType type = original.getState().getType();
+            if (ore().contains(type)) {
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
-                if (entity instanceof ArmorEquipable) {
-                    Optional<ItemStack> held = ((ArmorEquipable) entity).getItemInHand();
+                if (srcEnt instanceof ArmorEquipable) {
+                    Optional<ItemStack> held = ((ArmorEquipable) srcEnt).getItemInHand();
                     if (held.isPresent()) {
                         ItemStack stack = held.get();
 
                         // TODO Currently abusing NMS to determine "breakability"
                         ItemType itemType = stack.getItem();
-                        BlockType blockType = loc.getBlockType();
-                        if (itemType instanceof Item && blockType instanceof Block) {
-                            if (!((Item) stack.getItem()).canHarvestBlock((Block) blockType)) {
-                                break orePool;
+                        if (itemType instanceof Item && type instanceof Block) {
+                            if (!((Item) stack.getItem()).canHarvestBlock((Block) type)) {
+                                continue;
                             }
                         }
 
-                        Optional<EnchantmentData> optEnchantData = stack.getData(EnchantmentData.class);
-                        if (optEnchantData.isPresent()) {
-                            EnchantmentData enchantmentData = optEnchantData.get();
+                        // Handle fortune
+                        Optional<ItemEnchantment> optFortune = EnchantmentUtil.getHighestEnchantment(
+                                stack,
+                                Enchantments.FORTUNE
+                        );
+                        if (optFortune.isPresent()) {
+                            fortuneMod = optFortune.get().getLevel();
+                        }
 
-                            // Handle fortune
-                            Optional<Integer> optFortune = enchantmentData.get(Enchantments.FORTUNE);
-                            if (optFortune.isPresent()) {
-                                fortuneMod = optFortune.get();
-                            }
+                        // Handle silk touch
+                        Optional<ItemEnchantment> optSilkTouch = EnchantmentUtil.getHighestEnchantment(
+                                stack,
+                                Enchantments.SILK_TOUCH
+                        );
+                        if (optSilkTouch.isPresent()) {
+                            silkTouch = true;
+                        }
+                    } else if (srcEnt instanceof Player) {
+                        continue;
+                    }
+                }
 
-                            // Handle silk touch
-                            Optional<Integer> optSilkTouch = enchantmentData.get(Enchantments.SILK_TOUCH);
-                            if (optSilkTouch.isPresent()) {
-                                silkTouch = true;
+                addPool(loc, type, fortuneMod, silkTouch);
+            } else if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
+                Vector3d max = loc.getPosition().add(1, 1, 1);
+                Vector3d min = loc.getPosition().sub(1, 1, 1);
+
+                Extent world = loc.getExtent();
+
+                if (Probability.getChance(3)) {
+                    Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
+                    if (optEntity.isPresent()) {
+                        world.spawnEntity(optEntity.get(), Cause.of(this));
+                    }
+                }
+
+                // Do this one tick later to guarantee no collision with transaction data
+                Task.builder().delayTicks(1).execute(() -> {
+                    for (int x = min.getFloorX(); x <= max.getFloorX(); ++x) {
+                        for (int z = min.getFloorZ(); z <= max.getFloorZ(); ++z) {
+                            for (int y = min.getFloorY(); y <= max.getFloorY(); ++y) {
+                                if (!world.containsBlock(x, y, z)) {
+                                    continue;
+                                }
+
+                                if (world.getBlockType(x, y, z) == BlockTypes.STONE) {
+                                    world.setBlockType(x, y, z, BlockTypes.MONSTER_EGG);
+                                }
                             }
                         }
-                    } else if (entity instanceof Player) {
-                        break orePool;
                     }
-                }
-
-                addPool(loc, fortuneMod, silkTouch);
-            }
-        }
-        // TODO needs updated XP API
-        // event.setExp(event.getExp() * getLevel(loc));
-    }
-
-    @Subscribe
-    public void onExplode(EntityExplosionEvent event) {
-        Location origin = event.getExplosionLocation();
-        if (!isApplicable(origin.getExtent())) return;
-
-        event.setYield(Probability.getRangedRandom(event.getYield(), 100));
-
-        for (Location loc : event.getBlocks()) {
-            BlockType type = loc.getBlockType();
-            if (ore().contains(type)) {
-                addPool(loc, 0, false);
+                }).submit(SkreePlugin.inst());
             }
         }
     }
 
-    @Subscribe
-    public void onBlockPlace(BlockPlaceEvent event) {
-        Location loc = event.getBlock();
-        if (!isApplicable(loc.getExtent())) return;
-        if (ore().contains(loc.getBlockType())) {
+    @Listener
+    public void onBlockPlace(ChangeBlockEvent.Place event) {
+        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
 
-            if (event instanceof PlayerPlaceBlockEvent) {
-                Player player = ((PlayerPlaceBlockEvent) event).getEntity();
+            for (Transaction<BlockSnapshot> block :  event.getTransactions()) {
+                Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
-                // Allow creative mode players to still place blocks
-                if (player.getGameModeData().getGameMode() == GameModes.CREATIVE) {
-                    return;
+                if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
+                    continue;
                 }
 
-                try {
-                    Vector3d origin = loc.getPosition();
-                    World world = toWorld.from(loc.getExtent());
-                    for (int i = 0; i < 40; ++i) {
-                        ParticleEffect effect = game.getRegistry().getParticleEffectBuilder(
-                                ParticleTypes.CRIT_MAGIC
-                        ).motion(
-                                new Vector3d(
-                                        Probability.getRangedRandom(-1, 1),
-                                        Probability.getRangedRandom(-.7, .7),
-                                        Probability.getRangedRandom(-1, 1)
-                                )
-                        ).count(1).build();
-
-                        world.spawnParticles(effect, origin.add(.5, .5, .5));
+                Location<World> loc = optLoc.get();
+                if (ore().contains(loc.getBlockType())) {
+                    // Allow creative mode players to still place blocks
+                    if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
+                        continue;
                     }
 
-                } catch (Exception ex) {
-                    player.sendMessage(
+                    try {
+                        Vector3d origin = loc.getPosition();
+                        World world = loc.getExtent();
+                        for (int i = 0; i < 40; ++i) {
+                            ParticleEffect effect = ParticleEffect.builder().type(
+                                    ParticleTypes.CRIT_MAGIC
+                            ).motion(
+                                    new Vector3d(
+                                            Probability.getRangedRandom(-1, 1),
+                                            Probability.getRangedRandom(-.7, .7),
+                                            Probability.getRangedRandom(-1, 1)
+                                    )
+                            ).count(1).build();
+
+                            world.spawnParticles(effect, origin.add(.5, .5, .5));
+                        }
+                    } catch (Exception ex) {
+                        player.sendMessage(
                             /* ChatTypes.SYSTEM, */
-                            Texts.of(TextColors.RED, "You find yourself unable to place that block.")
-                    );
+                                Text.of(
+                                        TextColors.RED,
+                                        "You find yourself unable to place that block."
+                                )
+                        );
+                    }
+
+                    block.setValid(false);
                 }
             }
-            event.setCancelled(true);
         }
     }
 
-    public int getLevel(Location location) {
+    public Optional<Integer> getLevel(Location<World> location) {
 
         // Not in Wilderness
-        if (!isApplicable(location.getExtent())) {
-            return 0;
+        if (!isApplicable(location)) {
+            return Optional.empty();
         }
 
         // In Wilderness
-        return Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1;
+        return Optional.of(Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1);
+    }
+
+    public int getFirstPvPLevel() {
+        return 6;
+    }
+
+    public boolean allowsPvP(int level) {
+        return level >= getFirstPvPLevel();
     }
 
     public double getDropMod(int level, double mobHealth) {
@@ -348,7 +475,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public int getOreMod(int level) {
         int modifier = Math.max(1, level * 3);
 
-        Optional<ModifierService> optService = game.getServiceManager().provide(ModifierService.class);
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
             ModifierService service = optService.get();
             if (service.isActive(Modifiers.DOUBLE_WILD_ORES)) {
@@ -359,68 +486,74 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return modifier;
     }
 
-    private void addPool(Location block, int fortune, boolean hasSilkTouch) {
+    public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
+        if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
+            return Lists.newArrayList(newItemStack((ItemType) RED_SHARD));
+        }
+        return DropRegistry.createDropsFor(blockType, hasSilkTouch);
+    }
 
-        BlockType blockType = block.getBlockType();
+    private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
 
-        Collection<ItemStack> generalDrop = DropRegistry.createDropsFor(game, blockType, hasSilkTouch);
+        Optional<Integer> optLevel = getLevel(block);
+        Validate.isTrue(optLevel.isPresent());
+        int level = optLevel.get();
+
+        Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
         if (DropRegistry.dropsSelf(blockType)) {
             fortune = 0;
         }
 
-        final int times = Probability.getRandom(getOreMod(getLevel(block)));
+        final int times = Probability.getRandom(getOreMod(level));
+        final int finalFortune = fortune;
         ItemFountain fountain = new ItemFountain(
-                game,
-                toWorld.from(block.getExtent()),
-                block.getPosition().add(.5, 0, .5),
-                new FixedIntGenerator(fortune),
-                generalDrop
+                new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
+                (a) -> finalFortune,
+                generalDrop,
+                Cause.of(this)
         ) {
             @Override
             public boolean run(int timesL) {
-                getWorld().playSound(
+                getExtent().playSound(
                         SoundTypes.BLAZE_BREATH,
                         getPos(),
                         Math.min(
                                 1,
                                 (((float) timesL / times) * .6F) + ((float) 1 / times)
                         ),
-                        0
+                        1
                 );
                 return super.run(timesL);
             }
 
             @Override
             public void end() {
-                getWorld().playSound(SoundTypes.BLAZE_BREATH, getPos(), .2F, 0);
+                getExtent().playSound(SoundTypes.BLAZE_DEATH, getPos(), .2F, 0);
             }
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
-        Task task = game.getScheduler().getTaskBuilder().execute(runnable).delay(1, SECONDS).interval(
+        Task task = Task.builder().execute(runnable).delay(1, SECONDS).interval(
                 1,
                 SECONDS
-        ).submit(plugin);
+        ).submit(SkreePlugin.inst());
         runnable.setTask(task);
     }
 
     @Override
     public void run() {
         for (World world : getWorlds()) {
-            for (Entity entity : world.getEntities(p -> p.getType() == EntityTypes.PLAYER)) {
-                int currentLevel = getLevel(entity.getLocation());
+            for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
+                int currentLevel = getLevel(entity.getLocation()).get();
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {
                     ((Player) entity).sendTitle(
-                            new Title(
-                                    Texts.of("Wilderness Level"),
-                                    Texts.of(currentLevel),
-                                    20,
-                                    0,
-                                    20,
-                                    false,
-                                    false
-                            )
+                            Title.builder()
+                                    .title(Text.of("Wilderness Level"))
+                                    .subtitle(Text.of(currentLevel))
+                                    .fadeIn(20)
+                                    .fadeOut(20)
+                                    .build()
                     );
                     playerLevelMap.put((Player) entity, currentLevel);
                 }

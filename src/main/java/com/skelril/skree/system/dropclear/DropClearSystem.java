@@ -6,33 +6,32 @@
 
 package com.skelril.skree.system.dropclear;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.dropclear.DropClearCommand;
 import com.skelril.skree.service.DropClearService;
 import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 
+@NModule(name = "Drop Clear System")
 public class DropClearSystem implements ServiceProvider<DropClearService> {
 
     private DropClearService service;
 
-    public DropClearSystem(SkreePlugin plugin, Game game) {
-        service = new DropClearServiceImpl(plugin, game, 1000, 3);
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
+        service = new DropClearServiceImpl(1000, 3);
 
         // Register the service & command
-        try {
-            game.getServiceManager().setProvider(plugin, DropClearService.class, service);
-            game.getCommandDispatcher().register(plugin, DropClearCommand.aquireSpec(game, service, 120), "dropclear", "dc");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
 
-        game.getScheduler().getTaskBuilder().execute(
-                () -> game.getServer().getWorlds().stream().forEach(service::checkedCleanup)
-        ).interval(10).submit(plugin);
+        Task.builder().execute(
+                () -> Sponge.getServer().getWorlds().stream().forEach(service::checkedCleanup)
+        ).intervalTicks(10).submit(SkreePlugin.inst());
     }
 
     @Override

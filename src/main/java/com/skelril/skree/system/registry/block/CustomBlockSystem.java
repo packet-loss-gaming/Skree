@@ -6,24 +6,114 @@
 
 package com.skelril.skree.system.registry.block;
 
+import com.skelril.nitro.registry.Craftable;
+import com.skelril.nitro.registry.block.ICustomBlock;
+import com.skelril.nitro.registry.item.CookedItem;
+import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
-import org.spongepowered.api.Game;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.Sponge;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class CustomBlockSystem {
 
-    private final SkreePlugin plugin;
-    private final Game game;
-
-    public CustomBlockSystem(SkreePlugin plugin, Game game) {
-        this.plugin = plugin;
-        this.game = game;
-    }
-
     public void preInit() {
-
+        try {
+            iterate(CustomBlockSystem.class.getDeclaredMethod("register", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
     }
+
+    public void associate() {
+        try {
+            iterate(CustomBlockSystem.class.getDeclaredMethod("registerAssociates", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 
     public void init() {
+        try {
+            iterate(CustomBlockSystem.class.getDeclaredMethod("render", Object.class));
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+    }
 
+
+    private void iterate(Method method) {
+        method.setAccessible(true);
+        for (Field field : CustomBlockTypes.class.getFields()) {
+            try {
+                Object result = field.get(null);
+                method.invoke(this, result);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    // Invoked via reflection
+    @SuppressWarnings("unused")
+    private void register(Object block) {
+        if (block instanceof Block && block instanceof ICustomBlock) {
+            ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+
+            GameRegistry.registerBlock((Block) block, ((ICustomBlock) block).__getID());
+
+            // Add selective hooks
+            if (block instanceof EventAwareContent) {
+                Sponge.getEventManager().registerListeners(SkreePlugin.inst(), block);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void registerAssociates(Object block) {
+        if (block instanceof Block && block instanceof ICustomBlock) {
+            if (block instanceof Craftable) {
+                ((Craftable) block).registerRecipes();
+            }
+
+            if (block instanceof CookedItem) {
+                ((CookedItem) block).registerIngredients();
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
+    }
+
+    // Invoked via reflection
+    @SuppressWarnings("unused")
+    private void render(Object block) {
+        if (block instanceof Block && block instanceof ICustomBlock) {
+            if (Sponge.getPlatform().getExecutionType().isClient()) {
+                RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+
+                renderItem.getItemModelMesher().register(
+                        Item.getItemFromBlock((Block) block),
+                        0,
+                        new ModelResourceLocation(
+                                "skree:" + ((ICustomBlock) block).__getID(),
+                                "inventory"
+                        )
+                );
+
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid custom item!");
+        }
     }
 }

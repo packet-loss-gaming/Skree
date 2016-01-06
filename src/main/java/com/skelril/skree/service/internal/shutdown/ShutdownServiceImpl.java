@@ -6,42 +6,31 @@
 
 package com.skelril.skree.service.internal.shutdown;
 
-import com.google.common.base.Optional;
+
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
 import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ShutdownService;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Server;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.sink.MessageSinks;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
 public class ShutdownServiceImpl implements ShutdownService {
 
     private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
-    private static final Text DEFAULT_REASON = Texts.of("Shutting down!");
+    private static final Text DEFAULT_REASON = Text.of("Shutting down!");
 
-    private final SkreePlugin plugin;
-
-    private final Game game;
-    private final Server server;
-
-    private Optional<TimedRunnable> runnable = Optional.absent();
+    private Optional<TimedRunnable> runnable = Optional.empty();
     private String reopenDate;
 
-    public ShutdownServiceImpl(SkreePlugin plugin, Game game) {
-        this.plugin = plugin;
-        this.game = game;
-        this.server = game.getServer();
-    }
 
     @Override
     public int getSecondsTilOffline() {
@@ -90,8 +79,8 @@ public class ShutdownServiceImpl implements ShutdownService {
             @Override
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
-                    MessageSinks.toAll().sendMessage(
-                            Texts.of(
+                    MessageChannel.TO_ALL.send(
+                            Text.of(
                                     TextColors.RED,
                                     "Sever shutting down in " + times + " seconds - for " + reopenDate + "."
                             )
@@ -102,13 +91,13 @@ public class ShutdownServiceImpl implements ShutdownService {
 
             @Override
             public void end() {
-                MessageSinks.toAll().sendMessage(Texts.of(TextColors.RED, "Server shutting down!"));
+                MessageChannel.TO_ALL.send(Text.of(TextColors.RED, "Server shutting down!"));
                 forceShutdown(message);
             }
         };
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
-        Task task = game.getScheduler().getTaskBuilder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(plugin);
+        Task task = Task.builder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
         runnable.setTask(task);
 
         this.runnable = Optional.of(runnable);
@@ -122,14 +111,14 @@ public class ShutdownServiceImpl implements ShutdownService {
 
     @Override
     public void forceShutdown(Text message) {
-        server.shutdown(message);
+        Sponge.getServer().shutdown(message);
     }
 
     @Override
     public void cancelShutdown() {
         if (runnable.isPresent()) {
             runnable.get().cancel();
-            runnable = Optional.absent();
+            runnable = Optional.empty();
         }
     }
 }

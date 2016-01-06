@@ -6,14 +6,14 @@
 
 package com.skelril.skree.content.registry.item.tool.hoe;
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.hoe.CustomHoe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalHoe extends CustomHoe implements CraftableItem {
+public class CrystalHoe extends CustomHoe implements Craftable {
     @Override
     public String __getType() {
         return "crystal";

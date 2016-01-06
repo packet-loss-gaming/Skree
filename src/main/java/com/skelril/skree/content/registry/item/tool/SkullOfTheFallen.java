@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.registry.item.tool;
 
-import com.google.common.base.Optional;
-import com.skelril.nitro.registry.item.CraftableItem;
+
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
@@ -15,28 +15,31 @@ import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.EntityInteractionTypes;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class SkullOfTheFallen extends CustomItem implements EventAwareContent, CraftableItem {
+import java.text.DecimalFormat;
+import java.util.Optional;
+
+public class SkullOfTheFallen extends CustomItem implements EventAwareContent, Craftable {
 
     @Override
     public void registerRecipes() {
         GameRegistry.addRecipe(
-                new ItemStack(this),
+                new net.minecraft.item.ItemStack(this),
                 "BBB",
                 "BAB",
                 "B B",
-                'A', new ItemStack(CustomItemTypes.BLOOD_DIAMOND),
-                'B', new ItemStack(Items.bone)
+                'A', new net.minecraft.item.ItemStack(CustomItemTypes.BLOOD_DIAMOND),
+                'B', new net.minecraft.item.ItemStack(Items.bone)
         );
     }
 
@@ -55,42 +58,41 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
         return CreativeTabs.tabTools;
     }
 
-    @Subscribe
-    public void onRightClick(PlayerInteractBlockEvent event) {
-        if (event.getGame().getPlatform().getExecutionType().isClient()) return;
+    @Listener
+    public void onRightClick(InteractBlockEvent.Secondary event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
 
-        if (event.getInteractionType() == EntityInteractionTypes.USE) {
-            // TODO remove workaround depends on (Sponge #260)
-            // BEGIN WORKAROUND
-            if (event.getBlock().getX() == 0 && event.getBlock().getY() == 0 && event.getBlock().getZ() == 0 && event.getBlock().getBlockType() == BlockTypes.LOG) {
-                return;
-            }
-            // END WORKAROUND
+        if (!optPlayer.isPresent()) return;
 
-            Player player = event.getEntity();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Player player = optPlayer.get();
 
-            if (optHeldItem.isPresent()) {
-                if (this.equals(optHeldItem.get().getItem())) {
-                    Location pLoc = player.getLocation();
 
-                    Optional<WorldService> optWorldService = event.getGame().getServiceManager().provide(WorldService.class);
-                    if (optWorldService.isPresent()) {
-                        WorldService worldService = optWorldService.get();
-                        WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
-                        if (wrapper.isApplicable(pLoc.getExtent())) {
-                            int level = wrapper.getLevel(pLoc);
+        Optional<ItemStack> optHeldItem = player.getItemInHand();
 
-                            player.sendMessage(
-                                Texts.of(TextColors.YELLOW, "Wilderness level: " + level),
-                                Texts.of(TextColors.YELLOW, "Mob damage: +" + wrapper.getDamageMod(level)),
-                                Texts.of(TextColors.YELLOW, "Mob health: x" + wrapper.getHealthMod(level)),
-                                Texts.of(TextColors.YELLOW, "Ore modifier: x" + wrapper.getOreMod(level)),
-                                Texts.of(TextColors.YELLOW, "Drop modifier: x" + level * wrapper.getDropMod(level, 0))
-                            );
-                        } else {
-                            player.sendMessage(Texts.of(TextColors.RED, "You're not in a Wilderness world!"));
-                        }
+        if (optHeldItem.isPresent()) {
+            if (this.equals(optHeldItem.get().getItem())) {
+                Location<World> pLoc = player.getLocation();
+
+                Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+                if (optWorldService.isPresent()) {
+                    WorldService worldService = optWorldService.get();
+                    WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
+                    Optional<Integer> optLevel = wrapper.getLevel(pLoc);
+                    if (optLevel.isPresent()) {
+                        int level = optLevel.get();
+
+                        DecimalFormat df = new DecimalFormat("#,###.##");
+
+                        player.sendMessages(
+                            Text.of(TextColors.YELLOW, "Wilderness level: " + level),
+                            Text.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
+                            Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
+                            Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
+                            Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
+                            Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level, 0)))
+                        );
+                    } else {
+                        player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));
                     }
                 }
             }

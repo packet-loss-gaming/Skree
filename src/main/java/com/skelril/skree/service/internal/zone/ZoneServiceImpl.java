@@ -8,7 +8,7 @@ package com.skelril.skree.service.internal.zone;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.ZoneService;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -40,18 +40,23 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Override
     public void registerManager(ZoneManager<?> manager) {
-        managers.put(manager.getName().toLowerCase(), manager);
+        managers.put(manager.getSystemName(), manager);
+    }
+
+    @Override
+    public Optional<Integer> getMaxGroupSize(String managerName) {
+        return managers.get(ZoneService.mangleManagerName(managerName)).getMaxGroupSize();
     }
 
     @Override
     public Clause<Player, ZoneStatus> requestZone(String managerName, Player player) {
-        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
+        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         return manager != null ? requestZone(manager, player) : null;
     }
 
     @Override
     public Collection<Clause<Player, ZoneStatus>> requestZone(String managerName, Collection<Player> players) {
-        ZoneManager<?> manager = managers.get(managerName.toLowerCase());
+        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         return manager != null ? requestZone(manager, players) : null;
     }
 
@@ -67,20 +72,31 @@ public class ZoneServiceImpl implements ZoneService {
         return result;
     }
 
+
     @Override
-    public Clause<Player, ZoneStatus> requestZone(ZoneManager<?> manager, Player player) {
-        Zone zone = manager.discover(pickAllocator());
-        if (zone != null) {
-            return addToZone(zone, player);
+    public <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager) {
+        return manager.getMaxGroupSize();
+    }
+
+    @Override
+    public <T extends Zone> Clause<Player, ZoneStatus> requestZone(ZoneManager<T> manager, Player player) {
+        Optional<T> optZone = manager.discover(pickAllocator());
+        if (optZone.isPresent()) {
+            return addToZone(optZone.get(), player);
         }
         return new Clause<>(player, ZoneStatus.CREATION_FAILED);
     }
 
     @Override
-    public Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<?> manager, Collection<Player> players) {
-        Zone zone = manager.discover(pickAllocator());
-        if (zone != null) {
-            return players.stream().map(player -> addToZone(zone, player)).collect(Collectors.toList());
+    public <T extends Zone> Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<T> manager, Collection<Player> players) {
+        Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
+        if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
+            return players.stream().map(player -> new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList());
+        }
+
+        Optional<T> optZone = manager.discover(pickAllocator());
+        if (optZone.isPresent()) {
+            return players.stream().map(player -> addToZone(optZone.get(), player)).collect(Collectors.toList());
         }
         return players.stream().map(player -> new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList());
     }

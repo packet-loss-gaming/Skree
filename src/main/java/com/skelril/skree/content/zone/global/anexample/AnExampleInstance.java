@@ -7,10 +7,11 @@
 package com.skelril.skree.content.zone.global.anexample;
 
 import com.skelril.nitro.Clause;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public class AnExampleInstance implements Zone {
 
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
-        player.setLocation(new Location(region.getExtent(), region.getMaximumPoint()));
+        player.setLocation(new Location<>(region.getExtent(), region.getMaximumPoint()));
         return new Clause<>(player, ZoneStatus.ADDED);
     }
 
@@ -50,7 +51,12 @@ public class AnExampleInstance implements Zone {
     }
 
     @Override
-    public Collection<Player> getPlayers() {
+    public ZoneRegion getRegion() {
+        return region;
+    }
+
+    @Override
+    public Collection<Player> getPlayers(PlayerClassifier classifier) {
         return null;
     }
 }

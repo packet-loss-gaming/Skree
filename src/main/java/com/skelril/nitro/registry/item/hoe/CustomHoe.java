@@ -37,7 +37,7 @@ public abstract class CustomHoe extends ItemHoe implements ICustomHoe {
     }
 
     @Override
-    protected boolean func_179232_a(ItemStack p_179232_1_, EntityPlayer p_179232_2_, World worldIn, BlockPos p_179232_4_, IBlockState p_179232_5_) {
+    protected boolean useHoe(ItemStack p_179232_1_, EntityPlayer p_179232_2_, World worldIn, BlockPos p_179232_4_, IBlockState p_179232_5_) {
         return ICustomHoe.super.__modifyBlock(p_179232_1_, p_179232_2_, worldIn, p_179232_4_, p_179232_5_);
     }
 

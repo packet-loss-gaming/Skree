@@ -7,36 +7,32 @@
 package com.skelril.skree.content.zone;
 
 import com.skelril.skree.service.ZoneService;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.onlyOne;
-import static org.spongepowered.api.util.command.args.GenericArguments.string;
+import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class ZoneMeCommand implements CommandExecutor {
 
-    private ZoneService service;
-
-    public ZoneMeCommand(ZoneService service) {
-        this.service = service;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
         service.requestZone(args.<String>getOne("zone").get(), (Player) src);
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(ZoneService service) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Create a zone"))
+                .description(Text.of("Create a zone"))
                 .permission("skree.zone.zoneme")
-                .arguments(onlyOne(string(Texts.of("zone")))).executor(new ZoneMeCommand(service)).build();
+                .arguments(onlyOne(string(Text.of("zone")))).executor(new ZoneMeCommand()).build();
     }
 }

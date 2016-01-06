@@ -6,8 +6,8 @@
 
 package com.skelril.nitro.registry.item.hoe;
 
-import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.registry.item.DegradableItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.state.IBlockState;
@@ -51,7 +51,7 @@ public interface ICustomHoe extends ICustomItem, DegradableItem {
      * @param side The side being right-clicked
      */
     default boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (!playerIn.func_175151_a(pos.offset(side), side, stack)) {
+        if (!playerIn.canPlayerEdit(pos.offset(side), side, stack)) {
             return false;
         } else {
             int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(stack, playerIn, worldIn, pos);
@@ -60,7 +60,7 @@ public interface ICustomHoe extends ICustomItem, DegradableItem {
             IBlockState iblockstate = worldIn.getBlockState(pos);
             Block block = iblockstate.getBlock();
 
-            if (side != EnumFacing.DOWN && worldIn.isAirBlock(pos.offsetUp())) {
+            if (side != EnumFacing.DOWN && worldIn.isAirBlock(pos.up())) {
                 if (block == Blocks.grass) {
                     return this.__modifyBlock(stack, playerIn, worldIn, pos, Blocks.farmland.getDefaultState());
                 }

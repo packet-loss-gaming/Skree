@@ -6,7 +6,7 @@
 
 package com.skelril.skree.service;
 
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 public interface PlayerStateService {
     @Deprecated // Temporary function

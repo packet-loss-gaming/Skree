@@ -21,7 +21,7 @@ public class AnExampleManager extends GlobalZoneManager<AnExampleInstance> {
 
     @Override
     public AnExampleInstance init(ZoneSpaceAllocator allocator) {
-        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getName());
+        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
         ZoneRegion region = result.getKey();
 
         AnExampleInstance instance = new AnExampleInstance(region);

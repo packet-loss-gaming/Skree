@@ -7,49 +7,46 @@
 package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.skelril.nitro.generator.Generator;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Random;
+import java.util.function.Function;
 
-public class ItemFountain extends ItemDropper implements IntegratedRunnable  {
+public class ItemFountain implements IntegratedRunnable  {
 
-    private static Random random = new Random();
+    private final ItemDropper dropper;
 
-    private Game game;
-    private World world;
-    private Vector3d pos;
-    private Generator<Integer> amplifier;
-    private Collection<ItemStack> options;
+    private final Function<Integer, Integer> amplifier;
+    private final Collection<ItemStack> options;
+    private final Cause cause;
 
-    public ItemFountain(Game game, World world, Vector3d pos, Generator<Integer> amplifier, Collection<ItemStack> options) {
-        super(game, world, pos);
-        this.game = game;
-        this.world = world;
-        this.pos = pos;
+    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options, Cause cause) {
+        this.dropper = new ItemDropper(location);
+
         this.amplifier = amplifier;
         this.options = options;
+        this.cause = cause;
     }
 
-    public World getWorld() {
-        return world;
+    public World getExtent() {
+        return dropper.getExtent();
     }
 
     public Vector3d getPos() {
-        return pos;
+        return dropper.getPos();
     }
 
     @Override
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);
-        for (int i = 0; i < amplifier.get() + 1; i++) {
-            dropItems(Collections.singletonList(stack));
+        for (int i = 0; i < amplifier.apply(i) + 1; i++) {
+            dropper.dropItems(Collections.singletonList(stack), cause);
         }
         return true;
     }

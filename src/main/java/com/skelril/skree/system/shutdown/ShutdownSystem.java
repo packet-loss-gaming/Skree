@@ -6,32 +6,27 @@
 
 package com.skelril.skree.system.shutdown;
 
-import com.google.inject.Inject;
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.shutdown.ShutdownCommand;
 import com.skelril.skree.service.ShutdownService;
 import com.skelril.skree.service.internal.shutdown.ShutdownServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.Sponge;
 
+@NModule(name = "Shutdown System")
 public class ShutdownSystem implements ServiceProvider<ShutdownService> {
 
     private ShutdownService service;
 
-    @Inject
-    public ShutdownSystem(SkreePlugin plugin, Game game) {
-
-        service = new ShutdownServiceImpl(plugin, game);
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
+        service = new ShutdownServiceImpl();
 
         // Register the service & command
-        try {
-            game.getServiceManager().setProvider(plugin, ShutdownService.class, service);
-            game.getCommandDispatcher().register(plugin, ShutdownCommand.aquireSpec(service), "shutdown");
-        } catch (ProviderExistsException e) {
-            e.printStackTrace();
-            return;
-        }
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ShutdownService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), ShutdownCommand.aquireSpec(), "shutdown");
     }
 
     @Override

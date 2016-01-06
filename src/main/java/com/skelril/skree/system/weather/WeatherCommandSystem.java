@@ -6,17 +6,18 @@
 
 package com.skelril.skree.system.weather;
 
+import com.skelril.nitro.module.NModule;
+import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.weather.WeatherCommand;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.command.CommandService;
+import org.spongepowered.api.Sponge;
 
+@NModule(name = "Weather Command System")
 public class WeatherCommandSystem {
-    public WeatherCommandSystem(SkreePlugin plugin, Game game) {
-        CommandService cmdDispatcher = game.getCommandDispatcher();
-
-        cmdDispatcher.removeMapping(cmdDispatcher.get("weather").get());
-        cmdDispatcher.register(plugin, WeatherCommand.aquireSpec(game), "weather");
+    @NModuleTrigger(trigger = "SERVER_STARTED")
+    public void init() {
+        Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("weather").get());
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WeatherCommand.aquireSpec(), "weather");
     }
 }
 

@@ -6,14 +6,14 @@
 
 package com.skelril.skree.content.registry.item.weapon.sword;
 
-import com.skelril.nitro.registry.item.CraftableItem;
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.sword.CustomSword;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword implements CraftableItem {
+public class CrystalSword extends CustomSword implements Craftable {
     @Override
     public int __getMaxUses() {
         return ToolMaterial.EMERALD.getMaxUses();

@@ -6,28 +6,34 @@
 
 package com.skelril.skree.content.shutdown;
 
-import com.google.common.base.Optional;
-import com.skelril.skree.service.ShutdownService;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import com.skelril.skree.service.ShutdownService;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Optional;
+
+import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ShutdownCommand implements CommandExecutor {
 
-    private ShutdownService service;
-
-    public ShutdownCommand(ShutdownService service) {
-        this.service = service;
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        Optional<ShutdownService> optService = Sponge.getServiceManager().provide(ShutdownService.class);
+        if (!optService.isPresent()) {
+            src.sendMessage(Text.of(TextColors.DARK_RED, "The shutdown service is not currently running."));
+            return CommandResult.empty();
+        }
+
+        ShutdownService service = optService.get();
+
         Integer seconds = args.<Integer>getOne("seconds").get();
         Optional<String> message = args.<String>getOne("message");
 
@@ -35,13 +41,13 @@ public class ShutdownCommand implements CommandExecutor {
 
         if (args.<Boolean>getOne("f").isPresent()) {
             if (message.isPresent()) {
-                service.forceShutdown(Texts.of(message.get()));
+                service.forceShutdown(Text.of(message.get()));
             } else {
                 service.forceShutdown();
             }
         } else {
             if (message.isPresent()) {
-                service.shutdown(seconds, Texts.of(message.get()));
+                service.shutdown(seconds, Text.of(message.get()));
             } else {
                 service.shutdown(seconds);
             }
@@ -50,17 +56,17 @@ public class ShutdownCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public static CommandSpec aquireSpec(ShutdownService service) {
+    public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
-                .description(Texts.of("Shut the server off"))
+                .description(Text.of("Shut the server off"))
                 .permission("skree.shutdown")
                 .arguments(
                         flags().flag("f").buildWith(
                                 seq(
-                                        onlyOne(optionalWeak(integer(Texts.of("seconds")), 60)),
-                                        optional(remainingJoinedStrings(Texts.of("message")))
+                                        onlyOne(optionalWeak(integer(Text.of("seconds")), 60)),
+                                        optional(remainingJoinedStrings(Text.of("message")))
                                 )
                         )
-                ).executor(new ShutdownCommand(service)).build();
+                ).executor(new ShutdownCommand()).build();
     }
 }
