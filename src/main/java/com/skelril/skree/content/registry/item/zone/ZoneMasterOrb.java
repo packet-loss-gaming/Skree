@@ -74,6 +74,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         );
     }
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(net.minecraft.item.Item itemIn, CreativeTabs tab, List subItems) {
+        subItems.add(new ItemStack(itemIn, 1, 0));
+    }
+
     @Listener
     public void onLogin(ClientConnectionEvent.Join event) {
         purgeZoneItems(event.getTargetEntity(), Optional.empty());
