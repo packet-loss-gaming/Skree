@@ -403,9 +403,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 Location<World> loc = optLoc.get();
-                if (ore().contains(loc.getBlockType())) {
+                BlockType finalType = block.getFinal().getState().getType();
+                if (ore().contains(finalType)) {
                     // Allow creative mode players to still place blocks
                     if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
+                        continue;
+                    }
+
+                    BlockType originalType = block.getOriginal().getState().getType();
+                    if (ore().contains(originalType)) {
                         continue;
                     }
 
