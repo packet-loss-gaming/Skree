@@ -24,6 +24,7 @@ import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
 import com.skelril.skree.content.registry.item.tool.shovel.JurackShovel;
 import com.skelril.skree.content.registry.item.tool.terragu.*;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
+import com.skelril.skree.content.registry.item.weapon.bow.NetherBow;
 import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
 import com.skelril.skree.content.registry.item.weapon.sword.JurackSword;
 import com.skelril.skree.content.registry.item.weapon.sword.TwoTailedSword;
@@ -66,6 +67,8 @@ public class CustomItemTypes {
     public static final CookedGodFish COOKED_GOD_FISH = new CookedGodFish();
 
     /* Weapons */
+    public static final NetherBow NETHER_BOW = new NetherBow();
+
     public static final JurackSword JURACK_SWORD = new JurackSword();
     public static final CrystalSword CRYSTAL_SWORD = new CrystalSword();
     public static final TwoTailedSword TWO_TAILED_SWORD = new TwoTailedSword();
