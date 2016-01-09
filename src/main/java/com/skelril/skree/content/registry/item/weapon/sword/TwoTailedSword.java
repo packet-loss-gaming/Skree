@@ -53,6 +53,10 @@ public class TwoTailedSword extends CustomSword implements EventAwareContent {
         new PlayerCombatParser() {
             @Override
             public boolean verify(Living living) {
+                if (!(living instanceof ArmorEquipable)) {
+                    return false;
+                }
+
                 Optional<org.spongepowered.api.item.inventory.ItemStack> optHeld = ((ArmorEquipable) living).getItemInHand();
                 if (optHeld.isPresent() && optHeld.get().getItem() == CustomItemTypes.TWO_TAILED_SWORD) {
                     event.setBaseDamage(0);
