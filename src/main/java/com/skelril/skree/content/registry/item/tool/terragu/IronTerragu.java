@@ -24,15 +24,15 @@ public class IronTerragu extends CustomTerragu {
     public ItemStack __getRepairItemStack() {
         return new ItemStack(Items.iron_ingot);
     }
-
+    
     @Override
     public double __getHitPower() {
-        return ToolMaterial.IRON.getDamageVsEntity();
+        return ItemTiers.IRON.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.IRON.getEnchantability();
+        return ItemTiers.IRON.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class IronTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return ToolMaterial.IRON.getEfficiencyOnProperMaterial();
+        return ItemTiers.IRON.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.IRON.getMaxUses();
+        return ItemTiers.IRON.getDurability();
     }
 
     @Listener

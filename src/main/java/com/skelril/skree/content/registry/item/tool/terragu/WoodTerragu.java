@@ -27,12 +27,12 @@ public class WoodTerragu extends CustomTerragu {
 
     @Override
     public double __getHitPower() {
-        return ToolMaterial.WOOD.getDamageVsEntity();
+        return ItemTiers.WOOD.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.WOOD.getEnchantability();
+        return ItemTiers.WOOD.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class WoodTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return ToolMaterial.WOOD.getEfficiencyOnProperMaterial();
+        return ItemTiers.WOOD.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.WOOD.getMaxUses();
+        return ItemTiers.WOOD.getDurability();
     }
 
     @Listener

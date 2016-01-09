@@ -24,15 +24,15 @@ public class DiamondTerragu extends CustomTerragu {
     public ItemStack __getRepairItemStack() {
         return new ItemStack(Items.diamond);
     }
-
+    
     @Override
     public double __getHitPower() {
-        return ToolMaterial.EMERALD.getDamageVsEntity();
+        return ItemTiers.DIAMOND.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.EMERALD.getEnchantability();
+        return ItemTiers.DIAMOND.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class DiamondTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return ToolMaterial.EMERALD.getEfficiencyOnProperMaterial();
+        return ItemTiers.DIAMOND.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+        return ItemTiers.DIAMOND.getDurability();
     }
 
     @Listener

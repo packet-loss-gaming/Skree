@@ -27,12 +27,12 @@ public class CrystalTerragu extends CustomTerragu {
 
     @Override
     public double __getHitPower() {
-        return 6;
+        return ItemTiers.CRYSTAL.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.EMERALD.getEnchantability();
+        return ItemTiers.CRYSTAL.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class CrystalTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return 10.0F;
+        return ItemTiers.CRYSTAL.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+        return ItemTiers.CRYSTAL.getDurability();
     }
 
     @Listener

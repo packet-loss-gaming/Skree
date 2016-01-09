@@ -27,12 +27,12 @@ public class GoldTerragu extends CustomTerragu {
 
     @Override
     public double __getHitPower() {
-        return ToolMaterial.GOLD.getDamageVsEntity();
+        return ItemTiers.GOLD.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.GOLD.getEnchantability();
+        return ItemTiers.GOLD.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class GoldTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return ToolMaterial.GOLD.getEfficiencyOnProperMaterial();
+        return ItemTiers.GOLD.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.GOLD.getMaxUses();
+        return ItemTiers.GOLD.getDurability();
     }
 
     @Listener

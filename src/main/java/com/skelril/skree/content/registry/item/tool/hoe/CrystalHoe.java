@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.item.tool.hoe;
 
 import com.skelril.nitro.registry.Craftable;
+import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.hoe.CustomHoe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
@@ -21,7 +22,7 @@ public class CrystalHoe extends CustomHoe implements Craftable {
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+        return ItemTiers.CRYSTAL.getDurability();
     }
 
     @Override

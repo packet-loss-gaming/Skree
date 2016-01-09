@@ -27,12 +27,12 @@ public class StoneTerragu extends CustomTerragu {
 
     @Override
     public double __getHitPower() {
-        return ToolMaterial.STONE.getDamageVsEntity();
+        return ItemTiers.STONE.getDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.STONE.getEnchantability();
+        return ItemTiers.STONE.getEnchantability();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class StoneTerragu extends CustomTerragu {
 
     @Override
     public float __getSpecializedSpeed() {
-        return ToolMaterial.STONE.getEfficiencyOnProperMaterial();
+        return ItemTiers.STONE.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.STONE.getMaxUses();
+        return ItemTiers.STONE.getDurability();
     }
 
     @Listener

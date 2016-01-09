@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.tool.shovel;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
+import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.shovel.CustomShovel;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
@@ -28,12 +29,12 @@ public class CrystalShovel extends CustomShovel implements Craftable {
 
     @Override
     public double __getHitPower() {
-        return 5;
+        return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.SHOVEL.getBaseDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.EMERALD.getEnchantability();
+        return ItemTiers.CRYSTAL.getEnchantability();
     }
 
     @Override
@@ -43,12 +44,12 @@ public class CrystalShovel extends CustomShovel implements Craftable {
 
     @Override
     public float __getSpecializedSpeed() {
-        return 10.0F;
+        return ItemTiers.CRYSTAL.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+        return ItemTiers.CRYSTAL.getDurability();
     }
 
     @Override

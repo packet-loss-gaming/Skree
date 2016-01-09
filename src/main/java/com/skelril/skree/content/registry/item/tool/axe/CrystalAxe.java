@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.tool.axe;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
+import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.axe.CustomAxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
@@ -28,12 +29,12 @@ public class CrystalAxe extends CustomAxe implements Craftable {
 
     @Override
     public double __getHitPower() {
-        return 7;
+        return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.AXE.getBaseDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ToolMaterial.EMERALD.getEnchantability();
+        return ItemTiers.CRYSTAL.getEnchantability();
     }
 
     @Override
@@ -43,12 +44,12 @@ public class CrystalAxe extends CustomAxe implements Craftable {
 
     @Override
     public float __getSpecializedSpeed() {
-        return 10.0F;
+        return ItemTiers.CRYSTAL.getEfficienyOnProperMaterial();
     }
 
     @Override
     public int __getMaxUses() {
-        return ToolMaterial.EMERALD.getMaxUses();
+        return ItemTiers.CRYSTAL.getDurability();
     }
 
     @Override
