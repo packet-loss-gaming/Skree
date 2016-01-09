@@ -6,21 +6,25 @@
 
 package com.skelril.nitro.registry;
 
-public class HarvestTier {
+public abstract class ItemTier {
 
     private String tierName;
-    private int translation;
 
-    public HarvestTier(String tierName, int translation) {
+    public ItemTier(String tierName) {
         this.tierName = tierName;
-        this.translation = translation;
     }
 
     public String getTierName() {
         return tierName;
     }
 
-    public int getTranslation() {
-        return translation;
-    }
+    public abstract int getHarvestLevel();
+
+    public abstract int getDurability();
+
+    public abstract float getEfficienyOnProperMaterial();
+
+    public abstract float getDamage();
+
+    public abstract int getEnchantability();
 }

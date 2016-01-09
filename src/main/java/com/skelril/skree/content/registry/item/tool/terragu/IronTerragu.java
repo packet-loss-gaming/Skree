@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
-import com.skelril.nitro.registry.HarvestTier;
-import com.skelril.nitro.registry.item.HarvestTiers;
+import com.skelril.nitro.registry.ItemTier;
+import com.skelril.nitro.registry.item.ItemTiers;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.event.Listener;
@@ -36,8 +36,8 @@ public class IronTerragu extends CustomTerragu {
     }
 
     @Override
-    public HarvestTier __getHarvestTier() {
-        return HarvestTiers.IRON;
+    public ItemTier __getHarvestTier() {
+        return ItemTiers.IRON;
     }
 
     @Override

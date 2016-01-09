@@ -56,7 +56,7 @@ public interface ICustomPickaxe extends ICustomTool {
 
     default boolean canHarvestBlock(Block blockIn) {
         if (blockIn == Blocks.obsidian) {
-            return __getHarvestTier().getTranslation() == 3;
+            return __getHarvestTier().getHarvestLevel() == 3;
         } else if (blockIn != Blocks.diamond_block && blockIn != Blocks.diamond_ore) {
             if (blockIn != Blocks.emerald_ore && blockIn != Blocks.emerald_block) {
                 if (blockIn != Blocks.gold_block && blockIn != Blocks.gold_ore) {
@@ -65,22 +65,22 @@ public interface ICustomPickaxe extends ICustomTool {
                             if (blockIn != Blocks.redstone_ore && blockIn != Blocks.lit_redstone_ore) {
                                 return (blockIn.getMaterial() == Material.rock || (blockIn.getMaterial() == Material.iron || blockIn.getMaterial() == Material.anvil));
                             } else {
-                                return __getHarvestTier().getTranslation() >= 2;
+                                return __getHarvestTier().getHarvestLevel() >= 2;
                             }
                         } else {
-                            return __getHarvestTier().getTranslation() >= 1;
+                            return __getHarvestTier().getHarvestLevel() >= 1;
                         }
                     } else {
-                        return __getHarvestTier().getTranslation() >= 1;
+                        return __getHarvestTier().getHarvestLevel() >= 1;
                     }
                 } else {
-                    return __getHarvestTier().getTranslation() >= 2;
+                    return __getHarvestTier().getHarvestLevel() >= 2;
                 }
             } else {
-                return __getHarvestTier().getTranslation() >= 2;
+                return __getHarvestTier().getHarvestLevel() >= 2;
             }
         } else {
-            return __getHarvestTier().getTranslation() >= 2;
+            return __getHarvestTier().getHarvestLevel() >= 2;
         }
     }
 

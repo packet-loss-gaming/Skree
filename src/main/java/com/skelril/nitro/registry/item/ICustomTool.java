@@ -7,7 +7,7 @@
 package com.skelril.nitro.registry.item;
 
 import com.google.common.collect.Multimap;
-import com.skelril.nitro.registry.HarvestTier;
+import com.skelril.nitro.registry.ItemTier;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -66,7 +66,7 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
         return 1;
     }
 
-    HarvestTier __getHarvestTier();
+    ItemTier __getHarvestTier();
 
     float __getSpecializedSpeed();
 
@@ -161,7 +161,7 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
     default int getHarvestLevel(ItemStack stack, String toolClass) {
         int level = __superGetHarvestLevel(stack, toolClass);
         if (level == -1 && toolClass != null && toolClass.equals(__getToolClass())) {
-            return __getHarvestTier().getTranslation();
+            return __getHarvestTier().getHarvestLevel();
         } else {
             return level;
         }

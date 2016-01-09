@@ -7,8 +7,8 @@
 package com.skelril.skree.content.registry.item.tool.pickaxe;
 
 import com.skelril.nitro.registry.Craftable;
-import com.skelril.nitro.registry.HarvestTier;
-import com.skelril.nitro.registry.item.HarvestTiers;
+import com.skelril.nitro.registry.ItemTier;
+import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.pickaxe.CustomPickaxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
@@ -37,8 +37,8 @@ public class CrystalPickaxe extends CustomPickaxe implements Craftable {
     }
 
     @Override
-    public HarvestTier __getHarvestTier() {
-        return HarvestTiers.CRYSTAL;
+    public ItemTier __getHarvestTier() {
+        return ItemTiers.CRYSTAL;
     }
 
     @Override

@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
-import com.skelril.nitro.registry.HarvestTier;
-import com.skelril.nitro.registry.item.HarvestTiers;
+import com.skelril.nitro.registry.ItemTier;
+import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.event.Listener;
@@ -36,8 +36,8 @@ public class CrystalTerragu extends CustomTerragu {
     }
 
     @Override
-    public HarvestTier __getHarvestTier() {
-        return HarvestTiers.CRYSTAL;
+    public ItemTier __getHarvestTier() {
+        return ItemTiers.CRYSTAL;
     }
 
     @Override
