@@ -34,7 +34,7 @@ public class NetherBow extends CustomBow {
     }
 
     @Override
-    public Random getItemRand() {
+    public Random __getItemRand() {
         return itemRand;
     }
 }

@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.registry.item.bow;
 
+import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
@@ -21,7 +22,7 @@ import net.minecraft.world.World;
 
 import java.util.Random;
 
-public interface ICustomBow extends ICustomItem {
+public interface ICustomBow extends ICustomItem, DegradableItem {
     // Skelril Methods
 
     // General
@@ -63,7 +64,8 @@ public interface ICustomBow extends ICustomItem {
 
     // Native compatibility methods
 
-    Random getItemRand();
+    Random __getItemRand();
+
     // Modified Native Methods
 
     default boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
@@ -119,7 +121,7 @@ public interface ICustomBow extends ICustomItem {
             }
 
             stack.damageItem(1, playerIn);
-            worldIn.playSoundAtEntity(playerIn, "random.bow", 1.0F, 1.0F / (getItemRand().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+            worldIn.playSoundAtEntity(playerIn, "random.bow", 1.0F, 1.0F / (__getItemRand().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
             if (flag) {
                 entityarrow.canBePickedUp = 2;

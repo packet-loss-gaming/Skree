@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item;
 
 import com.skelril.skree.content.registry.item.admin.HackBook;
 import com.skelril.skree.content.registry.item.admin.SwordOGreatPain;
+import com.skelril.skree.content.registry.item.armor.*;
 import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
@@ -65,6 +66,17 @@ public class CustomItemTypes {
     /* Food */
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();
     public static final CookedGodFish COOKED_GOD_FISH = new CookedGodFish();
+
+    /* Armors */
+    public static final JurackHelmet JURACK_HELMET = new JurackHelmet();
+    public static final JurackChestplate JURACK_CHESTPLATE = new JurackChestplate();
+    public static final JurackLeggings JURACK_LEGGINGS = new JurackLeggings();
+    public static final JurackBoots JURACK_BOOTS = new JurackBoots();
+
+    public static final CrystalHelmet CRYSTAL_HELMET = new CrystalHelmet();
+    public static final CrystalChestplate CRYSTAL_CHESTPLATE = new CrystalChestplate();
+    public static final CrystalLeggings CRYSTAL_LEGGINGS = new CrystalLeggings();
+    public static final CrystalBoots CRYSTAL_BOOTS = new CrystalBoots();
 
     /* Weapons */
     public static final NetherBow NETHER_BOW = new NetherBow();
