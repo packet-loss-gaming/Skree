@@ -15,31 +15,31 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword implements Craftable {
+public class JurackSword extends CustomSword implements Craftable {
 
     @Override
     public String __getType() {
-        return "crystal";
+        return "jurack";
     }
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(CustomItemTypes.SEA_CRYSTAL);
+        return new ItemStack(CustomItemTypes.JURACK_GEM);
     }
 
     @Override
     public int __getMaxUses() {
-        return ItemTiers.CRYSTAL.getDurability();
+        return ItemTiers.JURACK.getDurability();
     }
 
     @Override
     public double __getHitPower() {
-        return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.SWORD.getBaseDamage();
+        return ItemTiers.JURACK.getDamage() + ItemToolTypes.SWORD.getBaseDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ItemTiers.CRYSTAL.getEnchantability();
+        return ItemTiers.JURACK.getEnchantability();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CrystalSword extends CustomSword implements Craftable {
                 " A ",
                 " A ",
                 " B ",
-                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
+                'A', new ItemStack(CustomItemTypes.JURACK_GEM),
                 'B', new ItemStack(Items.stick)
         );
     }

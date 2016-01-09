@@ -4,52 +4,62 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.weapon.sword;
+package com.skelril.skree.content.registry.item.tool.axe;
 
 import com.skelril.nitro.registry.Craftable;
+import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
-import com.skelril.nitro.registry.item.sword.CustomSword;
+import com.skelril.nitro.registry.item.axe.CustomAxe;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword implements Craftable {
-
+public class JurackAxe extends CustomAxe implements Craftable {
     @Override
     public String __getType() {
-        return "crystal";
+        return "jurack";
     }
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(CustomItemTypes.SEA_CRYSTAL);
-    }
-
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.CRYSTAL.getDurability();
+        return new ItemStack(CustomItemTypes.JURACK_GEM);
     }
 
     @Override
     public double __getHitPower() {
-        return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.SWORD.getBaseDamage();
+        return ItemTiers.JURACK.getDamage() + ItemToolTypes.AXE.getBaseDamage();
     }
 
     @Override
     public int __getEnchantability() {
-        return ItemTiers.CRYSTAL.getEnchantability();
+        return ItemTiers.JURACK.getEnchantability();
+    }
+
+    @Override
+    public ItemTier __getHarvestTier() {
+        return ItemTiers.JURACK;
+    }
+
+    @Override
+    public float __getSpecializedSpeed() {
+        return ItemTiers.JURACK.getEfficienyOnProperMaterial();
+    }
+
+    @Override
+    public int __getMaxUses() {
+        return ItemTiers.JURACK.getDurability();
     }
 
     @Override
     public void registerRecipes() {
         GameRegistry.addRecipe(
                 new ItemStack(this),
-                " A ",
-                " A ",
+                "AA ",
+                "AB ",
                 " B ",
-                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
+                'A', new ItemStack(CustomItemTypes.JURACK_GEM),
                 'B', new ItemStack(Items.stick)
         );
     }
