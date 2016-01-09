@@ -74,6 +74,10 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
     @Listener
     public void onPlayerCombat(DamageEntityEvent event) {
+        if (!isApplicable(event.getTargetEntity())) {
+            return;
+        }
+
         new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
