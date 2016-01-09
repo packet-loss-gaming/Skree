@@ -122,6 +122,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
+                                                                newItemStack((ItemType) TWO_TAILED_SWORD)
+                                                        )
+                                                ), 10000
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
                                                                 newItemStack((ItemType) RED_FEATHER)
                                                         )
                                                 ), 100000
