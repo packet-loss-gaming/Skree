@@ -89,7 +89,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                             Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
                             Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
                             Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
-                            Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level, 0)))
+                            Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(level)))
                         );
                     } else {
                         player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));

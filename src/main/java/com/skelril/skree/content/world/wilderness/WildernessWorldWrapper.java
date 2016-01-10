@@ -48,12 +48,11 @@ import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.entity.ArmorEquipable;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.monster.Boss;
 import org.spongepowered.api.entity.living.monster.Monster;
+import org.spongepowered.api.entity.living.monster.Wither;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
@@ -74,6 +73,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -88,7 +88,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
-    private DropTable dropTable;
+    private DropTable commonDropTable;
+    private DropTable netherMobDropTable;
 
     private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
 
@@ -100,7 +101,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         super("Wilderness", worlds);
 
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
-        dropTable = new MasterDropTable(
+        commonDropTable = new MasterDropTable(
                 slipRoller,
                 Lists.newArrayList(
                         new DropTableImpl(
@@ -125,13 +126,36 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                                                 newItemStack((ItemType) TWO_TAILED_SWORD)
                                                         )
                                                 ), 10000
-                                        ),
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack((ItemType) RED_FEATHER)
                                                         )
                                                 ), 100000
+                                        )
+                                )
+                        )
+                )
+        );
+        netherMobDropTable = new MasterDropTable(
+                slipRoller,
+                Lists.newArrayList(
+                        commonDropTable,
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack((ItemType) NETHER_BOW)
+                                                        )
+                                                ), 10000
                                         )
                                 )
                         )
@@ -268,12 +292,22 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
         int level = optLevel.get();
 
+
         if (entity instanceof Monster) {
+            DropTable dropTable;
+
+            if (entity.getLocation().getExtent().getDimension() == DimensionTypes.NETHER || entity instanceof Wither) {
+                dropTable = netherMobDropTable;
+            } else {
+                dropTable = commonDropTable;
+            }
+
             Collection<ItemStack> drops = dropTable.getDrops(
-                    level,
+                    (entity instanceof Boss ? 5 : 1) * level,
                     getDropMod(
                             level,
-                            ((Monster) entity).getHealthData().maxHealth().get()
+                            Optional.of(((Monster) entity).getHealthData().maxHealth().get()),
+                            Optional.of(entity.getType())
                     )
             );
 
@@ -473,8 +507,21 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return level >= getFirstPvPLevel();
     }
 
-    public double getDropMod(int level, double mobHealth) {
-        return (level * .2) + (mobHealth * .04);
+    public double getDropMod(int level) {
+        return getDropMod(level, Optional.empty(), Optional.empty());
+    }
+
+    public double getDropMod(int level, Optional<Double> optMobHealth, Optional<EntityType> optEntityType) {
+        double modifier = (level * .2) + (optMobHealth.isPresent() ? optMobHealth.get() * .04 : 0);
+        if (optEntityType.isPresent()) {
+            EntityType entityType = optEntityType.get();
+            if (entityType == EntityTypes.WITHER || entityType == EntityTypes.CREEPER) {
+                modifier *= 5;
+            } else if (entityType == EntityTypes.SILVERFISH) {
+                modifier *= 2;
+            }
+        }
+        return modifier;
     }
 
     public int getHealthMod(int level) {
