@@ -32,7 +32,7 @@ public class JurackHoe extends CustomHoe implements Craftable {
                 "AA ",
                 " B ",
                 " B ",
-                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
+                'A', new ItemStack(CustomItemTypes.JURACK_GEM),
                 'B', new ItemStack(Items.stick)
         );
     }
