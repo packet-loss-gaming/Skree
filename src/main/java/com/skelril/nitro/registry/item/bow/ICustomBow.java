@@ -8,6 +8,7 @@ package com.skelril.nitro.registry.item.bow;
 
 import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Random;
 
 public interface ICustomBow extends ICustomItem, DegradableItem {
@@ -37,6 +39,15 @@ public interface ICustomBow extends ICustomItem, DegradableItem {
     String __getType();
 
     @Override
+    default List<String> __getMeshDefinitions() {
+        List<String> baseList = ICustomItem.super.__getMeshDefinitions();
+        baseList.add(__getID() + "_pulling_0");
+        baseList.add(__getID() + "_pulling_1");
+        baseList.add(__getID() + "_pulling_2");
+        return baseList;
+    }
+
+    @Override
     default CreativeTabs __getCreativeTab() {
         return CreativeTabs.tabCombat;
     }
@@ -44,18 +55,8 @@ public interface ICustomBow extends ICustomItem, DegradableItem {
     // Repair
     ItemStack __getRepairItemStack();
 
-    // Combat Data
-    default int __getDamageForUseOnEntity() {
-        return 1;
-    }
-
     // Enchantability
     int __getEnchantability();
-
-    // Block Modification Data
-    default int __getDamageForUseOnBlock() {
-        return 2;
-    }
 
     @Override
     default String __getID() {
@@ -67,6 +68,25 @@ public interface ICustomBow extends ICustomItem, DegradableItem {
     Random __getItemRand();
 
     // Modified Native Methods
+
+    default net.minecraft.client.resources.model.ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining) {
+        if (player.getItemInUse() != null) {
+            int i = stack.getMaxItemUseDuration() - player.getItemInUseCount();
+
+            if (i >= 18) {
+                return new ModelResourceLocation("skree:" + __getID() + "_pulling_2", "inventory");
+            } else if (i > 13) {
+                return new ModelResourceLocation("skree:" + __getID() + "_pulling_1", "inventory");
+            } else if (i > 0) {
+                return new ModelResourceLocation("skree:" + __getID() + "_pulling_0", "inventory");
+            }
+        }
+        return null;
+    }
+
+    default void getSubItems(net.minecraft.item.Item itemIn, CreativeTabs tab, List subItems) {
+        subItems.add(new ItemStack(itemIn, 1, 0));
+    }
 
     default boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         ItemStack mat = __getRepairItemStack();

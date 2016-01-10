@@ -6,11 +6,16 @@
 
 package com.skelril.nitro.registry.item.bow;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 public abstract class CustomBow extends ItemBow implements ICustomBow {
     public CustomBow() {
@@ -18,6 +23,18 @@ public abstract class CustomBow extends ItemBow implements ICustomBow {
         this.setCreativeTab(__getCreativeTab());
 
         this.setMaxDamage(__getMaxUses());
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public net.minecraft.client.resources.model.ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining) {
+        return ICustomBow.super.getModel(stack, player, useRemaining);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(net.minecraft.item.Item itemIn, CreativeTabs tab, List subItems) {
+        ICustomBow.super.getSubItems(itemIn, tab, subItems);
     }
 
     @Override
