@@ -7,7 +7,6 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -33,7 +32,7 @@ public class JurackOrePopulator implements Populator {
 
         for (int x = min.getX(); x <= max.getX(); ++x) {
             for (int z = min.getZ(); z <= max.getZ(); ++z) {
-                if (!Probability.getChance(20)) {
+                if (random.nextInt(20) != 0) {
                     continue;
                 }
 
