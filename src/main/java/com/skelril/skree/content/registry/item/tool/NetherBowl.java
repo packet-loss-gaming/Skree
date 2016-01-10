@@ -8,14 +8,13 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.content.registry.item.Teleporter;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -24,7 +23,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
-public class NetherBowl extends CustomItem implements EventAwareContent {
+public class NetherBowl extends CustomItem implements EventAwareContent, Teleporter {
 
     @Override
     public String __getID() {
@@ -66,7 +65,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent {
 
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
-        Optional<Location<World>> optLoc = getDestination(stack);
+        Optional<Location<World>> optLoc = Teleporter.getDestination(stack);
         if (optLoc.isPresent()) {
             tf(playerIn).setLocation(optLoc.get());
         }
@@ -76,81 +75,19 @@ public class NetherBowl extends CustomItem implements EventAwareContent {
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemStackIn, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
-        if (getDestination(itemStackIn).isPresent()) {
+        if (Teleporter.getDestination(itemStackIn).isPresent()) {
             playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
         }
 
         return itemStackIn;
     }
 
-    public static void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
-        setDestination(tf(stack), target);
-    }
-
-    public static void setDestination(ItemStack stack, Location<World> target) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
-        }
-
-        if (!stack.getTagCompound().hasKey("skree_dest_data")) {
-            stack.getTagCompound().setTag("skree_dest_data", new NBTTagCompound());
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        tag.setString("world", target.getExtent().getName());
-        tag.setDouble("x", target.getX());
-        tag.setDouble("y", target.getY());
-        tag.setDouble("z", target.getZ());
-
-        stack.setItemDamage(1);
-    }
-
-    private static Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getDestination(tf(stack));
-    }
-
-    private static Optional<Location<World>> getDestination(ItemStack stack) {
-        if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
-            return Optional.empty();
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        String worldName = tag.getString("world");
-        double x = tag.getDouble("x");
-        double y = tag.getDouble("y");
-        double z = tag.getDouble("z");
-        Optional<World> optWorld = Sponge.getServer().getWorld(worldName);
-        if (optWorld.isPresent()) {
-            return Optional.of(new Location<>(optWorld.get(), x, y, z));
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getClientDestination(tf(stack));
-    }
-
-    private static Optional<String> getClientDestination(ItemStack stack) {
-        if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
-            return Optional.empty();
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        String worldName = tag.getString("world");
-        double x = tag.getDouble("x");
-        double y = tag.getDouble("y");
-        double z = tag.getDouble("z");
-
-        return Optional.of(worldName + " at " + (int) x + ", " + (int) y + ", " + (int) z);
-    }
-
-
     // Modified Native Item methods
 
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optDestStr = getClientDestination(stack);
+        Optional<String> optDestStr = Teleporter.getClientDestination(stack);
         if (optDestStr.isPresent()) {
             tooltip.add("Drink to return to your grave.");
         } else {
