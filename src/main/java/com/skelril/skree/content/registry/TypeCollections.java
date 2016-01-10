@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
@@ -22,7 +23,8 @@ public class TypeCollections {
             BlockTypes.IRON_ORE,
             BlockTypes.LAPIS_ORE,
             BlockTypes.LIT_REDSTONE_ORE,
-            BlockTypes.QUARTZ_ORE
+            BlockTypes.QUARTZ_ORE,
+            (BlockType) CustomBlockTypes.JURACK_ORE
     );
 
     public static ImmutableCollection<BlockType> ore() {

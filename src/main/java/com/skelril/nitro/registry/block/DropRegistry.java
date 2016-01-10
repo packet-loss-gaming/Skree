@@ -8,6 +8,8 @@ package com.skelril.nitro.registry.block;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -15,6 +17,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.property.block.HeldItemProperty;
 import org.spongepowered.api.data.type.DyeColors;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -56,6 +59,8 @@ public class DropRegistry {
                 return Lists.newArrayList(newItemStack(ItemTypes.EMERALD));
             } else if (type.equals(BlockTypes.QUARTZ_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.QUARTZ));
+            } else if (type.equals(CustomBlockTypes.JURACK_ORE)) {
+                return Lists.newArrayList(newItemStack((ItemType) CustomItemTypes.JURACK_GEM));
             }
         }
         return null;
