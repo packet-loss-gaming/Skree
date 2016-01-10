@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import com.skelril.nitro.ReflectiveModifier;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
@@ -14,9 +15,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
 
     public CustomArmor(int armorType) {
@@ -24,29 +22,12 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
                                                     // to determine which model to use
                                                     // This just bases everything off the diamond armor model
 
-        aggressiveReflectSetDamageReduceAmount();
+        // Refers to damageReduceAmount
+        ReflectiveModifier.modifyFieldValue(ItemArmor.class, this, "field_77879_b", __getDamageReductionAmount());
+
         this.setMaxDamage(__getMaxUses());
         this.maxStackSize = __getMaxStackSize();
         this.setCreativeTab(__getCreativeTab());
-    }
-
-    private void aggressiveReflectSetDamageReduceAmount() {
-        try {
-            Field field = ItemArmor.class.getDeclaredField("field_77879_b"); // Found in the MCP Mappings
-            field.setAccessible(true);                                       // Refers to damageReduceAmount
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-            field.set(this, __getDamageReductionAmount());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            System.out.println("Exception: " + e.getMessage());
-            for (Field field : ItemArmor.class.getDeclaredFields()) {
-                System.out.println(" - " + field.getName());
-            }
-        }
     }
 
     // Native compatibility methods
