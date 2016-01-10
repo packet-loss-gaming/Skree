@@ -20,6 +20,7 @@ import com.skelril.skree.content.registry.item.tool.axe.JurackAxe;
 import com.skelril.skree.content.registry.item.tool.hoe.CrystalHoe;
 import com.skelril.skree.content.registry.item.tool.hoe.JurackHoe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
+import com.skelril.skree.content.registry.item.tool.pickaxe.HardenedDiamondPickaxe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.JurackPickaxe;
 import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
 import com.skelril.skree.content.registry.item.tool.shovel.JurackShovel;
@@ -110,6 +111,7 @@ public class CustomItemTypes {
     public static final JurackHoe JURACK_HOE = new JurackHoe();
     public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
 
+    public static final HardenedDiamondPickaxe HARDENED_DIAMOND_PICKAXE = new HardenedDiamondPickaxe();
     public static final JurackPickaxe JURACK_PICKAXE = new JurackPickaxe();
     public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
 

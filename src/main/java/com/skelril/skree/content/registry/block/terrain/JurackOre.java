@@ -10,6 +10,7 @@ import com.skelril.nitro.ReflectiveModifier;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.registry.block.OreHelper;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
@@ -20,7 +21,7 @@ public class JurackOre extends BlockOre implements ICustomBlock {
 
     public JurackOre() {
         // Refers to blockMaterial
-        ReflectiveModifier.modifyFieldValue(BlockOre.class, this, "field_149764_J", OreHelper.CUSTOM_ORE_MATERIAL);
+        ReflectiveModifier.modifyFieldValue(Block.class, this, "field_149764_J", OreHelper.CUSTOM_ORE_MATERIAL);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(3.0F);
