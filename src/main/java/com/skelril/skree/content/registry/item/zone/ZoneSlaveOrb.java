@@ -19,6 +19,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,9 +58,13 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
             if (isZoneSlaveItem(stack)) {
                 Optional<Player> optPlayer = event.getCause().first(Player.class);
                 if (optPlayer.isPresent()) {
-                    if (!notifyGroupOwner(stack, optPlayer.get(), false)) {
+                    Player player = optPlayer.get();
+                    if (!notifyGroupOwner(stack, player, false)) {
                         // TODO Log this, as it shouldn't happen
                     }
+                    player.sendMessage(
+                            Text.of(TextColors.RED, "You've declined your group invite.")
+                    );
                 }
                 entity.remove();
             }
@@ -74,8 +80,18 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
-                    if (!isAttuned(itemStack) && notifyGroupOwner(itemStack, player, true)) {
-                        attune(itemStack);
+                    if (!isAttuned(itemStack)) {
+                        if (notifyGroupOwner(itemStack, player, true)) {
+                            attune(itemStack);
+                            player.setItemInHand(itemStack);
+                            player.sendMessage(
+                                    Text.of(TextColors.GOLD, "You've accepted your group invite.")
+                            );
+                        }
+                    } else {
+                        player.sendMessage(
+                                Text.of(TextColors.RED, "You've already accepted your group invite.")
+                        );
                     }
                     event.setCancelled(true);
                 }
@@ -96,8 +112,8 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
         // If there's an invalid item stack don't crash the client
         try {
             tooltip.add("Group owner: " + getGroupOwnerName(stack));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ignored) {
+            // Client side error, don't spam the log
         }
     }
 }

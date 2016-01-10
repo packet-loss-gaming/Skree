@@ -15,6 +15,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -72,17 +73,17 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 'A', new ItemStack(CustomItemTypes.FAIRY_DUST),
                 'B', new ItemStack(Blocks.glass)
         );
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Shnuggles Prime",
+                new ItemStack(this),
+                new ItemStack(Items.rotten_flesh)
+        ));
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubItems(net.minecraft.item.Item itemIn, CreativeTabs tab, List subItems) {
         subItems.add(new ItemStack(itemIn, 1, 0));
-    }
-
-    @Listener
-    public void onLogin(ClientConnectionEvent.Join event) {
-        purgeZoneItems(event.getTargetEntity(), Optional.empty());
     }
 
     @Listener
@@ -114,7 +115,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
                                     if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
                                         Optional<Player> optZoneOwner = getGroupOwner(aStack);
-                                        if (optZoneOwner.isPresent() && optZoneOwner.get().equals(player)) {
+                                        if (optZoneOwner.isPresent()) {
                                             group.add(aPlayer);
                                             break;
                                         }
@@ -129,9 +130,6 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
                             service.requestZone(getZone(itemStack).get(), group);
                         }
-                    } else {
-                        setMasterToZone(itemStack, "Shnuggles Prime");
-                        player.setItemInHand(tf(itemStack));
                     }
                     event.setCancelled(true);
                 }
@@ -157,6 +155,9 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                     } else {
                         org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
                         tf(targetPlayer).inventory.addItemStackToInventory(tf(newStack));
+                        player.sendMessage(
+                                Text.of(TextColors.GOLD, targetPlayer.getName() + " has been given invite.")
+                        );
                     }
                     event.setCancelled(true);
                 }
@@ -183,8 +184,11 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Optional<String> optZoneName = getZone(tf(stack));
         if (optZoneName.isPresent()) {
             tooltip.add("Zone: " + optZoneName.get());
-            Optional<Integer> maxPlayerCount = getMaxGroupSize(stack);
-            tooltip.add("Players: " + getGroupSize(stack) + " / " + (!maxPlayerCount.isPresent() ? "Unlimited" : maxPlayerCount.get()));
+            Optional<Integer> playerCount = getGroupSize(stack);
+            if (playerCount.isPresent()) {
+                Optional<Integer> maxPlayerCount = getMaxGroupSize(stack);
+                tooltip.add("Players: " + playerCount.get() + " / " + (!maxPlayerCount.isPresent() ? "Unlimited" : maxPlayerCount.get()));
+            }
         }
     }
 }

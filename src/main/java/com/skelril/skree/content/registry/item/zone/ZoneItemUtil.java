@@ -54,33 +54,39 @@ public class ZoneItemUtil {
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             if (joined) {
-                player.sendMessage(Text.of(TextColors.GOLD, holder.getName() + " has accepted your invitation."));
-                incrementCount(stack, player);
+                if (incrementCount(stack, player)) {
+                    player.sendMessage(Text.of(TextColors.GOLD, holder.getName() + " has accepted your invitation."));
+                }
             } else {
-                player.sendMessage(Text.of(TextColors.RED, holder.getName() + " has declined your invitation."));
-                decrementCount(stack, player);
+                if (!isAttuned(stack) || decrementCount(stack, player)) {
+                    player.sendMessage(Text.of(TextColors.RED, holder.getName() + " has declined your invitation."));
+                }
             }
             return true;
         }
         return false;
     }
 
-    private static void incrementCount(ItemStack slaveStack, Player player) {
+    private static boolean incrementCount(ItemStack slaveStack, Player player) {
         ItemStack[] itemStacks = tf(player).inventory.mainInventory;
         for (ItemStack itemStack : itemStacks) {
             if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
                 incrementCount(itemStack);
+                return true;
             }
         }
+        return false;
     }
 
-    private static void decrementCount(ItemStack slaveStack, Player player) {
+    private static boolean decrementCount(ItemStack slaveStack, Player player) {
         ItemStack[] itemStacks = tf(player).inventory.mainInventory;
         for (ItemStack itemStack : itemStacks) {
             if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
                 decrementCount(itemStack);
+                return true;
             }
         }
+        return false;
     }
 
     private static void incrementCount(ItemStack stack) {
@@ -98,14 +104,16 @@ public class ZoneItemUtil {
         for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
             ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
             for (int i = 0; i < itemStacks.length; ++i) {
-                if (!hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
+                if (hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
                     if (!zone.isPresent()) {
                         aPlayer.sendMessage(Text.of(TextColors.RED, "A group you were invited to has been destroyed."));
                     } else {
                         aPlayer.sendMessage(Text.of(TextColors.RED, "A " + zone.get() + " group you were invited to has been destroyed."));
                     }
+                    itemStacks[i] = null;
                 }
             }
+            tf(aPlayer).inventoryContainer.detectAndSendChanges();
         }
     }
 
@@ -203,14 +211,14 @@ public class ZoneItemUtil {
         }
     }
 
-    public static int getGroupSize(org.spongepowered.api.item.inventory.ItemStack stack) {
+    public static Optional<Integer> getGroupSize(org.spongepowered.api.item.inventory.ItemStack stack) {
         return getGroupSize(tf(stack));
     }
 
-    public static int getGroupSize(ItemStack stack) {
+    public static Optional<Integer> getGroupSize(ItemStack stack) {
         if (isZoneMasterItem(stack) && hasZoneData(stack)) {
             NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_zone_data");
-            return tag.getInteger("zone_player_count");
+            return tag.hasKey("zone_player_count") ? Optional.of(tag.getInteger("zone_player_count")) : Optional.empty();
         }
         throw new IllegalArgumentException("Invalid ItemStack provided");
     }
@@ -279,6 +287,27 @@ public class ZoneItemUtil {
 
             attune(stack);
         }
+    }
+
+    protected static org.spongepowered.api.item.inventory.ItemStack setMasterToZoneBasic(org.spongepowered.api.item.inventory.ItemStack stack, String zone) {
+        return tf(setMasterToZoneBasic(tf(stack), zone));
+    }
+
+    protected static ItemStack setMasterToZoneBasic(ItemStack stack, String zone) {
+
+        if (stack.getTagCompound() == null) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+
+        if (!stack.getTagCompound().hasKey("skree_zone_data")) {
+            stack.getTagCompound().setTag("skree_zone_data", new NBTTagCompound());
+        }
+
+        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_zone_data");
+        tag.setString("zone", zone);
+
+        attune(stack);
+        return stack;
     }
 
     public static boolean hasSameZoneID(org.spongepowered.api.item.inventory.ItemStack stackA, org.spongepowered.api.item.inventory.ItemStack stackB) {
