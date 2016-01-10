@@ -8,6 +8,7 @@ package com.skelril.nitro.registry.item.pickaxe;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.registry.item.ICustomTool;
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -30,6 +31,7 @@ public interface ICustomPickaxe extends ICustomTool {
                 Blocks.detector_rail,
                 Blocks.diamond_block,
                 Blocks.diamond_ore,
+                CustomBlockTypes.JURACK_ORE,
                 Blocks.double_stone_slab,
                 Blocks.golden_rail,
                 Blocks.gold_block,
@@ -55,33 +57,31 @@ public interface ICustomPickaxe extends ICustomTool {
     // Modified Native ItemTool methods
 
     default boolean canHarvestBlock(Block blockIn) {
+        if (blockIn == CustomBlockTypes.JURACK_ORE) {
+            return __getHarvestTier().getHarvestLevel() >= 3;
+        }
         if (blockIn == Blocks.obsidian) {
-            return __getHarvestTier().getHarvestLevel() == 3;
-        } else if (blockIn != Blocks.diamond_block && blockIn != Blocks.diamond_ore) {
-            if (blockIn != Blocks.emerald_ore && blockIn != Blocks.emerald_block) {
-                if (blockIn != Blocks.gold_block && blockIn != Blocks.gold_ore) {
-                    if (blockIn != Blocks.iron_block && blockIn != Blocks.iron_ore) {
-                        if (blockIn != Blocks.lapis_block && blockIn != Blocks.lapis_ore) {
-                            if (blockIn != Blocks.redstone_ore && blockIn != Blocks.lit_redstone_ore) {
-                                return (blockIn.getMaterial() == Material.rock || (blockIn.getMaterial() == Material.iron || blockIn.getMaterial() == Material.anvil));
-                            } else {
-                                return __getHarvestTier().getHarvestLevel() >= 2;
-                            }
-                        } else {
-                            return __getHarvestTier().getHarvestLevel() >= 1;
-                        }
-                    } else {
-                        return __getHarvestTier().getHarvestLevel() >= 1;
-                    }
-                } else {
-                    return __getHarvestTier().getHarvestLevel() >= 2;
-                }
-            } else {
-                return __getHarvestTier().getHarvestLevel() >= 2;
-            }
-        } else {
+            return __getHarvestTier().getHarvestLevel() >= 3;
+        }
+        if (blockIn == Blocks.diamond_block || blockIn == Blocks.diamond_ore) {
             return __getHarvestTier().getHarvestLevel() >= 2;
         }
+        if (blockIn == Blocks.emerald_ore || blockIn == Blocks.emerald_block) {
+            return __getHarvestTier().getHarvestLevel() >= 2;
+        }
+        if (blockIn == Blocks.gold_block || blockIn == Blocks.gold_ore) {
+            return __getHarvestTier().getHarvestLevel() >= 2;
+        }
+        if (blockIn == Blocks.iron_block || blockIn == Blocks.iron_ore) {
+            return __getHarvestTier().getHarvestLevel() >= 1;
+        }
+        if (blockIn == Blocks.lapis_block || blockIn == Blocks.lapis_ore) {
+            return __getHarvestTier().getHarvestLevel() >= 1;
+        }
+        if (blockIn == Blocks.redstone_ore || blockIn == Blocks.lit_redstone_ore) {
+            return __getHarvestTier().getHarvestLevel() >= 2;
+        }
+        return (blockIn.getMaterial() == Material.rock || (blockIn.getMaterial() == Material.iron || blockIn.getMaterial() == Material.anvil));
     }
 
     @Override
