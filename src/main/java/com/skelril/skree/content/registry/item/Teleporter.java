@@ -18,11 +18,11 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public interface Teleporter {
 
-    static void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
+    default void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
         setDestination(tf(stack), target);
     }
 
-    static void setDestination(ItemStack stack, Location<World> target) {
+    default void setDestination(ItemStack stack, Location<World> target) {
         if (stack.getTagCompound() == null) {
             stack.setTagCompound(new NBTTagCompound());
         }
@@ -40,11 +40,11 @@ public interface Teleporter {
         stack.setItemDamage(1);
     }
 
-    static Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
+    default Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
         return getDestination(tf(stack));
     }
 
-    static Optional<Location<World>> getDestination(ItemStack stack) {
+    default Optional<Location<World>> getDestination(ItemStack stack) {
         if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
             return Optional.empty();
         }
@@ -61,11 +61,11 @@ public interface Teleporter {
         return Optional.empty();
     }
 
-    static Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
+    default Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
         return getClientDestination(tf(stack));
     }
 
-    static Optional<String> getClientDestination(ItemStack stack) {
+    default Optional<String> getClientDestination(ItemStack stack) {
         if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
             return Optional.empty();
         }

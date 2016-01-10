@@ -65,7 +65,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
 
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
-        Optional<Location<World>> optLoc = Teleporter.getDestination(stack);
+        Optional<Location<World>> optLoc = getDestination(stack);
         if (optLoc.isPresent()) {
             tf(playerIn).setLocation(optLoc.get());
         }
@@ -75,7 +75,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemStackIn, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
-        if (Teleporter.getDestination(itemStackIn).isPresent()) {
+        if (getDestination(itemStackIn).isPresent()) {
             playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
         }
 
@@ -87,7 +87,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optDestStr = Teleporter.getClientDestination(stack);
+        Optional<String> optDestStr = getClientDestination(stack);
         if (optDestStr.isPresent()) {
             tooltip.add("Drink to return to your grave.");
         } else {

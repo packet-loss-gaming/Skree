@@ -72,7 +72,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
-                Teleporter.setDestination(held, player.getLocation());
+                setDestination(held, player.getLocation());
                 player.setItemInHand(held);
                 event.setCancelled(true);
             }
@@ -92,7 +92,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
-                Optional<Location<World>> optDestination = Teleporter.getDestination(held);
+                Optional<Location<World>> optDestination = getDestination(held);
                 InventoryPlayer playerInv = tf(player).inventory;
                 if (optDestination.isPresent() && playerInv.hasItem(CustomItemTypes.ENDER_FOCUS)) {
                     playerInv.consumeInventoryItem(CustomItemTypes.ENDER_FOCUS);
@@ -109,7 +109,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optDestStr = Teleporter.getClientDestination(stack);
+        Optional<String> optDestStr = getClientDestination(stack);
         tooltip.add("Destination: " + (optDestStr.isPresent() ? optDestStr.get() : "Not set"));
     }
 }

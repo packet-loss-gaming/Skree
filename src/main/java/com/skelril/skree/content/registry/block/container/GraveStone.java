@@ -9,7 +9,6 @@ package com.skelril.skree.content.registry.block.container;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.service.RespawnQueueService;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
@@ -168,7 +167,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
                     if (it.next().getItem() == CustomItemTypes.NETHER_BOWL) {
                         it.remove();
                         ItemStack stack = tf(new net.minecraft.item.ItemStack(CustomItemTypes.NETHER_BOWL));
-                        Teleporter.setDestination(stack, tf(player).getLocation());
+                        CustomItemTypes.NETHER_BOWL.setDestination(stack, tf(player).getLocation());
                         service.enque(tf(player), stack);
                         break;
                     }
