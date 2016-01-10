@@ -6,11 +6,13 @@
 
 package com.skelril.skree.content.registry.item.armor;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomBoots;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class JurackBoots extends CustomBoots {
+public class JurackBoots extends CustomBoots implements Craftable {
     @Override
     public int __getMaxUsesBaseModifier() {
         return 60;
@@ -34,5 +36,16 @@ public class JurackBoots extends CustomBoots {
     @Override
     public int __getEnchantability() {
         return 10;
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addRecipe(
+                new ItemStack(this),
+                "   ",
+                "A A",
+                "A A",
+                'A', new ItemStack(CustomItemTypes.JURACK_GEM)
+        );
     }
 }

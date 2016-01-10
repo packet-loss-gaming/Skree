@@ -6,11 +6,13 @@
 
 package com.skelril.skree.content.registry.item.armor;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomHelmet;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class JurackHelmet extends CustomHelmet {
+public class JurackHelmet extends CustomHelmet implements Craftable {
     @Override
     public int __getMaxUsesBaseModifier() {
         return 60;
@@ -34,5 +36,16 @@ public class JurackHelmet extends CustomHelmet {
     @Override
     public int __getEnchantability() {
         return 10;
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addRecipe(
+                new ItemStack(this),
+                "   ",
+                "AAA",
+                "A A",
+                'A', new ItemStack(CustomItemTypes.JURACK_GEM)
+        );
     }
 }
