@@ -19,6 +19,7 @@ import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
 import com.skelril.skree.system.pvp.PvPSystem;
 import com.skelril.skree.system.registry.CustomRegisterySystem;
+import com.skelril.skree.system.respawnqueue.RespawnQueueSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.teleport.TeleportSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
@@ -68,6 +69,7 @@ public class SkreePlugin {
                 PlayerStateSystem.class,
                 ProjectileWatcherSystem.class,
                 PvPSystem.class,
+                RespawnQueueSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
                 WorldGeneratorSystem.class,

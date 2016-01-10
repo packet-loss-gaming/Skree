@@ -8,6 +8,9 @@ package com.skelril.skree.content.registry.block.container;
 
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.registry.item.tool.NetherBowl;
+import com.skelril.skree.service.RespawnQueueService;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -24,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -31,10 +35,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
@@ -158,6 +159,21 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
             Collections.addAll(items, (ItemStack[]) (Object[]) armInv);
 
             items.removeAll(Collections.singleton(null));
+
+            Iterator<ItemStack> it = items.iterator();
+            Optional<RespawnQueueService> optService = Sponge.getServiceManager().provide(RespawnQueueService.class);
+            if (optService.isPresent()) {
+                RespawnQueueService service = optService.get();
+                while (it.hasNext()) {
+                    if (it.next().getItem() == CustomItemTypes.NETHER_BOWL) {
+                        it.remove();
+                        ItemStack stack = tf(new net.minecraft.item.ItemStack(CustomItemTypes.NETHER_BOWL));
+                        NetherBowl.setDestination(stack, tf(player).getLocation());
+                        service.enque(tf(player), stack);
+                        break;
+                    }
+                }
+            }
 
             player.inventory.clear();
 
