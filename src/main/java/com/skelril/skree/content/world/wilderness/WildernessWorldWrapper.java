@@ -70,6 +70,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
@@ -607,10 +608,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int currentLevel = getLevel(entity.getLocation()).get();
                 int lastLevel = playerLevelMap.getOrDefault(entity, -1);
                 if (currentLevel != lastLevel) {
+                    TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
                     ((Player) entity).sendTitle(
                             Title.builder()
-                                    .title(Text.of("Wilderness Level"))
-                                    .subtitle(Text.of(currentLevel))
+                                    .title(Text.of(color, "Wilderness Level"))
+                                    .subtitle(Text.of(color, currentLevel))
                                     .fadeIn(20)
                                     .fadeOut(20)
                                     .build()
