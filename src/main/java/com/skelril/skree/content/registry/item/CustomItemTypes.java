@@ -32,6 +32,7 @@ import com.skelril.skree.content.registry.item.weapon.sword.JurackSword;
 import com.skelril.skree.content.registry.item.weapon.sword.TwoTailedSword;
 import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
+import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
 
 public class CustomItemTypes {
     /* ** Admin ** */
@@ -95,6 +96,7 @@ public class CustomItemTypes {
     /* Zone Items */
     public static final ZoneMasterOrb ZONE_MASTER_ORB = new ZoneMasterOrb();
     public static final ZoneSlaveOrb ZONE_SLAVE_ORB = new ZoneSlaveOrb();
+    public static final ZoneTransitionalOrb ZONE_TRANSITIONAL_ORB = new ZoneTransitionalOrb();
 
     /* Tools */
     public static final WoodTerragu WOOD_TERRAGU = new WoodTerragu();
