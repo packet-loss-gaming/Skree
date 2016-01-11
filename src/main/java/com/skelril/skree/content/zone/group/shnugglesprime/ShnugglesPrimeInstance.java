@@ -20,6 +20,7 @@ import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossManager;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.ZoneBossDetail;
 import com.skelril.skree.service.WorldService;
@@ -548,6 +549,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
         player.setLocation(Probability.pickOneOf(spawnPts));
+        player.getInventory().offer(tf(new net.minecraft.item.ItemStack(CustomItemTypes.ZONE_TRANSITIONAL_ORB)));
+        tf(player).inventoryContainer.detectAndSendChanges();
         return new Clause<>(player, ZoneStatus.ADDED);
     }
 
