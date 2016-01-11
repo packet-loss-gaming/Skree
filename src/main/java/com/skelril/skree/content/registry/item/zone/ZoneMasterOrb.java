@@ -10,7 +10,9 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
+import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -102,6 +104,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 ItemStack itemStack = tf(optItemStack.get());
                 if (isZoneMasterItem(itemStack)) {
                     if (isAttuned(itemStack)) {
+                        if (isInInstanceWorld(player)) {
+                            player.sendMessage(Text.of(TextColors.RED, "You cannot start an instance from within an instance."));
+                            event.setCancelled(true);
+                            return;
+                        }
+
                         Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
                         if (optService.isPresent()) {
                             ZoneService service = optService.get();
@@ -136,6 +144,19 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 }
             }
         }
+    }
+
+    private boolean isInInstanceWorld(Player player) {
+        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+        if (optWorldService.isPresent()) {
+            WorldService worldService = optWorldService.get();
+            WorldEffectWrapper wrapper = worldService.getEffectWrapper("Instance");
+
+            if (wrapper.getWorlds().contains(player.getLocation().getExtent())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Listener
