@@ -12,10 +12,13 @@ import com.skelril.nitro.item.ItemComparisonUtil;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.service.MarketService;
+import com.skelril.skree.service.WorldService;
 import net.minecraft.entity.player.EntityPlayer;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.World;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,6 +44,18 @@ public class MarketImplUtil {
             }
         }
         return new BigDecimal(totalValue);
+    }
+
+    public static boolean canBuyOrSell(Player player) {
+        Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
+        if (optService.isPresent()) {
+            WorldService service = optService.get();
+            Collection<World> okayWorlds = new HashSet<>();
+            okayWorlds.addAll(service.getEffectWrapper("Main").getWorlds());
+            okayWorlds.addAll(service.getEffectWrapper("Build").getWorlds());
+            return okayWorlds.contains(player.getWorld());
+        }
+        return true;
     }
 
     public enum QueryMode {

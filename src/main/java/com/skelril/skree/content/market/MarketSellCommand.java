@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.skree.content.market.MarketImplUtil.canBuyOrSell;
 import static org.spongepowered.api.command.args.GenericArguments.flags;
 import static org.spongepowered.api.command.args.GenericArguments.none;
 
@@ -48,6 +49,11 @@ public class MarketSellCommand implements CommandExecutor {
         MarketService service = optService.get();
 
         Player player = (Player) src;
+
+        if (!canBuyOrSell(player)) {
+            player.sendMessage(Text.of(TextColors.DARK_RED, "You cannot buy or sell from this area."));
+            return CommandResult.empty();
+        }
 
         Optional<ItemStack> filter = Optional.empty();
 

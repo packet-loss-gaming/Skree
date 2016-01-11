@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+import static com.skelril.skree.content.market.MarketImplUtil.canBuyOrSell;
 import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
@@ -50,6 +51,11 @@ public class MarketBuyCommand implements CommandExecutor {
         MarketService service = optService.get();
 
         Player player = (Player) src;
+
+        if (!canBuyOrSell(player)) {
+            player.sendMessage(Text.of(TextColors.DARK_RED, "You cannot buy or sell from this area."));
+            return CommandResult.empty();
+        }
 
         String itemName = args.<String>getOne("item").get();
         List<String> targetItems;
