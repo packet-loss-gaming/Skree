@@ -32,8 +32,14 @@ public class ZoneItemUtil {
         ItemStack[] itemStacks = player.inventory.mainInventory;
         for (int i = 0; i < itemStacks.length; ++i) {
             if (isZoneItem(itemStacks[i])) {
-                if (isAttuned(itemStacks[i]) && isZoneMasterItem(itemStacks[i])) {
-                    rescindGroupInvite(itemStacks[i]);
+                if (isZoneMasterItem(itemStacks[i])) {
+                    if (isAttuned(itemStacks[i])) {
+                        rescindGroupInvite(itemStacks[i]);
+                        ItemStack reset = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
+                        setMasterToZone(reset, getZone(itemStacks[i]).get());
+                        itemStacks[i] = reset;
+                    }
+                    continue;
                 } else if (isZoneSlaveItem(itemStacks[i])) {
                     if (!activating.isPresent() || !hasSameZoneID(itemStacks[i], activating.get())) {
                         notifyGroupOwner(itemStacks[i], (Player) player, false);

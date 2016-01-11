@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -169,9 +170,11 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     public void onDropItem(DropItemEvent.Dispense event) {
         event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {
             ItemStack stack = ((EntityItem) entity).getEntityItem();
-            if (isZoneMasterItem(stack)) {
+            if (isZoneMasterItem(stack) && isAttuned(stack)) {
                 rescindGroupInvite(stack);
-                entity.remove();
+                ItemStack reset = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
+                setMasterToZone(reset, getZone(stack).get());
+                entity.offer(Keys.REPRESENTED_ITEM, tf(reset).createSnapshot());
             }
         });
     }
