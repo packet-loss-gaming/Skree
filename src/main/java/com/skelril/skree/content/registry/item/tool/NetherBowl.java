@@ -82,6 +82,12 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
         return itemStackIn;
     }
 
+    @Override
+    public void setDestination(ItemStack stack, Location<World> target) {
+        Teleporter.super.setDestination(stack, target);
+        stack.setItemDamage(1);
+    }
+
     // Modified Native Item methods
 
     @SuppressWarnings("unchecked")

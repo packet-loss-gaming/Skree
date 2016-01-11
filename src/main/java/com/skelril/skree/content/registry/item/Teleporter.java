@@ -36,8 +36,6 @@ public interface Teleporter {
         tag.setDouble("x", target.getX());
         tag.setDouble("y", target.getY());
         tag.setDouble("z", target.getZ());
-
-        stack.setItemDamage(1);
     }
 
     default Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
