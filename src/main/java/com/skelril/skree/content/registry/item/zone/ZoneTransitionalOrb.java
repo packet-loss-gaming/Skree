@@ -84,6 +84,7 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
                 Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
                 player.setLocation(worlds.iterator().next().getSpawnLocation());
                 tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                tf(player).inventoryContainer.detectAndSendChanges();
                 event.setCancelled(true);
                 return true;
             }
@@ -99,6 +100,7 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
             switch (zoneService.rejoin(player).getValue()) {
                 case ADDED:
                     tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                    tf(player).inventoryContainer.detectAndSendChanges();
                     break;
                 default:
                     // TODO more detailed cases

@@ -56,6 +56,7 @@ public class ZoneItemUtil {
                 itemStacks[i] = null;
             }
         }
+        player.inventoryContainer.detectAndSendChanges();
     }
 
     public static boolean notifyGroupOwner(org.spongepowered.api.item.inventory.ItemStack stack, Player holder, boolean joined) {
