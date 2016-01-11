@@ -33,12 +33,20 @@ public class ZoneItemUtil {
         for (int i = 0; i < itemStacks.length; ++i) {
             if (isZoneItem(itemStacks[i])) {
                 if (isZoneMasterItem(itemStacks[i])) {
+                    // Check to see if this is the activating item, if so remove it
+                    if (activating.isPresent() && hasSameZoneID(itemStacks[i], activating.get())) {
+                        itemStacks[i] = null;
+                        continue;
+                    }
+
+                    // Close groups for master orbs carried by other players
                     if (isAttuned(itemStacks[i])) {
                         rescindGroupInvite(itemStacks[i]);
                         ItemStack reset = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
                         setMasterToZone(reset, getZone(itemStacks[i]).get());
                         itemStacks[i] = reset;
                     }
+
                     continue;
                 } else if (isZoneSlaveItem(itemStacks[i])) {
                     if (!activating.isPresent() || !hasSameZoneID(itemStacks[i], activating.get())) {
