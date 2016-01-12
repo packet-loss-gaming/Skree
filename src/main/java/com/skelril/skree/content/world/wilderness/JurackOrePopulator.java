@@ -39,9 +39,12 @@ public class JurackOrePopulator implements Populator {
                 for (int y = min.getY(); y < 20; ++y) {
                     BlockPos searchPoint = new BlockPos(x, y, z);
                     if (world.getBlockState(searchPoint).getBlock() == Blocks.lava) {
-                        BlockPos lowPoint = searchPoint.add(0, -1, 0);
-                        if (world.getBlockState(lowPoint).getBlock() == Blocks.stone) {
-                            world.setBlockState(lowPoint, CustomBlockTypes.JURACK_ORE.getDefaultState(), 2);
+                        BlockPos above = searchPoint.add(0, 1, 0);
+                        if (world.getBlockState(above).getBlock() == Blocks.lava) {
+                            BlockPos lowPoint = searchPoint.add(0, -1, 0);
+                            if (world.getBlockState(lowPoint).getBlock() == Blocks.stone) {
+                                world.setBlockState(lowPoint, CustomBlockTypes.JURACK_ORE.getDefaultState(), 2);
+                            }
                         }
                     }
                 }
