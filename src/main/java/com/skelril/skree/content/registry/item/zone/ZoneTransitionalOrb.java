@@ -102,9 +102,17 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
                     tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
                     tf(player).inventoryContainer.detectAndSendChanges();
                     break;
+                case NO_REJOIN:
+                    player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
+                    break;
+                case REF_LOST:
+                    player.sendMessage(Text.of(TextColors.RED, "Your connection with your previous zone has been severed."));
+                    break;
+                case DESPAWNED:
+                    player.sendMessage(Text.of(TextColors.RED, "The your previous zone has despawned."));
+                    break;
                 default:
-                    // TODO more detailed cases
-                    player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin instance"));
+                    player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin your previous zone."));
                     break;
             }
             event.setCancelled(true);
