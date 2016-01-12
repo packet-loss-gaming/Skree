@@ -562,7 +562,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public int getOreMod(int level) {
-        int modifier = Math.max(1, level * 3);
+        int modifier = (int) Math.round(Math.max(1, level * 1.5));
 
         Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
