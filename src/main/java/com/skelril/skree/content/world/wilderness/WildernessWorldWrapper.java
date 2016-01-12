@@ -60,6 +60,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -303,28 +305,54 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 dropTable = commonDropTable;
             }
 
-            Collection<ItemStack> drops = dropTable.getDrops(
-                    (entity instanceof Boss ? 5 : 1) * level,
-                    getDropMod(
-                            level,
-                            Optional.of(((Monster) entity).getHealthData().maxHealth().get()),
-                            Optional.of(entity.getType())
-                    )
-            );
-
-            int times = 1;
-
-            Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-            if (optService.isPresent()) {
-                ModifierService service = optService.get();
-                if (service.isActive(Modifiers.DOUBLE_WILD_DROPS)) {
-                    times *= 2;
+            Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
+            if (optDamageSource.isPresent()) {
+                Entity srcEntity;
+                if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                    srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
+                } else {
+                    srcEntity = optDamageSource.get().getSource();
                 }
-            }
 
-            ItemDropper dropper = new ItemDropper(loc);
-            for (int i = 0; i < times; ++i) {
-                dropper.dropItems(drops, Cause.of(this));
+                int baseLevelMod = level;
+
+                if (srcEntity instanceof Player) {
+                    Optional<ItemStack> optHeldItem = ((Player) srcEntity).getItemInHand();
+                    if (optHeldItem.isPresent()) {
+                        Optional<ItemEnchantment> optLooting = EnchantmentUtil.getHighestEnchantment(
+                                optHeldItem.get(),
+                                Enchantments.LOOTING
+                        );
+
+                        if (optLooting.isPresent()) {
+                            baseLevelMod += optLooting.get().getLevel();
+                        }
+                    }
+
+                    Collection<ItemStack> drops = dropTable.getDrops(
+                            (entity instanceof Boss ? 5 : 1) * baseLevelMod,
+                            getDropMod(
+                                    baseLevelMod,
+                                    Optional.of(((Monster) entity).getHealthData().maxHealth().get()),
+                                    Optional.of(entity.getType())
+                            )
+                    );
+
+                    int times = 1;
+
+                    Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+                    if (optService.isPresent()) {
+                        ModifierService service = optService.get();
+                        if (service.isActive(Modifiers.DOUBLE_WILD_DROPS)) {
+                            times *= 2;
+                        }
+                    }
+
+                    ItemDropper dropper = new ItemDropper(loc);
+                    for (int i = 0; i < times; ++i) {
+                        dropper.dropItems(drops, Cause.of(this));
+                    }
+                }
             }
         }
         GRAVE_STONE.createGraveFromDeath(event);
