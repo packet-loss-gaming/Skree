@@ -132,10 +132,10 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                                 }
                             }
 
-                            for (int i = 1; i < group.size(); ++i) {
+                            for (int i = group.size() - 1; i >= 0; --i) {
                                 purgeZoneItems(group.get(i), Optional.of(itemStack));
+                                createLightningStrike(group.get(i));
                             }
-                            purgeZoneItems(group.get(0), Optional.of(itemStack));
 
                             service.requestZone(getZone(itemStack).get(), group);
                         }
@@ -144,6 +144,16 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 }
             }
         }
+    }
+
+    private void createLightningStrike(Player player) {
+        /*Location<World> loc = player.getLocation();
+        Optional<Entity> optLightning = loc.getExtent().createEntity(EntityTypes.LIGHTNING, loc.getPosition());
+        if (optLightning.isPresent()) {
+            Lightning lightning = (Lightning) optLightning.get();
+            lightning.setEffect(true);
+            loc.getExtent().spawnEntity(lightning, Cause.of(this));
+        }*/
     }
 
     private boolean isInInstanceWorld(Player player) {
