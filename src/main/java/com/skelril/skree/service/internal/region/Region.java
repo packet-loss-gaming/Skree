@@ -12,18 +12,20 @@ public class Region {
     private final UUID regionID;
     private final String worldName;
     private final RegionPoint masterBlock;
+    private String name;
     private int powerLevel;
     private Set<UUID> members = new HashSet<>();
     private Set<RegionPoint> fullPoints;
 
     protected Region(UUID regionID, String worldName, RegionPoint masterBlock, Set<UUID> members) {
-        this(regionID, worldName, masterBlock, 200, members, new HashSet<>());
+        this(regionID, worldName, masterBlock, "Fluffy Bunnies", 200, members, new HashSet<>());
     }
 
-    protected Region(UUID regionID, String worldName, RegionPoint masterBlock, int powerLevel, Set<UUID> members, Set<RegionPoint> fullPoints) {
+    protected Region(UUID regionID, String worldName, RegionPoint masterBlock, String name, int powerLevel, Set<UUID> members, Set<RegionPoint> fullPoints) {
         this.regionID = regionID;
         this.worldName = worldName;
         this.masterBlock = masterBlock;
+        this.name = name;
         this.powerLevel = powerLevel;
         this.members = members;
         this.fullPoints = fullPoints;
@@ -39,6 +41,10 @@ public class Region {
 
     public RegionPoint getMasterBlock() {
         return masterBlock;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getPowerLevel() {

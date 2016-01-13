@@ -9,6 +9,7 @@ package com.skelril.skree.system.region;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.region.RegionCommand;
 import com.skelril.skree.service.RegionService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.region.RegionManager;
@@ -38,6 +39,7 @@ public class RegionSystem implements ServiceProvider<RegionService> {
         // Register the service & command
         Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), RegionService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), RegionCommand.aquireSpec(), "region", "rg");
     }
 
     @Override

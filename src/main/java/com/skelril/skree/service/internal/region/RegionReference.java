@@ -88,6 +88,22 @@ public class RegionReference {
         return getReferred().getFullPoints().contains(point) || getReferred().getMasterBlock().equals(point);
     }
 
+    public void addMember(UUID newMember) {
+        addMember(Collections.singleton(newMember));
+    }
+
+    public void addMember(Collection<UUID> newMembers) {
+        ref.uncheckedAddMember(newMembers);
+    }
+
+    public void remMember(UUID oldMember) {
+        remMember(Collections.singleton(oldMember));
+    }
+
+    public void remMember(Collection<UUID> oldMembers) {
+        ref.uncheckedRemMember(oldMembers);
+    }
+
     public boolean isMember(Player player) {
         return getReferred().getMembers().contains(player.getUniqueId());
     }
