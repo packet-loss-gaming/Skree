@@ -8,6 +8,7 @@ package com.skelril.skree.service;
 
 import com.skelril.skree.service.internal.region.RegionReference;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 public interface RegionService {
     Optional<RegionReference> get(Location<World> location);
-    Optional<RegionReference> getOrCreate(Location<World> location);
+    Optional<RegionReference> getOrCreate(Location<World> location, User user);
     Optional<RegionReference> getMarkedRegion(Location<World> location);
 
     void rem(Location<World> location);

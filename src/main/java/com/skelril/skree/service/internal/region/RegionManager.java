@@ -72,7 +72,7 @@ public class RegionManager {
 
     public Optional<RegionReference> getMarkedRegion(RegionPoint point) {
         for (RegionReference region : regionList) {
-            if (region.getReferred().getFullPoints().contains(point) || region.getReferred().getMasterBlock().equals(point)) {
+            if (region.isMarkedPoint(point)) {
                 return Optional.of(region);
             }
         }

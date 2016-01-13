@@ -7,6 +7,7 @@
 package com.skelril.skree.service.internal.region;
 
 import com.google.common.collect.Lists;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class RegionReference {
 
     private List<RegionPoint> points = new ArrayList<>();
 
-    public RegionReference(Region ref, RegionManager manager) {
+    protected RegionReference(Region ref, RegionManager manager) {
         this.ref = ref;
         this.manager = manager;
 
@@ -81,6 +82,18 @@ public class RegionReference {
         points = new ArrayList<>(ref.getFullPoints());
         convexHull(points, true, true);
         checkIsActive();
+    }
+
+    public boolean isMarkedPoint(RegionPoint point) {
+        return getReferred().getFullPoints().contains(point) || getReferred().getMasterBlock().equals(point);
+    }
+
+    public boolean isMember(Player player) {
+        return getReferred().getMembers().contains(player.getUniqueId());
+    }
+
+    public boolean isEditPrevented(Player player, RegionPoint point) {
+        return isActive() && !isMember(player);
     }
 
     public boolean isActive() {

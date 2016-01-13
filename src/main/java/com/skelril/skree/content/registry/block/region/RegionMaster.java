@@ -55,7 +55,7 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                         RegionService service = optService.get();
                         Optional<Location<World>> optLoc = block.getFinal().getLocation();
                         if (optLoc.isPresent()) {
-                            Optional<RegionReference> optRef = service.getOrCreate(optLoc.get());
+                            Optional<RegionReference> optRef = service.getOrCreate(optLoc.get(), player);
                             if (optRef.isPresent()) {
                                 RegionReference ref = optRef.get();
                                 if (!ref.getReferred().getMasterBlock().equals(optLoc.get().getPosition())) {

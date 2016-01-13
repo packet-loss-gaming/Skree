@@ -6,8 +6,14 @@
 
 package com.skelril.skree.service.internal.region;
 
+import com.google.common.collect.Sets;
 import com.skelril.skree.service.RegionService;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -31,15 +37,23 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public Optional<RegionReference> getOrCreate(Location<World> location) {
+    public Optional<RegionReference> getOrCreate(Location<World> location, User user) {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
             RegionPoint point = new RegionPoint(location.getPosition());
             Optional<RegionReference> optRegion = manager.getRegion(point);
             if (optRegion.isPresent()) {
-                return optRegion;
+                if (optRegion.get().getReferred().getMembers().contains(user.getUniqueId())) {
+                    return optRegion;
+                }
+            } else {
+                return Optional.of(manager.addRegion(new Region(
+                        UUID.randomUUID(),
+                        location.getExtent().getName(),
+                        point,
+                        Sets.newHashSet(user.getUniqueId())
+                )));
             }
-            return Optional.of(manager.addRegion(new Region(UUID.randomUUID(), location.getExtent().getName(), point)));
         }
         return Optional.empty();
     }
@@ -73,5 +87,31 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public Optional<RegionReference> getSelectedRegion(Player player) {
         return Optional.ofNullable(selectionMap.get(player));
+    }
+
+    @Listener
+    public void onBlockChange(ChangeBlockEvent event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
+            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+                if (optLoc.isPresent()) {
+                    Location<World> loc = optLoc.get();
+                    RegionPoint point = new RegionPoint(loc.getPosition());
+                    RegionManager manager = managerMap.get(loc.getExtent());
+                    if (manager != null) {
+                        Optional<RegionReference> optRef = manager.getRegion(point);
+                        if (optRef.isPresent()) {
+                            RegionReference ref = optRef.get();
+                            if (ref.isEditPrevented(player, point)) {
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
