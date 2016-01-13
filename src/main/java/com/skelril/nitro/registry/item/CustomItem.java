@@ -8,6 +8,7 @@ package com.skelril.nitro.registry.item;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,7 +30,7 @@ public abstract class CustomItem extends Item implements ICustomItem {
     }
 
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems) {
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         ICustomItem.super.getSubItems(itemIn, tab, subItems);
     }
 }

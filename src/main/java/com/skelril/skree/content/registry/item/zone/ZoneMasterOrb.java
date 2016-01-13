@@ -25,15 +25,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,13 +152,13 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     }
 
     private void createLightningStrike(Player player) {
-        /*Location<World> loc = player.getLocation();
+        Location<World> loc = player.getLocation();
         Optional<Entity> optLightning = loc.getExtent().createEntity(EntityTypes.LIGHTNING, loc.getPosition());
         if (optLightning.isPresent()) {
             Lightning lightning = (Lightning) optLightning.get();
             lightning.setEffect(true);
             loc.getExtent().spawnEntity(lightning, Cause.of(this));
-        }*/
+        }
     }
 
     private boolean isInInstanceWorld(Player player) {

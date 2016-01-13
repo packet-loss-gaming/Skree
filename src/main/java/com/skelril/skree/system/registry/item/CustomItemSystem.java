@@ -18,13 +18,14 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CustomItemSystem {
 
@@ -114,18 +115,20 @@ public class CustomItemSystem {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
                 List<String> variants = ((ICustomItem) item).__getMeshDefinitions();
+                List<ResourceLocation> modelResources = new ArrayList<>();
                 for (int i = 0; i < variants.size(); ++i) {
-                    mesher.register(
-                            (Item) item,
-                            i,
-                            new ModelResourceLocation(
-                                    "skree:" + variants.get(i),
-                                    "inventory"
-                            )
+                    ModelResourceLocation resourceLocation = new ModelResourceLocation(
+                            "skree:" + variants.get(i),
+                            "inventory"
                     );
+
+                    mesher.register((Item) item, i, resourceLocation);
+                    modelResources.add(resourceLocation);
                 }
-                List<String> collect = variants.stream().map(e -> "skree:" + e).collect(Collectors.toList());
-                ModelBakery.addVariantName((Item) item, collect.toArray(new String[collect.size()]));
+                ModelBakery.registerItemVariants(
+                        (Item) item,
+                        modelResources.toArray(new ResourceLocation[modelResources.size()])
+                );
             }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");

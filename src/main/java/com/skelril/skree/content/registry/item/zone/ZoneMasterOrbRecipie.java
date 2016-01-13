@@ -21,7 +21,7 @@ import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.setMaste
 public class ZoneMasterOrbRecipie extends ShapelessRecipes {
     private final String zone;
 
-    public ZoneMasterOrbRecipie(String zone, Object... inputList) {
+    public ZoneMasterOrbRecipie(String zone, ItemStack... inputList) {
         super(setMasterToZoneBasic(new ItemStack(CustomItemTypes.ZONE_MASTER_ORB), zone), Arrays.asList(inputList));
         this.zone = zone;
     }

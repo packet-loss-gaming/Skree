@@ -20,7 +20,7 @@ public interface ICustomItem {
         return Lists.newArrayList(__getID());
     }
 
-    default void getSubItems(Item itemIn, CreativeTabs tab, List subItems) {
+    default void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         List<String> variants = __getMeshDefinitions();
         for (int i = 0; i < variants.size(); ++i) {
             subItems.add(new ItemStack(itemIn, 1, i));

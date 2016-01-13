@@ -70,14 +70,13 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int index) {
+    public ItemStack removeStackFromSlot(int index) {
         if (this.graveContents[index] != null) {
             ItemStack itemstack = this.graveContents[index];
             this.graveContents[index] = null;
             return itemstack;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -139,7 +138,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public String getCommandSenderName() {
+    public String getName() {
         return this.hasCustomName() ? this.customName : "container.gravestone";
     }
 
