@@ -80,7 +80,7 @@ public class RegionReference {
 
     private void loadPoints() {
         points = new ArrayList<>(ref.getFullPoints());
-        convexHull(points, true, true);
+        convexHull(points, true);
         checkIsActive();
     }
 
@@ -142,10 +142,25 @@ public class RegionReference {
             points.add(pos);
 
             // Perform convex hull
-            convexHull(points, false, true);
+            convexHull(points, false);
 
             // If our point set is equal, the point was within in the hull
-            return points.size() == this.points.size();
+            return !hullChanged(points, this.points);
+        }
+        return false;
+    }
+
+    private boolean hullChanged(List<RegionPoint> newPoints, List<RegionPoint> originalPoints) {
+        if (newPoints.size() != originalPoints.size()) {
+            return true;
+        }
+        for (int i = 0; i < newPoints.size(); ++i) {
+            if (newPoints.get(i).getX() != originalPoints.get(i).getX()) {
+                return true;
+            }
+            if (newPoints.get(i).getZ() != originalPoints.get(i).getZ()) {
+                return true;
+            }
         }
         return false;
     }
@@ -171,7 +186,7 @@ public class RegionReference {
         return (through.getX() - from.getX()) * (to.getZ() - from.getZ()) - (through.getZ() - from.getZ()) * (to.getX() - from.getX());
     }
 
-    public void convexHull(List<RegionPoint> regionPoints, boolean asd, boolean sdf) {
+    public void convexHull(List<RegionPoint> regionPoints, boolean updateMaxandMin) {
         if (regionPoints.size() > 1) {
             int k = 0;
             int n = regionPoints.size();
@@ -186,8 +201,9 @@ public class RegionReference {
                 }
             });
 
-            for (RegionPoint point : regionPoints) {
-                processPoint(point, asd);
+            if (updateMaxandMin) {
+                max = min = points.get(0);
+                regionPoints.forEach(this::processPoint);
             }
 
             // Build lower hull
@@ -215,15 +231,7 @@ public class RegionReference {
         }
     }
 
-    private void processPoint(RegionPoint newPoint, boolean updateMinAndMax) {
-        if (!updateMinAndMax) {
-            return;
-        }
-
-        if (min == null || max == null) {
-            min = max = newPoint;
-        }
-
+    private void processPoint(RegionPoint newPoint) {
         if (newPoint.getX() < min.getX() || newPoint.getZ() < min.getZ()) {
             min = new RegionPoint(
                     Math.min(min.getX(), newPoint.getX()),
@@ -237,14 +245,5 @@ public class RegionReference {
                     Math.max(max.getZ(), newPoint.getZ())
             );
         }
-    }
-
-
-    private double sqrDist(RegionPoint p1, RegionPoint p2) {
-        return (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getZ() - p2.getZ()) * (p1.getZ() - p2.getZ());
-    }
-
-    private enum Turn {
-        CLOCKWISE, COUNTER_CLOCKWISE, COLINEAR
     }
 }

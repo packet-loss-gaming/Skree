@@ -64,11 +64,6 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                                 if (ref.getReferred().getWorldName().equals(loc.getExtent().getName())) {
                                     ref.addPoint(new RegionPoint(loc.getPosition()));
                                     player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
-                                    player.sendMessage(Text.of("Max: ", ref.getMax(), " - Min: ", ref.getMin()));
-
-                                    for (RegionPoint point : ref.getPoints()) {
-                                        player.sendMessage(Text.of(TextColors.YELLOW, "-" + point.toString()));
-                                    }
                                     continue;
                                 }
                             }
