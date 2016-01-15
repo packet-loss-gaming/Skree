@@ -91,6 +91,7 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                                     block.setValid(false);
                                     player.sendMessage(Text.of(TextColors.RED, "You must first delete all markers!"));
                                 } else {
+                                    service.rem(optLoc.get());
                                     player.sendMessage(Text.of(TextColors.YELLOW, "Region deleted!"));
                                 }
                             }

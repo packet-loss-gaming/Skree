@@ -6,7 +6,15 @@
 
 package com.skelril.skree.service.internal.region;
 
+import com.skelril.skree.db.SQLHandle;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
+
+import static com.skelril.skree.db.schema.Tables.*;
 
 public class Region {
     private final UUID regionID;
@@ -65,12 +73,62 @@ public class Region {
         members.addAll(oldMembers);
     }
 
-    private void writeMemberAdditionToDB(Collection<UUID> newMembers) {
+    protected void writeInit(Connection con) throws SQLException {
+        writeMemberAdditionToDBWithCon(getMembers(), con);
+        writePointAdditionToDBWithCon(getFullPoints(), con);
+    }
 
+    private void writeMemberAdditionToDB(Collection<UUID> newMembers) {
+        try (Connection con = SQLHandle.getConnection()) {
+            writeMemberAdditionToDBWithCon(newMembers, con);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeMemberAdditionToDBWithCon(Collection<UUID> newMembers, Connection con) throws SQLException {
+        DSLContext create = DSL.using(con);
+        int rgID = create.select(REGIONS.ID).from(REGIONS).where(
+                REGIONS.UUID.equal(regionID.toString())
+        ).fetchOne().value1();
+
+        con.setAutoCommit(false);
+        for (UUID member : newMembers) {
+            create.insertInto(REGION_MEMBERS).columns(
+                    REGION_MEMBERS.PLAYER_ID, REGION_MEMBERS.REGION_ID
+            ).select(
+                    create.select(
+                            PLAYERS.ID,
+                            DSL.value(rgID)
+                    ).from(PLAYERS).where(PLAYERS.UUID.equal(member.toString()))
+            ).execute();
+        }
+        con.commit();
     }
 
     private void writeMemberRemovalFromDB(Collection<UUID> oldMembers) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            int rgID = create.select(REGIONS.ID).from(REGIONS).where(
+                    REGIONS.UUID.equal(regionID.toString())
+            ).fetchOne().value1();
 
+            con.setAutoCommit(false);
+            for (UUID member : oldMembers) {
+                create.deleteFrom(REGION_MEMBERS).where(
+                        REGION_MEMBERS.REGION_ID.equal(rgID).and(
+                                REGION_MEMBERS.PLAYER_ID.equal(DSL.select(
+                                        PLAYERS.ID
+                                ).from(PLAYERS).where(
+                                        PLAYERS.UUID.equal(member.toString()))
+                                )
+                        )
+                ).execute();
+            }
+            con.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public Set<RegionPoint> getFullPoints() {
@@ -87,11 +145,45 @@ public class Region {
         fullPoints.removeAll(oldPoints);
     }
 
-    private void writePointAdditionToDB(Collection<RegionPoint> point) {
-
+    private void writePointAdditionToDB(Collection<RegionPoint> newPoints) {
+        try (Connection con = SQLHandle.getConnection()) {
+            writePointAdditionToDBWithCon(newPoints, con);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void writePointRemovalFromDB(Collection<RegionPoint> point) {
+    private void writePointAdditionToDBWithCon(Collection<RegionPoint> newPoints, Connection con) throws SQLException {
+        DSLContext create = DSL.using(con);
+        con.setAutoCommit(false);
+        for (RegionPoint point : newPoints) {
+            create.insertInto(REGION_POINTS).columns(
+                    REGION_POINTS.REGION_ID, REGION_POINTS.X, REGION_POINTS.Y, REGION_POINTS.Z
+            ).select(
+                    create.select(REGIONS.ID,
+                            DSL.value(point.getX()), DSL.value(point.getY()), DSL.value(point.getZ())
+                    ).from(REGIONS).where(REGIONS.UUID.equal(regionID.toString()))
+            ).execute();
+        }
+        con.commit();
+    }
 
+    private void writePointRemovalFromDB(Collection<RegionPoint> oldPoints) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            con.setAutoCommit(false);
+            for (RegionPoint point : oldPoints) {
+                create.deleteFrom(REGION_POINTS).where(
+                        REGION_POINTS.REGION_ID.equal(
+                                DSL.select(REGIONS.ID).from(REGIONS).where(REGIONS.UUID.equal(regionID.toString()))
+                        ).and(REGION_POINTS.X.equal(DSL.value(point.getX())))
+                                .and(REGION_POINTS.Y.equal(DSL.value(point.getY())))
+                                .and(REGION_POINTS.Z.equal(DSL.value(point.getZ()))))
+                        .execute();
+            }
+            con.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

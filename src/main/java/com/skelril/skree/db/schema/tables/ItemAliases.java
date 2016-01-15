@@ -28,7 +28,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ItemAliases extends TableImpl<ItemAliasesRecord> {
 
-	private static final long serialVersionUID = 1709248581;
+	private static final long serialVersionUID = 438898148;
 
 	/**
 	 * The reference instance of <code>mc_db.item_aliases</code>
@@ -56,7 +56,7 @@ public class ItemAliases extends TableImpl<ItemAliasesRecord> {
 	/**
 	 * The column <code>mc_db.item_aliases.item_id</code>.
 	 */
-	public final TableField<ItemAliasesRecord, Integer> ITEM_ID = createField("item_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<ItemAliasesRecord, Integer> ITEM_ID = createField("item_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>mc_db.item_aliases</code> table reference

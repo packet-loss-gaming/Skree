@@ -4,9 +4,7 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.ItemAliases;
-import com.skelril.skree.db.schema.tables.ItemData;
-import com.skelril.skree.db.schema.tables.Modifiers;
+import com.skelril.skree.db.schema.tables.*;
 
 import javax.annotation.Generated;
 
@@ -38,4 +36,29 @@ public class Tables {
 	 * The table mc_db.modifiers
 	 */
 	public static final Modifiers MODIFIERS = com.skelril.skree.db.schema.tables.Modifiers.MODIFIERS;
+
+	/**
+	 * The table mc_db.players
+	 */
+	public static final Players PLAYERS = com.skelril.skree.db.schema.tables.Players.PLAYERS;
+
+	/**
+	 * The table mc_db.regions
+	 */
+	public static final Regions REGIONS = com.skelril.skree.db.schema.tables.Regions.REGIONS;
+
+	/**
+	 * The table mc_db.region_members
+	 */
+	public static final RegionMembers REGION_MEMBERS = com.skelril.skree.db.schema.tables.RegionMembers.REGION_MEMBERS;
+
+	/**
+	 * The table mc_db.region_points
+	 */
+	public static final RegionPoints REGION_POINTS = com.skelril.skree.db.schema.tables.RegionPoints.REGION_POINTS;
+
+	/**
+	 * The table mc_db.worlds
+	 */
+	public static final Worlds WORLDS = com.skelril.skree.db.schema.tables.Worlds.WORLDS;
 }

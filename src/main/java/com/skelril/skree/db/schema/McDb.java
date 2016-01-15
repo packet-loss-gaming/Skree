@@ -4,9 +4,7 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.ItemAliases;
-import com.skelril.skree.db.schema.tables.ItemData;
-import com.skelril.skree.db.schema.tables.Modifiers;
+import com.skelril.skree.db.schema.tables.*;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -29,7 +27,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class McDb extends SchemaImpl {
 
-	private static final long serialVersionUID = -489065605;
+	private static final long serialVersionUID = 312772327;
 
 	/**
 	 * The reference instance of <code>mc_db</code>
@@ -54,6 +52,11 @@ public class McDb extends SchemaImpl {
 		return Arrays.<Table<?>>asList(
 			ItemAliases.ITEM_ALIASES,
 			ItemData.ITEM_DATA,
-			Modifiers.MODIFIERS);
+			Modifiers.MODIFIERS,
+			Players.PLAYERS,
+			Regions.REGIONS,
+			RegionMembers.REGION_MEMBERS,
+			RegionPoints.REGION_POINTS,
+			Worlds.WORLDS);
 	}
 }

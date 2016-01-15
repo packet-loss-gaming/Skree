@@ -32,7 +32,9 @@ public class RegionSystem implements ServiceProvider<RegionService> {
         Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
         if (optWorldService.isPresent()) {
             for (World world : optWorldService.get().getEffectWrapper("Build").getWorlds()) {
-                service.addManager(world, new RegionManager());
+                RegionManager manager = new RegionManager(world.getName());
+                manager.load();
+                service.addManager(world, manager);
             }
         }
 

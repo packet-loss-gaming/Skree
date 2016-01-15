@@ -4,12 +4,8 @@
 package com.skelril.skree.db.schema;
 
 
-import com.skelril.skree.db.schema.tables.ItemAliases;
-import com.skelril.skree.db.schema.tables.ItemData;
-import com.skelril.skree.db.schema.tables.Modifiers;
-import com.skelril.skree.db.schema.tables.records.ItemAliasesRecord;
-import com.skelril.skree.db.schema.tables.records.ItemDataRecord;
-import com.skelril.skree.db.schema.tables.records.ModifiersRecord;
+import com.skelril.skree.db.schema.tables.*;
+import com.skelril.skree.db.schema.tables.records.*;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
@@ -39,6 +35,11 @@ public class Keys {
 	public static final Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = Identities0.IDENTITY_ITEM_ALIASES;
 	public static final Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = Identities0.IDENTITY_ITEM_DATA;
 	public static final Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = Identities0.IDENTITY_MODIFIERS;
+	public static final Identity<PlayersRecord, Integer> IDENTITY_PLAYERS = Identities0.IDENTITY_PLAYERS;
+	public static final Identity<RegionsRecord, Integer> IDENTITY_REGIONS = Identities0.IDENTITY_REGIONS;
+	public static final Identity<RegionMembersRecord, Integer> IDENTITY_REGION_MEMBERS = Identities0.IDENTITY_REGION_MEMBERS;
+	public static final Identity<RegionPointsRecord, Integer> IDENTITY_REGION_POINTS = Identities0.IDENTITY_REGION_POINTS;
+	public static final Identity<WorldsRecord, Integer> IDENTITY_WORLDS = Identities0.IDENTITY_WORLDS;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -51,6 +52,17 @@ public class Keys {
 	public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE = UniqueKeys0.KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = UniqueKeys0.KEY_MODIFIERS_PRIMARY;
 	public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = UniqueKeys0.KEY_MODIFIERS_NAME_UNIQUE;
+	public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PRIMARY = UniqueKeys0.KEY_PLAYERS_PRIMARY;
+	public static final UniqueKey<PlayersRecord> KEY_PLAYERS_UUID = UniqueKeys0.KEY_PLAYERS_UUID;
+	public static final UniqueKey<RegionsRecord> KEY_REGIONS_PRIMARY = UniqueKeys0.KEY_REGIONS_PRIMARY;
+	public static final UniqueKey<RegionsRecord> KEY_REGIONS_UUID = UniqueKeys0.KEY_REGIONS_UUID;
+	public static final UniqueKey<RegionsRecord> KEY_REGIONS_WORLD_ID_X_Y_Z = UniqueKeys0.KEY_REGIONS_WORLD_ID_X_Y_Z;
+	public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_PRIMARY = UniqueKeys0.KEY_REGION_MEMBERS_PRIMARY;
+	public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_REGION_PLAYER = UniqueKeys0.KEY_REGION_MEMBERS_REGION_PLAYER;
+	public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_PRIMARY = UniqueKeys0.KEY_REGION_POINTS_PRIMARY;
+	public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_X_Y_Z = UniqueKeys0.KEY_REGION_POINTS_X_Y_Z;
+	public static final UniqueKey<WorldsRecord> KEY_WORLDS_PRIMARY = UniqueKeys0.KEY_WORLDS_PRIMARY;
+	public static final UniqueKey<WorldsRecord> KEY_WORLDS_NAME = UniqueKeys0.KEY_WORLDS_NAME;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
@@ -58,6 +70,10 @@ public class Keys {
 
 	public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = ForeignKeys0.ITEM_ALIASES_IBFK_1;
 	public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = ForeignKeys0.ITEM_DATA_IBFK_1;
+	public static final ForeignKey<RegionsRecord, WorldsRecord> FK_WORLD_ID = ForeignKeys0.FK_WORLD_ID;
+	public static final ForeignKey<RegionMembersRecord, RegionsRecord> FK_REGION = ForeignKeys0.FK_REGION;
+	public static final ForeignKey<RegionMembersRecord, PlayersRecord> FK_PLAYER = ForeignKeys0.FK_PLAYER;
+	public static final ForeignKey<RegionPointsRecord, RegionsRecord> FK_REGION_ID = ForeignKeys0.FK_REGION_ID;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -67,6 +83,11 @@ public class Keys {
 		public static Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = createIdentity(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
 		public static Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = createIdentity(ItemData.ITEM_DATA, ItemData.ITEM_DATA.ID);
 		public static Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = createIdentity(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
+		public static Identity<PlayersRecord, Integer> IDENTITY_PLAYERS = createIdentity(Players.PLAYERS, Players.PLAYERS.ID);
+		public static Identity<RegionsRecord, Integer> IDENTITY_REGIONS = createIdentity(Regions.REGIONS, Regions.REGIONS.ID);
+		public static Identity<RegionMembersRecord, Integer> IDENTITY_REGION_MEMBERS = createIdentity(RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.ID);
+		public static Identity<RegionPointsRecord, Integer> IDENTITY_REGION_POINTS = createIdentity(RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.ID);
+		public static Identity<WorldsRecord, Integer> IDENTITY_WORLDS = createIdentity(Worlds.WORLDS, Worlds.WORLDS.ID);
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
@@ -77,10 +98,25 @@ public class Keys {
 		public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY_ALIAS_UNIQUE = createUniqueKey(ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_PRIMARY = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
 		public static final UniqueKey<ModifiersRecord> KEY_MODIFIERS_NAME_UNIQUE = createUniqueKey(Modifiers.MODIFIERS, Modifiers.MODIFIERS.NAME);
+		public static final UniqueKey<PlayersRecord> KEY_PLAYERS_PRIMARY = createUniqueKey(Players.PLAYERS, Players.PLAYERS.ID);
+		public static final UniqueKey<PlayersRecord> KEY_PLAYERS_UUID = createUniqueKey(Players.PLAYERS, Players.PLAYERS.UUID);
+		public static final UniqueKey<RegionsRecord> KEY_REGIONS_PRIMARY = createUniqueKey(Regions.REGIONS, Regions.REGIONS.ID);
+		public static final UniqueKey<RegionsRecord> KEY_REGIONS_UUID = createUniqueKey(Regions.REGIONS, Regions.REGIONS.UUID);
+		public static final UniqueKey<RegionsRecord> KEY_REGIONS_WORLD_ID_X_Y_Z = createUniqueKey(Regions.REGIONS, Regions.REGIONS.WORLD_ID, Regions.REGIONS.X, Regions.REGIONS.Y, Regions.REGIONS.Z);
+		public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_PRIMARY = createUniqueKey(RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.ID);
+		public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_REGION_PLAYER = createUniqueKey(RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.REGION_ID, RegionMembers.REGION_MEMBERS.PLAYER_ID);
+		public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_PRIMARY = createUniqueKey(RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.ID);
+		public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_X_Y_Z = createUniqueKey(RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.X, RegionPoints.REGION_POINTS.Y, RegionPoints.REGION_POINTS.Z, RegionPoints.REGION_POINTS.REGION_ID);
+		public static final UniqueKey<WorldsRecord> KEY_WORLDS_PRIMARY = createUniqueKey(Worlds.WORLDS, Worlds.WORLDS.ID);
+		public static final UniqueKey<WorldsRecord> KEY_WORLDS_NAME = createUniqueKey(Worlds.WORLDS, Worlds.WORLDS.NAME);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
 		public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_DATA_PRIMARY, ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ITEM_ID);
 		public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ALIASES_PRIMARY, ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
+		public static final ForeignKey<RegionsRecord, WorldsRecord> FK_WORLD_ID = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_WORLDS_PRIMARY, Regions.REGIONS, Regions.REGIONS.WORLD_ID);
+		public static final ForeignKey<RegionMembersRecord, RegionsRecord> FK_REGION = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_REGIONS_PRIMARY, RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.REGION_ID);
+		public static final ForeignKey<RegionMembersRecord, PlayersRecord> FK_PLAYER = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_PLAYERS_PRIMARY, RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.PLAYER_ID);
+		public static final ForeignKey<RegionPointsRecord, RegionsRecord> FK_REGION_ID = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_REGIONS_PRIMARY, RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.REGION_ID);
 	}
 }

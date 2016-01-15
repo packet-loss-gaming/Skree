@@ -12,6 +12,9 @@ import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
+import com.skelril.skree.service.DatabaseService;
+import com.skelril.skree.service.internal.database.DatabaseServiceImpl;
+import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 
@@ -22,7 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @NModule(name = "Database System")
-public class DatabaseSystem {
+public class DatabaseSystem implements ServiceProvider<DatabaseService> {
+
+    private DatabaseService service;
 
     private Path getDatabaseFile() throws IOException {
         ConfigManager service = Sponge.getGame().getConfigManager();
@@ -47,7 +52,7 @@ public class DatabaseSystem {
                 try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
                     DatabaseConfig config = gson.fromJson(reader, DatabaseConfig.class);
 
-                    if (config == null) {
+                    if (config == null || config.getDatabase().isEmpty()) {
                         return;
                     }
 
@@ -64,5 +69,14 @@ public class DatabaseSystem {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        service = new DatabaseServiceImpl();
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DatabaseService.class, service);
+    }
+
+    @Override
+    public DatabaseService getService() {
+        return service;
     }
 }

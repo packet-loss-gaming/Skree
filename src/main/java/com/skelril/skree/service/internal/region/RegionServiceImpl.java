@@ -72,7 +72,7 @@ public class RegionServiceImpl implements RegionService {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
             RegionPoint point = new RegionPoint(location.getPosition());
-            Optional<RegionReference> optRegion = manager.getRegion(point);
+            Optional<RegionReference> optRegion = manager.getMarkedRegion(point);
             if (optRegion.isPresent()) {
                 manager.remRegion(optRegion.get().getReferred());
             }
