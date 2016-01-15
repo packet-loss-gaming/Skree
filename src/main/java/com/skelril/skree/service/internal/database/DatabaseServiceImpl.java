@@ -26,9 +26,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     public void onLogin(ClientConnectionEvent.Auth event) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
+            Timestamp loginTime = new Timestamp(System.currentTimeMillis());
             create.insertInto(PLAYERS).columns(PLAYERS.UUID, PLAYERS.LAST_LOGIN)
-                    .values(event.getProfile().getUniqueId().toString(), new Timestamp(System.currentTimeMillis()))
-                    .onDuplicateKeyUpdate().set(PLAYERS.LAST_LOGIN, PLAYERS.LAST_LOGIN)
+                    .values(event.getProfile().getUniqueId().toString(), loginTime)
+                    .onDuplicateKeyUpdate().set(PLAYERS.LAST_LOGIN, loginTime)
                     .execute();
         } catch (SQLException e) {
             e.printStackTrace();
