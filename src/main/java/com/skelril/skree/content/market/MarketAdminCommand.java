@@ -22,6 +22,7 @@ public class MarketAdminCommand {
                 .child(MarketSetPrimaryAliasCommand.aquireSpec(), "setprimaryalias", "setpalias")
                 .child(MarketTrackItemCommand.aquireSpec(), "track")
                 .child(MarketUntrackItemComand.aquireSpec(), "untrack", "remove")
+                .child(MarketVerifyCommand.aquireSpec(), "verify")
                 .build();
     }
 }
