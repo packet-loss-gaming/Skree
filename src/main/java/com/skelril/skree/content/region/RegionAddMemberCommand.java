@@ -13,20 +13,20 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Identifiable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.spongepowered.api.command.args.GenericArguments.player;
+import static org.spongepowered.api.command.args.GenericArguments.allOf;
+import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class RegionAddMemberCommand implements CommandExecutor {
     @Override
@@ -53,9 +53,11 @@ public class RegionAddMemberCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        List<UUID> newMembers = args.<Player>getAll("player").stream().map(
-                Identifiable::getUniqueId
-        ).collect(Collectors.toList());
+        UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+
+        List<UUID> newMembers = args.<String>getAll("player").stream().map(userService::get).filter(
+                Optional::isPresent
+        ).map(a -> a.get().getUniqueId()).collect(Collectors.toList());
 
         RegionReference ref = optRef.get();
         ref.addMember(newMembers);
@@ -68,7 +70,7 @@ public class RegionAddMemberCommand implements CommandExecutor {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Add a player to a region"))
-                .arguments(GenericArguments.allOf(player(Text.of("player"))))
+                .arguments(allOf(string(Text.of("player"))))
                 .executor(new RegionAddMemberCommand())
                 .build();
     }
