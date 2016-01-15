@@ -55,11 +55,14 @@ public class RegionAddMemberCommand implements CommandExecutor {
 
         UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
 
+        RegionReference ref = optRef.get();
+
         List<UUID> newMembers = args.<String>getAll("player").stream().map(userService::get).filter(
                 Optional::isPresent
-        ).map(a -> a.get().getUniqueId()).collect(Collectors.toList());
+        ).map(a -> a.get().getUniqueId()).filter(
+                a -> !ref.getReferred().getMembers().contains(a)
+        ).collect(Collectors.toList());
 
-        RegionReference ref = optRef.get();
         ref.addMember(newMembers);
 
         player.sendMessage(Text.of(TextColors.YELLOW, "Added ", newMembers.size(), " players to the region."));
