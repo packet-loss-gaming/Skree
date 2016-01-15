@@ -70,7 +70,7 @@ public class Region {
 
     protected void uncheckedRemMember(Collection<UUID> oldMembers) {
         writeMemberRemovalFromDB(oldMembers);
-        members.addAll(oldMembers);
+        members.removeAll(oldMembers);
     }
 
     protected void writeInit(Connection con) throws SQLException {
