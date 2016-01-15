@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Players extends TableImpl<PlayersRecord> {
 
-	private static final long serialVersionUID = 1813610736;
+	private static final long serialVersionUID = 320218677;
 
 	/**
 	 * The reference instance of <code>mc_db.players</code>
@@ -55,9 +55,24 @@ public class Players extends TableImpl<PlayersRecord> {
 	public final TableField<PlayersRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.CHAR.length(36).nullable(false), this, "");
 
 	/**
+	 * The column <code>mc_db.players.first_login</code>.
+	 */
+	public final TableField<PlayersRecord, Timestamp> FIRST_LOGIN = createField("first_login", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
+
+	/**
 	 * The column <code>mc_db.players.last_login</code>.
 	 */
 	public final TableField<PlayersRecord, Timestamp> LAST_LOGIN = createField("last_login", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
+
+	/**
+	 * The column <code>mc_db.players.times_played</code>.
+	 */
+	public final TableField<PlayersRecord, Integer> TIMES_PLAYED = createField("times_played", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>mc_db.players.seconds_played</code>.
+	 */
+	public final TableField<PlayersRecord, Integer> SECONDS_PLAYED = createField("seconds_played", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>mc_db.players</code> table reference
