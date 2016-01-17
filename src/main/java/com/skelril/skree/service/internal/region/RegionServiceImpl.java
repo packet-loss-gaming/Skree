@@ -80,6 +80,15 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
+    public int cleanup() {
+        int total = 0;
+        for (RegionManager manager : managerMap.values()) {
+            total += manager.cleanup();
+        }
+        return total;
+    }
+
+    @Override
     public void setSelectedRegion(Player player, RegionReference region) {
         selectionMap.put(player, region);
     }

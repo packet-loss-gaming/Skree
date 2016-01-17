@@ -21,6 +21,8 @@ public interface RegionService {
 
     void rem(Location<World> location);
 
+    int cleanup();
+
     void setSelectedRegion(Player player, RegionReference region);
     Optional<RegionReference> getSelectedRegion(Player player);
 }

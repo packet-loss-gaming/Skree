@@ -6,9 +6,13 @@
 
 package com.skelril.skree.service.internal.region;
 
+import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import com.skelril.skree.db.SQLHandle;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.world.World;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -188,6 +192,29 @@ public class RegionManager {
             }
         }
         return false;
+    }
+
+    public int cleanup() {
+        Optional<World> optWorld = Sponge.getServer().getWorld(worldName);
+
+        int total = 0;
+
+        if (optWorld.isPresent()) {
+            World world = optWorld.get();
+            for (RegionReference region : regionList) {
+                List<RegionPoint> toRemove = new ArrayList<>();
+                for (RegionPoint point : region.getReferred().getFullPoints()) {
+                    BlockType type = world.getBlockType(point.toInt());
+                    if (type != CustomBlockTypes.REGION_MASTER && type != CustomBlockTypes.REGION_MARKER) {
+                        ++total;
+                        toRemove.add(point);
+                    }
+                }
+                region.remPoint(toRemove);
+            }
+        }
+
+        return total;
     }
 
     public boolean contains(RegionPoint point) {
