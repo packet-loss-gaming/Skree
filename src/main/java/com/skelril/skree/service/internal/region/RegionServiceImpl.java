@@ -10,10 +10,16 @@ import com.google.common.collect.Sets;
 import com.skelril.skree.service.RegionService;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -98,6 +104,59 @@ public class RegionServiceImpl implements RegionService {
         return Optional.ofNullable(selectionMap.get(player));
     }
 
+    private boolean check(Player player, Location<World> loc) {
+        RegionPoint point = new RegionPoint(loc.getPosition());
+        RegionManager manager = managerMap.get(loc.getExtent());
+
+        if (manager != null) {
+            Optional<RegionReference> optRef = manager.getRegion(point);
+            if (optRef.isPresent()) {
+                RegionReference ref = optRef.get();
+                if (ref.isEditPrevented(player, point)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Listener
+    public void onInteract(InteractBlockEvent event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
+
+            Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
+            if (optLoc.isPresent()) {
+                if (check(player, optLoc.get())) {
+                    event.setCancelled(true);
+                    if (event.getCause().root().equals(player)) {
+                        player.sendMessage(Text.of(TextColors.RED, "You can't interact with blocks here!"));
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onInteract(InteractEntityEvent event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
+
+            Entity target = event.getTargetEntity();
+
+            if (target.getType() != EntityTypes.PLAYER && check(player, target.getLocation())) {
+                event.setCancelled(true);
+                if (event.getCause().root().equals(player)) {
+                    player.sendMessage(Text.of(TextColors.RED, "You can't interact with entities here!"));
+                }
+                return;
+            }
+        }
+    }
+
     @Listener
     public void onBlockChange(ChangeBlockEvent event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
@@ -106,18 +165,12 @@ public class RegionServiceImpl implements RegionService {
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
                 Optional<Location<World>> optLoc = block.getOriginal().getLocation();
                 if (optLoc.isPresent()) {
-                    Location<World> loc = optLoc.get();
-                    RegionPoint point = new RegionPoint(loc.getPosition());
-                    RegionManager manager = managerMap.get(loc.getExtent());
-                    if (manager != null) {
-                        Optional<RegionReference> optRef = manager.getRegion(point);
-                        if (optRef.isPresent()) {
-                            RegionReference ref = optRef.get();
-                            if (ref.isEditPrevented(player, point)) {
-                                event.setCancelled(true);
-                                return;
-                            }
+                    if (check(player, optLoc.get())) {
+                        event.setCancelled(true);
+                        if (event.getCause().root().equals(player)) {
+                            player.sendMessage(Text.of(TextColors.RED, "You can't change blocks here!"));
                         }
+                        return;
                     }
                 }
             }
