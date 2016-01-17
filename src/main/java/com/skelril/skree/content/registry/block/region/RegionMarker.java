@@ -51,6 +51,10 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                if (!block.isValid()) {
+                    continue;
+                }
+
                 if (block.getFinal().getState().getType() == this) {
                     Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
                     if (optService.isPresent()) {
@@ -62,9 +66,11 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                                 Location<World> loc = optLoc.get();
                                 RegionReference ref = optRef.get();
                                 if (ref.getReferred().getWorldName().equals(loc.getExtent().getName())) {
-                                    ref.addPoint(new RegionPoint(loc.getPosition()));
-                                    player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
-                                    continue;
+                                    if (ref.isMember(player)) {
+                                        ref.addPoint(new RegionPoint(loc.getPosition()));
+                                        player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
+                                        continue;
+                                    }
                                 }
                             }
                         }
@@ -81,6 +87,10 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                if (!block.isValid()) {
+                    continue;
+                }
+
                 if (block.getOriginal().getState().getType() == this) {
                     Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
                     if (optService.isPresent()) {
@@ -90,8 +100,10 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                             Optional<RegionReference> optRef = service.getMarkedRegion(optLoc.get());
                             if (optRef.isPresent()) {
                                 RegionReference ref = optRef.get();
-                                ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
-                                player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
+                                if (ref.isMember(player)) {
+                                    ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
+                                    player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
+                                }
                             }
                         }
                     }

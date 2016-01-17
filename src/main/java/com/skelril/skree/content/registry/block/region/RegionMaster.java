@@ -49,6 +49,10 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                if (!block.isValid()) {
+                    continue;
+                }
+
                 if (block.getFinal().getState().getType() == this) {
                     Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
                     if (optService.isPresent()) {
@@ -78,6 +82,10 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                if (!block.isValid()) {
+                    continue;
+                }
+
                 if (block.getOriginal().getState().getType() == this) {
                     Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
                     if (optService.isPresent()) {
