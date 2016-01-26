@@ -12,7 +12,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
@@ -98,20 +98,18 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
     @Override
     public void run() {
+        PotionEffect speedEffect = PotionEffect.builder()
+                .duration(3 * 20)
+                .amplifier(5)
+                .particles(false)
+                .potionType(PotionEffectTypes.SPEED)
+                .build();
+
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
-                Optional<PotionEffectData> optPotionData = entity.get(PotionEffectData.class);
-                if (optPotionData.isPresent()) {
-                    PotionEffect.Builder builder = PotionEffect.builder();
-                    builder.potionType(PotionEffectTypes.SPEED);
-                    builder.amplifier(5);
-                    builder.duration(3 * 20);
-                    builder.particles(false);
-
-                    PotionEffectData potionData = optPotionData.get();
-                    potionData.effects().add(builder.build());
-                    entity.offer(potionData);
-                }
+                List<PotionEffect> potionEffects = entity.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
+                potionEffects.add(speedEffect);
+                entity.offer(Keys.POTION_EFFECTS, potionEffects);
             }
         }
     }

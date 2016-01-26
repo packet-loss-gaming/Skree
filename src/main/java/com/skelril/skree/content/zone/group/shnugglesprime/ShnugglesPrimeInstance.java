@@ -330,30 +330,22 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
                 PotionEffect witherEffect = PotionEffect.builder().duration(20 * 12)
                         .amplifier(1).potionType(PotionEffectTypes.WITHER).build();
-                /*for (Player player : contained) {
-                    Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
-                    if (!optPotionEffects.isPresent()) {
-                        optPotionEffects = Optional.of(new ArrayList<>(1));
-                    }
-                    List<PotionEffect> potionEffects = optPotionEffects.get();
+                for (Player player : contained) {
+                    List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
                     potionEffects.add(witherEffect);
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
-                }*/
+                }
                 break;
             case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
                 PotionEffect blindnessEffect = PotionEffect.builder().duration(20 * 4)
                         .amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
 
-                /*for (Player player : contained) {
-                    Optional<List<PotionEffect>> optPotionEffects = player.get(Keys.POTION_EFFECTS);
-                    if (!optPotionEffects.isPresent()) {
-                        optPotionEffects = Optional.of(new ArrayList<>(1));
-                    }
-                    List<PotionEffect> potionEffects = optPotionEffects.get();
+                for (Player player : contained) {
+                    List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
                     potionEffects.add(blindnessEffect);
                     player.offer(Keys.POTION_EFFECTS, potionEffects);
-                }*/
+                }
                 break;
             case TANGO_TIME:
                 sendAttackBroadcast("Tango time!", AttackSeverity.ULTIMATE);
