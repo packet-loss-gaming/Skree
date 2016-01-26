@@ -14,6 +14,6 @@ public enum ShnugglesPrimeAttack {
     EVERLASTING,
     FIRE,
     BASK_IN_MY_GLORY,
-    DOOM,
+    DARK_POTIONS,
     MINION_LEECH
 }

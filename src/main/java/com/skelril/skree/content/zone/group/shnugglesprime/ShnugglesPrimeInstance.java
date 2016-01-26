@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
@@ -130,8 +131,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void buffBabies() {
-        PotionEffect strengthBuff = PotionEffect.builder().duration(20 * 20)
-                .amplifier(3).potionType(PotionEffectTypes.STRENGTH).build();
+        PotionEffect strengthBuff = PotionEffect.of(PotionEffectTypes.STRENGTH, 3, 20 * 20);
         for (Entity zombie : getContained(Zombie.class)) {
             zombie.offer(Keys.POTION_EFFECTS, Lists.newArrayList(strengthBuff));
         }
@@ -289,7 +289,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
         // AI-ish system
         if ((attackCase == ShnugglesPrimeAttack.EVERLASTING || attackCase == ShnugglesPrimeAttack.MINION_LEECH) && bossHealth > maxBossHealth * .9) {
-            attackCase = Probability.getChance(2) ? ShnugglesPrimeAttack.DOOM : ShnugglesPrimeAttack.CORRUPTION;
+            attackCase = Probability.getChance(2) ? ShnugglesPrimeAttack.DARK_POTIONS : ShnugglesPrimeAttack.CORRUPTION;
         }
         for (Player player : contained) {
             if (player.get(Keys.HEALTH).get() < 4) {
@@ -317,19 +317,19 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             case WRATH:
                 sendAttackBroadcast("Taste my wrath!", AttackSeverity.NORMAL);
                 for (Player player : contained) {
-                    // TODO convert to Sponge
-                    tf(player).addVelocity(
-                            random.nextDouble() * 3 - 1.5,
-                            random.nextDouble() * 1 + 1.3,
-                            random.nextDouble() * 3 - 1.5
+                    player.offer(Keys.VELOCITY,
+                            new Vector3d(
+                                    random.nextDouble() * 3 - 1.5,
+                                    random.nextDouble() * 1 + 1.3,
+                                    random.nextDouble() * 3 - 1.5
+                            )
                     );
-                    tf(player).setFire(3); // This is in seconds for some reason
+                    player.offer(Keys.FIRE_TICKS, 20 * 3);
                 }
                 break;
             case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
-                PotionEffect witherEffect = PotionEffect.builder().duration(20 * 12)
-                        .amplifier(1).potionType(PotionEffectTypes.WITHER).build();
+                PotionEffect witherEffect = PotionEffect.of(PotionEffectTypes.WITHER, 1, 20 * 12);
                 for (Player player : contained) {
                     List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
                     potionEffects.add(witherEffect);
@@ -338,8 +338,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case BLINDNESS:
                 sendAttackBroadcast("Are you BLIND? Mwhahahaha!", AttackSeverity.NORMAL);
-                PotionEffect blindnessEffect = PotionEffect.builder().duration(20 * 4)
-                        .amplifier(0).potionType(PotionEffectTypes.BLINDNESS).build();
+                PotionEffect blindnessEffect = PotionEffect.of(PotionEffectTypes.BLINDNESS, 0, 20 * 4);
 
                 for (Player player : contained) {
                     List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
@@ -366,11 +365,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             ).build();
 
                             player.damage(100, source, Cause.of(boss));
-                            // TODO convert to Sponge
-                            tf(player).addVelocity(
-                                    random.nextDouble() * 1.7 - 1.5,
-                                    random.nextDouble() * 2,
-                                    random.nextDouble() * 1.7 - 1.5
+                            player.offer(Keys.VELOCITY,
+                                    new Vector3d(
+                                            random.nextDouble() * 1.7 - 1.5,
+                                            random.nextDouble() * 2,
+                                            random.nextDouble() * 1.7 - 1.5
+                                    )
                             );
                         } else {
                             player.sendMessage(Text.of(TextColors.YELLOW, "Fine... No tango this time..."));
@@ -400,8 +400,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             case FIRE:
                 sendAttackBroadcast("Fire is your friend...", AttackSeverity.NORMAL);
                 for (Player player : contained) {
-                    // TODO convert to Sponge
-                    tf(player).setFire(30); // This is in seconds for some reason
+                    player.offer(Keys.FIRE_TICKS, 20 * 30);
                 }
                 break;
             case BASK_IN_MY_GLORY:
@@ -447,26 +446,29 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 }
                 runRandomAttack();
                 break;
-            case DOOM:
-                runRandomAttack();
+            case DARK_POTIONS:
+                sendAttackBroadcast("Unleash the inner darkness!", AttackSeverity.NORMAL);
+                PotionEffect instantDamageEffect = PotionEffect.of(PotionEffectTypes.INSTANT_DAMAGE, 0, 1);
+                for (Living entity : getContained(Zombie.class)) {
+                    if (!Probability.getChance(5)) {
+                        continue;
+                    }
+
+                    entity.offer(Keys.HEALTH, 0D);
+
+                    Location targetLoc = entity.getLocation();
+                    Optional<Entity> optEntity = getRegion().getExtent().createEntity(
+                            EntityTypes.SPLASH_POTION,
+                            targetLoc.getPosition()
+                    );
+
+                    if (optEntity.isPresent()) {
+                        Entity potion = optEntity.get();
+                        potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
+                        getRegion().getExtent().spawnEntity(entity, Cause.of(this));
+                    }
+                }
                 return;
-                /*
-                // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "I ask thy lord for aid in this all mighty battle...");
-                // ChatUtil.sendWarning(spectator, ChatColor.DARK_RED + "Heed thy warning, or perish!");
-                activeAttacks.add(8);
-                Task.builder().delay(7, TimeUnit.SECONDS).execute(() -> {
-                    if (!isBossSpawned()) return;
-                    Collection<Player> newContained = getContained(Player.class);
-                    // ChatUtil.sendWarning(newContained, "May those who appose me die a death like no other...");
-                    // TODO convert to Sponge
-                    newContained.stream().filter(e -> ((EntityGiantZombie) boss).canEntityBeSeen(tf(e))).forEach(player -> {
-                        // ChatUtil.sendWarning(newContained, "Perish " + player.getName() + "!");
-                        // TODO Doom Prayer was used previously
-                    });
-                    activeAttacks.remove(8);
-                }).submit(SkreePlugin.inst());
-                break;
-                */
             case MINION_LEECH:
                 sendAttackBroadcast("My minions our time is now!", AttackSeverity.ULTIMATE);
                 activeAttacks.add(ShnugglesPrimeAttack.MINION_LEECH);

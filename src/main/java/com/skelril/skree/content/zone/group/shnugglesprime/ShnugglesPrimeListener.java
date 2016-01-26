@@ -94,8 +94,8 @@ public class ShnugglesPrimeListener {
                 case BASK_IN_MY_GLORY:
                     deathMessage = " basked in the glory of the boss";
                     break;
-                case DOOM:
-                    deathMessage = " was the victim of a devastating prayer";
+                case DARK_POTIONS:
+                    deathMessage = " was the victim of dark magic";
                     break;
                 case MINION_LEECH:
                     deathMessage = " has been consumed by the boss";
