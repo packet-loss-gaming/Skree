@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.item;
 
+import com.skelril.nitro.registry.item.ICustomItem;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.item.ItemType;
@@ -31,6 +32,22 @@ public class ItemStackFactory {
 
     public static ItemStack newItemStack(BlockType type, DataManipulator<?, ?> data, int quantity) {
         return newItemStack(type.getItem().get(), data, quantity);
+    }
+
+    public static ItemStack newItemStack(ICustomItem type) {
+        return newItemStack((ItemType) type);
+    }
+
+    public static ItemStack newItemStack(ICustomItem type, DataManipulator<?, ?> data) {
+        return newItemStack((ItemType) type, data);
+    }
+
+    public static ItemStack newItemStack(ICustomItem type, int quantity) {
+        return newItemStack((ItemType) type, quantity);
+    }
+
+    public static ItemStack newItemStack(ICustomItem type, DataManipulator<?, ?> data, int quantity) {
+        return newItemStack((ItemType) type, data, quantity);
     }
 
     public static ItemStack newItemStack(ItemType type) {

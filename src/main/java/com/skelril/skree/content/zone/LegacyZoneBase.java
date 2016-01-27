@@ -6,7 +6,6 @@
 
 package com.skelril.skree.content.zone;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -74,17 +73,7 @@ public abstract class LegacyZoneBase implements Zone {
     }
 
     public boolean contains(Location<World> location) {
-        if (getRegion().getExtent().equals(location.getExtent())) {
-            Vector3i min = getRegion().getMinimumPoint();
-            Vector3i max = getRegion().getMaximumPoint();
-
-            boolean withinX = location.getX() > min.getX() && location.getX() < max.getX();
-            boolean withinY = location.getY() > min.getY() && location.getY() < max.getY();
-            boolean withinZ = location.getZ() > min.getZ() && location.getZ() < max.getZ();
-
-            return withinX && withinY && withinZ;
-        }
-        return false;
+        return getRegion().getExtent().equals(location.getExtent()) && getRegion().contains(location.getPosition());
     }
 
     public void expire() {

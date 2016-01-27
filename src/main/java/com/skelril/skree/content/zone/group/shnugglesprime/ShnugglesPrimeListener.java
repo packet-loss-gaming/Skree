@@ -72,7 +72,7 @@ public class ShnugglesPrimeListener {
             inst.healBoss(.33F);
             // TODO inventory protection & removal of drops here
             String deathMessage;
-            switch (inst.getLastAttack().orElseGet(null)) {
+            switch (inst.getLastAttack().orElse(null)) {
                 case WRATH:
                     deathMessage = " discovered how tasty the boss's wrath is";
                     break;
@@ -104,7 +104,7 @@ public class ShnugglesPrimeListener {
                     deathMessage = " died while attempting to slay the boss";
                     break;
             }
-            event.setMessage(Text.of(player.getName() + deathMessage));
+            event.setMessage(Text.of(player.getName(), deathMessage));
         }
     }
 }

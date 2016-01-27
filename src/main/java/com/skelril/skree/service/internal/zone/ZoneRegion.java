@@ -6,45 +6,22 @@
 
 package com.skelril.skree.service.internal.zone;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.World;
 
-public class ZoneRegion {
+public class ZoneRegion extends ZoneBoundingBox {
 
     private final World world;
-    private final Vector3i origin;
-    private final Vector3i boundingBox;
 
     public ZoneRegion(World world, Vector3i origin, Vector3i boundingBox) {
+        super(origin, boundingBox);
         this.world = world;
-        this.origin = origin;
-        this.boundingBox = boundingBox;
     }
 
     public World getExtent() {
         return world;
     }
 
-    public Vector3i getOrigin() {
-        return origin;
-    }
-
-    public Vector3i getMinimumPoint() {
-        return getOrigin();
-    }
-
-    public Vector3i getMaximumPoint() {
-        return getOrigin().add(boundingBox);
-    }
-
-    public Vector3i getBoundingBox() {
-        return boundingBox;
-    }
-
-    public Vector3d getCenter() {
-        return getOrigin().toDouble().add(boundingBox.toDouble().div(2));
-    }
 
     public enum State {
         NEW,

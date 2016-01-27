@@ -38,7 +38,7 @@ import java.util.*;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
 
-public class ShnugglesPrimeManager  extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable {
+public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable {
 
     private Queue<ZoneRegion> freeRegions = new LinkedList<>();
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager = new BossManager<>();

@@ -14,6 +14,7 @@ import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.*;
+import com.skelril.skree.content.registry.item.minigame.GoldRushKey;
 import com.skelril.skree.content.registry.item.tool.*;
 import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
 import com.skelril.skree.content.registry.item.tool.axe.JurackAxe;
@@ -38,6 +39,10 @@ public class CustomItemTypes {
     /* ** Admin ** */
     public static final HackBook HACK_BOOK = new HackBook();
     public static final SwordOGreatPain SWORD_O_GREAT_PAIN = new SwordOGreatPain();
+
+    /* ** Minigame ** */
+    public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
+    public static final PrizeBox PRIZE_BOX = new PrizeBox();
 
     /* ** Standard ** */
 
@@ -124,6 +129,7 @@ public class CustomItemTypes {
     public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
     public static final Luminositor LUMINOSITOR = new Luminositor();
     public static final NetherBowl NETHER_BOWL = new NetherBowl();
+    public static final PhantomHymn PHANTOM_HYMN = new PhantomHymn();
     public static final ScrollOfSummation SCROLL_OF_SUMMATION = new ScrollOfSummation();
     public static final SkullOfTheFallen SKULL_OF_THE_FALLEN = new SkullOfTheFallen();
 }
