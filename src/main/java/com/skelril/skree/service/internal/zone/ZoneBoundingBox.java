@@ -22,7 +22,7 @@ public class ZoneBoundingBox {
 
     public boolean contains(Vector3d point) {
         Vector3i min = getMinimumPoint();
-        Vector3i max = getMaximumPoint().add(1, 1, 1);
+        Vector3i max = getMaximumPoint();
 
         return min.getX() <= point.getX() && point.getX() <= max.getX()
                 && min.getY() <= point.getY() && point.getY() <= max.getY()
