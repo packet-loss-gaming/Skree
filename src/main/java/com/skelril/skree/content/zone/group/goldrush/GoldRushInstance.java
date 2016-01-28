@@ -14,6 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.market.MarketImplUtil;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.ModifierService;
@@ -86,6 +87,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         setup();
         remove();
     }
+
     private void setup() {
         Vector3i offset = getRegion().getMinimumPoint();
 
@@ -96,11 +98,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 offset.getZ() + 6
         );
 
-        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), offset.add(29, 7, 74));
-        flashMemoryRoom = new ZoneBoundingBox(offset.add(11, 1, 17), offset.add(19, 7, 35));
+        startingRoom = new ZoneBoundingBox(offset.add(1, 1, 76), offset.add(27, 6, 13));
+        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), offset.add(25, 6, 38));
+        flashMemoryRoom = new ZoneBoundingBox(offset.add(11, 1, 17), offset.add(8, 6, 18));
 
-        flashMemoryDoor = new ZoneBoundingBox(offset.add(14, 1, 36), offset.add(16, 3, 36));
-        rewardRoomDoor = new ZoneBoundingBox(offset.add(14, 1, 16), offset.add(16, 3, 16));
+        flashMemoryDoor = new ZoneBoundingBox(offset.add(14, 1, 36), offset.add(3, 3, 1));
+        rewardRoomDoor = new ZoneBoundingBox(offset.add(14, 1, 16), offset.add(3, 3, 1));
 
         findChestAndKeys();         // Setup room one
         findLeversAndFloodBlocks(); // Setup room two
@@ -435,11 +438,10 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
             if (is == null || is.getItem() != CustomItemTypes.PRIZE_BOX) continue;
 
-            // TODO code to open & give the prize box
-            Optional<net.minecraft.item.ItemStack> optOpened = Optional.empty();
+            Optional<ItemStack> optOpened = PrizeBox.getPrizeStack(is);
             if (optService.isPresent() && optOpened.isPresent()) {
                 MarketService service = optService.get();
-                Optional<BigDecimal> value = service.getPrice(tf(optOpened.get()));
+                Optional<BigDecimal> value = service.getPrice(optOpened.get());
                 if (value.isPresent()) {
                     if (is.getItem() == ItemTypes.GOLD_NUGGET || is.getItem() == ItemTypes.GOLD_INGOT || is.getItem() == BlockTypes.GOLD_BLOCK) {
                         goldValue = goldValue.add(value.get());
