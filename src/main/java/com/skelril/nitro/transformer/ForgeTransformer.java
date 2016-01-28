@@ -8,25 +8,12 @@ package com.skelril.nitro.transformer;
 
 import com.flowpowered.math.vector.Vector3i;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.Inventory;
 
 public class ForgeTransformer {
-
-    /*
-     * Inventory transformations
-     */
-    public static IInventory tf(Inventory inventory) {
-        return (IInventory) inventory;
-    }
-
-    public static Inventory tf(IInventory inventory) {
-        return (Inventory) inventory;
-    }
 
     /*
      * Position transformations

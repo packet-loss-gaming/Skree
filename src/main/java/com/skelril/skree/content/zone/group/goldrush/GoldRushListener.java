@@ -13,9 +13,12 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
+import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.ILockableContainer;
+import net.minecraft.world.LockCode;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -47,7 +50,7 @@ public class GoldRushListener {
         this.manager = manager;
     }
 
-    private Map<TileEntity, Player> tileEntityClaimMap = new WeakHashMap<>();
+    private Map<String, Player> tileEntityClaimMap = new WeakHashMap<>();
 
     @Listener
     public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
@@ -63,26 +66,27 @@ public class GoldRushListener {
 
         GoldRushInstance inst = optInst.get();
 
-        BlockState state = event.getTargetBlock().getState();
-        Location<World> targetBlock = event.getTargetBlock().getLocation().get();
+        BlockSnapshot snapshot = event.getTargetBlock();
+        BlockState state = snapshot.getState();
+        Location<World> targetBlock = snapshot.getLocation().get();
         if (state.getType() == BlockTypes.WALL_SIGN && inst.getLockLocations().contains(targetBlock)) {
-            List<Text> texts = state.get(Keys.SIGN_LINES).orElse(Lists.newArrayList(Text.EMPTY, Text.EMPTY, Text.EMPTY, Text.EMPTY));
+            List<Text> texts = snapshot.get(Keys.SIGN_LINES).orElse(Lists.newArrayList(Text.EMPTY, Text.EMPTY, Text.EMPTY, Text.EMPTY));
 
             boolean unlocked = false;
 
             String text = texts.get(1).toPlain().toLowerCase();
             if (text.contains("blue")) {
-                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1)).poll().isPresent()) {
+                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1, 1)).poll().isPresent()) {
                     unlocked = true;
                 }
             } else if (text.contains("red")) {
-                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 0)).poll().isPresent()) {
+                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1, 0)).poll().isPresent()) {
                     unlocked = true;
                 }
             }
 
             if (unlocked) {
-                targetBlock.setBlock(state.with(
+                snapshot.with(
                         Keys.SIGN_LINES,
                         Lists.newArrayList(
                                 Text.EMPTY,
@@ -90,7 +94,7 @@ public class GoldRushListener {
                                 Text.of("Locked"),
                                 Text.of("- Unlocked -")
                         )
-                ).orElse(state));
+                ).orElse(snapshot).restore(true, false);
             }
         } else if (state.getType() == BlockTypes.LEVER) {
             Task.builder().execute(() -> {
@@ -102,89 +106,112 @@ public class GoldRushListener {
             player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully robbed the bank!"));
             inst.payPlayer(player);
         } else if (!inst.isLocked()) {
-            if (state.getType() == BlockTypes.CHEST) {
-                // TODO Sponge port
-                TileEntity tileEntity = tf(targetBlock.getExtent()).getTileEntity(tf(targetBlock.getBlockPosition()));
-                if (tileEntityClaimMap.containsKey(tileEntity)) {
-                    player.sendMessage(Text.of(TextColors.RED, "That chest is already in use!"));
-                    event.setCancelled(true);
-                } else {
-                    tileEntityClaimMap.put(tileEntity, player);
-                    if (tileEntity instanceof IInventory) {
-                        IInventory inventory = (IInventory) tileEntity;
-                        BigDecimal risk = Optional.ofNullable(
-                                inst.cofferRisk.get(player.getUniqueId())
-                        ).orElse(BigDecimal.ZERO);
-
-                        Collection<org.spongepowered.api.item.inventory.ItemStack> queue = CofferValueMap.inst().satisfy(risk.toBigInteger());
-                        Iterator<org.spongepowered.api.item.inventory.ItemStack> it = queue.iterator();
-                        for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-                            if (it.hasNext()) {
-                                inventory.setInventorySlotContents(i, tf(it.next()));
-                                continue;
-                            }
-                            inventory.setInventorySlotContents(i, null);
-                        }
-                    }
-                }
-            } else if (state.getType() == BlockTypes.STONE_BUTTON) {
+            if (state.getType() == BlockTypes.STONE_BUTTON) {
                 inst.tryToStart();
             }
         }
     }
 
     @Listener
+    public void onChestOpen(InteractInventoryEvent.Open event) {
+        Object optPlayer = event.getCause().root();
+        if (optPlayer instanceof Player) {
+            Player player = (Player) optPlayer;
+
+            Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
+            if (!optInst.isPresent()) return;
+
+            GoldRushInstance inst = optInst.get();
+
+            Inventory inventory = event.getTargetInventory();
+            if (!inst.isLocked() && inventory instanceof ContainerChest) {
+                IInventory chestInv = ((ContainerChest) inventory).getLowerChestInventory();
+                if (chestInv instanceof ILockableContainer) {
+                    LockCode newLockCode = new LockCode(UUID.randomUUID().toString());
+                    tileEntityClaimMap.put(newLockCode.getLock(), player);
+                    ((ILockableContainer) chestInv).setLockCode(newLockCode);
+
+                    BigDecimal risk = Optional.ofNullable(
+                            inst.cofferRisk.get(player.getUniqueId())
+                    ).orElse(BigDecimal.ZERO);
+
+                    Collection<org.spongepowered.api.item.inventory.ItemStack> queue = CofferValueMap.inst().satisfy(risk.toBigInteger());
+                    Iterator<org.spongepowered.api.item.inventory.ItemStack> it = queue.iterator();
+                    for (int i = 0; i < chestInv.getSizeInventory(); ++i) {
+                        if (it.hasNext()) {
+                            chestInv.setInventorySlotContents(i, tf(it.next()));
+                            continue;
+                        }
+                        chestInv.setInventorySlotContents(i, null);
+                    }
+                }
+            }
+
+        }
+    }
+
+    @Listener
     public void onChestClose(InteractInventoryEvent.Close event) {
         Inventory inventory = event.getTargetInventory();
-        if (inventory instanceof TileEntity) {
-            Optional<Player> optPlayer = Optional.ofNullable(tileEntityClaimMap.remove(inventory));
-            if (optPlayer.isPresent()) {
-                Player player = optPlayer.get();
+        if (inventory instanceof ContainerChest) {
+            IInventory chestInv = ((ContainerChest) inventory).getLowerChestInventory();
+            if (chestInv instanceof ILockableContainer) {
+                String lockCode = ((ILockableContainer) chestInv).getLockCode().getLock();
+                Optional<Player> optPlayer = Optional.ofNullable(tileEntityClaimMap.remove(lockCode));
+                if (optPlayer.isPresent()) {
+                    Player player = optPlayer.get();
+                    ((ILockableContainer) chestInv).setLockCode(LockCode.EMPTY_CODE);
 
-                Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
-                if (!optInst.isPresent()) return;
+                    Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
+                    if (!optInst.isPresent()) return;
 
-                // TODO Sponge port
-                GoldRushInstance inst = optInst.get();
-                List<org.spongepowered.api.item.inventory.ItemStack> toEvaluate = new ArrayList<>();
-                ArrayDeque<org.spongepowered.api.item.inventory.ItemStack> toReturn = new ArrayDeque<>();
+                    // TODO Sponge port
+                    GoldRushInstance inst = optInst.get();
+                    List<org.spongepowered.api.item.inventory.ItemStack> toEvaluate = new ArrayList<>();
+                    ArrayDeque<org.spongepowered.api.item.inventory.ItemStack> toReturn = new ArrayDeque<>();
 
-                IInventory inv = tf(inventory);
-                for (int i = 0; i < inv.getSizeInventory(); ++i) {
-                    ItemStack stack = inv.getStackInSlot(i);
-                    if (stack == null) {
-                        continue;
+                    for (int i = 0; i < chestInv.getSizeInventory(); ++i) {
+                        ItemStack stack = chestInv.getStackInSlot(i);
+                        if (stack == null) {
+                            continue;
+                        }
+
+                        if (stack.getItem() instanceof CofferItem) {
+                            toEvaluate.add(tf(stack));
+                        } else {
+                            toReturn.add(tf(stack));
+                        }
+                        chestInv.setInventorySlotContents(i, null);
                     }
 
-                    if (stack.getItem() instanceof CofferItem) {
-                        toEvaluate.add(tf(stack));
-                        continue;
+                    BigDecimal value = BigDecimal.ZERO;
+                    for (org.spongepowered.api.item.inventory.ItemStack stack : toEvaluate) {
+                        value = value.add(new BigDecimal(
+                                CofferValueMap.inst().getValue(Collections.singleton(stack)).orElse(BigInteger.ZERO)
+                        ));
                     }
-                    toReturn.add(tf(stack));
+
+                    inst.cofferRisk.put(
+                            player.getUniqueId(),
+                            value
+                    );
+
+                    for (Inventory slot : player.getInventory().slots()) {
+                        if (toReturn.isEmpty()) {
+                            break;
+                        }
+
+                        if (slot.size() == 0) {
+                            slot.set(toReturn.poll());
+                        }
+                    }
+
+                    if (!toReturn.isEmpty()) {
+                        new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.of(inst));
+                    }
+
+                    player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", value, " coffers."));
                 }
-
-                BigDecimal value = new BigDecimal(CofferValueMap.inst().getValue(toEvaluate).orElse(BigInteger.ZERO));
-
-                inst.cofferRisk.put(
-                        player.getUniqueId(),
-                        value
-                );
-
-                for (Inventory slot : player.getInventory().slots()) {
-                    if (toReturn.isEmpty()) {
-                        break;
-                    }
-
-                    if (slot.size() == 0) {
-                        slot.set(toReturn.poll());
-                    }
-                }
-
-                if (!toReturn.isEmpty()) {
-                    new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.of(inst));
-                }
-
-                player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", value, " coffers."));
             }
         }
     }

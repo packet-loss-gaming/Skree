@@ -14,6 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.anexample.AnExampleManager;
 import com.skelril.skree.content.zone.group.example.ExampleManager;
+import com.skelril.skree.content.zone.group.goldrush.GoldRushManager;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeManager;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
@@ -56,10 +57,11 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
                 for (String name : Arrays.asList("CursedMine")) {
                     service.registerManager(new AnExampleManager(name));
                 }
-                for (String name : Arrays.asList("Catacombs", "FreakyFour", "GoldRush", "PatientX")) {
+                for (String name : Arrays.asList("Catacombs", "FreakyFour", "PatientX")) {
                     service.registerManager(new ExampleManager(name));
                 }
 
+                service.registerManager(new GoldRushManager());
                 service.registerManager(new ShnugglesPrimeManager());
 
                 Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
