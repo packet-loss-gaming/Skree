@@ -22,8 +22,8 @@ public class GoldRushKey extends CustomItem {
     @Override
     public List<String> __getMeshDefinitions() {
         List<String> baseList = new ArrayList<>();
-        baseList.add("red_key");
-        baseList.add("blue_key");
+        baseList.add("gold_rush_red_key");
+        baseList.add("gold_rush_blue_key");
         return baseList;
     }
 

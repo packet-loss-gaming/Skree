@@ -35,7 +35,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -100,8 +99,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 offset.getZ() + 6
         );
 
-        startingRoom = new ZoneBoundingBox(offset.add(1, 1, 76), offset.add(30, 7, 14));
-        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), offset.add(25, 7, 39));
+        startingRoom = new ZoneBoundingBox(offset.add(2, 1, 76), offset.add(27, 7, 14));
+        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), offset.add(30, 7, 39));
         flashMemoryRoom = new ZoneBoundingBox(offset.add(11, 1, 17), offset.add(9, 7, 19));
 
         flashMemoryDoor = new ZoneBoundingBox(offset.add(14, 1, 36), offset.add(3, 3, 1));
@@ -175,11 +174,15 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 int iterationTimes = Probability.getRandom(27);
                 for (int i = iterationTimes; i > 0; --i) {
                     ItemStack targetStack;
+
+                    int goldRand = Probability.getRandom(Probability.getRandom(Probability.getRandom(64)));
+
                     if (Probability.getChance(1000)) {
-                        targetStack = makePrizeBox(newItemStack(BlockTypes.GOLD_BLOCK, Probability.getRandom(6)));
+                        targetStack = makePrizeBox(newItemStack(BlockTypes.GOLD_BLOCK, goldRand));
                     } else {
-                        targetStack = makePrizeBox(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(3)));
+                        targetStack = makePrizeBox(newItemStack(ItemTypes.GOLD_INGOT, goldRand));
                     }
+
                     inventory.setInventorySlotContents(
                             Probability.getRandom(inventory.getSizeInventory()) - 1,
                             tf(targetStack)
@@ -550,17 +553,34 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
 
         for (Player player : getContained(Player.class)) {
-            for (Inventory slot : player.getInventory().query(CustomItemTypes.PRIZE_BOX)) {
+            net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+            for (net.minecraft.item.ItemStack is : itemStacks) {
+                if (is == null || is.getItem() != CustomItemTypes.PRIZE_BOX) {
+                    continue;
+                }
+
+                Optional<ItemStack> optContained = PrizeBox.getPrizeStack(is);
+
+                if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
+                    drainAll(); // Force away all water
+                    floodBlockType = BlockTypes.FLOWING_LAVA;
+                    break;
+                }
+            }
+            /*for (Inventory slot : player.getInventory().query((ItemType) CustomItemTypes.PRIZE_BOX)) {
                 Optional<ItemStack> optStack = slot.peek();
                 if (optStack.isPresent()) {
                     Optional<ItemStack> optContained = PrizeBox.getPrizeStack(optStack.get());
                     if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
                         drainAll(); // Force away all water
                         floodBlockType = BlockTypes.FLOWING_LAVA;
+                        lootSplit = lootSplit.multiply(new BigDecimal(1.1));
                         break;
                     }
                 }
-            }
+            }*/
+
+            tf(player).inventoryContainer.detectAndSendChanges();
         }
     }
 

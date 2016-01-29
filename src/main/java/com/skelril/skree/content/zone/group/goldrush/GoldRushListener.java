@@ -29,6 +29,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -75,22 +76,60 @@ public class GoldRushListener {
             boolean unlocked = false;
 
             String text = texts.get(1).toPlain().toLowerCase();
-            if (text.contains("blue")) {
-                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1, 1)).poll().isPresent()) {
-                    unlocked = true;
+            /*net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+            for (int i = 0; i < itemStacks.length; ++i) {
+                ItemStack is = itemStacks[i];
+
+                if (is == null || is.getItem() != CustomItemTypes.GOLD_RUSH_KEY) {
+                    continue;
                 }
-            } else if (text.contains("red")) {
-                if (player.getInventory().query(new ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1, 0)).poll().isPresent()) {
+
+                if (text.contains("blue")) {
+                    if (is.getItemDamage() != 1) {
+                        continue;
+                    }
+                } else if (text.contains("red")) {
+                    if (is.getItemDamage() != 0) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+
+                unlocked = true;
+                itemStacks[i] = null;
+                break;
+            }*/
+
+            for (Inventory inv : player.getInventory().query((ItemType) CustomItemTypes.GOLD_RUSH_KEY)) {
+                Optional<org.spongepowered.api.item.inventory.ItemStack> optStack = inv.peek();
+                if (optStack.isPresent()) {
+                    if (text.contains("blue")) {
+                        if (tf(optStack.get()).getItemDamage() != 1) {
+                            continue;
+                        }
+                    } else if (text.contains("red")) {
+                        if (tf(optStack.get()).getItemDamage() != 0) {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
+
                     unlocked = true;
+                    inv.poll();
+                    break;
                 }
             }
 
             if (unlocked) {
+                tf(player).inventoryContainer.detectAndSendChanges();
+
                 snapshot.with(
                         Keys.SIGN_LINES,
                         Lists.newArrayList(
-                                Text.EMPTY,
-                                Text.EMPTY,
+                                texts.get(0),
+                                texts.get(1),
                                 Text.of("Locked"),
                                 Text.of("- Unlocked -")
                         )
