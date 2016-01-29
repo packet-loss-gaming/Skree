@@ -86,6 +86,11 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 new ItemStack(this),
                 new ItemStack(Items.rotten_flesh)
         ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Gold Rush",
+                new ItemStack(this),
+                new ItemStack(Items.gold_ingot)
+        ));
     }
 
     @Override
