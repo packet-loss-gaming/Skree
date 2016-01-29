@@ -7,14 +7,20 @@
 package com.skelril.nitro.registry.item;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICustomItem {
     String __getID();
+
+    default Optional<ItemMeshDefinition> __getCustomMeshDefinition() {
+        return Optional.empty();
+    }
 
     default List<String> __getMeshDefinitions() {
         return Lists.newArrayList(__getID());

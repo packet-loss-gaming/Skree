@@ -13,6 +13,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -26,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CustomItemSystem {
 
@@ -114,17 +116,27 @@ public class CustomItemSystem {
             if (Sponge.getPlatform().getExecutionType().isClient()) {
                 RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
                 ItemModelMesher mesher = renderItem.getItemModelMesher();
+
+                Optional<ItemMeshDefinition> optMeshDefinition = ((ICustomItem) item).__getCustomMeshDefinition();
+                if (optMeshDefinition.isPresent()) {
+                    mesher.register((Item) item, optMeshDefinition.get());
+                }
+
                 List<String> variants = ((ICustomItem) item).__getMeshDefinitions();
                 List<ResourceLocation> modelResources = new ArrayList<>();
+
                 for (int i = 0; i < variants.size(); ++i) {
                     ModelResourceLocation resourceLocation = new ModelResourceLocation(
                             "skree:" + variants.get(i),
                             "inventory"
                     );
 
-                    mesher.register((Item) item, i, resourceLocation);
+                    if (!optMeshDefinition.isPresent()) {
+                        mesher.register((Item) item, i, resourceLocation);
+                    }
                     modelResources.add(resourceLocation);
                 }
+
                 ModelBakery.registerItemVariants(
                         (Item) item,
                         modelResources.toArray(new ResourceLocation[modelResources.size()])

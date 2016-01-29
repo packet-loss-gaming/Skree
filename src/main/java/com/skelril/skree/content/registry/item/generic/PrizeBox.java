@@ -8,6 +8,8 @@ package com.skelril.skree.content.registry.item.generic;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -37,6 +39,39 @@ public class PrizeBox extends CustomItem {
     public CreativeTabs __getCreativeTab() {
         return null;
     }
+
+    @Override
+    public Optional<ItemMeshDefinition> __getCustomMeshDefinition() {
+        // DO NOT use a lambda here, converting this code to a lambda results
+        // in the model being unresolvable
+
+        //noinspection Convert2Lambda
+        return Optional.of(new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                Optional<org.spongepowered.api.item.inventory.ItemStack> optContained = getPrizeStack(stack);
+
+                return optContained.isPresent() ? new ModelResourceLocation(
+                        optContained.get().getItem().getId(),
+                        "inventory"
+                ) : null;
+            }
+        });
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean hasEffect(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public String getHighlightTip(ItemStack item, String displayName) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optContained = getPrizeStack(item);
+
+        return optContained.isPresent() ? tf(optContained.get()).getDisplayName() + " " + displayName: displayName;
+    }
+
 
     public static org.spongepowered.api.item.inventory.ItemStack makePrizeBox(org.spongepowered.api.item.inventory.ItemStack stack) {
         org.spongepowered.api.item.inventory.ItemStack newStack = newItemStack(CustomItemTypes.PRIZE_BOX);
@@ -86,7 +121,7 @@ public class PrizeBox extends CustomItem {
         Optional<org.spongepowered.api.item.inventory.ItemStack> optPrize = getPrizeStack(stack);
         if (optPrize.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack prize = optPrize.get();
-            tooltip.add("Contains: " + prize.getItem().getName() + "x" + prize.getQuantity());
+            tooltip.add("Contains: " + tf(prize).getDisplayName() + " x" + prize.getQuantity());
         }
     }
 }
