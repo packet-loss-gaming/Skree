@@ -51,6 +51,13 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
         return null;
     }
 
+    @Override
+    public String getHighlightTip(ItemStack item, String displayName) {
+        Optional<String> optContained = getZone(item);
+
+        return optContained.isPresent() ? optContained.get() + " " + displayName: displayName;
+    }
+
     @Listener
     public void onDropItem(DropItemEvent.Dispense event) {
         event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {

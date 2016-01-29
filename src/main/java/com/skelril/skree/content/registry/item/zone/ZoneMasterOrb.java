@@ -99,6 +99,14 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         subItems.add(new ItemStack(itemIn, 1, 0));
     }
 
+    @Override
+    public String getHighlightTip(ItemStack item, String displayName) {
+        Optional<String> optContained = getZone(item);
+
+        return optContained.isPresent() ? optContained.get() + " " + displayName: displayName;
+    }
+
+
     @Listener
     public void onLogout(ClientConnectionEvent.Disconnect event) {
         purgeZoneItems(event.getTargetEntity(), Optional.empty());
