@@ -99,12 +99,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 offset.getZ() + 6
         );
 
-        startingRoom = new ZoneBoundingBox(offset.add(2, 1, 76), offset.add(27, 7, 14));
-        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), offset.add(30, 7, 39));
-        flashMemoryRoom = new ZoneBoundingBox(offset.add(11, 1, 17), offset.add(9, 7, 19));
+        startingRoom = new ZoneBoundingBox(offset.add(2, 1, 76), new Vector3i(27, 7, 14));
+        keyRoom = new ZoneBoundingBox(offset.add(1, 1, 36), new Vector3i(30, 7, 39));
+        flashMemoryRoom = new ZoneBoundingBox(offset.add(11, 1, 17), new Vector3i(9, 7, 19));
 
-        flashMemoryDoor = new ZoneBoundingBox(offset.add(14, 1, 36), offset.add(3, 3, 1));
-        rewardRoomDoor = new ZoneBoundingBox(offset.add(14, 1, 16), offset.add(3, 3, 1));
+        flashMemoryDoor = new ZoneBoundingBox(offset.add(14, 1, 36), new Vector3i(3, 3, 1));
+        rewardRoomDoor = new ZoneBoundingBox(offset.add(14, 1, 16), new Vector3i(3, 3, 1));
 
         findChestAndKeys();         // Setup room one
         findLeversAndFloodBlocks(); // Setup room two
