@@ -33,12 +33,14 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
 
     @Override
     public void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
-        pasteAt(worldResolver, new Vector3i(lastEnd.getX(), 0, lastEnd.getY()), managerName, region -> {
-            // Update last end
-            Vector3i lastMax = region.getMaximumPoint();
-            lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
+        ZoneRegion incompleteRegion = pasteAt(
+                worldResolver,
+                new Vector3i(lastEnd.getX(), 0, lastEnd.getY()),
+                managerName,
+                region -> callBack.accept(new Clause<>(region, ZoneRegion.State.NEW))
+        );
 
-            callBack.accept(new Clause<>(region, ZoneRegion.State.NEW));
-        });
+        Vector3i lastMax = incompleteRegion.getMaximumPoint();
+        lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
     }
 }

@@ -51,7 +51,7 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
         }
     }
 
-    protected void pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
+    protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
 
         try {
@@ -63,18 +63,23 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
                     .to(new Vector(origin.getX(), origin.getY(), origin.getZ()))
                     .build();
 
+            Vector dimensions = holder.getClipboard().getDimensions();
+
+            ZoneRegion region = new ZoneRegion(
+                    world.getSpongeWorld(),
+                    origin,
+                    new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
+            );
 
             RunManager.runOperation(operation, () -> {
-                Vector dimensions = holder.getClipboard().getDimensions();
-                callback.accept(new ZoneRegion(
-                        world.getSpongeWorld(),
-                        origin,
-                        new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
-                ));
+                callback.accept(region);
             });
+
+            return region;
         } catch (IOException e) {
             e.printStackTrace();
             callback.accept(null);
         }
+        return null;
     }
 }
