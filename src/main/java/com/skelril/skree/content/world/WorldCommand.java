@@ -42,7 +42,12 @@ public class WorldCommand implements CommandExecutor {
 
         World world = Sponge.getServer().getWorld(optWorldName.get().getUniqueId()).get();
 
-        ((Player) src).setLocationSafely(world.getSpawnLocation());
+        if (args.hasAny("f")) {
+            ((Player) src).setLocation(world.getSpawnLocation());
+        } else {
+            ((Player) src).setLocationSafely(world.getSpawnLocation());
+        }
+
         src.sendMessage(Text.of("Entered world: " + world.getName() + " successfully!"));
         return CommandResult.success();
     }
@@ -51,7 +56,7 @@ public class WorldCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Text.of("Teleport to a different world"))
                 .permission("skree.world")
-                .arguments(optional(onlyOne(world(Text.of("world")))))
+                .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
                 .executor(new WorldCommand()).build();
     }
 }

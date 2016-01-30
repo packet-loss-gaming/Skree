@@ -6,10 +6,11 @@
 
 package com.skelril.skree.content.zone.global.anexample;
 
-import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
+
+import java.util.function.Consumer;
 
 public class AnExampleManager extends GlobalZoneManager<AnExampleInstance> {
 
@@ -20,14 +21,15 @@ public class AnExampleManager extends GlobalZoneManager<AnExampleInstance> {
     }
 
     @Override
-    public AnExampleInstance init(ZoneSpaceAllocator allocator) {
-        Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
-        ZoneRegion region = result.getKey();
+    public void init(ZoneSpaceAllocator allocator, Consumer<AnExampleInstance> callback) {
+        allocator.regionFor(getSystemName(), clause -> {
+            ZoneRegion region = clause.getKey();
 
-        AnExampleInstance instance = new AnExampleInstance(region);
-        instance.init();
+            AnExampleInstance instance = new AnExampleInstance(region);
+            instance.init();
 
-        return instance;
+            callback.accept(instance);
+        });
     }
 
     @Override

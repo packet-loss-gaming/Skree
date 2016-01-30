@@ -13,19 +13,26 @@ import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T> {
     protected T zone;
 
-    public abstract T init(ZoneSpaceAllocator allocator);
+    public abstract void init(ZoneSpaceAllocator allocator, Consumer<T> callback);
 
     public boolean isActive() {
         return zone != null && zone.isActive();
     }
 
     @Override
-    public Optional<T> discover(ZoneSpaceAllocator allocator) {
-        return Optional.of(!isActive() ? zone = init(allocator) : zone);
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+        if (!isActive()) {
+            init(allocator, returnedZone -> {
+                callback.accept(Optional.of(zone = returnedZone));
+            });
+        } else {
+            callback.accept(Optional.of(zone));
+        }
     }
 
     @Override

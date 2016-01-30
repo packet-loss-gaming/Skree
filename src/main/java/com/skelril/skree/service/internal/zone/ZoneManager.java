@@ -10,9 +10,10 @@ import com.skelril.skree.service.ZoneService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface ZoneManager<T extends Zone> {
-    Optional<T> discover(ZoneSpaceAllocator allocator);
+    void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback);
     Collection<T> getActiveZones();
 
     default Optional<Integer> getMaxGroupSize() {

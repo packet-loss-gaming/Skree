@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.group.goldrush;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implements Runnable {
     private Queue<ZoneRegion> freeRegions = new LinkedList<>();
@@ -42,19 +44,23 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
     }
 
     @Override
-    public Optional<GoldRushInstance> discover(ZoneSpaceAllocator allocator) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+        Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
+            ZoneRegion region = clause.getKey();
+
+            GoldRushInstance instance = new GoldRushInstance(region);
+            instance.init();
+            zones.add(instance);
+
+            callback.accept(Optional.of(instance));
+        };
+
         ZoneRegion region = freeRegions.poll();
         if (region == null) {
-            Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
-            region = result.getKey();
+            allocator.regionFor(getSystemName(), consumer);
+        } else {
+            consumer.accept(new Clause<>(region, ZoneRegion.State.RELOADED));
         }
-
-        GoldRushInstance instance = new GoldRushInstance(region);
-        instance.init();
-
-        zones.add(instance);
-
-        return Optional.of(instance);
     }
 
     @Override

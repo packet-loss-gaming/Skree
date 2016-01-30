@@ -8,14 +8,12 @@ package com.skelril.skree.service.internal.zone.allocator;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.registry.WorldData;
@@ -27,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
@@ -52,28 +51,30 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
         }
     }
 
-    protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName) {
+    protected void pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
 
-        Operation operation;
         try {
             ClipboardHolder holder = getHolder(managerName, world.getWorldEditWorld().getWorldData());
             Region clipReg = holder.getClipboard().getRegion();
             holder.getClipboard().setOrigin(clipReg.getMinimumPoint());
-            operation = holder
+            Operation operation = holder
                     .createPaste(transaction, transaction.getWorld().getWorldData())
                     .to(new Vector(origin.getX(), origin.getY(), origin.getZ()))
                     .build();
 
-            Operations.completeLegacy(operation);
 
-            Vector dimensions = holder.getClipboard().getDimensions();
-
-            return new ZoneRegion(world.getSpongeWorld(), origin, new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ()));
-        } catch (IOException | MaxChangedBlocksException e) {
+            RunManager.runOperation(operation, () -> {
+                Vector dimensions = holder.getClipboard().getDimensions();
+                callback.accept(new ZoneRegion(
+                        world.getSpongeWorld(),
+                        origin,
+                        new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
+                ));
+            });
+        } catch (IOException e) {
             e.printStackTrace();
-            transaction.undo(transaction);
+            callback.accept(null);
         }
-        return null;
     }
 }

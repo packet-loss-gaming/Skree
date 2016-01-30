@@ -19,6 +19,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneBossDetail;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
+import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -35,6 +36,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
 
@@ -168,19 +170,23 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
     }
 
     @Override
-    public Optional<ShnugglesPrimeInstance> discover(ZoneSpaceAllocator allocator) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+        Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
+            ZoneRegion region = clause.getKey();
+
+            ShnugglesPrimeInstance instance = new ShnugglesPrimeInstance(region, bossManager);
+            instance.init();
+            zones.add(instance);
+
+            callback.accept(Optional.of(instance));
+        };
+
         ZoneRegion region = freeRegions.poll();
         if (region == null) {
-            Clause<ZoneRegion, ZoneRegion.State> result = allocator.regionFor(getSystemName());
-            region = result.getKey();
+            allocator.regionFor(getSystemName(), consumer);
+        } else {
+            consumer.accept(new Clause<>(region, ZoneRegion.State.RELOADED));
         }
-
-        ShnugglesPrimeInstance instance = new ShnugglesPrimeInstance(region, bossManager);
-        instance.init();
-
-        zones.add(instance);
-
-        return Optional.of(instance);
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 public class ChainPlacementAllocator extends WESchematicAllocator {
 
@@ -31,13 +32,13 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
     }
 
     @Override
-    public Clause<ZoneRegion, ZoneRegion.State> regionFor(String managerName) {
-        ZoneRegion region = pasteAt(worldResolver, new Vector3i(lastEnd.getX(), 0, lastEnd.getY()), managerName);
+    public void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
+        pasteAt(worldResolver, new Vector3i(lastEnd.getX(), 0, lastEnd.getY()), managerName, region -> {
+            // Update last end
+            Vector3i lastMax = region.getMaximumPoint();
+            lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
 
-        // Update last end
-        Vector3i lastMax = region.getMaximumPoint();
-        lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
-
-        return new Clause<>(region, ZoneRegion.State.NEW);
+            callBack.accept(new Clause<>(region, ZoneRegion.State.NEW));
+        });
     }
 }

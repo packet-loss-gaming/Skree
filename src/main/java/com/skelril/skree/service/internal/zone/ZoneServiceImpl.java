@@ -12,6 +12,7 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ZoneServiceImpl implements ZoneService {
@@ -49,15 +50,23 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public Clause<Player, ZoneStatus> requestZone(String managerName, Player player) {
+    public void requestZone(String managerName, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
         ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
-        return manager != null ? requestZone(manager, player) : null;
+        if (manager != null) {
+            requestZone(manager, player, callback);
+        } else {
+            callback.accept(Optional.empty());
+        }
     }
 
     @Override
-    public Collection<Clause<Player, ZoneStatus>> requestZone(String managerName, Collection<Player> players) {
+    public void requestZone(String managerName, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
         ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
-        return manager != null ? requestZone(manager, players) : null;
+        if (manager != null) {
+            requestZone(manager, players, callback);
+        } else {
+            callback.accept(Optional.empty());
+        }
     }
 
     private Clause<Player, ZoneStatus> addToZone(Zone zone, Player player) {
@@ -69,6 +78,7 @@ public class ZoneServiceImpl implements ZoneService {
         if (result.getValue() == ZoneStatus.ADDED) {
             previousZone.put(player, new WeakReference<>(zone));
         }
+
         return result;
     }
 
@@ -79,26 +89,37 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public <T extends Zone> Clause<Player, ZoneStatus> requestZone(ZoneManager<T> manager, Player player) {
-        Optional<T> optZone = manager.discover(pickAllocator());
-        if (optZone.isPresent()) {
-            return addToZone(optZone.get(), player);
-        }
-        return new Clause<>(player, ZoneStatus.CREATION_FAILED);
+    public <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
+        manager.discover(pickAllocator(), optZone -> {
+            if (optZone.isPresent()) {
+                callback.accept(Optional.of(addToZone(optZone.get(), player)));
+                return;
+            }
+            callback.accept(Optional.of(new Clause<>(player, ZoneStatus.CREATION_FAILED)));
+        });
     }
 
     @Override
-    public <T extends Zone> Collection<Clause<Player, ZoneStatus>> requestZone(ZoneManager<T> manager, Collection<Player> players) {
+    public <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
         Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
         if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
-            return players.stream().map(player -> new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList());
+            callback.accept(Optional.of(players.stream().map(player ->
+                    new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList()
+            )));
+            return;
         }
 
-        Optional<T> optZone = manager.discover(pickAllocator());
-        if (optZone.isPresent()) {
-            return players.stream().map(player -> addToZone(optZone.get(), player)).collect(Collectors.toList());
-        }
-        return players.stream().map(player -> new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList());
+        manager.discover(pickAllocator(), optZone -> {
+            if (optZone.isPresent()) {
+                callback.accept(Optional.of(players.stream().map(player ->
+                        addToZone(optZone.get(), player)).collect(Collectors.toList()
+                )));
+                return;
+            }
+            callback.accept(Optional.of(players.stream().map(player ->
+                    new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList()
+            )));
+        });
     }
 
     private Clause<Zone, ZoneStatus> getPreviousZone(Player player) {
