@@ -396,11 +396,17 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     @Override
     public void run() {
-        if (!isLocked()) return; // If it's not locked things haven't been started yet
-        if (System.currentTimeMillis() - startTime > TimeUnit.MINUTES.toMillis(7) || isEmpty()) {
+        if (isEmpty()) {
             expire();
             return;
         }
+
+        if (!isLocked()) return; // If it's not locked things haven't been started yet
+        if (System.currentTimeMillis() - startTime > TimeUnit.MINUTES.toMillis(7)) {
+            expire();
+            return;
+        }
+
         if (checkKeys()) {
             unlockKeys();
             if (getContained(Player.class).stream().filter(p -> keyRoom.contains(p.getLocation().getPosition())).count() > 0) {
