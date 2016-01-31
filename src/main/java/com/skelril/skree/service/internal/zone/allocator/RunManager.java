@@ -11,8 +11,6 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.Optional;
 
@@ -57,7 +55,6 @@ public class RunManager {
 
         @Override
         public boolean shouldContinue() {
-            MessageChannel.TO_ALL.send(Text.of("Performing check: ", System.currentTimeMillis() - curStart));
             return System.currentTimeMillis() - curStart < 500;
         }
     }
