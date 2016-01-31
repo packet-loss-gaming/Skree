@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
@@ -51,35 +52,58 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
         }
     }
 
+    private HashMap<String, HashRef> hashRefMap = new HashMap<>();
+
     protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
 
-        try {
-            ClipboardHolder holder = getHolder(managerName, world.getWorldEditWorld().getWorldData());
-            Region clipReg = holder.getClipboard().getRegion();
-            holder.getClipboard().setOrigin(clipReg.getMinimumPoint());
-            Operation operation = holder
-                    .createPaste(transaction, transaction.getWorld().getWorldData())
-                    .to(new Vector(origin.getX(), origin.getY(), origin.getZ()))
-                    .build();
+        hashRefMap.computeIfAbsent(managerName, (a) -> {
+            HashRef ref = new HashRef();
+            try {
+                ref.holder = getHolder(managerName, world.getWorldEditWorld().getWorldData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return ref;
+        });
 
-            Vector dimensions = holder.getClipboard().getDimensions();
-
-            ZoneRegion region = new ZoneRegion(
-                    world.getSpongeWorld(),
-                    origin,
-                    new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
-            );
-
-            RunManager.runOperation(operation, () -> {
-                callback.accept(region);
-            });
-
-            return region;
-        } catch (IOException e) {
-            e.printStackTrace();
+        HashRef ref = hashRefMap.get(managerName);
+        if (ref == null) {
             callback.accept(null);
+            return null;
         }
-        return null;
+
+        ++ref.refCount;
+
+        Clipboard clipboard = ref.holder.getClipboard();
+        Region clipReg = clipboard.getRegion();
+        clipboard.setOrigin(clipReg.getMinimumPoint());
+
+        Operation operation = ref.holder
+                .createPaste(transaction, transaction.getWorld().getWorldData())
+                .to(new Vector(origin.getX(), origin.getY(), origin.getZ()))
+                .build();
+
+        Vector dimensions = clipboard.getDimensions();
+
+        ZoneRegion region = new ZoneRegion(
+                world.getSpongeWorld(),
+                origin,
+                new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
+        );
+
+        RunManager.runOperation(operation, () -> {
+            callback.accept(region);
+            if (--ref.refCount == 0) {
+                hashRefMap.remove(managerName);
+            }
+        });
+
+        return region;
+    }
+
+    private class HashRef {
+        public ClipboardHolder holder;
+        public int refCount = 0;
     }
 }
