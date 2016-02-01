@@ -31,8 +31,7 @@ public class ShnugglesPrimeListener {
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
         event.getEntities().removeAll(event.filterEntities(e -> {
-            Optional<ShnugglesPrimeInstance> optInst = manager.getApplicableZone(e);
-            if (optInst.isPresent()) {
+            if (manager.getApplicableZone(e).isPresent()) {
                 if  (e instanceof Giant) {
                     return true;
                 }
@@ -43,7 +42,7 @@ public class ShnugglesPrimeListener {
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent event) {
+    public void onBlockChange(ChangeBlockEvent event) {
         Optional<Player> player = event.getCause().first(Player.class);
         if (player.isPresent() && manager.getApplicableZone(player.get()).isPresent()) {
             event.setCancelled(true);
