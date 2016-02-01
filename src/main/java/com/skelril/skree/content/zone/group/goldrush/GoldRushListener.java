@@ -44,6 +44,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+import static com.skelril.skree.content.market.MarketImplUtil.format;
 
 public class GoldRushListener {
 
@@ -285,7 +286,7 @@ public class GoldRushListener {
                         new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.of(inst));
                     }
 
-                    player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", value, " coffers."));
+                    player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));
                 }
             }
         }

@@ -51,11 +51,14 @@ import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static com.skelril.skree.content.registry.item.generic.PrizeBox.makePrizeBox;
 
 public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     // Constants
     private static final BigDecimal MIN_START_RISK = new BigDecimal(100);
+    private static final BigDecimal GRAB_RATIO = new BigDecimal(.2);
+    private static final BigDecimal PIVOTAL_VALUE = new BigDecimal(5500);
 
     private ZoneBoundingBox startingRoom, keyRoom, flashMemoryRoom;
 
@@ -351,7 +354,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 continue;
             }
 
-            lootSplit = lootSplit.add(origCharge.multiply(new BigDecimal(.3)));
+            lootSplit = lootSplit.add(origCharge.multiply(new BigDecimal(.05)));
         }
         lootSplit = lootSplit.divide(new BigDecimal(cPlayers.size()), RoundingMode.HALF_DOWN);
 
@@ -467,20 +470,27 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             }
         }
 
+        BigDecimal totalGrabbed = goldValue.add(itemValue);
+        BigDecimal grabRatio = GRAB_RATIO.multiply(totalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN));
+        BigDecimal splitBoost = fee.multiply(grabRatio);
+        BigDecimal personalLootSplit = lootSplit.add(splitBoost);
+
         tf(player).inventoryContainer.detectAndSendChanges();
 
-        // TODO formatting
         player.sendMessage(Text.of(TextColors.YELLOW, "You obtain: "));
-        player.sendMessage(Text.of(TextColors.YELLOW, " - Bail: ", fee, "."));
-        player.sendMessage(Text.of(TextColors.YELLOW, " - Split: ", lootSplit, "."));
-        if (goldValue.compareTo(BigDecimal.ZERO) > 0) {
-            player.sendMessage(Text.of(TextColors.YELLOW, " - Gold: ", goldValue.intValue(), "."));
+        player.sendMessage(Text.of(TextColors.YELLOW, " - Bail: ", format(fee)));
+        player.sendMessage(Text.of(TextColors.YELLOW, " - Split: ", format(lootSplit), ", Boost: ", format(grabRatio.multiply(new BigDecimal(100))), "%"));
+        if (grabRatio.compareTo(BigDecimal.ZERO) > 0) {
+            player.sendMessage(Text.of(TextColors.YELLOW, "   - Boost value: ", format(splitBoost)));
         }
-        if (itemValue.compareTo(BigDecimal.ZERO) > 0) {
-            player.sendMessage(Text.of(TextColors.YELLOW, " - Items: ", itemValue.intValue(), "."));
+        if (goldValue.compareTo(BigDecimal.ZERO) > 0) {
+            player.sendMessage(Text.of(TextColors.YELLOW, " - Gold: ", format(goldValue)));
         }
 
-        MarketImplUtil.setBalanceTo(player, fee.add(lootSplit).add(goldValue).add(MarketImplUtil.getMoney(player)), Cause.of(this));
+        BigDecimal total = fee.add(personalLootSplit).add(goldValue);
+        player.sendMessage(Text.of(TextColors.YELLOW, "Total: ", format(total)));
+
+        MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.of(this));
         remove(player);
         return true;
     }
@@ -571,6 +581,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
                     drainAll(); // Force away all water
                     floodBlockType = BlockTypes.FLOWING_LAVA;
+                    lootSplit = lootSplit.multiply(new BigDecimal(1.1));
                     break;
                 }
             }
@@ -581,7 +592,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
                         drainAll(); // Force away all water
                         floodBlockType = BlockTypes.FLOWING_LAVA;
-                        lootSplit = lootSplit.multiply(new BigDecimal(1.1));
                         break;
                     }
                 }
