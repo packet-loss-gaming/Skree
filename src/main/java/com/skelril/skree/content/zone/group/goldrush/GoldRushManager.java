@@ -15,6 +15,8 @@ import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,8 +37,12 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
     }
 
     public Optional<GoldRushInstance> getApplicableZone(Entity entity) {
+        return getApplicableZone(entity.getLocation());
+    }
+
+    public Optional<GoldRushInstance> getApplicableZone(Location<World> loc) {
         for (GoldRushInstance inst : zones) {
-            if (inst.contains(entity)) {
+            if (inst.contains(loc)) {
                 return Optional.of(inst);
             }
         }

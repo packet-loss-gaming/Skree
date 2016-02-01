@@ -456,11 +456,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 ItemStack opened = optOpened.get();
                 Optional<BigDecimal> value = service.getPrice(opened);
                 if (value.isPresent()) {
-                    if (opened.getItem() == ItemTypes.GOLD_NUGGET || opened.getItem() == ItemTypes.GOLD_INGOT || opened.getItem() == BlockTypes.GOLD_BLOCK) {
+                    if (opened.getItem() == ItemTypes.GOLD_NUGGET || opened.getItem() == ItemTypes.GOLD_INGOT || opened.getItem() == BlockTypes.GOLD_BLOCK.getItem().get()) {
                         goldValue = goldValue.add(value.get());
                         itemStacks[i] = null;
                     } else {
                         itemValue = itemValue.add(value.get());
+                        itemStacks[i] = tf(opened);
                     }
                 }
             }

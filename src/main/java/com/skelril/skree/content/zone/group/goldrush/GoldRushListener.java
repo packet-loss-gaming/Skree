@@ -23,11 +23,13 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -52,6 +54,40 @@ public class GoldRushListener {
     }
 
     private Map<String, Player> tileEntityClaimMap = new WeakHashMap<>();
+
+    @Listener
+    public void onEntitySpawn(SpawnEntityEvent event) {
+        event.getEntities().removeAll(event.filterEntities(e -> {
+            if (manager.getApplicableZone(e).isPresent()) {
+                return !(e instanceof Agent);
+            }
+            return true;
+        }));
+    }
+
+    /*@Listener
+    public void onBlockChange(ChangeBlockEvent event) {
+        Optional<Player> player = event.getCause().first(Player.class);
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
+                BlockType originalType = transaction.getOriginal().getState().getType();
+                BlockType finalType = transaction.getFinal().getState().getType();
+                if (player.isPresent()) {
+                    if (originalType == BlockTypes.AIR || finalType == BlockTypes.AIR) {
+                        transaction.setValid(false);
+                    }
+                } else {
+                    if (originalType == BlockTypes.LEVER &&
+                            (finalType == BlockTypes.FLOWING_LAVA
+                                    || finalType == BlockTypes.LAVA
+                                    || finalType == BlockTypes.FLOWING_WATER
+                                    || finalType == BlockTypes.WATER)) {
+                        transaction.setValid(false);
+                    }
+                }
+            }
+        }
+    }*/
 
     @Listener
     public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
