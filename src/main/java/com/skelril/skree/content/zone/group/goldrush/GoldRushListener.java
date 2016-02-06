@@ -6,7 +6,6 @@
 
 package com.skelril.skree.content.zone.group.goldrush;
 
-import com.google.common.collect.Lists;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
@@ -20,14 +19,19 @@ import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.LockCode;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
@@ -66,29 +70,48 @@ public class GoldRushListener {
         }));
     }
 
-    /*@Listener
+    private BlockType[] allowedChanges = {
+            BlockTypes.REDSTONE_LAMP, BlockTypes.LIT_REDSTONE_LAMP,
+            BlockTypes.FLOWING_LAVA, BlockTypes.LAVA,
+            BlockTypes.FLOWING_WATER, BlockTypes.WATER
+    };
+
+    private boolean isAllowedChange(BlockType originalType, BlockType finalType) {
+        if (originalType != finalType) {
+            for (int i = 0; i < allowedChanges.length - 1; ++i) {
+                if (originalType == allowedChanges[i] && finalType == allowedChanges[i + 1]) {
+                    return true;
+                }
+                if (originalType == allowedChanges[i + 1] && finalType == allowedChanges[i]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Listener
     public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> player = event.getCause().first(Player.class);
+        Optional<Player> player = event.getCause().get(NamedCause.SOURCE, Player.class);
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
                 BlockType originalType = transaction.getOriginal().getState().getType();
                 BlockType finalType = transaction.getFinal().getState().getType();
                 if (player.isPresent()) {
-                    if (originalType == BlockTypes.AIR || finalType == BlockTypes.AIR) {
-                        transaction.setValid(false);
+                    if (!isAllowedChange(originalType, finalType)) {
+                        event.setCancelled(true);
+                        break;
                     }
                 } else {
-                    if (originalType == BlockTypes.LEVER &&
-                            (finalType == BlockTypes.FLOWING_LAVA
-                                    || finalType == BlockTypes.LAVA
-                                    || finalType == BlockTypes.FLOWING_WATER
-                                    || finalType == BlockTypes.WATER)) {
-                        transaction.setValid(false);
+                    if (originalType == BlockTypes.LEVER && finalType != BlockTypes.LEVER) {
+                        event.setCancelled(true);
+                        break;
                     }
                 }
             }
         }
-    }*/
+    }
 
     @Listener
     public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
@@ -108,7 +131,21 @@ public class GoldRushListener {
         BlockState state = snapshot.getState();
         Location<World> targetBlock = snapshot.getLocation().get();
         if (state.getType() == BlockTypes.WALL_SIGN && inst.getLockLocations().contains(targetBlock)) {
-            List<Text> texts = snapshot.get(Keys.SIGN_LINES).orElse(Lists.newArrayList(Text.EMPTY, Text.EMPTY, Text.EMPTY, Text.EMPTY));
+            Optional<TileEntity> optTileEnt = snapshot.getLocation().get().getTileEntity();
+
+            if (!optTileEnt.isPresent()) {
+                return;
+            }
+
+            TileEntity tileEntity = optTileEnt.get();
+
+            Optional<List<Text>> optTexts = tileEntity.get(Keys.SIGN_LINES);
+
+            if (!optTexts.isPresent()) {
+                return;
+            }
+
+            List<Text> texts = optTexts.get();
 
             boolean unlocked = false;
 
@@ -162,15 +199,9 @@ public class GoldRushListener {
             if (unlocked) {
                 tf(player).inventoryContainer.detectAndSendChanges();
 
-                snapshot.with(
-                        Keys.SIGN_LINES,
-                        Lists.newArrayList(
-                                texts.get(0),
-                                texts.get(1),
-                                Text.of("Locked"),
-                                Text.of("- Unlocked -")
-                        )
-                ).orElse(snapshot).restore(true, false);
+                texts.set(2, Text.of("Locked"));
+                texts.set(3, Text.of("- Unlocked -"));
+                tileEntity.offer(Keys.SIGN_LINES, texts);
             }
         } else if (state.getType() == BlockTypes.LEVER) {
             Task.builder().execute(() -> {

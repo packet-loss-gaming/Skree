@@ -30,6 +30,7 @@ import com.skelril.skree.system.zone.ZoneSystem;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.logging.Logger;
 
@@ -43,6 +44,13 @@ public class SkreePlugin {
     protected NitroModuleManager manager = new NitroModuleManager();
 
     private static SkreePlugin inst;
+
+    @Inject
+    private PluginContainer container;
+
+    public static PluginContainer container() {
+        return inst.container;
+    }
 
     public static SkreePlugin inst() {
         return inst;

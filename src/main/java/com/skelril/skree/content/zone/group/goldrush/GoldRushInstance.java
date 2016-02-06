@@ -7,7 +7,6 @@
 package com.skelril.skree.content.zone.group.goldrush;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
@@ -24,12 +23,11 @@ import com.skelril.skree.service.internal.zone.ZoneBoundingBox;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.trait.BooleanTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -151,17 +149,25 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             BlockState block = getRegion().getExtent().getBlock(pt);
             if (block.getType() == BlockTypes.CHEST) {
                 // TODO Sponge port
-                TileEntity tileEntity = tf(getRegion().getExtent()).getTileEntity(tf(pt));
-                if (tileEntity instanceof IInventory) {
-                    ((IInventory) tileEntity).clear();
+                Optional<TileEntity> optTileEnt = getRegion().getExtent().getTileEntity(pt);
+                if (optTileEnt.isPresent() && optTileEnt.get() instanceof IInventory) {
+                    ((IInventory) optTileEnt.get()).clear();
                 }
 
                 chestBlocks.add(new Location<>(getRegion().getExtent(), pt));
             } else if (block.getType() == BlockTypes.WALL_SIGN) {
-                BlockSnapshot blockSnapshot = getRegion().getExtent().createSnapshot(pt);
-                blockSnapshot.with(Keys.SIGN_LINES, Lists.newArrayList(
-                        Text.EMPTY, Text.EMPTY, Text.of("- Locked -"), Text.of("Unlocked")
-                )).orElse(blockSnapshot).restore(true, false);
+                Optional<org.spongepowered.api.block.tileentity.TileEntity> optTileEnt = getRegion().getExtent().getTileEntity(pt);
+                if (!optTileEnt.isPresent()) {
+                    return;
+                }
+
+                Optional<List<Text>> optTexts = optTileEnt.get().get(Keys.SIGN_LINES);
+                if (optTexts.isPresent()) {
+                    List<Text> text = optTexts.get();
+                    text.set(2, Text.of("- Locked -"));
+                    text.set(3, Text.of("Unlocked"));
+                    optTileEnt.get().offer(Keys.SIGN_LINES, text);
+                }
 
                 locks.add(new Location<>(getRegion().getExtent(), pt));
             }
@@ -171,9 +177,9 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     private void populateChest() {
         for (Location<World> chest : chestBlocks) {
             // TODO Sponge port
-            TileEntity tileEntity = tf(getRegion().getExtent()).getTileEntity(tf(chest.getBlockPosition()));
-            if (tileEntity instanceof IInventory) {
-                IInventory inventory = ((IInventory) tileEntity);
+            Optional<TileEntity> optTileEnt = chest.getTileEntity();
+            if (optTileEnt.isPresent() && optTileEnt.get() instanceof IInventory) {
+                IInventory inventory = ((IInventory) optTileEnt.get());
                 int iterationTimes = Probability.getRandom(27);
                 for (int i = iterationTimes; i > 0; --i) {
                     ItemStack targetStack;
@@ -202,10 +208,9 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
 
         for (int i = 0; i < 2; i++) {
-            Vector3i targetPos = Probability.pickOneOf(chestBlocks).getBlockPosition();
-            TileEntity tileEntity = tf(getRegion().getExtent()).getTileEntity(tf(targetPos));
-            if (tileEntity instanceof IInventory) {
-                IInventory inventory = ((IInventory) tileEntity);
+            Optional<TileEntity> optTileEnt = Probability.pickOneOf(chestBlocks).getTileEntity();
+            if (optTileEnt.isPresent() && optTileEnt.get() instanceof IInventory) {
+                IInventory inventory = ((IInventory) optTileEnt.get());
                 inventory.setInventorySlotContents(
                         Probability.getRandom(inventory.getSizeInventory()) - 1,
                         new net.minecraft.item.ItemStack(CustomItemTypes.GOLD_RUSH_KEY, 1, i)
@@ -217,17 +222,23 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     private void resetChestAndKeys() {
         for (Location<World> chest : chestBlocks) {
             // TODO Sponge port
-            TileEntity tileEntity = tf(getRegion().getExtent()).getTileEntity(tf(chest.getBlockPosition()));
-            if (tileEntity instanceof IInventory) {
-                ((IInventory) tileEntity).clear();
+            Optional<TileEntity> optTileEnt = chest.getTileEntity();
+            if (optTileEnt.isPresent() && optTileEnt.get() instanceof IInventory) {
+                ((IInventory) optTileEnt.get()).clear();
             }
         }
 
-        for (Location lock : locks) {
-            BlockSnapshot snapshot = lock.createSnapshot();
-            snapshot.with(Keys.SIGN_LINES, Lists.newArrayList(
-                    Text.EMPTY, Text.EMPTY, Text.of("- Locked -"), Text.of("Unlocked")
-            )).orElse(snapshot).restore(true, false);
+        for (Location<World> lock : locks) {
+            Optional<TileEntity> optTileEnt = lock.getTileEntity();
+            if (optTileEnt.isPresent()) {
+                Optional<List<Text>> optTexts = optTileEnt.get().get(Keys.SIGN_LINES);
+                if (optTexts.isPresent()) {
+                    List<Text> text = optTexts.get();
+                    text.set(2, Text.of("- Locked -"));
+                    text.set(3, Text.of("Unlocked"));
+                    optTileEnt.get().offer(Keys.SIGN_LINES, text);
+                }
+            }
         }
 
         keysTriggered = false;
@@ -252,7 +263,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     BlockState state = getRegion().getExtent().getBlock(x, y, z);
                     if (state.getType() == BlockTypes.LEVER) {
                         Location<World> loc = new Location<>(getRegion().getExtent(), x, y, z);
-                        loc.setBlock(state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state));
+                        loc.getExtent().setBlock(
+                                loc.getBlockPosition(),
+                                state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
+                                true,
+                                Cause.of(SkreePlugin.container())
+                        );
 
                         leverBlocks.put(loc, !Probability.getChance(3));
                         for (int i = y; i < maxY; i++) {
@@ -295,7 +311,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         for (Location<World> entry : leverBlocks.keySet()) {
             BlockState state = entry.getBlock();
 
-            entry.setBlock(state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state));
+            entry.getExtent().setBlock(
+                    entry.getBlockPosition(),
+                    state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
+                    true,
+                    Cause.of(SkreePlugin.container())
+            );
 
             leverBlocks.put(entry, !Probability.getChance(3));
         }
@@ -505,12 +526,19 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
 
         for (Location<World> lock : locks) {
-            Optional<List<Text>> optSignText = lock.createSnapshot().get(Keys.SIGN_LINES);
-            if (!optSignText.isPresent()) {
+            Optional<org.spongepowered.api.block.tileentity.TileEntity> optTileEnt = lock.getTileEntity();
+            if (!optTileEnt.isPresent()) {
                 return false;
             }
 
-            if (optSignText.get().get(2).toPlain().startsWith("-")) return false;
+            org.spongepowered.api.block.tileentity.TileEntity tileEnt = optTileEnt.get();
+            Optional<List<Text>> optTexts = tileEnt.get(Keys.SIGN_LINES);
+
+            if (!optTexts.isPresent()) {
+                return false;
+            }
+
+            if (optTexts.get().get(2).toPlain().startsWith("-")) return false;
         }
         return true;
     }
@@ -521,14 +549,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void setDoor(ZoneBoundingBox door, BlockType type) {
-        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type));
+        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, true, Cause.of(SkreePlugin.container())));
     }
 
     private void drainAll() {
         flashMemoryRoom.forAll((pt) -> {
             BlockType type = getRegion().getExtent().getBlockType(pt);
             if (type == BlockTypes.WATER || type == BlockTypes.FLOWING_WATER || type == BlockTypes.LAVA || type == BlockTypes.FLOWING_LAVA) {
-                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR);
+                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.of(SkreePlugin.container()));
             }
         });
     }
@@ -538,20 +566,35 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         if (System.currentTimeMillis() - lastLeverSwitch >= TimeUnit.SECONDS.toMillis(14)) {
             for (Location<World> entry : leverBlocks.keySet()) {
                 BlockState state = entry.getBlock();
-                entry.setBlock(state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state));
+                entry.getExtent().setBlock(
+                        entry.getBlockPosition(),
+                        state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
+                        true,
+                        Cause.of(SkreePlugin.container())
+                );
                 leverBlocks.put(entry, !Probability.getChance(3));
             }
             lastLeverSwitch = System.currentTimeMillis();
             randomizeLevers();
         } else if (System.currentTimeMillis() - lastLeverSwitch == 0) {
             for (Location<World> entry : leverBlocks.keySet()) {
-                entry.add(0, -2, 0).setBlockType(BlockTypes.STONEBRICK);
+                Location<World> targLoc = entry.add(0, -2, 0);
+                targLoc.getExtent().setBlockType(
+                        targLoc.getBlockPosition(),
+                        BlockTypes.STONEBRICK,
+                        true,
+                        Cause.of(SkreePlugin.container())
+                );
             }
 
             Task.builder().execute(() -> {
                 for (Map.Entry<Location<World>, Boolean> entry : leverBlocks.entrySet()) {
-                    entry.getKey().add(0, -2, 0).setBlockType(
-                            entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK
+                    Location<World> targLoc = entry.getKey().add(0, -2, 0);
+                    targLoc.getExtent().setBlockType(
+                            targLoc.getBlockPosition(),
+                            entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK,
+                            true,
+                            Cause.of(SkreePlugin.container())
                     );
                 }
 
@@ -559,7 +602,13 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             }).delayTicks(15).submit(SkreePlugin.inst());
         } else {
             for (Location entry : leverBlocks.keySet()) {
-                entry.add(0, -2, 0).setBlockType(BlockTypes.STONEBRICK);
+                Location<World> targLoc = entry.add(0, -2, 0);
+                targLoc.getExtent().setBlockType(
+                        targLoc.getBlockPosition(),
+                        BlockTypes.STONEBRICK,
+                        true,
+                        Cause.of(SkreePlugin.container())
+                );
             }
         }
     }
@@ -605,7 +654,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         if (System.currentTimeMillis() - startTime >= TimeUnit.SECONDS.toMillis((3 * 60) / playerMod)) {
 
             for (Location<World> floodBlock : floodBlocks) {
-                floodBlock.setBlockType(floodBlockType);
+                floodBlock.getExtent().setBlockType(
+                        floodBlock.getBlockPosition(),
+                        floodBlockType,
+                        true,
+                        Cause.of(SkreePlugin.container())
+                );
             }
 
             if (System.currentTimeMillis() - lastFlood >= TimeUnit.SECONDS.toMillis(30 / Math.max(1, playerMod))) {
@@ -625,7 +679,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                         for (int y = minY; y <= maxY; y++) {
                             BlockType type = getRegion().getExtent().getBlockType(x, y, z);
                             if (type == BlockTypes.AIR) {
-                                getRegion().getExtent().setBlockType(x, y, z, floodBlockType);
+                                getRegion().getExtent().setBlockType(
+                                        x, y, z,
+                                        floodBlockType,
+                                        true,
+                                        Cause.of(SkreePlugin.container())
+                                );
                                 break;
                             }
                         }
