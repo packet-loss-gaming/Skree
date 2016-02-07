@@ -35,7 +35,6 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -150,7 +149,7 @@ public class GoldRushListener {
             boolean unlocked = false;
 
             String text = texts.get(1).toPlain().toLowerCase();
-            /*net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+            net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
             for (int i = 0; i < itemStacks.length; ++i) {
                 ItemStack is = itemStacks[i];
 
@@ -173,9 +172,9 @@ public class GoldRushListener {
                 unlocked = true;
                 itemStacks[i] = null;
                 break;
-            }*/
+            }
 
-            for (Inventory inv : player.getInventory().query((ItemType) CustomItemTypes.GOLD_RUSH_KEY)) {
+            /*for (Inventory inv : player.getInventory().query((ItemType) CustomItemTypes.GOLD_RUSH_KEY)) {
                 Optional<org.spongepowered.api.item.inventory.ItemStack> optStack = inv.peek();
                 if (optStack.isPresent()) {
                     if (text.contains("blue")) {
@@ -194,7 +193,7 @@ public class GoldRushListener {
                     inv.poll();
                     break;
                 }
-            }
+            }*/
 
             if (unlocked) {
                 tf(player).inventoryContainer.detectAndSendChanges();
