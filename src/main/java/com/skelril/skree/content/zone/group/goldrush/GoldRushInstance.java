@@ -73,6 +73,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     // Session
     private long startTime = -1;
+    private BigDecimal multiplier = BigDecimal.ONE;
     private BigDecimal lootSplit = BigDecimal.ZERO;
     private int playerMod = 0;
     private BlockType floodBlockType = BlockTypes.WATER;
@@ -368,6 +369,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void calculateLootSplit() {
+        multiplier = BigDecimal.ONE;
+
         Collection<Player> cPlayers = getContained(Player.class);
         for (Player next : cPlayers) {
             BigDecimal origCharge = cofferRisk.get(next.getUniqueId());
@@ -380,13 +383,13 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         lootSplit = lootSplit.divide(new BigDecimal(cPlayers.size()), RoundingMode.HALF_DOWN);
 
         playerMod = Math.max(1, cPlayers.size() / 2);
-        if (Probability.getChance(35)) lootSplit = lootSplit.multiply(BigDecimal.TEN);
-        if (Probability.getChance(15)) lootSplit = lootSplit.multiply(new BigDecimal(2));
+        if (Probability.getChance(35)) multiplier = multiplier.multiply(BigDecimal.TEN);
+        if (Probability.getChance(15)) multiplier = multiplier.multiply(new BigDecimal(2));
 
         Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
             ModifierService service = optService.get();
-            if (service.isActive(Modifiers.QUAD_GOLD_RUSH)) lootSplit = lootSplit.multiply(new BigDecimal(4));
+            if (service.isActive(Modifiers.QUAD_GOLD_RUSH)) multiplier = multiplier.multiply(new BigDecimal(4));
         }
     }
 
@@ -493,8 +496,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
         BigDecimal totalGrabbed = goldValue.add(itemValue);
         BigDecimal grabRatio = GRAB_RATIO.multiply(totalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN));
-        BigDecimal splitBoost = fee.multiply(grabRatio);
-        BigDecimal personalLootSplit = lootSplit.add(splitBoost);
+        BigDecimal splitBoost = multiplier.multiply(fee.multiply(grabRatio));
+        BigDecimal personalLootSplit = multiplier.multiply(lootSplit).add(splitBoost);
 
         tf(player).inventoryContainer.detectAndSendChanges();
 
@@ -630,7 +633,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
                     drainAll(); // Force away all water
                     floodBlockType = BlockTypes.FLOWING_LAVA;
-                    lootSplit = lootSplit.multiply(new BigDecimal(1.1));
+                    multiplier = multiplier.multiply(new BigDecimal(1.1));
                     break;
                 }
             }
