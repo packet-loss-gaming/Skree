@@ -93,10 +93,12 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
         );
 
         RunManager.runOperation(operation, () -> {
-            callback.accept(region);
-            if (--ref.refCount == 0) {
-                hashRefMap.remove(managerName);
-            }
+            RunManager.runOperation(transaction.commit(), () -> {
+                callback.accept(region);
+                if (--ref.refCount == 0) {
+                    hashRefMap.remove(managerName);
+                }
+            });
         });
 
         return region;
