@@ -56,6 +56,7 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
     protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
+        transaction.enableQueue();
 
         hashRefMap.computeIfAbsent(managerName, (a) -> {
             HashRef ref = new HashRef();
