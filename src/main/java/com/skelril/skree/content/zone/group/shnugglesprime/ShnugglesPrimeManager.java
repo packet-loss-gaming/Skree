@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
@@ -116,18 +117,20 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
 
                 if (Probability.getChance(3) && event.getCause().first(Player.class).isPresent()) {
                     int affected = 0;
-                    /* TODO Convert to Sponge
-                    for (Entity e : boss.getNearbyEntities(8, 8, 8)) {
-                        if (e.isValid() && e instanceof Player && inst.contains(e)) {
-                            e.setVelocity(new Vector(
-                                    Math.random() * 3 - 1.5,
-                                    Math.random() * 4,
-                                    Math.random() * 3 - 1.5
-                            ));
-                            e.setFireTicks(ChanceUtil.getRandom(20 * 60));
-                            affected++;
+                    if (boss.getTargetEntity().isPresent()) {
+                        for (Entity e : boss.getTargetEntity().get().getNearbyEntities(8)) {
+                            if (e.isLoaded() && !e.isRemoved() && e instanceof Player && inst.contains(e)) {
+                                e.setVelocity(new Vector3d(
+                                        Math.random() * 3 - 1.5,
+                                        Math.random() * 4,
+                                        Math.random() * 3 - 1.5
+                                ));
+                                e.offer(Keys.FIRE_TICKS, Probability.getRandom(20 * 60));
+                                ++affected;
+                            }
                         }
-                    }*/
+                    }
+
                     if (affected > 0) {
                         inst.sendAttackBroadcast("Feel my power!", AttackSeverity.INFO);
                     }
