@@ -10,9 +10,14 @@ import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.ZoneRegion.State;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface ZoneSpaceAllocator {
     float getLoad();
 
-    void regionFor(String managerName, Consumer<Clause<ZoneRegion, State>> callBack);
+    default void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
+        regionFor(managerName, zoneRegionStateClause -> new Clause<>(zoneRegionStateClause.getKey(), State.NEW), zoneRegionStateClause -> callBack);
+    }
+
+    <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Function<T, Consumer<T>> callBack);
 }

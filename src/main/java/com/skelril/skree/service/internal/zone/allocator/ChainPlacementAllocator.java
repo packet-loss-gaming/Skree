@@ -14,6 +14,7 @@ import com.skelril.skree.service.internal.zone.ZoneRegion;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ChainPlacementAllocator extends WESchematicAllocator {
 
@@ -32,12 +33,13 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
     }
 
     @Override
-    public void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
+    public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Function<T, Consumer<T>> callBack) {
         ZoneRegion incompleteRegion = pasteAt(
                 worldResolver,
                 new Vector3i(lastEnd.getX(), 0, lastEnd.getY()),
                 managerName,
-                region -> callBack.accept(new Clause<>(region, ZoneRegion.State.NEW))
+                initMapper,
+                callBack::apply
         );
 
         Vector3i lastMax = incompleteRegion.getMaximumPoint();

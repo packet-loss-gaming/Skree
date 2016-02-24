@@ -17,6 +17,7 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.registry.WorldData;
+import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
@@ -54,7 +56,7 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
     private HashMap<String, HashRef> hashRefMap = new HashMap<>();
 
-    protected ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Consumer<ZoneRegion> callback) {
+    protected <T> ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
         transaction.enableQueue();
 
@@ -93,9 +95,11 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
                 new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
         );
 
+        T returnVal = initMapper.apply(new Clause<>(region, ZoneRegion.State.NEW_LOADING));
+
         RunManager.runOperation(operation, () -> {
             RunManager.runOperation(transaction.commit(), () -> {
-                callback.accept(region);
+                callback.accept(returnVal);
                 if (--ref.refCount == 0) {
                     hashRefMap.remove(managerName);
                 }

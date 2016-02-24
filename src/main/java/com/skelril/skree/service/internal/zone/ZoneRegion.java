@@ -25,6 +25,7 @@ public class ZoneRegion extends ZoneBoundingBox {
 
     public enum State {
         NEW,
+        NEW_LOADING,
         RELOADED
     }
 }
