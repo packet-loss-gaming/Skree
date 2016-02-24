@@ -34,6 +34,9 @@ public class CombinedText {
                     outputStream[i] = result;
                     continue;
                 }
+            } else if (obj instanceof GeneratedText) {
+                outputStream[i] = ((GeneratedText) obj).getText();
+                continue;
             }
             outputStream[i] = obj;
         }
