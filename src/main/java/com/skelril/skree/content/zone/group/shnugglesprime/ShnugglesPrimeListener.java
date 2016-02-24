@@ -11,6 +11,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -35,7 +36,7 @@ public class ShnugglesPrimeListener {
                 if  (e instanceof Giant) {
                     return true;
                 }
-                return e instanceof Zombie && ((EntityZombie) e).isChild();
+                return e instanceof Projectile || (e instanceof Zombie && ((EntityZombie) e).isChild());
             }
             return true;
         }));
