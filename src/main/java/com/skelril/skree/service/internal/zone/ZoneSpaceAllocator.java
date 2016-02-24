@@ -16,8 +16,8 @@ public interface ZoneSpaceAllocator {
     float getLoad();
 
     default void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
-        regionFor(managerName, zoneRegionStateClause -> new Clause<>(zoneRegionStateClause.getKey(), State.NEW), zoneRegionStateClause -> callBack);
+        regionFor(managerName, zoneRegionStateClause -> new Clause<>(zoneRegionStateClause.getKey(), State.NEW), callBack);
     }
 
-    <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Function<T, Consumer<T>> callBack);
+    <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack);
 }

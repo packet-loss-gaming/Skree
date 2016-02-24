@@ -56,7 +56,6 @@ import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
 public class PatientXManager extends GroupZoneManager<PatientXInstance> implements Runnable {
 
-    private Queue<ZoneRegion> freeRegions = new LinkedList<>();
     private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager = new BossManager<>();
     private final PatientXConfig config = new PatientXConfig();
 
@@ -225,22 +224,22 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
 
     @Override
     public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
-        Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
+        Function<Clause<ZoneRegion, ZoneRegion.State>, PatientXInstance> initFunc = clause -> {
             ZoneRegion region = clause.getKey();
 
             PatientXInstance instance = new PatientXInstance(region, config, bossManager);
-            instance.init();
             zones.add(instance);
+
+            return instance;
+        };
+
+        Consumer<PatientXInstance> postInitFunc = instance -> {
+            instance.init();
 
             callback.accept(Optional.of(instance));
         };
 
-        ZoneRegion region = freeRegions.poll();
-        if (region == null) {
-            allocator.regionFor(getSystemName(), consumer);
-        } else {
-            consumer.accept(new Clause<>(region, ZoneRegion.State.RELOADED));
-        }
+        allocator.regionFor(getSystemName(), initFunc, postInitFunc);
     }
 
     @Override
@@ -258,7 +257,6 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                 continue;
             }
             next.forceEnd();
-            freeRegions.add(next.getRegion());
             it.remove();
         }
     }

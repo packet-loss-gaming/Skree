@@ -33,13 +33,13 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
     }
 
     @Override
-    public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Function<T, Consumer<T>> callBack) {
+    public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack) {
         ZoneRegion incompleteRegion = pasteAt(
                 worldResolver,
                 new Vector3i(lastEnd.getX(), 0, lastEnd.getY()),
                 managerName,
                 initMapper,
-                callBack::apply
+                callBack::accept
         );
 
         Vector3i lastMax = incompleteRegion.getMaximumPoint();
