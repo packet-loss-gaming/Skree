@@ -30,14 +30,14 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -159,21 +159,24 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
 
             return Optional.of((Instruction<DamagedCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>) (damagedCondition, zombieZoneBossDetailBoss) -> {
                 PatientXInstance inst = boss.getDetail().getZone();
-                Optional<Entity> optEnt = event.getCause().get(NamedCause.SOURCE, Entity.class);
-                if (optEnt.isPresent()) {
-                    Entity attacker = optEnt.get();
-                    if (attacker instanceof Player) {
-                        Optional<ItemStack> optHeld = ((Player) attacker).getItemInHand();
-                        if (optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.BLAZE_ROD) {
-                            inst.modifyDifficulty(2);
-                        }
-                    } else if (attacker instanceof Projectile) {
-                        List<Snowball> snowBalls = sendExplosiveSnowballs(inst.getBoss().get().getLocation(), inst);
-                        for (Snowball snowball : snowBalls) {
-                            snowball.setCreator(inst.getMetaOwnerID());
+                if (optDamageSource.isPresent() && optDamageSource.get() instanceof EntityDamageSource) {
+                    if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                        Location<World> curPos = inst.getBoss().get().getLocation();
+                        Task.builder().execute(() -> {
+                            sendExplosiveSnowballs(curPos, inst);
+                        }).delayTicks(1).submit(SkreePlugin.inst());
+                    } else {
+                        Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
+
+                        if (srcEntity instanceof Player) {
+                            Optional<ItemStack> optHeld = ((Player) srcEntity).getItemInHand();
+                            if (optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.BLAZE_ROD) {
+                                inst.modifyDifficulty(2);
+                            }
                         }
                     }
                 }
+
                 inst.modifyDifficulty(.5);
                 inst.teleportRandom(true);
 

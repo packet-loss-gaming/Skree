@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraftforge.event.world.ExplosionEvent;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
@@ -19,6 +20,7 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.action.CollideEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
@@ -62,6 +64,11 @@ public class PatientXListener {
 
     @Listener
     public void onBlockChange(ChangeBlockEvent event) {
+        // Depends on SpongeForge#550
+        if (event instanceof ExplosionEvent.Detonate) {
+            return;
+        }
+
         Optional<PluginContainer> optPluginContainer = event.getCause().first(PluginContainer.class);
         if (!optPluginContainer.isPresent()) {
             for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
@@ -99,18 +106,17 @@ public class PatientXListener {
     }
 
     @Listener
-    public void onProjectileHit(DestructEntityEvent event) {
-        Entity entity = event.getTargetEntity();
+    public void onProjectileHit(CollideEvent.Impact event) {
+        Entity entity = event.getCause().first(Entity.class).get();
         Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
         if (!optInst.isPresent()) return;
 
-        PatientXInstance inst = optInst.get();
-
         if (entity instanceof Snowball) {
-            if (inst.getMetaOwnerID().equals(entity.getCreator().orElse(null))) {
+            if (!event.getCause().containsType(Player.class)) {
                 entity.getLocation().getExtent().triggerExplosion(
                         Explosion.builder()
                                 .radius(3)
+                                .world(entity.getLocation().getExtent())
                                 .origin(entity.getLocation().getPosition())
                                 .shouldBreakBlocks(false)
                                 .build()

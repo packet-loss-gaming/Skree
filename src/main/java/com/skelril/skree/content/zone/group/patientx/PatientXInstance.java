@@ -62,8 +62,6 @@ import static com.skelril.skree.service.internal.zone.PlayerClassifier.SPECTATOR
 
 public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
-    private final UUID FAKE_OWNER = UUID.randomUUID();
-
     private final PatientXConfig config;
     private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager;
 
@@ -128,10 +126,6 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
     public ZoneBoundingBox getDropRegion() {
         return drops;
-    }
-
-    public UUID getMetaOwnerID() {
-        return FAKE_OWNER;
     }
 
     @Override
@@ -278,7 +272,6 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     Probability.getRangedRandom(.25, 1),
                                     0
                             ));
-                            melivn.setCreator(FAKE_OWNER);
                             getRegion().getExtent().spawnEntity(melivn, Cause.of(this));
                         }
                     }
@@ -470,7 +463,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     random.nextDouble() * .8 + .2,
                                     random.nextDouble() * 1 - .5
                             ));
-                            explosive.offer(Keys.FUSE_DURATION, 20 * 2);
+                            explosive.offer(Keys.FUSE_DURATION, 20 * 4);
                             getRegion().getExtent().spawnEntity(explosive, Cause.of(this));
                         }
                     }
