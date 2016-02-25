@@ -105,7 +105,7 @@ public class RegionServiceImpl implements RegionService {
         return Optional.ofNullable(selectionMap.get(player));
     }
 
-    private Map<Player, Long> recentNoticies = new WeakHashMap<>();
+    private Map<Player, Long> recentNotices = new WeakHashMap<>();
 
     private boolean check(Player player, Location<World> loc) {
         RegionPoint point = new RegionPoint(loc.getPosition());
@@ -117,10 +117,10 @@ public class RegionServiceImpl implements RegionService {
                 RegionReference ref = optRef.get();
                 if (ref.isEditPrevented(player, point)) {
                     if (player.hasPermission("skree.admin.edit.regions")) {
-                        long lastNotice = recentNoticies.getOrDefault(player, 0L);
+                        long lastNotice = recentNotices.getOrDefault(player, 0L);
                         if (System.currentTimeMillis() - lastNotice > TimeUnit.SECONDS.toMillis(15)) {
                             player.sendMessage(Text.of(TextColors.RED, "Warning! You have been given an admin exemption to perform this action!"));
-                            recentNoticies.put(player, System.currentTimeMillis());
+                            recentNotices.put(player, System.currentTimeMillis());
                         }
                         return false;
                     }
