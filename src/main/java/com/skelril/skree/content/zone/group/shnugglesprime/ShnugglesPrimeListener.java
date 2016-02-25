@@ -8,10 +8,10 @@ package com.skelril.skree.content.zone.group.shnugglesprime;
 
 import net.minecraft.entity.monster.EntityZombie;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -29,17 +29,26 @@ public class ShnugglesPrimeListener {
         this.manager = manager;
     }
 
+
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        event.getEntities().removeAll(event.filterEntities(e -> {
-            if (manager.getApplicableZone(e).isPresent()) {
-                if  (e instanceof Giant) {
-                    return true;
+        for (Entity entity : event.getEntities()) {
+            Optional<ShnugglesPrimeInstance> optInst = manager.getApplicableZone(entity);
+            if (optInst.isPresent()) {
+
+                if (entity instanceof Giant) {
+                    continue;
                 }
-                return e instanceof Projectile || (e instanceof Zombie && ((EntityZombie) e).isChild());
+
+                if  (entity instanceof Agent) {
+                    if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
+                        continue;
+                    }
+                    event.setCancelled(true);
+                    break;
+                }
             }
-            return true;
-        }));
+        }
     }
 
     @Listener

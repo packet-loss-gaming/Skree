@@ -61,12 +61,12 @@ public class GoldRushListener {
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        event.getEntities().removeAll(event.filterEntities(e -> {
-            if (manager.getApplicableZone(e).isPresent()) {
-                return !(e instanceof Agent);
+        for (Entity entity : event.getEntities()) {
+            if (manager.getApplicableZone(entity).isPresent() && entity instanceof Agent) {
+                event.setCancelled(true);
+                break;
             }
-            return true;
-        }));
+        }
     }
 
     private BlockType[] allowedChanges = {

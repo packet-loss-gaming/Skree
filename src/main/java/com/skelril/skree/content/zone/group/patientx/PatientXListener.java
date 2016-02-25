@@ -14,9 +14,9 @@ import net.minecraftforge.event.world.ExplosionEvent;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -49,17 +49,25 @@ public class PatientXListener {
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
-        event.getEntities().removeAll(event.filterEntities(e -> {
-            Optional<PatientXInstance> optInst = manager.getApplicableZone(e);
+        for (Entity entity : event.getEntities()) {
+            Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
             if (optInst.isPresent()) {
                 PatientXInstance inst = optInst.get();
-                if  (e instanceof Zombie) {
-                    return ((EntityZombie) e).isChild() || (!inst.isBossSpawned() && !inst.hasBossBeenKilled());
+                if  (entity instanceof Agent) {
+                    if (entity instanceof Zombie) {
+                        if (!((EntityZombie) entity).isChild()) {
+                            if (inst.isBossSpawned() || inst.hasBossBeenKilled()) {
+                                event.setCancelled(true);
+                                break;
+                            }
+                        }
+                        continue;
+                    }
+                    event.setCancelled(true);
+                    break;
                 }
-                return e instanceof Projectile;
             }
-            return true;
-        }));
+        }
     }
 
     @Listener
