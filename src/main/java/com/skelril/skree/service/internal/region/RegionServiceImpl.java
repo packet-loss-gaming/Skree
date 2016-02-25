@@ -24,6 +24,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class RegionServiceImpl implements RegionService {
     private Map<World, RegionManager> managerMap = new HashMap<>();
@@ -104,6 +105,8 @@ public class RegionServiceImpl implements RegionService {
         return Optional.ofNullable(selectionMap.get(player));
     }
 
+    private Map<Player, Long> recentNoticies = new WeakHashMap<>();
+
     private boolean check(Player player, Location<World> loc) {
         RegionPoint point = new RegionPoint(loc.getPosition());
         RegionManager manager = managerMap.get(loc.getExtent());
@@ -113,6 +116,14 @@ public class RegionServiceImpl implements RegionService {
             if (optRef.isPresent()) {
                 RegionReference ref = optRef.get();
                 if (ref.isEditPrevented(player, point)) {
+                    if (player.hasPermission("skree.admin.edit.regions")) {
+                        long lastNotice = recentNoticies.getOrDefault(player, 0L);
+                        if (System.currentTimeMillis() - lastNotice > TimeUnit.SECONDS.toMillis(15)) {
+                            player.sendMessage(Text.of(TextColors.RED, "Warning! You have been given an admin exemption to perform this action!"));
+                            recentNoticies.put(player, System.currentTimeMillis());
+                        }
+                        return false;
+                    }
                     return true;
                 }
             }

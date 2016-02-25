@@ -12,6 +12,8 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -20,12 +22,14 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -68,6 +72,30 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             if (entity instanceof Monster) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    private boolean check(Player player, Location<World> loc) {
+        return isApplicable(loc) && !player.hasPermission("skree.admin.edit.main");
+    }
+
+    @Listener
+    public void onBlockChange(ChangeBlockEvent event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+            Player player = optPlayer.get();
+            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+                Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+                if (optLoc.isPresent()) {
+                    if (check(player, optLoc.get())) {
+                        event.setCancelled(true);
+                        if (event.getCause().root().equals(player)) {
+                            player.sendMessage(Text.of(TextColors.RED, "You can't change blocks here!"));
+                        }
+                        return;
+                    }
+                }
             }
         }
     }
