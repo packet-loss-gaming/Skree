@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
@@ -48,6 +49,14 @@ public class ShnugglesPrimeListener {
                     break;
                 }
             }
+        }
+    }
+
+    @Listener
+    public void onItemSpawn(DropItemEvent.Destruct event) {
+        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
+        if (optPlayer.isPresent() && manager.getApplicableZone(optPlayer.get()).isPresent()) {
+            event.setCancelled(true);
         }
     }
 
