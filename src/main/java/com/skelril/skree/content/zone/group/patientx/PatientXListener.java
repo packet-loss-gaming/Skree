@@ -180,38 +180,38 @@ public class PatientXListener {
                     PatientXInstance.AttackSeverity.INFO
             );
 
-            String deathMessage;
-            switch (inst.getLastAttack().orElse(null)) {
-                case MUSICAL_CHAIRS:
-                    deathMessage = " tripped over a chair";
-                    break;
-                case SMASHING_HIT:
-                    deathMessage = " got smashed";
-                    break;
-                case BOMB_PERFORMANCE:
-                    deathMessage = " bombed a performance evaluation";
-                    break;
-                case WITHER_AWAY:
-                    deathMessage = " became a fellow candle";
-                    break;
-                case SPLASH_TO_IT:
-                    deathMessage = " loves toxic fluids";
-                    break;
-                case COLD_FEET:
-                    deathMessage = " lost a foot or two";
-                    break;
-                case IM_JUST_BATTY:
-                    deathMessage = " went batty";
-                    break;
-                case RADIATION:
-                    deathMessage = " was irradiated";
-                    break;
-                case SNOWBALL_FIGHT:
-                    deathMessage = " took a snowball to the face";
-                    break;
-                default:
-                    deathMessage = " froze";
-                    break;
+            Optional<PatientXAttack> optAttack = inst.getLastAttack();
+            String deathMessage = " froze";
+            if (optAttack.isPresent()) {
+                switch (optAttack.get()) {
+                    case MUSICAL_CHAIRS:
+                        deathMessage = " tripped over a chair";
+                        break;
+                    case SMASHING_HIT:
+                        deathMessage = " got smashed";
+                        break;
+                    case BOMB_PERFORMANCE:
+                        deathMessage = " bombed a performance evaluation";
+                        break;
+                    case WITHER_AWAY:
+                        deathMessage = " became a fellow candle";
+                        break;
+                    case SPLASH_TO_IT:
+                        deathMessage = " loves toxic fluids";
+                        break;
+                    case COLD_FEET:
+                        deathMessage = " lost a foot or two";
+                        break;
+                    case IM_JUST_BATTY:
+                        deathMessage = " went batty";
+                        break;
+                    case RADIATION:
+                        deathMessage = " was irradiated";
+                        break;
+                    case SNOWBALL_FIGHT:
+                        deathMessage = " took a snowball to the face";
+                        break;
+                }
             }
 
             event.setMessage(Text.of(player.getName(), deathMessage));

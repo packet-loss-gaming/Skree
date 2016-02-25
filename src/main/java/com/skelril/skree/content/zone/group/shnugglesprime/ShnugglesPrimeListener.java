@@ -88,40 +88,41 @@ public class ShnugglesPrimeListener {
         if (optInst.isPresent()) {
             ShnugglesPrimeInstance inst = optInst.get();
             inst.healBoss(.33F);
-            // TODO inventory protection & removal of drops here
-            String deathMessage;
-            switch (inst.getLastAttack().orElse(null)) {
-                case WRATH:
-                    deathMessage = " discovered how tasty the boss's wrath is";
-                    break;
-                case CORRUPTION:
-                    deathMessage = " embraced the boss's corruption";
-                    break;
-                case BLINDNESS:
-                    deathMessage = " did not die seeing";
-                    break;
-                case TANGO_TIME:
-                    deathMessage = " found out the boss has two left feet";
-                    break;
-                case EVERLASTING:
-                    deathMessage = " needs not pester invincible overlords";
-                    break;
-                case FIRE:
-                    deathMessage = " died to a terrible inferno";
-                    break;
-                case BASK_IN_MY_GLORY:
-                    deathMessage = " basked in the glory of the boss";
-                    break;
-                case DARK_POTIONS:
-                    deathMessage = " was the victim of dark magic";
-                    break;
-                case MINION_LEECH:
-                    deathMessage = " has been consumed by the boss";
-                    break;
-                default:
-                    deathMessage = " died while attempting to slay the boss";
-                    break;
+
+            Optional<ShnugglesPrimeAttack> optAttack = inst.getLastAttack();
+            String deathMessage = " died while attempting to slay Shnuggles Prime";
+            if (optAttack.isPresent()) {
+                switch (optAttack.get()) {
+                    case WRATH:
+                        deathMessage = " discovered how tasty the boss's wrath is";
+                        break;
+                    case CORRUPTION:
+                        deathMessage = " embraced the boss's corruption";
+                        break;
+                    case BLINDNESS:
+                        deathMessage = " did not die seeing";
+                        break;
+                    case TANGO_TIME:
+                        deathMessage = " found out the boss has two left feet";
+                        break;
+                    case EVERLASTING:
+                        deathMessage = " needs not pester invincible overlords";
+                        break;
+                    case FIRE:
+                        deathMessage = " died to a terrible inferno";
+                        break;
+                    case BASK_IN_MY_GLORY:
+                        deathMessage = " basked in the glory of the boss";
+                        break;
+                    case DARK_POTIONS:
+                        deathMessage = " was the victim of dark magic";
+                        break;
+                    case MINION_LEECH:
+                        deathMessage = " has been consumed by the boss";
+                        break;
+                }
             }
+            
             event.setMessage(Text.of(player.getName(), deathMessage));
         }
     }
