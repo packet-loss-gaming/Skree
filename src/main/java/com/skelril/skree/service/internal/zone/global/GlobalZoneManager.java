@@ -35,6 +35,10 @@ public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T
         }
     }
 
+    public Optional<T> getActiveZone() {
+        return Optional.ofNullable(zone);
+    }
+
     @Override
     public Collection<T> getActiveZones() {
         return isActive() ? Collections.singletonList(zone) : Collections.emptyList();

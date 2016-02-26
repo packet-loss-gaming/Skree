@@ -14,6 +14,10 @@ public class WorldResolver {
     private World spongeWorld;
     private com.sk89q.worldedit.world.World worldEditWorld;
 
+    public WorldResolver(World world) {
+        this(world, WorldEdit.getInstance());
+    }
+
     public WorldResolver(World world, WorldEdit worldEdit) {
         this.spongeWorld = world;
         for (com.sk89q.worldedit.world.World aWorld : worldEdit.getServer().getWorlds()) {

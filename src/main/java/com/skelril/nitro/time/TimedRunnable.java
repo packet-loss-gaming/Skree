@@ -45,6 +45,10 @@ public class TimedRunnable<T extends IntegratedRunnable> implements Runnable {
         this.task = task;
     }
 
+    public Task getTask() {
+        return task;
+    }
+
     @Override
     public void run() {
         if (times > 0) {
