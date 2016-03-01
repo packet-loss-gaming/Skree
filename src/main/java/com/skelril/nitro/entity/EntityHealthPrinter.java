@@ -12,15 +12,15 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class EntityHealthPrinter {
-    private Optional<CombinedText> living;
-    private Optional<CombinedText> dead;
+    private CombinedText living;
+    private CombinedText dead;
 
-    public EntityHealthPrinter(Optional<CombinedText> living, Optional<CombinedText> dead) {
+    public EntityHealthPrinter(@Nullable CombinedText living, @Nullable CombinedText dead) {
         this.living = living;
         this.dead = dead;
     }
@@ -52,18 +52,18 @@ public class EntityHealthPrinter {
     }
 
     private void printLiving(MessageChannel channel, Living entity) {
-        if (!living.isPresent()) {
+        if (living == null) {
             return;
         }
 
-        channel.send(format(living.get(), entity));
+        channel.send(format(living, entity));
     }
 
     private void printDead(MessageChannel channel, Living entity) {
-        if (!dead.isPresent()) {
+        if (dead == null) {
             return;
         }
 
-        channel.send(format(dead.get(), entity));
+        channel.send(format(dead, entity));
     }
 }

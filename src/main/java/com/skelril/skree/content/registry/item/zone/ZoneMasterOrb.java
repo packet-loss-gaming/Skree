@@ -114,7 +114,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
     @Listener
     public void onLogout(ClientConnectionEvent.Disconnect event) {
-        purgeZoneItems(event.getTargetEntity(), Optional.empty());
+        purgeZoneItems(event.getTargetEntity(), null);
     }
 
     @Listener
@@ -156,7 +156,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             }
 
                             for (int i = group.size() - 1; i >= 0; --i) {
-                                purgeZoneItems(group.get(i), Optional.of(itemStack));
+                                purgeZoneItems(group.get(i), itemStack);
                                 createLightningStrike(group.get(i));
                             }
 

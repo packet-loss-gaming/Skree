@@ -17,6 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,17 +25,17 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class ZoneItemUtil {
 
-    public static void purgeZoneItems(Player player, Optional<ItemStack> activating) {
+    public static void purgeZoneItems(Player player, @Nullable ItemStack activating) {
         purgeZoneItems(tf(player), activating);
     }
 
-    public static void purgeZoneItems(EntityPlayer player, Optional<ItemStack> activating) {
+    public static void purgeZoneItems(EntityPlayer player, @Nullable ItemStack activating) {
         ItemStack[] itemStacks = player.inventory.mainInventory;
         for (int i = 0; i < itemStacks.length; ++i) {
             if (isZoneItem(itemStacks[i])) {
                 if (isZoneMasterItem(itemStacks[i])) {
                     // Check to see if this is the activating item, if so remove it
-                    if (activating.isPresent() && hasSameZoneID(itemStacks[i], activating.get())) {
+                    if (activating != null && hasSameZoneID(itemStacks[i], activating)) {
                         itemStacks[i] = null;
                         continue;
                     }
@@ -49,7 +50,7 @@ public class ZoneItemUtil {
 
                     continue;
                 } else if (isZoneSlaveItem(itemStacks[i])) {
-                    if (!activating.isPresent() || !hasSameZoneID(itemStacks[i], activating.get())) {
+                    if (activating == null || !hasSameZoneID(itemStacks[i], activating)) {
                         notifyGroupOwner(itemStacks[i], (Player) player, false);
                     }
                 }

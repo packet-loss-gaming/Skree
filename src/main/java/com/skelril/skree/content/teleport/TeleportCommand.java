@@ -37,7 +37,7 @@ public class TeleportCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<Vector3d> dest = args.<Vector3d>getOne("dest");
+        Optional<Vector3d> dest = args.getOne("dest");
         Vector3d rotation = new Vector3d(0, 0, 0);
         World targetExtent = target.getWorld();
         String destStr;

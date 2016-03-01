@@ -19,7 +19,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,21 +27,21 @@ public class ShutdownServiceImpl implements ShutdownService {
     private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
     private static final Text DEFAULT_REASON = Text.of("Shutting down!");
 
-    private Optional<TimedRunnable> runnable = Optional.empty();
+    private TimedRunnable runnable = null;
     private String reopenDate;
 
 
     @Override
     public int getSecondsTilOffline() {
         if (isShuttingDown()) {
-            return runnable.get().getTimes();
+            return runnable.getTimes();
         }
         return -1;
     }
 
     @Override
     public boolean isShuttingDown() {
-        return runnable.isPresent();
+        return runnable != null;
     }
 
     @Override
@@ -70,8 +69,8 @@ public class ShutdownServiceImpl implements ShutdownService {
 
         reopenDate = PrettyText.dateFromCur(System.currentTimeMillis() + downtime + (seconds * 1000));
 
-        if (runnable.isPresent()) {
-            runnable.get().setTimes(seconds);
+        if (runnable != null) {
+            runnable.setTimes(seconds);
             return true;
         }
 
@@ -100,7 +99,7 @@ public class ShutdownServiceImpl implements ShutdownService {
         Task task = Task.builder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
         runnable.setTask(task);
 
-        this.runnable = Optional.of(runnable);
+        this.runnable = runnable;
         return true;
     }
 
@@ -116,9 +115,9 @@ public class ShutdownServiceImpl implements ShutdownService {
 
     @Override
     public void cancelShutdown() {
-        if (runnable.isPresent()) {
-            runnable.get().cancel();
-            runnable = Optional.empty();
+        if (runnable != null) {
+            runnable.cancel();
+            runnable = null;
         }
     }
 }

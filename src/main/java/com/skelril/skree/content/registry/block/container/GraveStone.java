@@ -110,7 +110,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return ((EnumFacing) state.getValue(FACING_PROP)).getIndex();
+        return state.getValue(FACING_PROP).getIndex();
     }
 
     @Override

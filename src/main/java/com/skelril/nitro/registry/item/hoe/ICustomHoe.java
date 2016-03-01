@@ -66,7 +66,7 @@ public interface ICustomHoe extends ICustomItem, DegradableItem {
                 }
 
                 if (block == Blocks.dirt) {
-                    switch (SwitchDirtType.field_179590_a[((BlockDirt.DirtType) iblockstate.getValue(BlockDirt.VARIANT)).ordinal()]) {
+                    switch (SwitchDirtType.field_179590_a[iblockstate.getValue(BlockDirt.VARIANT).ordinal()]) {
                         case 1:
                             return this.__modifyBlock(stack, playerIn, worldIn, pos, Blocks.farmland.getDefaultState());
                         case 2:

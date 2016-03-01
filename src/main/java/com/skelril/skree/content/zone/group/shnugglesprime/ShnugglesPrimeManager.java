@@ -144,7 +144,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                 if (dmgSource instanceof EntityDamageSource) {
                     Entity attacker = ((EntityDamageSource) dmgSource).getSource();
                     if (Probability.getChance(3) && attacker instanceof Player) {
-                        inst.spawnMinions(Optional.of((Player) attacker));
+                        inst.spawnMinions((Player) attacker);
                     }
                     if (attacker instanceof Player) {
                     /* TODO Convert to Sponge

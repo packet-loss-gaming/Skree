@@ -59,6 +59,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -71,9 +72,9 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager;
 
-    private Optional<Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>>> boss = Optional.empty();
+    private Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = null;
     private long lastAttackTime = 0;
-    private Optional<ShnugglesPrimeAttack> lastAttack = Optional.empty();
+    private ShnugglesPrimeAttack lastAttack = null;
     private long lastDeath = 0;
     private boolean damageHeals = false;
     private Set<ShnugglesPrimeAttack> activeAttacks = EnumSet.noneOf(ShnugglesPrimeAttack.class);
@@ -144,7 +145,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
             Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
-            this.boss = Optional.of(boss);
+            this.boss = boss;
         }
     }
 
@@ -156,11 +157,11 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 e.remove();
             }
         });
-        return boss.isPresent() && boss.get().getTargetEntity().isPresent();
+        return boss != null && boss.getTargetEntity().isPresent();
     }
 
     public Optional<Giant> getBoss() {
-        return isBossSpawned() ? boss.get().getTargetEntity() : Optional.empty();
+        return isBossSpawned() ? boss.getTargetEntity() : Optional.empty();
     }
 
     public void healBoss(float percentHealth) {
@@ -174,7 +175,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     public void bossDied() {
         activeAttacks.clear();
         lastDeath = System.currentTimeMillis();
-        boss = Optional.empty();
+        boss = null;
     }
 
     public boolean damageHeals() {
@@ -182,7 +183,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public Optional<ShnugglesPrimeAttack> getLastAttack() {
-        return lastAttackTime + 13000 > System.currentTimeMillis() ? lastAttack : Optional.empty();
+        return lastAttackTime + 13000 > System.currentTimeMillis() ? Optional.ofNullable(lastAttack) : Optional.empty();
     }
 
     public boolean isActiveAttack(ShnugglesPrimeAttack attack) {
@@ -190,16 +191,14 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            Optional.of(
-                    CombinedText.of(
-                            TextColors.DARK_AQUA,
-                            "Boss Health: ",
-                            new PlaceHolderText("health int"),
-                            " / ",
-                            new PlaceHolderText("max health int")
-                    )
+            CombinedText.of(
+                    TextColors.DARK_AQUA,
+                    "Boss Health: ",
+                    new PlaceHolderText("health int"),
+                    " / ",
+                    new PlaceHolderText("max health int")
             ),
-            Optional.empty()
+            null
     );
 
     public void printBossHealth() {
@@ -217,7 +216,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         weapon.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(new ItemEnchantment(Enchantments.SHARPNESS, 2)));
     }
 
-    public void spawnMinions(Optional<Living> target) {
+    public void spawnMinions(@Nullable Living target) {
         int spawnCount = Math.max(3, getPlayers(PARTICIPANT).size());
         for (Location<World> spawnPt : spawnPts) {
             if (Probability.getChance(11)) {
@@ -230,8 +229,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         zombie.setItemInHand(weapon.copy());
                         getRegion().getExtent().spawnEntity(zombie, Cause.of(this));
 
-                        if (target.isPresent()) {
-                            zombie.setTarget(target.get());
+                        if (target != null) {
+                            zombie.setTarget(target);
                         }
                     }
                 }
@@ -523,7 +522,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
         }
         lastAttackTime = System.currentTimeMillis();
-        lastAttack = Optional.of(attackCase);
+        lastAttack = attackCase;
     }
 
     @Override

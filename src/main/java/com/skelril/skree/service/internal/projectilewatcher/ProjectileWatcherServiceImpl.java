@@ -17,12 +17,15 @@ import org.spongepowered.api.event.entity.projectile.LaunchProjectileEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, Runnable {
 
     private Map<UUID, TrackedProjectileInfo> watched = new HashMap<>();
-    private Optional<Task> task = Optional.empty();
+    private Task task = null;
 
     @Listener
     public void onProjectileLaunch(LaunchProjectileEvent event) {
@@ -38,8 +41,8 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
     @Override
     public void track(Projectile projectile, Cause cause) {
         watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, cause));
-        if (!task.isPresent()) {
-            task = Optional.of(Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(SkreePlugin.inst()));
+        if (task == null) {
+            task = Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(SkreePlugin.inst());
         }
     }
 
@@ -60,9 +63,9 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
                 it.remove();
             }
         }
-        if (!updated && task.isPresent()) {
-            task.get().cancel();
-            task = Optional.empty();
+        if (!updated && task != null) {
+            task.cancel();
+            task = null;
         }
     }
 }

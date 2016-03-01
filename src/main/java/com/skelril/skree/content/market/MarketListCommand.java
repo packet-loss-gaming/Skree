@@ -54,7 +54,7 @@ public class MarketListCommand implements CommandExecutor {
         MarketService service = optService.get();
         PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
 
-        Optional<String> optFilter = args.<String>getOne("name");
+        Optional<String> optFilter = args.getOne("name");
         String filter = optFilter.isPresent() ? optFilter.get() : "";
 
         if (!filter.matches(MarketService.VALID_ALIAS_REGEX)) {

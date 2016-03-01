@@ -73,7 +73,7 @@ public class MarketSellCommand implements CommandExecutor {
             }
         }
 
-        Clause<BigDecimal, List<Integer>> changes = MarketImplUtil.getChanges(player, service, mode, filter);
+        Clause<BigDecimal, List<Integer>> changes = MarketImplUtil.getChanges(player, service, mode, filter.orElse(null));
 
         if (changes.getValue().isEmpty()) {
             src.sendMessage(Text.of(TextColors.DARK_RED, "No sellable items found" + (filter.isPresent() ? " that matched the filter" : "") + "!"));

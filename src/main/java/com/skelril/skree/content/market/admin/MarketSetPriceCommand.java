@@ -46,7 +46,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<String> optAlias = args.<String>getOne("alias");
+        Optional<String> optAlias = args.getOne("alias");
         Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand() : Optional.empty();
         if (optAlias.isPresent()) {
             String alias = optAlias.get();

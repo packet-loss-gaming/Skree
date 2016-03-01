@@ -67,9 +67,9 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
     private ZoneBoundingBox ice, drops;
 
-    private Optional<Boss<Zombie, ZoneBossDetail<PatientXInstance>>> boss = Optional.empty();
+    private Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = null;
     private long attackDur = 0;
-    private Optional<PatientXAttack> lastAttack = Optional.empty();
+    private PatientXAttack lastAttack = null;
     private long lastUltimateAttack = 0;
     private long lastDeath = 0;
     private long lastTelep = 0;
@@ -163,7 +163,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 e.remove();
             }
         });
-        return boss.isPresent();
+        return boss != null && boss.getTargetEntity().isPresent();
     }
 
     public boolean hasBossBeenKilled() {
@@ -180,7 +180,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
             Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = new Boss<>((Zombie) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
-            this.boss = Optional.of(boss);
+            this.boss = boss;
         }
     }
 
@@ -190,7 +190,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     public Optional<Zombie> getBoss() {
-        return isBossSpawned() ? boss.get().getTargetEntity() : Optional.empty();
+        return isBossSpawned() ? boss.getTargetEntity() : Optional.empty();
     }
 
     public void healBoss(float percentHealth) {
@@ -203,7 +203,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
     public void bossDied() {
         lastDeath = System.currentTimeMillis();
-        boss = Optional.empty();
+        boss = null;
     }
 
     protected void teleportRandom() {
@@ -314,30 +314,28 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     public Optional<PatientXAttack> getLastAttack() {
-        return System.currentTimeMillis() > attackDur ? Optional.empty() : lastAttack;
+        return System.currentTimeMillis() > attackDur ? Optional.empty() : Optional.ofNullable(lastAttack);
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            Optional.of(
-                    CombinedText.of(
-                            TextColors.DARK_AQUA,
-                            "Boss Health: ",
-                            new PlaceHolderText("health int"),
-                            " / ",
-                            new PlaceHolderText("max health int"),
-                            " Enragement: ",
-                            new GeneratedText() {
-                                @Override
-                                public Text getText() {
-                                    double maxDiff = config.maxDifficulty - config.minDifficulty;
-                                    double curDiff = difficulty - config.minDifficulty;
-                                    return Text.of((int) Math.round((curDiff / maxDiff) * 100));
-                                }
-                            },
-                            "%"
-                    )
+            CombinedText.of(
+                    TextColors.DARK_AQUA,
+                    "Boss Health: ",
+                    new PlaceHolderText("health int"),
+                    " / ",
+                    new PlaceHolderText("max health int"),
+                    " Enragement: ",
+                    new GeneratedText() {
+                        @Override
+                        public Text getText() {
+                            double maxDiff = config.maxDifficulty - config.minDifficulty;
+                            double curDiff = difficulty - config.minDifficulty;
+                            return Text.of((int) Math.round((curDiff / maxDiff) * 100));
+                        }
+                    },
+                    "%"
             ),
-            Optional.empty()
+            null
     );
 
     public void printBossHealth() {
@@ -554,7 +552,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 sendAttackBroadcast("Let's have a snow ball fight!", AttackSeverity.NORMAL);
                 break;
         }
-        lastAttack = Optional.of(attackCase);
+        lastAttack = attackCase;
     }
 
     private void throwSlashPotion(Location<World> location) {

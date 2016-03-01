@@ -35,7 +35,7 @@ public class ShutdownCommand implements CommandExecutor {
         ShutdownService service = optService.get();
 
         Integer seconds = args.<Integer>getOne("seconds").get();
-        Optional<String> message = args.<String>getOne("message");
+        Optional<String> message = args.getOne("message");
 
         seconds = Math.min(Math.max(seconds, 10), 120);
 

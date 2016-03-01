@@ -81,6 +81,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
@@ -227,16 +228,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            Optional.of(
-                    CombinedText.of(
-                            TextColors.DARK_AQUA,
-                            "Entity Health: ",
-                            new PlaceHolderText("health int"),
-                            " / ",
-                            new PlaceHolderText("max health int")
-                    )
+            CombinedText.of(
+                    TextColors.DARK_AQUA,
+                    "Entity Health: ",
+                    new PlaceHolderText("health int"),
+                    " / ",
+                    new PlaceHolderText("max health int")
             ),
-            Optional.of(CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!"))
+            CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
     );
 
     @Listener
@@ -333,8 +332,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                             (entity instanceof Boss ? 5 : 1) * baseLevelMod,
                             getDropMod(
                                     baseLevelMod,
-                                    Optional.of(((Monster) entity).getHealthData().maxHealth().get()),
-                                    Optional.of(entity.getType())
+                                    ((Monster) entity).getHealthData().maxHealth().get(),
+                                    entity.getType()
                             )
                     );
 
@@ -537,13 +536,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public double getDropMod(int level) {
-        return getDropMod(level, Optional.empty(), Optional.empty());
+        return getDropMod(level, null, null);
     }
 
-    public double getDropMod(int level, Optional<Double> optMobHealth, Optional<EntityType> optEntityType) {
-        double modifier = (level * .2) + (optMobHealth.isPresent() ? optMobHealth.get() * .04 : 0);
-        if (optEntityType.isPresent()) {
-            EntityType entityType = optEntityType.get();
+    public double getDropMod(int level, @Nullable Double mobHealth, @Nullable EntityType entityType) {
+        double modifier = (level * .2) + (mobHealth != null ? mobHealth * .04 : 0);
+        if (entityType != null) {
             if (entityType == EntityTypes.WITHER || entityType == EntityTypes.CREEPER) {
                 modifier *= 5;
             } else if (entityType == EntityTypes.SILVERFISH) {

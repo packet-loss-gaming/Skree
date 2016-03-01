@@ -145,14 +145,12 @@ public class RegionManager {
 
     private List<RegionReference> uncheckedAddRegion(Collection<Region> regions) {
         List<RegionReference> regionReferences = new ArrayList<>();
-        for (Region region : regions) {
-            if (!regionMap.containsKey(region.getID())) {
-                RegionReference ref = new RegionReference(region, this);
-                regionMap.put(region.getID(), ref);
-                regionList.add(ref);
-                regionReferences.add(ref);
-            }
-        }
+        regions.stream().filter(region -> !regionMap.containsKey(region.getID())).forEach(region -> {
+            RegionReference ref = new RegionReference(region, this);
+            regionMap.put(region.getID(), ref);
+            regionList.add(ref);
+            regionReferences.add(ref);
+        });
         return regionReferences;
     }
 

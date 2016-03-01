@@ -47,7 +47,7 @@ public class PvPCommand implements CommandExecutor {
         PvPService service = optService.get();
 
         Player player = (Player) src;
-        Optional<PvPState> stateArg = args.<PvPState>getOne("status");
+        Optional<PvPState> stateArg = args.getOne("status");
         PvPState state = stateArg.orElse(service.getPvPState(player));
         service.setPvPState(player, state);
 

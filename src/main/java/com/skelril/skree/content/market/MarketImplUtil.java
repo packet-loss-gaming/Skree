@@ -20,6 +20,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -64,7 +65,7 @@ public class MarketImplUtil {
         HELD
     }
 
-    public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, Optional<ItemStack> filter) {
+    public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, @Nullable ItemStack filter) {
         EntityPlayer playerEnt = tf(player);
 
         BigDecimal totalPrice = BigDecimal.ZERO;
@@ -94,8 +95,8 @@ public class MarketImplUtil {
                 continue;
             }
 
-            if (filter.isPresent()) {
-                if (!ItemComparisonUtil.isSimilar(filter.get(), tf(stack))) {
+            if (filter != null) {
+                if (!ItemComparisonUtil.isSimilar(filter, tf(stack))) {
                     continue;
                 }
             }

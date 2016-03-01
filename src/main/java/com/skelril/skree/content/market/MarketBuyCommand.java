@@ -82,7 +82,7 @@ public class MarketBuyCommand implements CommandExecutor {
 
             price = price.add(optPrice.get());
         }
-        Optional<Integer> optAmt = args.<Integer>getOne("amount");
+        Optional<Integer> optAmt = args.getOne("amount");
         int amt = Math.max(1, optAmt.isPresent() ? optAmt.get() : 0);
         price = price.multiply(BigDecimal.valueOf(amt));
 
