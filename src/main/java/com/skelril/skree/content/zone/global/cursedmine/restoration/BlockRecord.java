@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.global.cursedmine.restoration;
 
+import com.sun.istack.internal.NotNull;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -36,7 +37,7 @@ public class BlockRecord implements Comparable<BlockRecord> {
 
     // Oldest to newest
     @Override
-    public int compareTo(BlockRecord record) {
+    public int compareTo(@NotNull BlockRecord record) {
 
         if (record == null) return -1;
 
