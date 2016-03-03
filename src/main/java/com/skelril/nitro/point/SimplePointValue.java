@@ -6,8 +6,6 @@
 
 package com.skelril.nitro.point;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.Collection;
 
 public class SimplePointValue<KeyType, PointType extends Comparable<PointType>> implements PointValue<KeyType, PointType> {
@@ -30,7 +28,7 @@ public class SimplePointValue<KeyType, PointType extends Comparable<PointType>> 
     }
 
     @Override
-    public int compareTo(@NotNull PointValue<KeyType, PointType> pointValue) {
+    public int compareTo(PointValue<KeyType, PointType> pointValue) {
         return this.points.compareTo(pointValue.getPoints());
     }
 }
