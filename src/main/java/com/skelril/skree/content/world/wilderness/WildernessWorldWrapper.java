@@ -19,6 +19,7 @@ import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
+import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
@@ -207,10 +208,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                 entity.offer(
                         Keys.EXPLOSIVE_RADIUS,
-                        Math.min(
-                                entity instanceof Fireball ? 4 : 9,
-                                Math.max(min, (min + level) / 2)
-                        )
+                        MathExt.bound((min + level) / 2, min, entity instanceof Fireball ? 4 : 9)
                 );
             }
         }
