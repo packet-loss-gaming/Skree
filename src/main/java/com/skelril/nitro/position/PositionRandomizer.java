@@ -8,6 +8,7 @@ package com.skelril.nitro.position;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
 
 public class PositionRandomizer {
@@ -26,10 +27,16 @@ public class PositionRandomizer {
     }
 
     public Vector3i createPosition3i(Vector3i src) {
-        return src.add(
+        Vector3i res = src.add(
                 Probability.getRangedRandom(-noiseX, noiseX * 2),
                 Probability.getRangedRandom(-noiseY, noiseY * 2),
                 Probability.getRangedRandom(-noiseZ, noiseZ * 2)
+        );
+
+        return new Vector3i(
+                MathExt.bound(res.getX(), -30000000, 30000000),
+                MathExt.bound(res.getY(), 0, 255),
+                MathExt.bound(res.getZ(), -30000000, 30000000)
         );
     }
 
