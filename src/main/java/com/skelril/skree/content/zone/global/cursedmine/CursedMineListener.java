@@ -31,7 +31,6 @@ import org.spongepowered.api.entity.living.monster.Blaze;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
@@ -75,16 +74,14 @@ public class CursedMineListener {
     }
 
     @Listener
-    public void onPlayerInteract(InteractBlockEvent event) {
-        if (event instanceof InteractBlockEvent.Primary || event instanceof InteractBlockEvent.Secondary) {
-            return;
-        }
-
-        BlockSnapshot snapshot = event.getTargetBlock();
-
-        Optional<CursedMineInstance> optInst = manager.getApplicableZone(snapshot);
-        if (optInst.isPresent() && triggerBlocks.contains(snapshot.getState().getType())) {
-            optInst.get().activatePumps();
+    public void onPlayerInteract(ChangeBlockEvent event) {
+        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+            BlockSnapshot snapshot = block.getOriginal();
+            Optional<CursedMineInstance> optInst = manager.getApplicableZone(snapshot);
+            if (optInst.isPresent() && triggerBlocks.contains(snapshot.getState().getType())) {
+                optInst.get().activatePumps();
+                break;
+            }
         }
     }
 
@@ -233,7 +230,7 @@ public class CursedMineListener {
                 continue;
             }
 
-            if (finalType == BlockTypes.FIRE && event.getCause().first(PluginContainer.class).isPresent()) {
+            if (event.getCause().first(PluginContainer.class).isPresent()) {
                 continue;
             }
 

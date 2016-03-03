@@ -82,7 +82,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
     private ZoneBoundingBox floodGate;
     private Location<World> entryPoint;
 
-    private final long lastActivationTime = 18000;
+    private final long timeTilPumpShutoff = 18000;
     private long lastActivation = 0;
     private PlayerMappedBlockRecordIndex recordSystem = new PlayerMappedBlockRecordIndex();
     private Map<Player, List<Task>> activeTask = new HashMap<>();
@@ -156,11 +156,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
     }
 
     public void activatePumps() {
-        long temp = lastActivation;
         lastActivation = System.currentTimeMillis();
-        if (System.currentTimeMillis() - temp <= lastActivationTime * 5) {
-            lastActivation -= lastActivationTime * .4;
-        }
     }
 
     public void clearCurses(Player player) {
@@ -634,7 +630,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
 
     private void changeWater() {
         BlockType targetType = BlockTypes.AIR;
-        if (lastActivation == 0 || System.currentTimeMillis() - lastActivation >= lastActivationTime) {
+        if (lastActivation == 0 || System.currentTimeMillis() - lastActivation >= timeTilPumpShutoff) {
             targetType = BlockTypes.PLANKS;
         }
 
@@ -674,7 +670,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
 
                 // Emerald
                 long diff = System.currentTimeMillis() - lastActivation;
-                if (playerLoc.getY() < 30 && (lastActivation == 0 || diff <= lastActivationTime * .35 || diff >= lastActivationTime * 5)) {
+                if (playerLoc.getY() < 30 && (lastActivation == 0 || diff <= timeTilPumpShutoff * .35 || diff >= timeTilPumpShutoff * 5)) {
                     PositionRandomizer randomizer = new PositionRandomizer(5);
                     for (int i = 0; i < Probability.getRangedRandom(2, 5); i++) {
                         Vector3i targetPos;
