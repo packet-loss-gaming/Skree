@@ -17,7 +17,9 @@ import com.skelril.openboss.condition.BindCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneBossDetail;
+import com.skelril.skree.content.zone.ZonePvPListener;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
@@ -41,7 +43,7 @@ import java.util.function.Consumer;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
 
-public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable {
+public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable, LocationZone<ShnugglesPrimeInstance> {
 
     private Queue<ZoneRegion> freeRegions = new LinkedList<>();
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager = new BossManager<>();
@@ -50,6 +52,10 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ShnugglesPrimeListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZonePvPListener(a -> getApplicableZone(a).isPresent())
         );
 
         setupBossManager();
@@ -161,15 +167,6 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
 
             return Optional.empty();
         });
-    }
-
-    public Optional<ShnugglesPrimeInstance> getApplicableZone(Entity entity) {
-        for (ShnugglesPrimeInstance inst : zones) {
-            if (inst.contains(entity)) {
-                return Optional.of(inst);
-            }
-        }
-        return Optional.empty();
     }
 
     @Override

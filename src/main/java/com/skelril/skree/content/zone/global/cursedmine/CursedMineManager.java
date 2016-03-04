@@ -8,22 +8,19 @@ package com.skelril.skree.content.zone.global.cursedmine;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> implements Runnable {
+public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> implements Runnable, LocationZone<CursedMineInstance> {
     private HitList hitList = new HitList();
 
     public CursedMineManager() {
@@ -37,22 +34,6 @@ public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> imp
 
     public HitList getHitList() {
         return hitList;
-    }
-
-    public Optional<CursedMineInstance> getApplicableZone(BlockSnapshot block) {
-        return getApplicableZone(block.getLocation().get());
-    }
-
-    public Optional<CursedMineInstance> getApplicableZone(Entity entity) {
-        return getApplicableZone(entity.getLocation());
-    }
-
-    public Optional<CursedMineInstance> getApplicableZone(Location<World> loc) {
-        Optional<CursedMineInstance> optInst = getActiveZone();
-        if (optInst.isPresent() && optInst.get().contains(loc)) {
-            return Optional.of(optInst.get());
-        }
-        return Optional.empty();
     }
 
     @Override

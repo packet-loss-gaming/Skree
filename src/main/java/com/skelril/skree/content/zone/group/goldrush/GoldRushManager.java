@@ -8,15 +8,14 @@ package com.skelril.skree.content.zone.group.goldrush;
 
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.zone.LocationZone;
+import com.skelril.skree.content.zone.ZonePvPListener;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Consumer;
 
-public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implements Runnable {
+public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implements Runnable, LocationZone<GoldRushInstance> {
     private Queue<ZoneRegion> freeRegions = new LinkedList<>();
 
     public GoldRushManager() {
@@ -32,21 +31,12 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
                 SkreePlugin.inst(),
                 new GoldRushListener(this)
         );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZonePvPListener(a -> getApplicableZone(a).isPresent())
+        );
 
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
-    }
-
-    public Optional<GoldRushInstance> getApplicableZone(Entity entity) {
-        return getApplicableZone(entity.getLocation());
-    }
-
-    public Optional<GoldRushInstance> getApplicableZone(Location<World> loc) {
-        for (GoldRushInstance inst : zones) {
-            if (inst.contains(loc)) {
-                return Optional.of(inst);
-            }
-        }
-        return Optional.empty();
     }
 
     @Override

@@ -18,7 +18,9 @@ import com.skelril.openboss.condition.DamageCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneBossDetail;
+import com.skelril.skree.content.zone.ZonePvPListener;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -54,7 +56,7 @@ import java.util.function.Function;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
-public class PatientXManager extends GroupZoneManager<PatientXInstance> implements Runnable {
+public class PatientXManager extends GroupZoneManager<PatientXInstance> implements Runnable, LocationZone<PatientXInstance> {
 
     private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager = new BossManager<>();
     private final PatientXConfig config = new PatientXConfig();
@@ -63,6 +65,10 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new PatientXListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZonePvPListener(a -> getApplicableZone(a).isPresent())
         );
 
         setupBossManager();
@@ -210,19 +216,6 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
             resultSet.add(sendExplosiveSnowball(loc, new Vector3d(Math.cos(a), 0, Math.sin(a)), .5F, zone));
         }
         return resultSet;
-    }
-
-    public Optional<PatientXInstance> getApplicableZone(Entity entity) {
-        return getApplicableZone(entity.getLocation());
-    }
-
-    public Optional<PatientXInstance> getApplicableZone(Location<World> loc) {
-        for (PatientXInstance inst : zones) {
-            if (inst.contains(loc)) {
-                return Optional.of(inst);
-            }
-        }
-        return Optional.empty();
     }
 
     @Override
