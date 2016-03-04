@@ -190,25 +190,25 @@ public class CursedMineListener {
                         }
                     }
 
-                    Optional<Entity> optXPOrb = player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
-                    if (optXPOrb.isPresent()) {
-                        ExperienceOrb xpOrb = (ExperienceOrb) optXPOrb.get();
-                        xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
-                    }
-
                     /*if (Probability.getChance(3000)) {
                         ChatUtil.send(player, "You feel as though a spirit is trying to tell you something...");
                         player.getInventory().addItem(BookUtil.Lore.Areas.theGreatMine());
                     }*/
 
-                    inst.eatFood(player);
-                    inst.poison(player, 6);
-                    inst.ghost(player, originalType);
-
                     // TODO Work around for the item dropped by blocks being indiscernible
                     // from items dropped from players
                     event.setCancelled(true);
                     Task.builder().execute(() -> {
+                        Optional<Entity> optXPOrb = player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
+                        if (optXPOrb.isPresent()) {
+                            ExperienceOrb xpOrb = (ExperienceOrb) optXPOrb.get();
+                            xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
+                        }
+
+                        inst.eatFood(player);
+                        inst.poison(player, 6);
+                        inst.ghost(player, originalType);
+
                         block.getOriginal().getLocation().get().setBlockType(BlockTypes.AIR);
                     }).delayTicks(1).submit(SkreePlugin.inst());
                 }
