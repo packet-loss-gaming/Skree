@@ -13,11 +13,8 @@ import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
@@ -49,30 +46,6 @@ public class ShnugglesPrimeListener {
                     break;
                 }
             }
-        }
-    }
-
-    @Listener
-    public void onItemSpawn(DropItemEvent.Destruct event) {
-        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
-        if (optPlayer.isPresent() && manager.getApplicableZone(optPlayer.get()).isPresent()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> player = event.getCause().first(Player.class);
-        if (player.isPresent() && manager.getApplicableZone(player.get()).isPresent()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @Listener
-    public void onEntityDrop(DropItemEvent.Destruct event) {
-        Optional<Zombie> zombie = event.getCause().first(Zombie.class);
-        if (zombie.isPresent() && manager.getApplicableZone(zombie.get()).isPresent()) {
-            event.setCancelled(true);
         }
     }
 

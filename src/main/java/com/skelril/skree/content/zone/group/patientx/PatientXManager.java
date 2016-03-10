@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.group.patientx;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.Clause;
+import com.skelril.nitro.entity.VelocityEntitySpawner;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossListener;
@@ -18,9 +19,7 @@ import com.skelril.openboss.condition.DamageCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.zone.LocationZone;
-import com.skelril.skree.content.zone.ZoneBossDetail;
-import com.skelril.skree.content.zone.ZonePvPListener;
+import com.skelril.skree.content.zone.*;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -32,7 +31,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
@@ -57,7 +55,6 @@ import java.util.function.Function;
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
 public class PatientXManager extends GroupZoneManager<PatientXInstance> implements Runnable, LocationZone<PatientXInstance> {
-
     private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager = new BossManager<>();
     private final PatientXConfig config = new PatientXConfig();
 
@@ -69,6 +66,14 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZonePvPListener(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneInventoryProtector(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneCreatureDropBlocker(a -> getApplicableZone(a).isPresent())
         );
 
         setupBossManager();
@@ -169,7 +174,7 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                     if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
                         Location<World> curPos = inst.getBoss().get().getLocation();
                         Task.builder().execute(() -> {
-                            sendExplosiveSnowballs(curPos, inst);
+                            VelocityEntitySpawner.sendRadial(EntityTypes.SNOWBALL, curPos, Cause.source(inst).build());
                         }).delayTicks(1).submit(SkreePlugin.inst());
                     } else {
                         Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
@@ -189,33 +194,6 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                 return Optional.empty();
             });
         });
-    }
-
-
-    private Snowball sendExplosiveSnowball(Location<World> loc, Vector3d dir, float speed, Zone zone) {
-        Vector3d actualDir = dir.normalize();
-        Vector3d finalVecLoc = loc.getPosition().add(actualDir.mul(2));
-        loc.setPosition(finalVecLoc);
-        Optional<Entity> optEnt = loc.getExtent().createEntity(EntityTypes.SNOWBALL, loc.getPosition());
-        if (optEnt.isPresent()) {
-            Snowball projectile = (Snowball) optEnt.get();
-            projectile.setVelocity(dir.mul(speed));
-            loc.getExtent().spawnEntity(projectile, Cause.source(zone).build());
-            return projectile;
-        }
-        throw new IllegalStateException();
-    }
-
-    private List<Snowball> sendExplosiveSnowballs(Location<World> loc, Zone zone) {
-        final int amt = 12;
-        final double tau = 2 * Math.PI;
-
-        double arc = tau / amt;
-        List<Snowball> resultSet = new ArrayList<>();
-        for (double a = 0; a < tau; a += arc) {
-            resultSet.add(sendExplosiveSnowball(loc, new Vector3d(Math.cos(a), 0, Math.sin(a)), .5F, zone));
-        }
-        return resultSet;
     }
 
     @Override

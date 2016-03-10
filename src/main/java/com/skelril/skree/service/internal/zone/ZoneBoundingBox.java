@@ -8,25 +8,23 @@ package com.skelril.skree.service.internal.zone;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.skelril.nitro.position.CuboidContainmentPredicate;
 
 import java.util.function.Consumer;
 
 public class ZoneBoundingBox {
     private final Vector3i origin;
     private final Vector3i boundingBox;
+    private CuboidContainmentPredicate predicate;
 
     public ZoneBoundingBox(Vector3i origin, Vector3i boundingBox) {
         this.origin = origin;
         this.boundingBox = boundingBox;
+        this.predicate = new CuboidContainmentPredicate(getMinimumPoint().toDouble(), getMaximumPoint().toDouble());
     }
 
     public boolean contains(Vector3d point) {
-        Vector3i min = getMinimumPoint();
-        Vector3i max = getMaximumPoint();
-
-        return min.getX() <= point.getX() && point.getX() <= max.getX()
-                && min.getY() <= point.getY() && point.getY() <= max.getY()
-                && min.getZ() <= point.getZ() && point.getZ() <= max.getZ();
+        return predicate.test(point);
     }
 
     public Vector3i getOrigin() {

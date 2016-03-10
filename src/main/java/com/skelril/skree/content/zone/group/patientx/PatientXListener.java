@@ -23,13 +23,11 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.CollideEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
@@ -69,14 +67,6 @@ public class PatientXListener {
                     break;
                 }
             }
-        }
-    }
-
-    @Listener
-    public void onItemSpawn(DropItemEvent.Destruct event) {
-        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
-        if (optPlayer.isPresent() && manager.getApplicableZone(optPlayer.get()).isPresent()) {
-            event.setCancelled(true);
         }
     }
 

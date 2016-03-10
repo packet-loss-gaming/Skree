@@ -20,17 +20,14 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class ZonePvPListener {
-
-    private final Predicate<Location<World>> isApplicable;
-
+public class ZonePvPListener extends ZoneApplicableListener {
     public ZonePvPListener(Predicate<Location<World>> isApplicable) {
-        this.isApplicable = isApplicable;
+        super(isApplicable);
     }
 
     @Listener
     public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable.test(event.getTargetEntity().getLocation())) {
+        if (!isApplicable(event.getTargetEntity())) {
             return;
         }
 

@@ -17,9 +17,7 @@ import com.skelril.openboss.condition.BindCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.zone.LocationZone;
-import com.skelril.skree.content.zone.ZoneBossDetail;
-import com.skelril.skree.content.zone.ZonePvPListener;
+import com.skelril.skree.content.zone.*;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
@@ -56,6 +54,18 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZonePvPListener(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneInventoryProtector(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneImmutableBlockListener(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneCreatureDropBlocker(a -> getApplicableZone(a).isPresent())
         );
 
         setupBossManager();
