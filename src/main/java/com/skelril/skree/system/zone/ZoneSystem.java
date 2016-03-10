@@ -13,6 +13,7 @@ import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.cursedmine.CursedMineManager;
+import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
 import com.skelril.skree.content.zone.group.example.ExampleManager;
 import com.skelril.skree.content.zone.group.goldrush.GoldRushManager;
 import com.skelril.skree.content.zone.group.patientx.PatientXManager;
@@ -55,12 +56,13 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
             try {
                 service = new ZoneServiceImpl(new ChainPlacementAllocator(getWorkingDir(), instWorldResolver));
 
-                for (String name : Arrays.asList("Catacombs", "FreakyFour")) {
+                for (String name : Arrays.asList("FreakyFour")) {
                     service.registerManager(new ExampleManager(name));
                 }
 
                 service.registerManager(new CursedMineManager());
 
+                service.registerManager(new CatacombsManager());
                 service.registerManager(new GoldRushManager());
                 service.registerManager(new ShnugglesPrimeManager());
                 service.registerManager(new PatientXManager());

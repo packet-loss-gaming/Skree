@@ -129,6 +129,7 @@ public class CustomItemTypes {
     public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
     public static final Luminositor LUMINOSITOR = new Luminositor();
     public static final NetherBowl NETHER_BOWL = new NetherBowl();
+    public static final PhantomClock PHANTOM_CLOCK = new PhantomClock();
     public static final PhantomHymn PHANTOM_HYMN = new PhantomHymn();
     public static final ScrollOfSummation SCROLL_OF_SUMMATION = new ScrollOfSummation();
     public static final SkullOfTheFallen SKULL_OF_THE_FALLEN = new SkullOfTheFallen();
