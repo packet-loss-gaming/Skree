@@ -79,7 +79,7 @@ public class MarketListCommand implements CommandExecutor {
         pagination.builder()
                 .contents(result)
                 .title(Text.of(TextColors.GOLD, "Item List"))
-                .paddingString(" ")
+                .padding(Text.of(" "))
                 .sendTo(src);
 
         return CommandResult.success();

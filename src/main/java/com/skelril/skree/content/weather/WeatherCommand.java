@@ -66,7 +66,7 @@ public class WeatherCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        world.forecast(weather, duration.get() * 20);
+        world.setWeather(weather, duration.get() * 20);
 
         src.sendMessage(
                 Text.of(

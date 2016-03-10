@@ -18,6 +18,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -112,13 +113,15 @@ public class MarketBuyCommand implements CommandExecutor {
         }
 
         // Alright, all items have been found
-        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(this))) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(NamedCause.source(this)))) {
             // TODO Auto reporting
             src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
         }
 
-        Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(player, itemStacks, Cause.of(this));
+        Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(
+                player, itemStacks, Cause.of(NamedCause.source(this))
+        );
 
         if (!transactions.getKey()) {
             // TODO Auto reporting

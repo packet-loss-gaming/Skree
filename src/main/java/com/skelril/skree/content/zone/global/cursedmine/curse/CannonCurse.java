@@ -10,6 +10,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -19,7 +20,7 @@ public class CannonCurse implements Consumer<Player> {
     public void accept(Player player) {
         Optional<Entity> optEntity = player.getWorld().createEntity(EntityTypes.FIREBALL, player.getLocation().getPosition());
         if (optEntity.isPresent()) {
-            player.getWorld().spawnEntity(optEntity.get(), Cause.of(this));
+            player.getWorld().spawnEntity(optEntity.get(), Cause.of(NamedCause.source(this)));
         }
     }
 }

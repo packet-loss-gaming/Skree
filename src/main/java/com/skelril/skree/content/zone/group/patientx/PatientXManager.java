@@ -34,6 +34,7 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
@@ -200,7 +201,7 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
         if (optEnt.isPresent()) {
             Snowball projectile = (Snowball) optEnt.get();
             projectile.setVelocity(dir.mul(speed));
-            loc.getExtent().spawnEntity(projectile, Cause.of(zone));
+            loc.getExtent().spawnEntity(projectile, Cause.of(NamedCause.source(zone)));
             return projectile;
         }
         throw new IllegalStateException();

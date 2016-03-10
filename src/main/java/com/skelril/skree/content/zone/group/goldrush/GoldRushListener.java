@@ -313,7 +313,7 @@ public class GoldRushListener {
                     }
 
                     if (!toReturn.isEmpty()) {
-                        new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.of(inst));
+                        new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.of(NamedCause.source(inst)));
                     }
 
                     player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));
@@ -344,12 +344,12 @@ public class GoldRushListener {
                     deathMessage = " is now folding and hanging... though mostly hanging...";
                     break;
                 case 4:
-                    if (event.getMessage().orElse(Text.EMPTY).toPlain().contains("drown")) {
+                    if (event.getMessage().toPlain().contains("drown")) {
                         deathMessage = " discovered H2O is not always good for ones health";
                         break;
                     }
                 case 5:
-                    if (event.getMessage().orElse(Text.EMPTY).toPlain().contains("starved")) {
+                    if (event.getMessage().toPlain().contains("starved")) {
                         deathMessage = " should take note of the need to bring food with them";
                         break;
                     }

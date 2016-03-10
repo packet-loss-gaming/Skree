@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.global.cursedmine.curse;
 import com.skelril.nitro.item.ItemDropper;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -31,6 +32,6 @@ public class ButterFingersCurse implements Consumer<Player> {
 
         Collections.shuffle(drops);
 
-        new ItemDropper(player.getLocation()).dropItems(drops, Cause.of(this));
+        new ItemDropper(player.getLocation()).dropItems(drops, Cause.of(NamedCause.source(this)));
     }
 }

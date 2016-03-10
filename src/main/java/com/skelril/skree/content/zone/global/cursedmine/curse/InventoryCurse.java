@@ -11,6 +11,7 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -36,7 +37,7 @@ public class InventoryCurse implements Consumer<Player> {
         Optional<ItemStack> optHeld = player.getItemInHand();
         if (optHeld.isPresent() && !isSimilar(optHeld.get(), stack)) {
             new ItemDropper(player.getLocation()).dropItems(
-                    Lists.newArrayList(optHeld.get()), Cause.of(this)
+                    Lists.newArrayList(optHeld.get()), Cause.of(NamedCause.source(this))
             );
         }
         player.setItemInHand(stack);

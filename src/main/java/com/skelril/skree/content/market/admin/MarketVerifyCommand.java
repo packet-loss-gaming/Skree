@@ -109,7 +109,7 @@ public class MarketVerifyCommand implements CommandExecutor {
             pagination.builder()
                     .contents(result)
                     .title(Text.of(TextColors.GOLD, "Profit Margin Report"))
-                    .paddingString(" ")
+                    .padding(Text.of(" "))
                     .sendTo(src);
         }).submit(SkreePlugin.inst());
 

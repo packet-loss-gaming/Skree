@@ -45,6 +45,7 @@ import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
@@ -141,7 +142,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     public void spawnBoss() {
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
         if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.of(this));
+            getRegion().getExtent().spawnEntity(spawned.get(), Cause.of(NamedCause.source(this)));
 
             Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
@@ -227,7 +228,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         // TODO convert to Sponge Data API
                         ((EntityZombie) zombie).setChild(true);
                         zombie.setItemInHand(weapon.copy());
-                        getRegion().getExtent().spawnEntity(zombie, Cause.of(this));
+                        getRegion().getExtent().spawnEntity(zombie, Cause.of(NamedCause.source(this)));
 
                         if (target != null) {
                             zombie.setTarget(target);
@@ -363,7 +364,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                     DamageTypes.ATTACK
                             ).build();
 
-                            player.damage(100, source, Cause.of(boss));
+                            player.damage(100, source, Cause.of(NamedCause.source(boss)));
                             player.offer(Keys.VELOCITY,
                                     new Vector3d(
                                             random.nextDouble() * 1.7 - 1.5,
@@ -464,7 +465,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     if (optEntity.isPresent()) {
                         Entity potion = optEntity.get();
                         potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
-                        getRegion().getExtent().spawnEntity(entity, Cause.of(this));
+                        getRegion().getExtent().spawnEntity(entity, Cause.of(NamedCause.source(this)));
                     }
                 }
                 return;
@@ -490,7 +491,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                         DamageTypes.ATTACK
                                 ).build();
 
-                                entity.damage(realDamage, source, Cause.of(boss));
+                                entity.damage(realDamage, source, Cause.of(NamedCause.source(boss)));
                             }
                             toHeal += realDamage / 3;
                         }

@@ -35,7 +35,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import java.util.logging.Logger;
 
 @Singleton
-@Plugin(id = "Skree", name = "Skree", version = "1.0")
+@Plugin(id = "com.skelril.skree", name = "Skree", description = "The Skelril super-mod", version = "1.0")
 public class SkreePlugin {
 
     @Inject

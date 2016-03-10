@@ -32,6 +32,7 @@ import org.spongepowered.api.block.trait.BooleanTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
@@ -268,7 +269,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                                 loc.getBlockPosition(),
                                 state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
                                 true,
-                                Cause.of(SkreePlugin.container())
+                                Cause.of(NamedCause.source(SkreePlugin.container()))
                         );
 
                         leverBlocks.put(loc, !Probability.getChance(3));
@@ -316,7 +317,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     entry.getBlockPosition(),
                     state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
                     true,
-                    Cause.of(SkreePlugin.container())
+                    Cause.of(NamedCause.source(SkreePlugin.container()))
             );
 
             leverBlocks.put(entry, !Probability.getChance(3));
@@ -456,7 +457,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
         // They didn't pay, CHEATER!!!
         if (fee == null) return;
-        MarketImplUtil.setBalanceTo(player, fee.add(MarketImplUtil.getMoney(player)), Cause.of(this));
+        MarketImplUtil.setBalanceTo(player, fee.add(MarketImplUtil.getMoney(player)), Cause.of(NamedCause.source(this)));
         remove(player);
         player.sendMessage(Text.of(TextColors.YELLOW, "[Partner] These @$#&!@# restarts... Here, have your bail money..."));
     }
@@ -514,7 +515,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         BigDecimal total = fee.add(personalLootSplit).add(goldValue);
         player.sendMessage(Text.of(TextColors.YELLOW, "Total: ", format(total)));
 
-        MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.of(this));
+        MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.of(NamedCause.source(this)));
         remove(player);
         return true;
     }
@@ -552,14 +553,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void setDoor(ZoneBoundingBox door, BlockType type) {
-        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, true, Cause.of(SkreePlugin.container())));
+        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, true, Cause.of(NamedCause.source(SkreePlugin.container()))));
     }
 
     private void drainAll() {
         flashMemoryRoom.forAll((pt) -> {
             BlockType type = getRegion().getExtent().getBlockType(pt);
             if (type == BlockTypes.WATER || type == BlockTypes.FLOWING_WATER || type == BlockTypes.LAVA || type == BlockTypes.FLOWING_LAVA) {
-                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.of(SkreePlugin.container()));
+                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.of(NamedCause.source(SkreePlugin.container())));
             }
         });
     }
@@ -573,7 +574,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                         entry.getBlockPosition(),
                         state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
                         true,
-                        Cause.of(SkreePlugin.container())
+                        Cause.of(NamedCause.source(SkreePlugin.container()))
                 );
                 leverBlocks.put(entry, !Probability.getChance(3));
             }
@@ -586,7 +587,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                         targLoc.getBlockPosition(),
                         BlockTypes.STONEBRICK,
                         true,
-                        Cause.of(SkreePlugin.container())
+                        Cause.of(NamedCause.source(SkreePlugin.container()))
                 );
             }
 
@@ -597,20 +598,20 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                             targLoc.getBlockPosition(),
                             entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK,
                             true,
-                            Cause.of(SkreePlugin.container())
+                            Cause.of(NamedCause.source(SkreePlugin.container()))
                     );
                 }
 
                 Task.builder().execute(this::randomizeLevers).delayTicks(15).submit(SkreePlugin.inst());
             }).delayTicks(15).submit(SkreePlugin.inst());
         } else {
-            for (Location entry : leverBlocks.keySet()) {
+            for (Location<World> entry : leverBlocks.keySet()) {
                 Location<World> targLoc = entry.add(0, -2, 0);
                 targLoc.getExtent().setBlockType(
                         targLoc.getBlockPosition(),
                         BlockTypes.STONEBRICK,
                         true,
-                        Cause.of(SkreePlugin.container())
+                        Cause.of(NamedCause.source(SkreePlugin.container()))
                 );
             }
         }
@@ -661,7 +662,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                         floodBlock.getBlockPosition(),
                         floodBlockType,
                         true,
-                        Cause.of(SkreePlugin.container())
+                        Cause.of(NamedCause.source(SkreePlugin.container()))
                 );
             }
 
@@ -686,7 +687,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                                         x, y, z,
                                         floodBlockType,
                                         true,
-                                        Cause.of(SkreePlugin.container())
+                                        Cause.of(NamedCause.source(SkreePlugin.container()))
                                 );
                                 break;
                             }

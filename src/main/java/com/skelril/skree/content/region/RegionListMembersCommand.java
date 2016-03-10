@@ -66,7 +66,7 @@ public class RegionListMembersCommand implements CommandExecutor {
         pagination.builder()
                 .contents(result)
                 .title(Text.of(TextColors.GOLD, "Region Members"))
-                .paddingString(" ")
+                .padding(Text.of(" "))
                 .sendTo(src);
 
         return CommandResult.success();
