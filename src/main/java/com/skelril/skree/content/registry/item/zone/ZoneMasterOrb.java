@@ -32,7 +32,6 @@ import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -176,7 +175,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         if (optLightning.isPresent()) {
             Lightning lightning = (Lightning) optLightning.get();
             lightning.setEffect(true);
-            loc.getExtent().spawnEntity(lightning, Cause.of(NamedCause.source(this)));
+            loc.getExtent().spawnEntity(lightning, Cause.source(this).build());
         }
     }
 

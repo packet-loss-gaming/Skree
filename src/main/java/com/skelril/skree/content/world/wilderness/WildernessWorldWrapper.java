@@ -347,7 +347,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                     ItemDropper dropper = new ItemDropper(loc);
                     for (int i = 0; i < times; ++i) {
-                        dropper.dropItems(drops, Cause.of(NamedCause.source(this)));
+                        dropper.dropItems(drops, Cause.source(this).build());
                     }
                 }
             }
@@ -432,7 +432,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (Probability.getChance(3)) {
                     Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
                     if (optEntity.isPresent()) {
-                        world.spawnEntity(optEntity.get(), Cause.of(NamedCause.source(this)));
+                        world.spawnEntity(optEntity.get(), Cause.source(this).build());
                     }
                 }
 
@@ -595,7 +595,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
                 (a) -> finalFortune,
                 generalDrop,
-                Cause.of(NamedCause.source(this))
+                Cause.source(this).build()
         ) {
             @Override
             public boolean run(int timesL) {

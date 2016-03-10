@@ -47,7 +47,6 @@ import org.spongepowered.api.entity.living.animal.Wolf;
 import org.spongepowered.api.entity.living.monster.Blaze;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -221,14 +220,14 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                         player.sendMessage(Text.of(TextColors.YELLOW, "Caspher the friendly ghost drops some bread."));
                         new ItemDropper(player.getLocation()).dropItems(
                                 Lists.newArrayList(newItemStack(ItemTypes.BREAD, Probability.getRandom(16))),
-                                Cause.of(NamedCause.source(this))
+                                Cause.source(this).build()
                         );
                         break;
                     case 2:
                         player.sendMessage(Text.of(TextColors.YELLOW, "COOKIE gives you a cookie."));
                         new ItemDropper(player.getLocation()).dropItems(
                                 Lists.newArrayList(newItemStack(ItemTypes.COOKIE)),
-                                Cause.of(NamedCause.source(this))
+                                Cause.source(this).build()
                         );
                         break;
                     case 3:
@@ -240,13 +239,13 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             caspherLoot.add(newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64)));
                         }
 
-                        new ItemDropper(player.getLocation()).dropItems(caspherLoot, Cause.of(NamedCause.source(this)));
+                        new ItemDropper(player.getLocation()).dropItems(caspherLoot, Cause.source(this).build());
                         break;
                     case 4:
                         player.sendMessage(Text.of(TextColors.YELLOW, "John gives you a new jacket."));
                         new ItemDropper(player.getLocation()).dropItems(
                                 Lists.newArrayList(newItemStack(ItemTypes.LEATHER_CHESTPLATE)),
-                                Cause.of(NamedCause.source(this))
+                                Cause.source(this).build()
                         );
                         break;
                     case 5:
@@ -259,7 +258,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                                 newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(64)),
                                 newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64))
                         );
-                        new ItemDropper(player.getLocation()).dropItems(teleportLootExtras, Cause.of(NamedCause.source(this)));
+                        new ItemDropper(player.getLocation()).dropItems(teleportLootExtras, Cause.source(this).build());
                         break;
                     case 6:
                         player.sendMessage(Text.of(TextColors.YELLOW, "Dan gives you a sparkling touch."));
@@ -439,7 +438,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                         for (int i = 0; i < tf(player).inventory.mainInventory.length * 1.5; i++) {
                             sticks.add(newItemStack(ItemTypes.STICK, 64));
                         }
-                        new ItemDropper(player.getLocation()).dropItems(sticks, Cause.of(NamedCause.source(this)));
+                        new ItemDropper(player.getLocation()).dropItems(sticks, Cause.source(this).build());
                         break;
                     case 5:
                         player.sendMessage(Text.of(TextColors.RED, "Ben dumps out your backpack."));
@@ -539,7 +538,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             if (optEntity.isPresent()) {
                                 Blaze blaze = (Blaze) optEntity.get();
                                 blaze.setTarget(player);
-                                getRegion().getExtent().spawnEntity(blaze, Cause.of(NamedCause.source(this)));
+                                getRegion().getExtent().spawnEntity(blaze, Cause.source(this).build());
                             }
                         }
                         break;
@@ -550,7 +549,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             if (optEntity.isPresent()) {
                                 Wolf wolf = (Wolf) optEntity.get();
                                 wolf.setTarget(player);
-                                getRegion().getExtent().spawnEntity(wolf, Cause.of(NamedCause.source(this)));
+                                getRegion().getExtent().spawnEntity(wolf, Cause.source(this).build());
                             }
                         }
                         break;
@@ -638,7 +637,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
         final BlockType finalTarget = targetType;
         floodGate.forAll((pt) -> {
             if (replaceableTypes.contains(getRegion().getExtent().getBlockType(pt))) {
-                getRegion().getExtent().setBlockType(pt, finalTarget, true, Cause.of(NamedCause.source(SkreePlugin.container())));
+                getRegion().getExtent().setBlockType(pt, finalTarget, true, Cause.source(SkreePlugin.container()).build());
             }
         });
     }
@@ -681,7 +680,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
 
                         Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BLAZE, targetPos);
                         if (optEntity.isPresent()) {
-                            getRegion().getExtent().spawnEntity(optEntity.get(), Cause.of(NamedCause.source(this)));
+                            getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(this).build());
                         }
                     }
                 }

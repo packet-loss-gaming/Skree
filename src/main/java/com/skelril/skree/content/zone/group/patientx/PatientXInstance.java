@@ -42,7 +42,6 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.scheduler.Task;
@@ -177,7 +176,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, getRegion().getCenter());
         if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.of(NamedCause.source(this)));
+            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(this).build());
 
             Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = new Boss<>((Zombie) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
@@ -255,7 +254,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             if (aboveType == BlockTypes.AIR && belowType == BlockTypes.WATER || belowType == BlockTypes.FLOWING_WATER) {
                 if (percentage >= 100) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.ICE, true, Cause.of(NamedCause.source(SkreePlugin.container()))
+                            pt, BlockTypes.ICE, true, Cause.source(SkreePlugin.container()).build()
                     );
                     return;
                 }
@@ -264,7 +263,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
                 if (curType == BlockTypes.PACKED_ICE || curType == BlockTypes.ICE) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.WATER, true, Cause.of(NamedCause.source(SkreePlugin.container()))
+                            pt, BlockTypes.WATER, true, Cause.source(SkreePlugin.container()).build()
                     );
                     if (!Probability.getChance(config.snowBallChance) || !throwExplosives) return;
                     Location target = new Location<>(getRegion().getExtent(), pt.add(0, 1, 0));
@@ -277,12 +276,12 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     Probability.getRangedRandom(.25, 1),
                                     0
                             ));
-                            getRegion().getExtent().spawnEntity(melivn, Cause.of(NamedCause.source(this)));
+                            getRegion().getExtent().spawnEntity(melivn, Cause.source(this).build());
                         }
                     }
                 } else if (Probability.getChance(percentage, 100)) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.PACKED_ICE, true, Cause.of(NamedCause.source(SkreePlugin.container()))
+                            pt, BlockTypes.PACKED_ICE, true, Cause.source(SkreePlugin.container()).build()
                     );
                 }
             }
@@ -315,7 +314,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 // TODO convert to Sponge Data API
                 ((EntityZombie) zombie).setCanPickUpLoot(false);
                 ((EntityZombie) zombie).setChild(true);
-                getRegion().getExtent().spawnEntity(zombie, Cause.of(NamedCause.source(this)));
+                getRegion().getExtent().spawnEntity(zombie, Cause.source(this).build());
             }
         }
     }
@@ -469,7 +468,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     random.nextDouble() * 1 - .5
                             ));
                             explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                            getRegion().getExtent().spawnEntity(explosive, Cause.of(NamedCause.source(this)));
+                            getRegion().getExtent().spawnEntity(explosive, Cause.source(this).build());
                         }
                     }
                 }
@@ -510,7 +509,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                     // player.chat("I love Patient X!");
                     Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
                     if (optEntity.isPresent()) {
-                        getRegion().getExtent().spawnEntity(optEntity.get(), Cause.of(NamedCause.source(this)));
+                        getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(this).build());
                         optEntity.get().setPassenger(player);
                     }
                 }
@@ -582,7 +581,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             ));
             entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
 
-            getRegion().getExtent().spawnEntity(entity, Cause.of(NamedCause.source(this)));
+            getRegion().getExtent().spawnEntity(entity, Cause.source(this).build());
         }
     }
 }

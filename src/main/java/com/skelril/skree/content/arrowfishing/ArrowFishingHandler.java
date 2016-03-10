@@ -25,7 +25,6 @@ import org.spongepowered.api.entity.projectile.Arrow;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.world.Location;
@@ -91,7 +90,7 @@ public class ArrowFishingHandler {
             }
 
             new ItemDropper(loc).dropItems(
-                    dropTable.getDrops(1, modifier), Cause.of(NamedCause.source(event.getTargetEntity()))
+                    dropTable.getDrops(1, modifier), Cause.source(event.getTargetEntity()).build()
             );
         }
     }

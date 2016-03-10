@@ -18,7 +18,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -90,7 +89,7 @@ public class MarketSellCommand implements CommandExecutor {
         }
 
         BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
-        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.of(NamedCause.source(this)))) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(this).build())) {
             // TODO Auto reporting
             src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();

@@ -155,7 +155,7 @@ public class PatientXListener {
             if (Probability.getChance(10)) {
                 new ItemDropper(entity.getLocation()).dropItems(
                         Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
-                        Cause.of(NamedCause.source(inst))
+                        Cause.source(inst).build()
                 );
             }
         }
