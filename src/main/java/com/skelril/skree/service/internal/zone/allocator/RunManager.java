@@ -12,39 +12,83 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.scheduler.Task;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class RunManager {
-    private static ModifiedRunContext supervisor = new ModifiedRunContext();
+    private static final long MAX_TIME = 100;
+    private static final int MAX_TASK = 5;
 
-    public static void runOperation(Operation operation, Runnable callBack) {
-        runOperation(operation, callBack, supervisor);
+    private static SupervisingRunContext supervisor = new SupervisingRunContext();
+    private static List<RunningOperation> runners = new ArrayList<>();
+
+    static {
+        Task.builder().execute(() -> {
+            supervisor.resume();
+
+            List<Runnable> callBacks = new ArrayList<>();
+
+            while (!runners.isEmpty() && supervisor.shouldContinue()) {
+                Iterator<RunningOperation> it = runners.iterator();
+
+                while (it.hasNext()) {
+                    TaskRunContext taskRunContext = new TaskRunContext();
+                    RunningOperation next = it.next();
+                    if (next.complete(taskRunContext)) {
+                        // Queue up the call backs, they can add a new runner,
+                        // which will cause a CME if executed here
+                        callBacks.add(next.getCallBack());
+                        it.remove();
+                    }
+                }
+            }
+
+            callBacks.forEach(Runnable::run);
+        }).intervalTicks(10).submit(SkreePlugin.inst());
     }
 
-    private static void runOperation(Operation operation, Runnable callBack, ModifiedRunContext context) {
-        context.resume();
+    public static void runOperation(Operation operation, Runnable callBack) {
+        runners.add(new RunningOperation(operation, callBack));
+    }
 
-        Optional<Operation> optNext = Optional.of(operation);
-        while (optNext.isPresent() && context.shouldContinue()) {
+    private static Operation runOperation(Operation operation, RunContext context) {
+        Operation next = operation;
+        while (next != null && context.shouldContinue()) {
             try {
-                optNext = Optional.ofNullable(optNext.get().resume(context));
+                next = next.resume(context);
             } catch (WorldEditException e) {
                 e.printStackTrace();
-                return;
+                return null;
             }
         }
 
-        if (optNext.isPresent()) {
-            Operation next = optNext.get();
-            Task.builder().execute(() -> {
-                runOperation(next, callBack, context);
-            }).delayTicks(10).submit(SkreePlugin.inst());
+        if (next != null) {
+            return next;
         } else {
-            callBack.run();
+            return null;
         }
     }
 
-    private static class ModifiedRunContext extends RunContext {
+    private static class RunningOperation {
+        private final Runnable callBack;
+        private Operation next;
+
+        public RunningOperation(Operation next, Runnable callBack) {
+            this.next = next;
+            this.callBack = callBack;
+        }
+
+        public boolean complete(RunContext context) {
+            return (next = runOperation(next, context)) == null;
+        }
+
+        public Runnable getCallBack() {
+            return callBack;
+        }
+    }
+
+    private static abstract class TimeContext extends RunContext {
         private long curStart = System.currentTimeMillis();
 
         public void resume() {
@@ -53,9 +97,29 @@ public class RunManager {
             }
         }
 
+        public boolean shouldContinue() {
+            return System.currentTimeMillis() - curStart < getTimeRequirement();
+        }
+
+        public abstract long getTimeRequirement();
+    }
+
+    private static class SupervisingRunContext extends TimeContext {
+        @Override
+        public long getTimeRequirement() {
+            return MAX_TIME;
+        }
+    }
+
+    private static class TaskRunContext extends TimeContext {
         @Override
         public boolean shouldContinue() {
-            return System.currentTimeMillis() - curStart < 500;
+            return supervisor.shouldContinue() && super.shouldContinue();
+        }
+
+        @Override
+        public long getTimeRequirement() {
+            return MAX_TIME / Math.min(MAX_TASK, runners.size());
         }
     }
 }
