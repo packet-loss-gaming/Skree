@@ -94,7 +94,10 @@ public class FreakyFourListener {
                 }
                 boss = inst.getCurrentboss().orElse(null);
 
-                player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(boss)));
+                if (!inst.getRegion(boss).contains(player.getLocation().getPosition())) {
+                    player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(boss)));
+                }
+
                 inst.spawnBoss(boss);
             }
         }
