@@ -17,7 +17,6 @@ import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.ModifierService;
-import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneBoundingBox;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -345,9 +344,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
         // TODO remove any items given
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
-        return new Clause<>(player, ZoneStatus.REMOVED);
+        return super.remove(player);
     }
 
     private BigDecimal getCoffersNeeded() {

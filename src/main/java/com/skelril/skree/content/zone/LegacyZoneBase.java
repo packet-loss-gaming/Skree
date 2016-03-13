@@ -6,11 +6,13 @@
 
 package com.skelril.skree.content.zone;
 
-import com.skelril.skree.service.internal.zone.PlayerClassifier;
-import com.skelril.skree.service.internal.zone.Zone;
-import com.skelril.skree.service.internal.zone.ZoneRegion;
+import com.google.common.collect.Lists;
+import com.skelril.nitro.Clause;
+import com.skelril.skree.service.WorldService;
+import com.skelril.skree.service.internal.zone.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.monster.Monster;
@@ -20,6 +22,8 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class LegacyZoneBase implements Zone {
@@ -32,6 +36,13 @@ public abstract class LegacyZoneBase implements Zone {
 
     public boolean isActive() {
         return !expired;
+    }
+
+    @Override
+    public Clause<Player, ZoneStatus> remove(Player player) {
+        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
+        return new Clause<>(player, ZoneStatus.REMOVED);
     }
 
     @Override
@@ -48,24 +59,97 @@ public abstract class LegacyZoneBase implements Zone {
         return getContained(Entity.class);
     }
 
-    private Collection<Entity> __getContained(Class<?>... classes) {
+    private Collection<Entity> __getContained(Predicate<Location<World>> locationPredicate, Predicate<Entity> entityPredicate) {
         return getRegion().getExtent().getEntities(e -> {
-            for (Class<?> clazz : classes) {
-                if (clazz.isInstance(e)) {
-                    return contains(e.getLocation());
+            return entityPredicate.test(e) && locationPredicate.test(e.getLocation());
+        });
+    }
+
+    private class ZoneBoundingBoxPredicate implements Predicate<Location<World>> {
+
+        private ZoneBoundingBox box;
+
+        public ZoneBoundingBoxPredicate(ZoneBoundingBox box) {
+            this.box = box;
+        }
+
+        @Override
+        public boolean test(Location<World> location) {
+            return contains(location) && box.contains(location.getPosition());
+        }
+    }
+
+    private class EntityTypePredicate implements Predicate<Entity> {
+
+        private List<EntityType> entityTypes;
+
+        public EntityTypePredicate(List<EntityType> entityTypes) {
+            this.entityTypes = entityTypes;
+        }
+
+        @Override
+        public boolean test(Entity entity) {
+            for (EntityType entityType : entityTypes) {
+                if (entity.getType() == entityType) {
+                    return true;
                 }
             }
             return false;
-        });
+        }
+    }
+
+    private class ClassPredicate implements Predicate<Entity> {
+
+        private List<Class<?>> classes;
+
+        public ClassPredicate(List<Class<?>> classes) {
+            this.classes = classes;
+        }
+
+        @Override
+        public boolean test(Entity entity) {
+            for (Class<?> clazz : classes) {
+                if (clazz.isInstance(entity)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> Collection<T> getContained(Class<T> clazz) {
-        return (Collection<T>) __getContained(clazz);
+        return (Collection<T>) __getContained(this::contains, new ClassPredicate(Lists.newArrayList(clazz)));
     }
 
     public Collection<Entity> getContained(Class<?>... classes) {
-        return __getContained(classes);
+        return __getContained(this::contains, new ClassPredicate(Lists.newArrayList(classes)));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Entity> Collection<T> getContained(ZoneBoundingBox box, Class<T> clazz) {
+        return (Collection<T>) __getContained(
+                new ZoneBoundingBoxPredicate(box),
+                new ClassPredicate(Lists.newArrayList(clazz))
+        );
+    }
+
+    public Collection<Entity> getContained(ZoneBoundingBox box, Class<?>... classes) {
+        return __getContained(
+                new ZoneBoundingBoxPredicate(box),
+                new ClassPredicate(Lists.newArrayList(classes))
+        );
+    }
+
+    public Collection<Entity> getContained(EntityType... types) {
+        return __getContained(this::contains, new EntityTypePredicate(Lists.newArrayList(types)));
+    }
+
+    public Collection<Entity> getContained(ZoneBoundingBox box, EntityType... types) {
+        return __getContained(
+                new ZoneBoundingBoxPredicate(box),
+                new EntityTypePredicate(Lists.newArrayList(types))
+        );
     }
 
     public boolean contains(Entity entity) {

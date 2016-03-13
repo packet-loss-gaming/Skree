@@ -22,10 +22,8 @@ import com.skelril.openboss.BossManager;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.ZoneBossDetail;
-import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.*;
 import net.minecraft.entity.monster.EntityZombie;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -378,13 +376,6 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
         player.sendMessage(Text.of(TextColors.YELLOW, "Let's see if you have what it takes..."));
 
         return new Clause<>(player, ZoneStatus.ADDED);
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
-        return new Clause<>(player, ZoneStatus.REMOVED);
     }
 
     protected enum AttackSeverity {

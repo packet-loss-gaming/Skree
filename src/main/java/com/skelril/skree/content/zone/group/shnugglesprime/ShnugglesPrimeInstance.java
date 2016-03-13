@@ -24,14 +24,12 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.ZoneBossDetail;
-import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -545,12 +543,5 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         player.getInventory().offer(tf(new net.minecraft.item.ItemStack(CustomItemTypes.ZONE_TRANSITIONAL_ORB)));
         tf(player).inventoryContainer.detectAndSendChanges();
         return new Clause<>(player, ZoneStatus.ADDED);
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
-        return new Clause<>(player, ZoneStatus.REMOVED);
     }
 }

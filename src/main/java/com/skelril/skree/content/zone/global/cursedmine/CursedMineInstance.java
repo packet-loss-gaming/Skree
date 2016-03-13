@@ -27,7 +27,6 @@ import com.skelril.skree.content.zone.global.cursedmine.curse.*;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
 import com.skelril.skree.content.zone.global.cursedmine.restoration.BlockRecord;
 import com.skelril.skree.content.zone.global.cursedmine.restoration.PlayerMappedBlockRecordIndex;
-import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneBoundingBox;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -114,13 +113,6 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
     public Clause<Player, ZoneStatus> add(Player player) {
         player.setLocation(entryPoint);
         return new Clause<>(player, ZoneStatus.ADDED);
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
-        return new Clause<>(player, ZoneStatus.REMOVED);
     }
 
     private void setUp() {

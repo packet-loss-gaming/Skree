@@ -21,11 +21,9 @@ import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.group.catacombs.instruction.CatacombsHealthInstruction;
 import com.skelril.skree.content.zone.group.catacombs.instruction.bossmove.*;
-import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
@@ -79,13 +77,6 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
     public Clause<Player, ZoneStatus> add(Player player) {
         player.setLocation(entryPoint);
         return new Clause<>(player, ZoneStatus.ADDED);
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper("Main").getWorlds().iterator().next().getSpawnLocation());
-        return new Clause<>(player, ZoneStatus.REMOVED);
     }
 
     private void setUp() {
