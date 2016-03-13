@@ -31,6 +31,8 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -227,7 +229,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
     private Zombie checkedZombieSpawn(Location<World> loc) {
         Optional<Entity> optEnt = loc.getExtent().createEntity(EntityTypes.ZOMBIE, loc.getPosition());
         if (optEnt.isPresent()) {
-            loc.getExtent().spawnEntity(optEnt.get(), Cause.source(this).build());
+            loc.getExtent().spawnEntity(optEnt.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
             return (Zombie) optEnt.get();
         }
         throw new IllegalStateException("Zombie could not be spawned");

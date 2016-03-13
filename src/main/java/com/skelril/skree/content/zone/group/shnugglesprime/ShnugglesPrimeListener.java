@@ -6,15 +6,10 @@
 
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
-import net.minecraft.entity.monster.EntityZombie;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Agent;
-import org.spongepowered.api.entity.living.monster.Giant;
-import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
@@ -25,28 +20,6 @@ public class ShnugglesPrimeListener {
 
     public ShnugglesPrimeListener(ShnugglesPrimeManager manager) {
         this.manager = manager;
-    }
-
-
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            Optional<ShnugglesPrimeInstance> optInst = manager.getApplicableZone(entity);
-            if (optInst.isPresent()) {
-
-                if (entity instanceof Giant) {
-                    continue;
-                }
-
-                if  (entity instanceof Agent) {
-                    if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
-                        continue;
-                    }
-                    event.setCancelled(true);
-                    break;
-                }
-            }
-        }
     }
 
     @Listener

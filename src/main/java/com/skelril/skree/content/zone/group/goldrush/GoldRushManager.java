@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.group.goldrush;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
+import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
 import com.skelril.skree.content.zone.ZonePvPListener;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -30,6 +31,10 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new GoldRushListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),

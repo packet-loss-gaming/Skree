@@ -25,16 +25,12 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
-import org.spongepowered.api.entity.living.Agent;
-import org.spongepowered.api.entity.living.animal.Wolf;
-import org.spongepowered.api.entity.living.monster.Blaze;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -51,19 +47,6 @@ public class CursedMineListener {
 
     public CursedMineListener(CursedMineManager manager) {
         this.manager = manager;
-    }
-
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            if (manager.getApplicableZone(entity).isPresent() && entity instanceof Agent) {
-                if (entity instanceof Blaze || entity instanceof Wolf) {
-                    continue;
-                }
-                event.setCancelled(true);
-                break;
-            }
-        }
     }
 
     private static Set<BlockType> triggerBlocks = new HashSet<>();

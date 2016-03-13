@@ -42,6 +42,8 @@ import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -174,7 +176,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, getRegion().getCenter());
         if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(this).build());
+            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
             Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = new Boss<>((Zombie) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
@@ -274,7 +276,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     Probability.getRangedRandom(.25, 1),
                                     0
                             ));
-                            getRegion().getExtent().spawnEntity(melivn, Cause.source(this).build());
+                            getRegion().getExtent().spawnEntity(melivn, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                         }
                     }
                 } else if (Probability.getChance(percentage, 100)) {
@@ -312,7 +314,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 // TODO convert to Sponge Data API
                 ((EntityZombie) zombie).setCanPickUpLoot(false);
                 ((EntityZombie) zombie).setChild(true);
-                getRegion().getExtent().spawnEntity(zombie, Cause.source(this).build());
+                getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
             }
         }
     }
@@ -459,7 +461,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                                     random.nextDouble() * 1 - .5
                             ));
                             explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                            getRegion().getExtent().spawnEntity(explosive, Cause.source(this).build());
+                            getRegion().getExtent().spawnEntity(explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                         }
                     }
                 }
@@ -500,7 +502,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                     // player.chat("I love Patient X!");
                     Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
                     if (optEntity.isPresent()) {
-                        getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(this).build());
+                        getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                         optEntity.get().setPassenger(player);
                     }
                 }
@@ -572,7 +574,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             ));
             entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
 
-            getRegion().getExtent().spawnEntity(entity, Cause.source(this).build());
+            getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
         }
     }
 }

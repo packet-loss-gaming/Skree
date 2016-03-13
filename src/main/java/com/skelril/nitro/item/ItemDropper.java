@@ -12,6 +12,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -35,13 +37,13 @@ public class ItemDropper {
         return location.getPosition();
     }
 
-    public void dropItems(Collection<ItemStack> stacks, Cause cause) {
+    public void dropItems(Collection<ItemStack> stacks, SpawnType type) {
         for (ItemStack stack : stacks) {
             Optional<Entity> optEntity = getExtent().createEntity(EntityTypes.ITEM, getPos());
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
                 item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot());
-                getExtent().spawnEntity(item, cause);
+                getExtent().spawnEntity(item, Cause.source(SpawnCause.builder().type(type).build()).build());
             }
         }
     }

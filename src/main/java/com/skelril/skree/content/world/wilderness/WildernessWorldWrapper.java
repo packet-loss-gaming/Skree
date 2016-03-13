@@ -63,6 +63,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -347,7 +349,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                     ItemDropper dropper = new ItemDropper(loc);
                     for (int i = 0; i < times; ++i) {
-                        dropper.dropItems(drops, Cause.source(this).build());
+                        dropper.dropItems(drops, SpawnTypes.DROPPED_ITEM);
                     }
                 }
             }
@@ -432,7 +434,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (Probability.getChance(3)) {
                     Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
                     if (optEntity.isPresent()) {
-                        world.spawnEntity(optEntity.get(), Cause.source(this).build());
+                        world.spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
                     }
                 }
 
@@ -595,7 +597,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
                 (a) -> finalFortune,
                 generalDrop,
-                Cause.source(this).build()
+                SpawnTypes.DROPPED_ITEM
         ) {
             @Override
             public boolean run(int timesL) {

@@ -25,15 +25,13 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
@@ -58,16 +56,6 @@ public class GoldRushListener {
     }
 
     private Map<String, Player> tileEntityClaimMap = new WeakHashMap<>();
-
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            if (manager.getApplicableZone(entity).isPresent() && entity instanceof Agent) {
-                event.setCancelled(true);
-                break;
-            }
-        }
-    }
 
     private BlockType[] allowedChanges = {
             BlockTypes.REDSTONE_LAMP, BlockTypes.LIT_REDSTONE_LAMP,
@@ -313,7 +301,7 @@ public class GoldRushListener {
                     }
 
                     if (!toReturn.isEmpty()) {
-                        new ItemDropper(player.getLocation()).dropItems(toReturn, Cause.source(inst).build());
+                        new ItemDropper(player.getLocation()).dropItems(toReturn, SpawnTypes.PLUGIN);
                     }
 
                     player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));

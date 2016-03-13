@@ -7,6 +7,7 @@
 package com.skelril.skree.content.market;
 
 import com.skelril.nitro.Clause;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.market.MarketImplUtil.QueryMode;
 import com.skelril.skree.service.MarketService;
 import org.spongepowered.api.Sponge;
@@ -89,7 +90,7 @@ public class MarketSellCommand implements CommandExecutor {
         }
 
         BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
-        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(this).build())) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
             // TODO Auto reporting
             src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();

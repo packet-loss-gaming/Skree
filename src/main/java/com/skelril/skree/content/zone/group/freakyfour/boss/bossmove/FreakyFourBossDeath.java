@@ -22,7 +22,7 @@ public class FreakyFourBossDeath implements Instruction<UnbindCondition, Boss<Li
     ) {
         FreakyFourInstance inst = boss.getDetail().getZone();
 
-        inst.bossDied(inst.getCurrentboss());
+        inst.bossDied(inst.getCurrentboss().get());
 
         return Optional.empty();
     }

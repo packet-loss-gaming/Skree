@@ -9,7 +9,7 @@ package com.skelril.nitro.item;
 import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.time.IntegratedRunnable;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -24,14 +24,14 @@ public class ItemFountain implements IntegratedRunnable  {
 
     private final Function<Integer, Integer> amplifier;
     private final Collection<ItemStack> options;
-    private final Cause cause;
+    private final SpawnType spawnType;
 
-    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options, Cause cause) {
+    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options, SpawnType spawnType) {
         this.dropper = new ItemDropper(location);
 
         this.amplifier = amplifier;
         this.options = options;
-        this.cause = cause;
+        this.spawnType = spawnType;
     }
 
     public World getExtent() {
@@ -46,7 +46,7 @@ public class ItemFountain implements IntegratedRunnable  {
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);
         for (int i = 0; i < amplifier.apply(i) + 1; i++) {
-            dropper.dropItems(Collections.singletonList(stack), cause);
+            dropper.dropItems(Collections.singletonList(stack), spawnType);
         }
         return true;
     }

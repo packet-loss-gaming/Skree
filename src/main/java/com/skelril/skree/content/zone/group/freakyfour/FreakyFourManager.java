@@ -12,6 +12,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneCreatureDropBlocker;
 import com.skelril.skree.content.zone.ZoneInventoryProtector;
+import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
 import com.skelril.skree.content.zone.group.freakyfour.boss.CharlotteBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.DaBombBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.FrimusBossManager;
@@ -46,6 +47,10 @@ public class FreakyFourManager extends GroupZoneManager<FreakyFourInstance> impl
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new FreakyFourListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),

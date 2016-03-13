@@ -12,6 +12,7 @@ import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -38,7 +39,7 @@ public class MagicBlockStateHelper {
         drops.addAll(newItemStackCollection(ladder, foundLadder));
         drops.addAll(newItemStackCollection(platform, foundPlatform));
 
-        new ItemDropper(loc).dropItems(drops, cause);
+        new ItemDropper(loc).dropItems(drops, SpawnTypes.DROPPED_ITEM);
 
         foundLadder = foundPlatform = 0;
     }

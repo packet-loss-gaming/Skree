@@ -12,15 +12,12 @@ import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.text.CombinedText;
 import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.skree.SkreePlugin;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -35,22 +32,6 @@ public class CatacombsListener {
 
     public CatacombsListener(CatacombsManager manager) {
         this.manager = manager;
-    }
-
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            Optional<CatacombsInstance> optInst = manager.getApplicableZone(entity);
-            if (optInst.isPresent()) {
-                if  (entity instanceof Agent) {
-                    if (entity.get(Keys.DISPLAY_NAME).isPresent()) {
-                        continue;
-                    }
-                    event.setCancelled(true);
-                    break;
-                }
-            }
-        }
     }
 
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(

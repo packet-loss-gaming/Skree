@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.global.cursedmine;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
+import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
@@ -27,6 +28,10 @@ public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> imp
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new CursedMineListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
         );
 
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());

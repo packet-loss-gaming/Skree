@@ -46,6 +46,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -139,7 +141,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     public void spawnBoss() {
         Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
         if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(this).build());
+            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
             Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this));
             bossManager.bind(boss);
@@ -225,7 +227,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         // TODO convert to Sponge Data API
                         ((EntityZombie) zombie).setChild(true);
                         zombie.setItemInHand(weapon.copy());
-                        getRegion().getExtent().spawnEntity(zombie, Cause.source(this).build());
+                        getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
                         if (target != null) {
                             zombie.setTarget(target);
@@ -462,7 +464,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     if (optEntity.isPresent()) {
                         Entity potion = optEntity.get();
                         potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
-                        getRegion().getExtent().spawnEntity(entity, Cause.source(this).build());
+                        getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                     }
                 }
                 return;

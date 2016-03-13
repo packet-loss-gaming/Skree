@@ -14,7 +14,6 @@ import net.minecraftforge.event.world.ExplosionEvent;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Snowball;
@@ -22,12 +21,11 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.CollideEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
@@ -45,29 +43,6 @@ public class PatientXListener {
 
     public PatientXListener(PatientXManager manager) {
         this.manager = manager;
-    }
-
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
-            if (optInst.isPresent()) {
-                PatientXInstance inst = optInst.get();
-                if  (entity instanceof Agent) {
-                    if (entity instanceof Zombie) {
-                        if (!((EntityZombie) entity).isChild()) {
-                            if (inst.isBossSpawned() || inst.hasBossBeenKilled()) {
-                                event.setCancelled(true);
-                                break;
-                            }
-                        }
-                        continue;
-                    }
-                    event.setCancelled(true);
-                    break;
-                }
-            }
-        }
     }
 
     @Listener
@@ -145,7 +120,7 @@ public class PatientXListener {
             if (Probability.getChance(10)) {
                 new ItemDropper(entity.getLocation()).dropItems(
                         Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
-                        Cause.source(inst).build()
+                        SpawnTypes.DROPPED_ITEM
                 );
             }
         }

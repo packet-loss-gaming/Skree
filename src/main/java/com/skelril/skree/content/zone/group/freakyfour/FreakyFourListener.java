@@ -69,12 +69,12 @@ public class FreakyFourListener {
 
                 FreakyFourInstance inst = optInst.get();
 
-                FreakyFourBoss boss = inst.getCurrentboss();
+                FreakyFourBoss boss = inst.getCurrentboss().orElse(null);
                 if (boss == null) {
                     inst.setCurrentboss(FreakyFourBoss.CHARLOTTE);
                     player.sendMessage(Text.of(TextColors.RED, "You think you can beat us? Ha! we'll see about that..."));
-                } else if (inst.getBoss(boss) == null) {
-                    switch (inst.getCurrentboss()) {
+                } else if (!inst.getBoss(boss).isPresent()) {
+                    switch (boss) {
                         case CHARLOTTE:
                             inst.setCurrentboss(FreakyFourBoss.FRIMUS);
                             break;
@@ -89,11 +89,13 @@ public class FreakyFourListener {
                             inst.forceEnd();
                             return;
                     }
-                    player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(inst.getCurrentboss())));
                 } else {
                     return;
                 }
-                inst.spawnBoss(inst.getCurrentboss());
+                boss = inst.getCurrentboss().orElse(null);
+
+                player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(boss)));
+                inst.spawnBoss(boss);
             }
         }
     }

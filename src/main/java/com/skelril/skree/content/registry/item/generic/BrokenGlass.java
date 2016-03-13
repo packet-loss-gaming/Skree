@@ -24,7 +24,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -64,12 +64,12 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
         GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(Blocks.glass_pane), 0);
     }
 
-    private void dropBrokenGlass(Transaction<BlockSnapshot> block, Cause cause, int variant) {
+    private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {
         Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
         if (optOrigin.isPresent()) {
             new ItemDropper(optOrigin.get()).dropItems(
                     Collections.singleton(tf(new ItemStack(this, 1, variant))),
-                    cause
+                    SpawnTypes.DROPPED_ITEM
             );
         }
     }
@@ -89,9 +89,9 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
         for (Transaction<BlockSnapshot> block : event.getTransactions()) {
             BlockType originalType = block.getOriginal().getState().getType();
             if (originalType == BlockTypes.GLASS || originalType == BlockTypes.STAINED_GLASS) {
-                dropBrokenGlass(block, event.getCause(), 0);
+                dropBrokenGlass(block, 0);
             } else if (originalType == BlockTypes.GLASS_PANE || originalType == BlockTypes.STAINED_GLASS_PANE) {
-                dropBrokenGlass(block, event.getCause(), 1);
+                dropBrokenGlass(block, 1);
             }
         }
     }

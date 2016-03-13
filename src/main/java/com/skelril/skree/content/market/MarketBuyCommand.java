@@ -8,6 +8,7 @@ package com.skelril.skree.content.market;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.MarketService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -112,14 +113,14 @@ public class MarketBuyCommand implements CommandExecutor {
         }
 
         // Alright, all items have been found
-        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(this).build())) {
+        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
             // TODO Auto reporting
             src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
         }
 
         Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(
-                player, itemStacks, Cause.source(this).build()
+                player, itemStacks, Cause.source(SkreePlugin.container()).build()
         );
 
         if (!transactions.getKey()) {

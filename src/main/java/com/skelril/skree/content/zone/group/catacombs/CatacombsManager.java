@@ -44,6 +44,10 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
+                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
                 new ZonePvPListener(a -> getApplicableZone(a).isPresent())
         );
         Sponge.getEventManager().registerListeners(

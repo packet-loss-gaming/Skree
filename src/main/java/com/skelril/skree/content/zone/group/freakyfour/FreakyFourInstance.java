@@ -34,6 +34,8 @@ import org.spongepowered.api.entity.living.monster.CaveSpider;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -89,10 +91,10 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
 
     private void setUp() {
         Vector3i offset = region.getMinimumPoint();
-        regions.put(FreakyFourBoss.CHARLOTTE, new ZoneBoundingBox(offset.add(72, 7, 1), new Vector3i(94, 12, 42)));
-        regions.put(FreakyFourBoss.FRIMUS, new ZoneBoundingBox(offset.add(48, 7, 1), new Vector3i(70, 12, 42)));
-        regions.put(FreakyFourBoss.DA_BOMB, new ZoneBoundingBox(offset.add(24, 7, 1), new Vector3i(46, 12, 42)));
-        regions.put(FreakyFourBoss.SNIPEE, new ZoneBoundingBox(offset.add(1, 7, 1), new Vector3i(22, 12, 42)));
+        regions.put(FreakyFourBoss.CHARLOTTE, new ZoneBoundingBox(offset.add(72, 7, 1), new Vector3i(22, 5, 41)));
+        regions.put(FreakyFourBoss.FRIMUS, new ZoneBoundingBox(offset.add(48, 7, 1), new Vector3i(22, 5, 41)));
+        regions.put(FreakyFourBoss.DA_BOMB, new ZoneBoundingBox(offset.add(24, 7, 1), new Vector3i(22, 5, 41)));
+        regions.put(FreakyFourBoss.SNIPEE, new ZoneBoundingBox(offset.add(1, 7, 1), new Vector3i(21, 5, 41)));
     }
 
     @Override
@@ -193,8 +195,8 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
         return aBoss != null ? aBoss.getTargetEntity() : Optional.empty();
     }
 
-    public FreakyFourBoss getCurrentboss() {
-        return currentboss;
+    public Optional<FreakyFourBoss> getCurrentboss() {
+        return Optional.ofNullable(currentboss);
     }
 
     public void setCurrentboss(FreakyFourBoss currentBoss) {
@@ -216,6 +218,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     public void spawnBoss(FreakyFourBoss boss, long delay) {
         Task.builder().execute(() -> {
             Entity entity = getRegion().getExtent().createEntity(boss.getEntityType(), getCenter(boss)).get();
+            getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
             Boss<Living, ZoneBossDetail<FreakyFourInstance>> aBoss = new Boss<>(
                     (Living) entity,
@@ -368,6 +371,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
 
     private void spawnCharlotteMinion(Vector3d position) {
         Entity entity = getRegion().getExtent().createEntity(EntityTypes.CAVE_SPIDER, position).get();
+        getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
         Boss<CaveSpider, ZoneBossDetail<FreakyFourInstance>> boss = new Boss<>(
                 (CaveSpider) entity,

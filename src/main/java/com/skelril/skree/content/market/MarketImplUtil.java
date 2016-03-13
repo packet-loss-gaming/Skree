@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.World;
 
@@ -151,7 +152,7 @@ public class MarketImplUtil {
         }
 
         // Add remaining currency
-        new ItemDropper(player.getLocation()).dropItems(results, cause);
+        new ItemDropper(player.getLocation()).dropItems(results, SpawnTypes.PLUGIN);
         return true;
     }
 
@@ -179,7 +180,7 @@ public class MarketImplUtil {
 
         // Add remaining transactions
         transactions.addAll(stacks.stream().map(stack -> new Clause<>(stack, stack.getQuantity())).collect(Collectors.toList()));
-        new ItemDropper(player.getLocation()).dropItems(stacks, cause);
+        new ItemDropper(player.getLocation()).dropItems(stacks, SpawnTypes.PLUGIN);
 
         return new Clause<>(true, transactions);
     }
