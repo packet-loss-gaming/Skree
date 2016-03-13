@@ -24,7 +24,7 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implements Runnable, LocationZone<GoldRushInstance> {
-    private Queue<ZoneRegion> freeRegions = new LinkedList<>();
+    private final Queue<ZoneRegion> freeRegions = new LinkedList<>();
 
     public GoldRushManager() {
         Sponge.getEventManager().registerListeners(
