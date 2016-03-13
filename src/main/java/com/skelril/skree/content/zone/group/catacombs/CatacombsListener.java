@@ -6,23 +6,12 @@
 
 package com.skelril.skree.content.zone.group.catacombs;
 
-import com.skelril.nitro.combat.PlayerCombatParser;
-import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.text.CombinedText;
-import com.skelril.nitro.text.PlaceHolderText;
-import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Optional;
 
@@ -32,33 +21,6 @@ public class CatacombsListener {
 
     public CatacombsListener(CatacombsManager manager) {
         this.manager = manager;
-    }
-
-    private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            CombinedText.of(
-                    TextColors.DARK_AQUA,
-                    "Entity Health: ",
-                    new PlaceHolderText("health int"),
-                    " / ",
-                    new PlaceHolderText("max health int")
-            ),
-            CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
-    );
-
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!manager.getApplicableZone(event.getTargetEntity()).isPresent()) {
-            return;
-        }
-
-        new PlayerCombatParser() {
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) {
-                Task.builder().delayTicks(1).execute(
-                        () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
-                ).submit(SkreePlugin.inst());
-            }
-        }.parse(event);
     }
 
     @Listener

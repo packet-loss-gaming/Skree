@@ -62,6 +62,10 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
                 SkreePlugin.inst(),
                 new ZoneCreatureDropBlocker(a -> getApplicableZone(a).isPresent())
         );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneGlobalHealthPrinter(a -> getApplicableZone(a).isPresent())
+        );
 
         setUpBoss();
         setUpWave();
