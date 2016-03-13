@@ -25,6 +25,11 @@ public class EntityHealthUtil {
         living.offer(Keys.HEALTH, Math.min(health + amt, maxHealth));
     }
 
+    public static void forceDamage(Living living, double amt) {
+        double health = getHealth(living);
+        living.offer(Keys.HEALTH, Math.max(0, health - amt));
+    }
+
     public static void toFullHealth(Living living) {
         living.offer(Keys.HEALTH, living.get(Keys.MAX_HEALTH).get());
     }
