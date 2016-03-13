@@ -32,13 +32,16 @@ public class VelocityEntitySpawner {
     }
 
     public static List<Entity> sendRadial(EntityType type, Location<World> loc, Cause cause) {
-        final int amt = 12;
+        return sendRadial(type, loc, 12, .5F, cause);
+    }
+
+    public static List<Entity> sendRadial(EntityType type, Location<World> loc, int amt, float speed, Cause cause) {
         final double tau = 2 * Math.PI;
 
         double arc = tau / amt;
         List<Entity> resultSet = new ArrayList<>();
         for (double a = 0; a < tau; a += arc) {
-            Optional<Entity> optEnt = send(type, loc, new Vector3d(Math.cos(a), 0, Math.sin(a)), .5F, cause);
+            Optional<Entity> optEnt = send(type, loc, new Vector3d(Math.cos(a), 0, Math.sin(a)), speed, cause);
             if (optEnt.isPresent()) {
                 resultSet.add(optEnt.get());
             }
