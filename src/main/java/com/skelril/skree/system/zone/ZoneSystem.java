@@ -14,7 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.cursedmine.CursedMineManager;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
-import com.skelril.skree.content.zone.group.example.ExampleManager;
+import com.skelril.skree.content.zone.group.freakyfour.FreakyFourManager;
 import com.skelril.skree.content.zone.group.goldrush.GoldRushManager;
 import com.skelril.skree.content.zone.group.patientx.PatientXManager;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeManager;
@@ -32,7 +32,6 @@ import org.spongepowered.api.world.World;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Optional;
 
 @NModule(name = "Zone System")
@@ -56,13 +55,10 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
             try {
                 service = new ZoneServiceImpl(new ChainPlacementAllocator(getWorkingDir(), instWorldResolver));
 
-                for (String name : Arrays.asList("FreakyFour")) {
-                    service.registerManager(new ExampleManager(name));
-                }
-
                 service.registerManager(new CursedMineManager());
 
                 service.registerManager(new CatacombsManager());
+                service.registerManager(new FreakyFourManager());
                 service.registerManager(new GoldRushManager());
                 service.registerManager(new ShnugglesPrimeManager());
                 service.registerManager(new PatientXManager());
