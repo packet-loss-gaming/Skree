@@ -24,6 +24,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -121,6 +123,14 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
                 attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
 
                 event.setCancelled(true);
+            }
+
+            @Override
+            public void processNonLivingAttack(DamageSource attacker, Player defender) {
+                if (attacker.getType() == DamageTypes.VOID) {
+                    defender.setLocation(defender.getWorld().getSpawnLocation());
+                    event.setCancelled(true);
+                }
             }
         }.parse(event);
     }
