@@ -10,10 +10,7 @@ package com.skelril.skree.system.world;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
-import com.skelril.skree.content.world.SolidWorldGeneratorModifier;
-import com.skelril.skree.content.world.WorldCommand;
-import com.skelril.skree.content.world.WorldListCommand;
+import com.skelril.skree.content.world.*;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
@@ -50,6 +47,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         // Register the service & command
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
 
