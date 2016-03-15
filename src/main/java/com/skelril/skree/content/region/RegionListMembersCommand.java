@@ -7,7 +7,7 @@
 package com.skelril.skree.content.region;
 
 import com.skelril.skree.service.RegionService;
-import com.skelril.skree.service.internal.region.RegionReference;
+import com.skelril.skree.service.internal.region.Region;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -44,18 +44,18 @@ public class RegionListMembersCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        Optional<RegionReference> optRef = service.getSelectedRegion(player);
+        Optional<Region> optRef = service.getSelectedRegion(player);
         if (!optRef.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
             return CommandResult.empty();
         }
 
-        RegionReference ref = optRef.get();
+        Region ref = optRef.get();
 
         UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
         PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
 
-        List<Text> result = ref.getReferred().getMembers().stream()
+        List<Text> result = ref.getMembers().stream()
                 .map(userService::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

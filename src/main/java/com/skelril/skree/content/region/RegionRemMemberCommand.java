@@ -7,7 +7,7 @@
 package com.skelril.skree.content.region;
 
 import com.skelril.skree.service.RegionService;
-import com.skelril.skree.service.internal.region.RegionReference;
+import com.skelril.skree.service.internal.region.Region;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -47,7 +47,7 @@ public class RegionRemMemberCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        Optional<RegionReference> optRef = service.getSelectedRegion(player);
+        Optional<Region> optRef = service.getSelectedRegion(player);
         if (!optRef.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
             return CommandResult.empty();
@@ -55,12 +55,12 @@ public class RegionRemMemberCommand implements CommandExecutor {
 
         UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
 
-        RegionReference ref = optRef.get();
+        Region ref = optRef.get();
 
         List<UUID> oldMembers = args.<String>getAll("player").stream().map(userService::get).filter(
                 Optional::isPresent
         ).map(a -> a.get().getUniqueId()).filter(
-                a -> ref.getReferred().getMembers().contains(a)
+                a -> ref.getMembers().contains(a)
         ).collect(Collectors.toList());
 
         ref.remMember(oldMembers);

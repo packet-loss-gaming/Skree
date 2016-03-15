@@ -9,7 +9,7 @@ package com.skelril.skree.content.registry.block.region;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.service.RegionService;
-import com.skelril.skree.service.internal.region.RegionReference;
+import com.skelril.skree.service.internal.region.Region;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -59,10 +59,10 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                         RegionService service = optService.get();
                         Optional<Location<World>> optLoc = block.getFinal().getLocation();
                         if (optLoc.isPresent()) {
-                            Optional<RegionReference> optRef = service.getOrCreate(optLoc.get(), player);
+                            Optional<Region> optRef = service.getOrCreate(optLoc.get(), player);
                             if (optRef.isPresent()) {
-                                RegionReference ref = optRef.get();
-                                if (!ref.getReferred().getMasterBlock().equals(optLoc.get().getPosition())) {
+                                Region ref = optRef.get();
+                                if (!ref.getMasterBlock().equals(optLoc.get().getPosition())) {
                                     block.setValid(false);
                                 }
                                 service.setSelectedRegion(player, ref);
@@ -92,10 +92,10 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                         RegionService service = optService.get();
                         Optional<Location<World>> optLoc = block.getOriginal().getLocation();
                         if (optLoc.isPresent()) {
-                            Optional<RegionReference> optRef = service.getMarkedRegion(optLoc.get());
+                            Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
                             if (optRef.isPresent()) {
-                                RegionReference ref = optRef.get();
-                                if (!ref.getReferred().getFullPoints().isEmpty()) {
+                                Region ref = optRef.get();
+                                if (!ref.getFullPoints().isEmpty()) {
                                     block.setValid(false);
                                     player.sendMessage(Text.of(TextColors.RED, "You must first delete all markers!"));
                                 } else {

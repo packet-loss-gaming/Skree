@@ -6,184 +6,61 @@
 
 package com.skelril.skree.service.internal.region;
 
-import com.skelril.skree.db.SQLHandle;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
+import org.spongepowered.api.entity.living.player.Player;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import static com.skelril.skree.db.schema.Tables.*;
+public interface Region {
+    UUID getID();
 
-public class Region {
-    private final UUID regionID;
-    private final String worldName;
-    private final RegionPoint masterBlock;
-    private String name;
-    private int powerLevel;
-    private Set<UUID> members = new HashSet<>();
-    private Set<RegionPoint> fullPoints;
+    String getWorldName();
 
-    protected Region(UUID regionID, String worldName, RegionPoint masterBlock, Set<UUID> members) {
-        this(regionID, worldName, masterBlock, "Fluffy Bunnies", 200, members, new HashSet<>());
-    }
+    RegionPoint getMasterBlock();
 
-    protected Region(UUID regionID, String worldName, RegionPoint masterBlock, String name, int powerLevel, Set<UUID> members, Set<RegionPoint> fullPoints) {
-        this.regionID = regionID;
-        this.worldName = worldName;
-        this.masterBlock = masterBlock;
-        this.name = name;
-        this.powerLevel = powerLevel;
-        this.members = members;
-        this.fullPoints = fullPoints;
-    }
+    String getName();
 
-    public UUID getID() {
-        return regionID;
-    }
+    int getPowerLevel();
 
-    public String getWorldName() {
-        return worldName;
-    }
+    Set<UUID> getMembers();
 
-    public RegionPoint getMasterBlock() {
-        return masterBlock;
-    }
+    Set<RegionPoint> getFullPoints();
 
-    public String getName() {
-        return name;
-    }
+    RegionPoint getMax();
 
-    public int getPowerLevel() {
-        return powerLevel;
-    }
+    RegionPoint getMin();
 
-    public Set<UUID> getMembers() {
-        return Collections.unmodifiableSet(members);
-    }
+    List<RegionPoint> getPoints();
 
-    protected void uncheckedAddMember(Collection<UUID> newMembers) {
-        writeMemberAdditionToDB(newMembers);
-        members.addAll(newMembers);
-    }
+    boolean addPoint(RegionPoint newPoint);
 
-    protected void uncheckedRemMember(Collection<UUID> oldMembers) {
-        writeMemberRemovalFromDB(oldMembers);
-        members.removeAll(oldMembers);
-    }
+    boolean addPoint(Collection<RegionPoint> newPoints);
 
-    protected void writeInit(Connection con) throws SQLException {
-        writeMemberAdditionToDBWithCon(getMembers(), con);
-        writePointAdditionToDBWithCon(getFullPoints(), con);
-    }
+    boolean remPoint(RegionPoint oldPoint);
 
-    private void writeMemberAdditionToDB(Collection<UUID> newMembers) {
-        try (Connection con = SQLHandle.getConnection()) {
-            writeMemberAdditionToDBWithCon(newMembers, con);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    boolean remPoint(Collection<RegionPoint> oldPoint);
 
-    private void writeMemberAdditionToDBWithCon(Collection<UUID> newMembers, Connection con) throws SQLException {
-        DSLContext create = DSL.using(con);
-        int rgID = create.select(REGIONS.ID).from(REGIONS).where(
-                REGIONS.UUID.equal(regionID.toString())
-        ).fetchOne().value1();
+    boolean isMarkedPoint(RegionPoint point);
 
-        con.setAutoCommit(false);
-        for (UUID member : newMembers) {
-            create.insertInto(REGION_MEMBERS).columns(
-                    REGION_MEMBERS.PLAYER_ID, REGION_MEMBERS.REGION_ID
-            ).select(
-                    create.select(
-                            PLAYERS.ID,
-                            DSL.value(rgID)
-                    ).from(PLAYERS).where(PLAYERS.UUID.equal(member.toString()))
-            ).execute();
-        }
-        con.commit();
-    }
+    void addMember(UUID newMember);
 
-    private void writeMemberRemovalFromDB(Collection<UUID> oldMembers) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            int rgID = create.select(REGIONS.ID).from(REGIONS).where(
-                    REGIONS.UUID.equal(regionID.toString())
-            ).fetchOne().value1();
+    void addMember(Collection<UUID> newMembers);
 
-            con.setAutoCommit(false);
-            for (UUID member : oldMembers) {
-                create.deleteFrom(REGION_MEMBERS).where(
-                        REGION_MEMBERS.REGION_ID.equal(rgID).and(
-                                REGION_MEMBERS.PLAYER_ID.equal(DSL.select(
-                                        PLAYERS.ID
-                                ).from(PLAYERS).where(
-                                        PLAYERS.UUID.equal(member.toString()))
-                                )
-                        )
-                ).execute();
-            }
-            con.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    void remMember(UUID oldMember);
 
-    public Set<RegionPoint> getFullPoints() {
-        return Collections.unmodifiableSet(fullPoints);
-    }
+    void remMember(Collection<UUID> oldMembers);
 
-    protected void uncheckedAddPoint(Collection<RegionPoint> newPoints) {
-        writePointAdditionToDB(newPoints);
-        fullPoints.addAll(newPoints);
-    }
+    boolean isMember(Player player);
 
-    protected void uncheckedRemPoint(Collection<RegionPoint> oldPoints) {
-        writePointRemovalFromDB(oldPoints);
-        fullPoints.removeAll(oldPoints);
-    }
+    boolean isEditPrevented(Player player, RegionPoint point);
 
-    private void writePointAdditionToDB(Collection<RegionPoint> newPoints) {
-        try (Connection con = SQLHandle.getConnection()) {
-            writePointAdditionToDBWithCon(newPoints, con);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    boolean isActive();
 
-    private void writePointAdditionToDBWithCon(Collection<RegionPoint> newPoints, Connection con) throws SQLException {
-        DSLContext create = DSL.using(con);
-        con.setAutoCommit(false);
-        for (RegionPoint point : newPoints) {
-            create.insertInto(REGION_POINTS).columns(
-                    REGION_POINTS.REGION_ID, REGION_POINTS.X, REGION_POINTS.Y, REGION_POINTS.Z
-            ).select(
-                    create.select(REGIONS.ID,
-                            DSL.value(point.getX()), DSL.value(point.getY()), DSL.value(point.getZ())
-                    ).from(REGIONS).where(REGIONS.UUID.equal(regionID.toString()))
-            ).execute();
-        }
-        con.commit();
-    }
+    boolean contains(RegionPoint pos);
 
-    private void writePointRemovalFromDB(Collection<RegionPoint> oldPoints) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            con.setAutoCommit(false);
-            for (RegionPoint point : oldPoints) {
-                create.deleteFrom(REGION_POINTS).where(
-                        REGION_POINTS.REGION_ID.equal(
-                                DSL.select(REGIONS.ID).from(REGIONS).where(REGIONS.UUID.equal(regionID.toString()))
-                        ).and(REGION_POINTS.X.equal(DSL.value(point.getX())))
-                                .and(REGION_POINTS.Y.equal(DSL.value(point.getY())))
-                                .and(REGION_POINTS.Z.equal(DSL.value(point.getZ()))))
-                        .execute();
-            }
-            con.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    double cross(RegionPoint from, RegionPoint through, RegionPoint to);
+
+    void convexHull(List<RegionPoint> regionPoints, boolean updateMaxandMin);
 }

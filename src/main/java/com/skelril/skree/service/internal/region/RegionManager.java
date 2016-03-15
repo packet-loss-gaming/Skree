@@ -24,8 +24,8 @@ import static com.skelril.skree.db.schema.Tables.*;
 public class RegionManager {
     private final String worldName;
 
-    private HashMap<UUID, RegionReference> regionMap = new HashMap<>();
-    private List<RegionReference> regionList = new ArrayList<>();
+    private HashMap<UUID, CachedRegion> regionMap = new HashMap<>();
+    private List<CachedRegion> regionList = new ArrayList<>();
 
     public RegionManager(String worldName) {
         this.worldName = worldName;
@@ -37,7 +37,7 @@ public class RegionManager {
 
             int worldID = create.select(WORLDS.ID).from(WORLDS).where(WORLDS.NAME.equal(worldName)).fetchOne().value1();
 
-            List<Region> loaded = create.select(
+            List<RegionDatabaseHandle> loaded = create.select(
                     REGIONS.ID,
                     REGIONS.UUID,
                     REGIONS.X,
@@ -76,7 +76,7 @@ public class RegionManager {
                         new RegionPoint(entry.value1(), entry.value2(), entry.value3())
                 ).collect(Collectors.toSet());
 
-                return new Region(regionID, worldName, masterBlock, name, power, members, points);
+                return new RegionDatabaseHandle(regionID, worldName, masterBlock, name, power, members, points);
             }).collect(Collectors.toList());
 
             uncheckedAddRegion(loaded);
@@ -85,32 +85,32 @@ public class RegionManager {
         }
     }
 
-    public RegionReference addRegion(Region region) {
+    public CachedRegion addRegion(RegionDatabaseHandle region) {
         return addRegion(Collections.singleton(region)).get(0);
     }
 
-    public List<RegionReference> addRegion(Collection<Region> regions) {
+    public List<CachedRegion> addRegion(Collection<RegionDatabaseHandle> regions) {
         writeAddRegion(regions);
         return uncheckedAddRegion(regions);
     }
 
-    public void remRegion(Region region) {
+    public void remRegion(RegionDatabaseHandle region) {
         remRegion(Collections.singleton(region));
     }
 
-    public void remRegion(Collection<Region> regions) {
+    public void remRegion(Collection<RegionDatabaseHandle> regions) {
         writeRemRegion(regions);
         uncheckedRemRegion(regions);
     }
 
-    private void writeAddRegion(Collection<Region> newRegions) {
+    private void writeAddRegion(Collection<RegionDatabaseHandle> newRegions) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             con.setAutoCommit(false);
 
             int worldID = create.select(WORLDS.ID).from(WORLDS).where(WORLDS.NAME.equal(worldName)).fetchOne().value1();
 
-            for (Region region : newRegions) {
+            for (RegionDatabaseHandle region : newRegions) {
                 create.insertInto(REGIONS).columns(REGIONS.UUID, REGIONS.WORLD_ID, REGIONS.X, REGIONS.Y, REGIONS.Z, REGIONS.NAME, REGIONS.POWER)
                         .values(
                                 region.getID().toString(),
@@ -130,11 +130,11 @@ public class RegionManager {
         }
     }
 
-    private void writeRemRegion(Collection<Region> oldRegions) {
+    private void writeRemRegion(Collection<RegionDatabaseHandle> oldRegions) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
             con.setAutoCommit(false);
-            for (Region region : oldRegions) {
+            for (RegionDatabaseHandle region : oldRegions) {
                 create.deleteFrom(REGIONS).where(REGIONS.UUID.equal(region.getID().toString())).execute();
             }
             con.commit();
@@ -143,10 +143,10 @@ public class RegionManager {
         }
     }
 
-    private List<RegionReference> uncheckedAddRegion(Collection<Region> regions) {
-        List<RegionReference> regionReferences = new ArrayList<>();
+    private List<CachedRegion> uncheckedAddRegion(Collection<RegionDatabaseHandle> regions) {
+        List<CachedRegion> regionReferences = new ArrayList<>();
         regions.stream().filter(region -> !regionMap.containsKey(region.getID())).forEach(region -> {
-            RegionReference ref = new RegionReference(region, this);
+            CachedRegion ref = new CachedRegion(region, this);
             regionMap.put(region.getID(), ref);
             regionList.add(ref);
             regionReferences.add(ref);
@@ -154,14 +154,14 @@ public class RegionManager {
         return regionReferences;
     }
 
-    private void uncheckedRemRegion(Collection<Region> regions) {
-        for (Region region : regions) {
+    private void uncheckedRemRegion(Collection<RegionDatabaseHandle> regions) {
+        for (RegionDatabaseHandle region : regions) {
             regionList.remove(regionMap.remove(region.getID()));
         }
     }
 
-    public Optional<RegionReference> getRegion(RegionPoint point) {
-        for (RegionReference region : regionList) {
+    public Optional<CachedRegion> getRegion(RegionPoint point) {
+        for (CachedRegion region : regionList) {
             if (region.contains(point)) {
                 return Optional.of(region);
             }
@@ -169,8 +169,8 @@ public class RegionManager {
         return Optional.empty();
     }
 
-    public Optional<RegionReference> getMarkedRegion(RegionPoint point) {
-        for (RegionReference region : regionList) {
+    public Optional<CachedRegion> getMarkedRegion(RegionPoint point) {
+        for (CachedRegion region : regionList) {
             if (region.isMarkedPoint(point)) {
                 return Optional.of(region);
             }
@@ -178,8 +178,8 @@ public class RegionManager {
         return Optional.empty();
     }
 
-    public boolean createsIntersect(RegionReference addedTo, RegionPoint point) {
-        for (RegionReference region : regionList) {
+    public boolean createsIntersect(CachedRegion addedTo, RegionPoint point) {
+        for (CachedRegion region : regionList) {
             if (addedTo.equals(region)) {
                 continue;
             }
@@ -199,9 +199,9 @@ public class RegionManager {
 
         if (optWorld.isPresent()) {
             World world = optWorld.get();
-            for (RegionReference region : regionList) {
+            for (CachedRegion region : regionList) {
                 List<RegionPoint> toRemove = new ArrayList<>();
-                for (RegionPoint point : region.getReferred().getFullPoints()) {
+                for (RegionPoint point : region.getFullPoints()) {
                     BlockType type = world.getBlockType(point.toInt());
                     if (type != CustomBlockTypes.REGION_MASTER && type != CustomBlockTypes.REGION_MARKER) {
                         ++total;

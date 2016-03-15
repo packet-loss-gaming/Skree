@@ -11,8 +11,8 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.*;
 
-public class RegionReference {
-    private final Region ref;
+public class CachedRegion implements Region {
+    private final RegionDatabaseHandle ref;
     private final RegionManager manager;
 
     private RegionPoint min;
@@ -22,15 +22,50 @@ public class RegionReference {
 
     private List<RegionPoint> points = new ArrayList<>();
 
-    protected RegionReference(Region ref, RegionManager manager) {
+    protected CachedRegion(RegionDatabaseHandle ref, RegionManager manager) {
         this.ref = ref;
         this.manager = manager;
 
         loadPoints();
     }
 
-    public Region getReferred() {
+    public RegionDatabaseHandle getHandle() {
         return ref;
+    }
+
+    @Override
+    public UUID getID() {
+        return ref.getID();
+    }
+
+    @Override
+    public String getWorldName() {
+        return ref.getWorldName();
+    }
+
+    @Override
+    public RegionPoint getMasterBlock() {
+        return ref.getMasterBlock();
+    }
+
+    @Override
+    public String getName() {
+        return ref.getName();
+    }
+
+    @Override
+    public int getPowerLevel() {
+        return ref.getPowerLevel();
+    }
+
+    @Override
+    public Set<UUID> getMembers() {
+        return ref.getMembers();
+    }
+
+    @Override
+    public Set<RegionPoint> getFullPoints() {
+        return ref.getFullPoints();
     }
 
     public RegionPoint getMax() {
@@ -85,7 +120,7 @@ public class RegionReference {
     }
 
     public boolean isMarkedPoint(RegionPoint point) {
-        return getReferred().getFullPoints().contains(point) || getReferred().getMasterBlock().equals(point);
+        return ref.getFullPoints().contains(point) || ref.getMasterBlock().equals(point);
     }
 
     public void addMember(UUID newMember) {
@@ -105,7 +140,7 @@ public class RegionReference {
     }
 
     public boolean isMember(Player player) {
-        return getReferred().getMembers().contains(player.getUniqueId());
+        return ref.getMembers().contains(player.getUniqueId());
     }
 
     public boolean isEditPrevented(Player player, RegionPoint point) {

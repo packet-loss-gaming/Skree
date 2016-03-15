@@ -28,33 +28,34 @@ import java.util.concurrent.TimeUnit;
 
 public class RegionServiceImpl implements RegionService {
     private Map<World, RegionManager> managerMap = new HashMap<>();
-    private Map<Player, RegionReference> selectionMap = new WeakHashMap<>();
+    private Map<Player, Region> selectionMap = new WeakHashMap<>();
 
     public void addManager(World world, RegionManager manager) {
         managerMap.put(world, manager);
     }
 
     @Override
-    public Optional<RegionReference> get(Location<World> location) {
+    public Optional<Region> get(Location<World> location) {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
-            return manager.getRegion(new RegionPoint(location.getPosition()));
+            return Optional.ofNullable(manager.getRegion(new RegionPoint(location.getPosition())).orElse(null));
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<RegionReference> getOrCreate(Location<World> location, User user) {
+    public Optional<Region> getOrCreate(Location<World> location, User user) {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
             RegionPoint point = new RegionPoint(location.getPosition());
-            Optional<RegionReference> optRegion = manager.getRegion(point);
+            Optional<CachedRegion> optRegion = manager.getRegion(point);
             if (optRegion.isPresent()) {
-                if (optRegion.get().getReferred().getMembers().contains(user.getUniqueId())) {
-                    return optRegion;
+                Region region = optRegion.get();
+                if (region.getMembers().contains(user.getUniqueId())) {
+                    return Optional.of(region);
                 }
             } else {
-                return Optional.of(manager.addRegion(new Region(
+                return Optional.of(manager.addRegion(new RegionDatabaseHandle(
                         UUID.randomUUID(),
                         location.getExtent().getName(),
                         point,
@@ -66,10 +67,10 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public Optional<RegionReference> getMarkedRegion(Location<World> location) {
+    public Optional<Region> getMarkedRegion(Location<World> location) {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
-            return manager.getMarkedRegion(new RegionPoint(location.getPosition()));
+            return Optional.ofNullable(manager.getMarkedRegion(new RegionPoint(location.getPosition())).orElse(null));
         }
         return Optional.empty();
     }
@@ -79,9 +80,9 @@ public class RegionServiceImpl implements RegionService {
         RegionManager manager = managerMap.get(location.getExtent());
         if (manager != null) {
             RegionPoint point = new RegionPoint(location.getPosition());
-            Optional<RegionReference> optRegion = manager.getMarkedRegion(point);
+            Optional<CachedRegion> optRegion = manager.getMarkedRegion(point);
             if (optRegion.isPresent()) {
-                manager.remRegion(optRegion.get().getReferred());
+                manager.remRegion(optRegion.get().getHandle());
             }
         }
     }
@@ -96,12 +97,12 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Override
-    public void setSelectedRegion(Player player, RegionReference region) {
+    public void setSelectedRegion(Player player, Region region) {
         selectionMap.put(player, region);
     }
 
     @Override
-    public Optional<RegionReference> getSelectedRegion(Player player) {
+    public Optional<Region> getSelectedRegion(Player player) {
         return Optional.ofNullable(selectionMap.get(player));
     }
 
@@ -112,9 +113,9 @@ public class RegionServiceImpl implements RegionService {
         RegionManager manager = managerMap.get(loc.getExtent());
 
         if (manager != null) {
-            Optional<RegionReference> optRef = manager.getRegion(point);
+            Optional<CachedRegion> optRef = manager.getRegion(point);
             if (optRef.isPresent()) {
-                RegionReference ref = optRef.get();
+                CachedRegion ref = optRef.get();
                 if (ref.isEditPrevented(player, point)) {
                     if (player.hasPermission("skree.admin.edit.regions")) {
                         long lastNotice = recentNotices.getOrDefault(player, 0L);

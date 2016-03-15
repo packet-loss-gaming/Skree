@@ -9,8 +9,8 @@ package com.skelril.skree.content.registry.block.region;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.service.RegionService;
+import com.skelril.skree.service.internal.region.Region;
 import com.skelril.skree.service.internal.region.RegionPoint;
-import com.skelril.skree.service.internal.region.RegionReference;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -61,11 +61,11 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                         RegionService service = optService.get();
                         Optional<Location<World>> optLoc = block.getFinal().getLocation();
                         if (optLoc.isPresent()) {
-                            Optional<RegionReference> optRef = service.getSelectedRegion(player);
+                            Optional<Region> optRef = service.getSelectedRegion(player);
                             if (optRef.isPresent()) {
                                 Location<World> loc = optLoc.get();
-                                RegionReference ref = optRef.get();
-                                if (ref.getReferred().getWorldName().equals(loc.getExtent().getName())) {
+                                Region ref = optRef.get();
+                                if (ref.getWorldName().equals(loc.getExtent().getName())) {
                                     if (ref.isMember(player)) {
                                         ref.addPoint(new RegionPoint(loc.getPosition()));
                                         player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
@@ -97,9 +97,9 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                         RegionService service = optService.get();
                         Optional<Location<World>> optLoc = block.getOriginal().getLocation();
                         if (optLoc.isPresent()) {
-                            Optional<RegionReference> optRef = service.getMarkedRegion(optLoc.get());
+                            Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
                             if (optRef.isPresent()) {
-                                RegionReference ref = optRef.get();
+                                Region ref = optRef.get();
                                 if (ref.isMember(player)) {
                                     ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
                                     player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));

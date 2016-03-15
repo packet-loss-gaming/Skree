@@ -7,7 +7,7 @@
 package com.skelril.skree.content.region;
 
 import com.skelril.skree.service.RegionService;
-import com.skelril.skree.service.internal.region.RegionReference;
+import com.skelril.skree.service.internal.region.Region;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -40,16 +40,16 @@ public class RegionInfoCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        Optional<RegionReference> optRef = service.getSelectedRegion(player);
+        Optional<Region> optRef = service.getSelectedRegion(player);
         if (!optRef.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
             return CommandResult.empty();
         }
 
-        RegionReference ref = optRef.get();
-        player.sendMessage(Text.of(TextColors.GOLD, "Region information for: ", (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getReferred().getName().toUpperCase()));
-        player.sendMessage(Text.of(ref.getReferred().getPowerLevel(), TextColors.YELLOW, " block power range"));
-        player.sendMessage(Text.of(ref.getReferred().getMembers().size(), TextColors.YELLOW, " members"));
+        Region ref = optRef.get();
+        player.sendMessage(Text.of(TextColors.GOLD, "Region information for: ", (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getName().toUpperCase()));
+        player.sendMessage(Text.of(ref.getPowerLevel(), TextColors.YELLOW, " block power range"));
+        player.sendMessage(Text.of(ref.getMembers().size(), TextColors.YELLOW, " members"));
         player.sendMessage(Text.of(ref.getPoints().size(), TextColors.YELLOW, " active markers"));
 
         return CommandResult.success();
