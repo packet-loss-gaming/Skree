@@ -11,7 +11,7 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.*;
 
-public class CachedRegion implements Region {
+class CachedRegion implements Region {
     private final RegionDatabaseHandle ref;
     private final RegionManager manager;
 

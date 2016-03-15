@@ -16,7 +16,7 @@ import java.util.*;
 
 import static com.skelril.skree.db.schema.Tables.*;
 
-public class RegionDatabaseHandle {
+class RegionDatabaseHandle {
     private final UUID regionID;
     private final String worldName;
     private final RegionPoint masterBlock;
