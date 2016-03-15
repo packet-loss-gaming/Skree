@@ -56,6 +56,11 @@ public class RegionAddMemberCommand implements CommandExecutor {
 
         Region ref = optRef.get();
 
+        if (!ref.getMembers().contains(player.getUniqueId())) {
+            player.sendMessage(Text.of(TextColors.RED, "You must be a member of the region to modify it!"));
+            return CommandResult.empty();
+        }
+
         List<UUID> newMembers = args.<User>getAll("player").stream().map(Identifiable::getUniqueId).filter(
                 a -> !ref.getMembers().contains(a)
         ).collect(Collectors.toList());
