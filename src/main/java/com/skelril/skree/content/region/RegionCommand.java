@@ -17,6 +17,7 @@ public class RegionCommand {
                 .child(RegionRemMemberCommand.aquireSpec(), "removemember", "remmember")
                 .child(RegionInfoCommand.aquireSpec(), "info", "i")
                 .child(RegionListMembersCommand.aquireSpec(), "listmembers")
+                .child(RegionListMarkersCommand.aquireSpec(), "listmarkers")
                 .child(RegionCleanupCommand.aquireSpec(), "cleanup")
                 .build();
     }
