@@ -50,7 +50,7 @@ public class WorldListCommand implements CommandExecutor {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
             .description(Text.of("List available worlds"))
-            .permission("skree.world")
+            .permission("skree.world.teleport")
             .executor(new WorldListCommand()).build();
     }
 }

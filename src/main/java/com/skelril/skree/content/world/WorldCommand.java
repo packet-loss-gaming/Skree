@@ -7,7 +7,6 @@
 package com.skelril.skree.content.world;
 
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -16,7 +15,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -33,29 +32,24 @@ public class WorldCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<WorldProperties> optWorldName = args.getOne("world");
+        Optional<WorldProperties> optWorld = args.getOne("world");
 
-        if (!optWorldName.isPresent()) {
+        if (!optWorld.isPresent()) {
             src.sendMessage(Text.of("You are in: " + ((Player) src).getWorld().getName() + "."));
             return CommandResult.empty();
         }
 
-        World world = Sponge.getServer().getWorld(optWorldName.get().getUniqueId()).get();
+        WorldProperties world = optWorld.get();
+        ((Player) src).transferToWorld(world.getUniqueId(), world.getSpawnPosition().toDouble());
 
-        if (args.hasAny("f")) {
-            ((Player) src).setLocation(world.getSpawnLocation());
-        } else {
-            ((Player) src).setLocationSafely(world.getSpawnLocation());
-        }
-
-        src.sendMessage(Text.of("Entered world: " + world.getName() + " successfully!"));
+        src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getWorldName() + " successfully!"));
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Teleport to a different world"))
-                .permission("skree.world")
+                .permission("skree.world.teleport")
                 .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
                 .executor(new WorldCommand()).build();
     }
