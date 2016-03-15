@@ -18,6 +18,7 @@ class CachedRegion implements Region {
     private RegionPoint min;
     private RegionPoint max;
 
+    private double area;
     private boolean active = false;
 
     private List<RegionPoint> points = new ArrayList<>();
@@ -54,8 +55,18 @@ class CachedRegion implements Region {
     }
 
     @Override
+    public double getArea() {
+        return area;
+    }
+
+    @Override
     public int getPowerLevel() {
         return ref.getPowerLevel();
+    }
+
+    @Override
+    public double getMaximumArea() {
+        return manager.getPowerToAreaConstant() * ref.getPowerLevel();
     }
 
     @Override
@@ -80,27 +91,38 @@ class CachedRegion implements Region {
         return Collections.unmodifiableList(points);
     }
 
-    public boolean addPoint(RegionPoint newPoint) {
+    public RegionErrorStatus addPoint(RegionPoint newPoint) {
         return addPoint(Collections.singleton(newPoint));
     }
 
-    public boolean addPoint(Collection<RegionPoint> newPoints) {
+    public RegionErrorStatus addPoint(Collection<RegionPoint> newPoints) {
+        List<RegionPoint> stagedPoints = new ArrayList<>();
+        stagedPoints.addAll(newPoints);
+        stagedPoints.addAll(points);
+
+        convexHull(stagedPoints, false);
+
+        if (area(stagedPoints) > getMaximumArea()) {
+            return RegionErrorStatus.REGION_TOO_LARGE;
+        }
+
         for (RegionPoint point : newPoints) {
             if (manager.createsIntersect(this, point)) {
-                return false;
+                return RegionErrorStatus.INTERSECT;
             }
         }
+
         uncheckedAddPoint(newPoints);
-        return true;
+        return RegionErrorStatus.NONE;
     }
 
-    public boolean remPoint(RegionPoint oldPoint) {
+    public RegionErrorStatus remPoint(RegionPoint oldPoint) {
         return remPoint(Collections.singleton(oldPoint));
     }
 
-    public boolean remPoint(Collection<RegionPoint> oldPoint) {
+    public RegionErrorStatus remPoint(Collection<RegionPoint> oldPoint) {
         uncheckedRemPoint(oldPoint);
-        return true;
+        return RegionErrorStatus.NONE;
     }
 
     protected void uncheckedAddPoint(Collection<RegionPoint> newPoints) {
@@ -116,6 +138,7 @@ class CachedRegion implements Region {
     private void loadPoints() {
         points = new ArrayList<>(ref.getFullPoints());
         convexHull(points, true);
+        area = area(points);
         checkIsActive();
     }
 
@@ -217,8 +240,24 @@ class CachedRegion implements Region {
         active = uncheckedContains(ref.getMasterBlock());
     }
 
-    public double cross(RegionPoint from, RegionPoint through, RegionPoint to) {
+    private double cross(RegionPoint from, RegionPoint through, RegionPoint to) {
         return (through.getX() - from.getX()) * (to.getZ() - from.getZ()) - (through.getZ() - from.getZ()) * (to.getX() - from.getX());
+    }
+
+    private double area(List<RegionPoint> regionPoints) {
+        double area = 0;
+        int k = regionPoints.size() - 1;
+
+        for (int i = 0; i < regionPoints.size(); ++i) {
+            double xSum = regionPoints.get(k).getX() + regionPoints.get(i).getX();
+            double zDiff = regionPoints.get(k).getZ() - regionPoints.get(i).getZ();
+
+            area += xSum * zDiff;
+
+            k = i;
+        }
+
+        return -(area / 2); // The convex hull traversal is negative
     }
 
     public void convexHull(List<RegionPoint> regionPoints, boolean updateMaxandMin) {

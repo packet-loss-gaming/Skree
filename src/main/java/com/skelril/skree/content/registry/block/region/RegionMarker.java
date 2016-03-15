@@ -10,6 +10,7 @@ import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.service.RegionService;
 import com.skelril.skree.service.internal.region.Region;
+import com.skelril.skree.service.internal.region.RegionErrorStatus;
 import com.skelril.skree.service.internal.region.RegionPoint;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -67,9 +68,15 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
                                 Region ref = optRef.get();
                                 if (ref.getWorldName().equals(loc.getExtent().getName())) {
                                     if (ref.isMember(player)) {
-                                        ref.addPoint(new RegionPoint(loc.getPosition()));
-                                        player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
-                                        continue;
+                                        RegionErrorStatus status = ref.addPoint(new RegionPoint(loc.getPosition()));
+                                        if (status == RegionErrorStatus.NONE) {
+                                            player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
+                                            continue;
+                                        } else if (status == RegionErrorStatus.INTERSECT) {
+                                            player.sendMessage(Text.of(TextColors.RED, "No two regions can occupy the same space!"));
+                                        } else if (status == RegionErrorStatus.REGION_TOO_LARGE) {
+                                            player.sendMessage(Text.of(TextColors.RED, "You do not have enough power to expand your region!"));
+                                        }
                                     }
                                 }
                             }

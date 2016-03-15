@@ -19,6 +19,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class RegionInfoCommand implements CommandExecutor {
@@ -46,11 +47,44 @@ public class RegionInfoCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
+        DecimalFormat countFormat = new DecimalFormat("#,###");
         Region ref = optRef.get();
-        player.sendMessage(Text.of(TextColors.GOLD, "Region information for: ", (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getName().toUpperCase()));
-        player.sendMessage(Text.of(ref.getPowerLevel(), TextColors.YELLOW, " block power range"));
-        player.sendMessage(Text.of(ref.getMembers().size(), TextColors.YELLOW, " members"));
-        player.sendMessage(Text.of(ref.getPoints().size(), TextColors.YELLOW, " active markers"));
+        player.sendMessage(
+                Text.of(
+                        TextColors.GOLD,
+                        "Region information for: ",
+                        (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getName().toUpperCase()
+                )
+        );
+
+        player.sendMessage(
+                Text.of(
+                        countFormat.format(ref.getPowerLevel()),
+                        TextColors.YELLOW, " power cores"
+                )
+        );
+        player.sendMessage(
+                Text.of(
+                        countFormat.format(ref.getArea()),
+                        TextColors.YELLOW, " block area"
+                )
+        );
+        player.sendMessage(
+                Text.of(
+                        countFormat.format(ref.getMaximumArea()),
+                        TextColors.YELLOW, " block maximum area"
+                )
+        );
+        player.sendMessage(
+                Text.of(
+                        countFormat.format(ref.getMembers().size()),
+                        TextColors.YELLOW, " members")
+        );
+        player.sendMessage(
+                Text.of(
+                        countFormat.format(ref.getPoints().size()),
+                        TextColors.YELLOW, " active markers")
+        );
 
         return CommandResult.success();
     }

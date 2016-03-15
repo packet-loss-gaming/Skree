@@ -24,6 +24,9 @@ public interface Region {
 
     int getPowerLevel();
 
+    double getArea();
+    double getMaximumArea();
+
     Set<UUID> getMembers();
 
     Set<RegionPoint> getFullPoints();
@@ -34,13 +37,13 @@ public interface Region {
 
     List<RegionPoint> getPoints();
 
-    boolean addPoint(RegionPoint newPoint);
+    RegionErrorStatus addPoint(RegionPoint newPoint);
 
-    boolean addPoint(Collection<RegionPoint> newPoints);
+    RegionErrorStatus addPoint(Collection<RegionPoint> newPoints);
 
-    boolean remPoint(RegionPoint oldPoint);
+    RegionErrorStatus remPoint(RegionPoint oldPoint);
 
-    boolean remPoint(Collection<RegionPoint> oldPoint);
+    RegionErrorStatus remPoint(Collection<RegionPoint> oldPoint);
 
     boolean isMarkedPoint(RegionPoint point);
 
@@ -59,8 +62,4 @@ public interface Region {
     boolean isActive();
 
     boolean contains(RegionPoint pos);
-
-    double cross(RegionPoint from, RegionPoint through, RegionPoint to);
-
-    void convexHull(List<RegionPoint> regionPoints, boolean updateMaxandMin);
 }

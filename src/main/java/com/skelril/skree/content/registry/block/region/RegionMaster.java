@@ -62,9 +62,12 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                             Optional<Region> optRef = service.getOrCreate(optLoc.get(), player);
                             if (optRef.isPresent()) {
                                 Region ref = optRef.get();
+
+                                // Determine if this is a new region or not
                                 if (!ref.getMasterBlock().equals(optLoc.get().getPosition())) {
                                     block.setValid(false);
                                 }
+
                                 service.setSelectedRegion(player, ref);
                                 player.sendMessage(Text.of(TextColors.YELLOW, "Active region set!"));
                             }

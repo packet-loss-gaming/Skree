@@ -218,4 +218,8 @@ public class RegionManager {
     public boolean contains(RegionPoint point) {
         return getRegion(point).isPresent();
     }
+
+    public double getPowerToAreaConstant() {
+        return 500;
+    }
 }
