@@ -13,6 +13,7 @@ public class RegionCommand {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Manipulate regions"))
+                .child(RegionSelectCommand.aquireSpec(), "select")
                 .child(RegionAddMemberCommand.aquireSpec(), "addmember")
                 .child(RegionRemMemberCommand.aquireSpec(), "removemember", "remmember")
                 .child(RegionInfoCommand.aquireSpec(), "info", "i")
