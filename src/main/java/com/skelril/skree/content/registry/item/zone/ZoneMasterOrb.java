@@ -6,6 +6,8 @@
 
 package com.skelril.skree.content.registry.item.zone;
 
+import com.flowpowered.math.vector.Vector3i;
+import com.skelril.nitro.position.PositionRandomizer;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -13,6 +15,7 @@ import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
+import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -160,9 +163,17 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             for (int i = group.size() - 1; i >= 0; --i) {
                                 purgeZoneItems(group.get(i), itemStack);
                                 createLightningStrike(group.get(i));
+                                moveToInstanceIsle(group.get(i));
                             }
 
-                            service.requestZone(getZone(itemStack).get(), group);
+                            service.requestZone(getZone(itemStack).get(), group, result -> {
+                                if (result.isPresent()) {
+                                    result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
+                                        player.setLocation(player.getWorld().getSpawnLocation());
+                                        player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
+                                    });
+                                }
+                            });
                         }
                     }
                     event.setCancelled(true);
@@ -179,6 +190,16 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
             lightning.setEffect(true);
             loc.getExtent().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
         }
+    }
+
+    private void moveToInstanceIsle(Player player) {
+        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+        Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
+        World targetWorld = service.getEffectWrapper("Main").getWorlds().iterator().next();
+        Location<World> targetPos = targetWorld.getLocation(randomizedPos);
+        player.setLocation(targetPos);
+        player.sendMessage(Text.of(TextColors.YELLOW, "Your instance is building..."));
+        player.sendMessage(Text.of(TextColors.YELLOW, "You will automatically be teleported when it's finished."));
     }
 
     private boolean isInInstanceWorld(Player player) {
