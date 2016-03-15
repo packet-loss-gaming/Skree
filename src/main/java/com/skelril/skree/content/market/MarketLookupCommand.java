@@ -18,6 +18,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -77,14 +78,38 @@ public class MarketLookupCommand implements CommandExecutor {
         String sellUsedPrice = df.format(sellPrice.multiply(new BigDecimal(percentageSale)));
         String sellNewPrice = df.format(sellPrice);
 
+        String alias = optAlias.get();
+
+        Text itemDisplay = Text.of(
+                TextColors.BLUE,
+                TextActions.showItem(service.getItem(alias).get()), alias.toUpperCase()
+        );
+
+        Text.Builder itemSteps = Text.builder();
+        for (int i : new int[]{1, 16, 32, 64}) {
+            if (i != 1) {
+                itemSteps.append(Text.of(TextColors.YELLOW, ", "));
+            }
+
+            BigDecimal intervalPrice = price.multiply(new BigDecimal(i));
+
+            itemSteps.append(Text.of(
+                    TextColors.BLUE,
+                    TextActions.runCommand("/market buy -a " + i + " " + alias),
+                    TextActions.showText(Text.of("Buy ", i, " for ", df.format(intervalPrice))),
+                    i
+            ));
+        }
+
         List<Text> information = new ArrayList<>(6);
         Collections.addAll(
                 information,
-                Text.of(TextColors.GOLD, "Price information for: ", TextColors.BLUE, optAlias.get().toUpperCase()),
+                Text.of(TextColors.GOLD, "Price information for: ", itemDisplay),
                 Text.of(TextColors.YELLOW, "When you buy it you pay:"),
                 Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
                 Text.of(TextColors.YELLOW, "When you sell it you get:"),
-                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each.")
+                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each."),
+                Text.of(TextColors.YELLOW, "Quick buy: ", itemSteps.build())
         );
 
         if (percentageSale != 1) {
