@@ -9,6 +9,7 @@ package com.skelril.nitro.combat;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -32,6 +33,9 @@ public interface PlayerCombatParser extends CombatParser {
             }
 
             if (!(srcEntity instanceof Living)) {
+                if (entity instanceof Player) {
+                    processNonLivingAttack(optDamageSource.get(), (Player) entity);
+                }
                 return;
             }
 
@@ -57,4 +61,6 @@ public interface PlayerCombatParser extends CombatParser {
     default void processMonsterAttack(Living attacker, Player defender) { }
 
     default void processPlayerAttack(Player attacker, Living defender) { }
+
+    default void processNonLivingAttack(DamageSource attacker, Player defender) { }
 }
