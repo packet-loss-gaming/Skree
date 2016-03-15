@@ -17,6 +17,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
@@ -38,6 +39,8 @@ public class MarketListCommand implements CommandExecutor {
         Text sellText = Text.of(TextColors.WHITE, sell);
 
         return Text.of(
+                TextActions.runCommand("/market lookup " + entry.getKey()),
+                TextActions.showText(Text.of("Show detailed item information")),
                 TextColors.BLUE, entry.getKey().toUpperCase(),
                 TextColors.YELLOW, " (Quick Price: ", buyText, " - ", sellText, ")"
         );
