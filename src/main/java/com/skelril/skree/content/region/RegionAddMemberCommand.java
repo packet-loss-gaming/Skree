@@ -16,9 +16,10 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Identifiable;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.spongepowered.api.command.args.GenericArguments.allOf;
-import static org.spongepowered.api.command.args.GenericArguments.string;
+import static org.spongepowered.api.command.args.GenericArguments.user;
 
 public class RegionAddMemberCommand implements CommandExecutor {
     @Override
@@ -53,13 +54,9 @@ public class RegionAddMemberCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-
         Region ref = optRef.get();
 
-        List<UUID> newMembers = args.<String>getAll("player").stream().map(userService::get).filter(
-                Optional::isPresent
-        ).map(a -> a.get().getUniqueId()).filter(
+        List<UUID> newMembers = args.<User>getAll("player").stream().map(Identifiable::getUniqueId).filter(
                 a -> !ref.getMembers().contains(a)
         ).collect(Collectors.toList());
 
@@ -73,7 +70,7 @@ public class RegionAddMemberCommand implements CommandExecutor {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Add a player to a region"))
-                .arguments(allOf(string(Text.of("player"))))
+                .arguments(allOf(user(Text.of("player"))))
                 .executor(new RegionAddMemberCommand())
                 .build();
     }
