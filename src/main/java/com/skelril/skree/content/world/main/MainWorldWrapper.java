@@ -21,6 +21,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
@@ -135,6 +136,10 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
+                if (entity.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) != GameModes.SURVIVAL) {
+                    continue;
+                }
+
                 List<PotionEffect> potionEffects = entity.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
                 potionEffects.add(speedEffect);
                 entity.offer(Keys.POTION_EFFECTS, potionEffects);
