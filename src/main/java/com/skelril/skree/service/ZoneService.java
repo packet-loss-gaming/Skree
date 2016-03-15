@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public interface ZoneService {
@@ -22,6 +23,7 @@ public interface ZoneService {
     }
 
     void registerManager(ZoneManager<?> manager);
+    Set<String> getManagerNames();
 
     Optional<Integer> getMaxGroupSize(String managerName);
     default void requestZone(String managerName, Player player) {

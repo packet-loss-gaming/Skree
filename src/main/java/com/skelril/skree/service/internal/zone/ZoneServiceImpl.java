@@ -45,6 +45,11 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    public Set<String> getManagerNames() {
+        return managers.keySet();
+    }
+
+    @Override
     public Optional<Integer> getMaxGroupSize(String managerName) {
         return managers.get(ZoneService.mangleManagerName(managerName)).getMaxGroupSize();
     }

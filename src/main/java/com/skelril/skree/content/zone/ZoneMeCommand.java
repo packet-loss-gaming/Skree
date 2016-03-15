@@ -17,8 +17,11 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.spongepowered.api.command.args.GenericArguments.choices;
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
-import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class ZoneMeCommand implements CommandExecutor {
 
@@ -30,9 +33,13 @@ public class ZoneMeCommand implements CommandExecutor {
     }
 
     public static CommandSpec aquireSpec() {
+        ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
+
+        Map<String, String> options = service.getManagerNames().stream().collect(Collectors.toMap(a -> a, a -> a));
+
         return CommandSpec.builder()
                 .description(Text.of("Create a zone"))
                 .permission("skree.zone.zoneme")
-                .arguments(onlyOne(string(Text.of("zone")))).executor(new ZoneMeCommand()).build();
+                .arguments(onlyOne(choices(Text.of("zone"), options))).executor(new ZoneMeCommand()).build();
     }
 }

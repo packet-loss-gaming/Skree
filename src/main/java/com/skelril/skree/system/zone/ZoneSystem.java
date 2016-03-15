@@ -63,8 +63,8 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
                 service.registerManager(new ShnugglesPrimeManager());
                 service.registerManager(new PatientXManager());
 
-                Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
                 Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
+                Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
             } catch (IOException e) {
                 e.printStackTrace();
             }
