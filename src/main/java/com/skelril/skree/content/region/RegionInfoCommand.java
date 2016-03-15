@@ -17,6 +17,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.text.DecimalFormat;
@@ -77,13 +78,19 @@ public class RegionInfoCommand implements CommandExecutor {
         );
         player.sendMessage(
                 Text.of(
+                        TextActions.runCommand("/rg listmembers"),
+                        TextActions.showText(Text.of("List the region's members")),
                         countFormat.format(ref.getMembers().size()),
-                        TextColors.YELLOW, " members")
+                        TextColors.YELLOW, " members"
+                )
         );
         player.sendMessage(
                 Text.of(
+                        TextActions.runCommand("/rg listmarkers"),
+                        TextActions.showText(Text.of("List the region's marker block positions")),
                         countFormat.format(ref.getPoints().size()),
-                        TextColors.YELLOW, " active markers")
+                        TextColors.YELLOW, " active markers"
+                )
         );
 
         return CommandResult.success();
