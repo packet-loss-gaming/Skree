@@ -86,6 +86,7 @@ public class DropClearServiceImpl implements DropClearService {
         checkedEntities.add(EntityTypes.ITEM);
         checkedEntities.add(EntityTypes.ARROW);
         checkedEntities.add(EntityTypes.EXPERIENCE_ORB);
+        checkedEntities.add(EntityTypes.SPLASH_POTION);
 
         checkPredicate = new EntityTypePredicate(checkedEntities);
     }
