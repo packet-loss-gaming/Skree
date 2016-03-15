@@ -78,7 +78,7 @@ public class RegionInfoCommand implements CommandExecutor {
         );
         player.sendMessage(
                 Text.of(
-                        TextActions.runCommand("/rg listmembers"),
+                        TextActions.runCommand("/region listmembers"),
                         TextActions.showText(Text.of("List the region's members")),
                         countFormat.format(ref.getMembers().size()),
                         TextColors.YELLOW, " members"
@@ -86,7 +86,7 @@ public class RegionInfoCommand implements CommandExecutor {
         );
         player.sendMessage(
                 Text.of(
-                        TextActions.runCommand("/rg listmarkers"),
+                        TextActions.runCommand("/region listmarkers"),
                         TextActions.showText(Text.of("List the region's marker block positions")),
                         countFormat.format(ref.getPoints().size()),
                         TextColors.YELLOW, " active markers"
