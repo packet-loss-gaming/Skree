@@ -86,7 +86,7 @@ public class MarketLookupCommand implements CommandExecutor {
         );
 
         Text.Builder itemSteps = Text.builder();
-        for (int i : new int[]{1, 16, 32, 64}) {
+        for (int i : new int[]{1, 16, 32, 64, 128, 256}) {
             if (i != 1) {
                 itemSteps.append(Text.of(TextColors.YELLOW, ", "));
             }
