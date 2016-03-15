@@ -81,7 +81,7 @@ public class RegionSelectCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Text.of("Select a region"))
                 .arguments(optional(firstParsing(player(Text.of("player"))), location(Text.of("position"))))
-                .executor(new RegionAddMemberCommand())
+                .executor(new RegionSelectCommand())
                 .build();
     }
 }
