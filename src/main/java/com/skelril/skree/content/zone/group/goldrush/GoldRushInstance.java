@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.group.goldrush;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
@@ -331,13 +332,20 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         resetChestAndKeys();
     }
 
+
+    private void moveToRoom(Player player, ZoneBoundingBox room) {
+        Vector3d target = room.getCenter();
+        target = new Vector3d(target.getX(), 1, target.getZ());
+        player.setLocation(new Location<>(getRegion().getExtent(), target));
+    }
+
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
         if (isLocked()) {
             return new Clause<>(player, ZoneStatus.NO_REJOIN);
         }
 
-        player.setLocation(new Location<>(getRegion().getExtent(), startingRoom.getCenter()));
+        moveToRoom(player, startingRoom);
         return new Clause<>(player, ZoneStatus.ADDED);
     }
 
@@ -400,7 +408,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             player.offer(Keys.EXHAUSTION, 0D);
 
             // Move player into the game
-            player.setLocation(new Location<>(getRegion().getExtent(), keyRoom.getCenter()));
+            moveToRoom(player, keyRoom);
         }
 
         // Partner talk
