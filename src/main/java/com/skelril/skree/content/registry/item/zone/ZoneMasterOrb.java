@@ -162,7 +162,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
                             for (int i = group.size() - 1; i >= 0; --i) {
                                 purgeZoneItems(group.get(i), itemStack);
-                                createLightningStrike(group.get(i));
+                                // createLightningStrike(group.get(i)); SpongeCommon/420
                                 moveToInstanceIsle(group.get(i));
                             }
 
