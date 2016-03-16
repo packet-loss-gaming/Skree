@@ -21,27 +21,36 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorldListCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        src.sendMessage(Text.of(TextColors.GOLD, "Available worlds (click to teleport):"));
+        List<WorldEffectWrapper> worldEffectWrapperList = service.getEffectWrappers().stream().sorted(
+                (a, b) -> a.getName().compareToIgnoreCase(b.getName())
+        ).collect(Collectors.toList());
 
-        Optional<WorldService> service = Sponge.getServiceManager().provide(WorldService.class);
-
-        for (WorldEffectWrapper wrapper : service.get().getEffectWrappers()) {
+        for (WorldEffectWrapper wrapper : worldEffectWrapperList) {
             String worldType = wrapper.getName();
+            if (!src.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport")) {
+                continue;
+            }
+
+            src.sendMessage(Text.of(TextColors.GOLD, "Available ", worldType, " worlds (click to teleport):"));
             for (World world : wrapper.getWorlds()) {
-                Text.Builder builder = Text.builder();
                 String worldName = world.getName();
-                builder.append(Text.of(worldName + " [" + worldType + "]"));
-                builder.color(TextColors.GREEN);
-                builder.onClick(TextActions.runCommand("/world " + worldName));
-                builder.onHover(TextActions.showText(Text.of("Teleport to " + worldName)));
-                src.sendMessage(builder.build());
+                String prettyName = worldName.replaceAll("_", " ");
+
+                src.sendMessage(Text.of(
+                        TextColors.YELLOW,
+                        TextActions.runCommand("/world " + worldName),
+                        TextActions.showText(Text.of("Teleport to " + prettyName)),
+                        " - ", prettyName
+                ));
             }
         }
         return CommandResult.success();
@@ -50,7 +59,6 @@ public class WorldListCommand implements CommandExecutor {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
             .description(Text.of("List available worlds"))
-            .permission("skree.world.teleport")
             .executor(new WorldListCommand()).build();
     }
 }

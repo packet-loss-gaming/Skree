@@ -7,10 +7,12 @@
 package com.skelril.skree.service.internal.world;
 
 import com.skelril.skree.service.WorldService;
+import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class WorldServiceImpl implements WorldService {
 
@@ -24,6 +26,18 @@ public class WorldServiceImpl implements WorldService {
     @Override
     public WorldEffectWrapper getEffectWrapper(String name) {
         return worlds.get(name);
+    }
+
+    @Override
+    public Optional<WorldEffectWrapper> getEffectWrapperFor(World world) {
+        for (WorldEffectWrapper wrapper : worlds.values()) {
+            for (World worldEntry : wrapper.getWorlds()) {
+                if (world.equals(worldEntry)) {
+                    return Optional.of(wrapper);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

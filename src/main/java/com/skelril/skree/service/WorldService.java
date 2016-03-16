@@ -7,11 +7,14 @@
 package com.skelril.skree.service;
 
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
+import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface WorldService {
     void registerEffectWrapper(WorldEffectWrapper world);
     WorldEffectWrapper getEffectWrapper(String name);
+    Optional<WorldEffectWrapper> getEffectWrapperFor(World world);
     Collection<WorldEffectWrapper> getEffectWrappers();
 }

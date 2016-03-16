@@ -7,6 +7,9 @@
 package com.skelril.skree.content.world;
 
 
+import com.skelril.skree.service.WorldService;
+import com.skelril.skree.service.internal.world.WorldEffectWrapper;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -16,6 +19,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -32,24 +36,42 @@ public class WorldCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Optional<WorldProperties> optWorld = args.getOne("world");
+        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        if (!optWorld.isPresent()) {
-            src.sendMessage(Text.of("You are in: " + ((Player) src).getWorld().getName() + "."));
+        Optional<WorldProperties> optProperties = args.getOne("world");
+
+        if (!optProperties.isPresent()) {
+            src.sendMessage(Text.of(TextColors.YELLOW, "You are in: " + ((Player) src).getWorld().getName() + "."));
             return CommandResult.empty();
         }
 
-        WorldProperties world = optWorld.get();
-        ((Player) src).transferToWorld(world.getUniqueId(), world.getSpawnPosition().toDouble());
+        Optional<World> optWorld = Sponge.getServer().getWorld(optProperties.get().getWorldName());
+        if (!optWorld.isPresent()) {
+            src.sendMessage(Text.of(TextColors.RED, "No loaded world by that name found."));
+            return CommandResult.empty();
+        }
 
-        src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getWorldName() + " successfully!"));
+        World world = optWorld.get();
+        Optional<WorldEffectWrapper> optEffectWrapper = service.getEffectWrapperFor(world);
+        String worldType = "misc";
+        if (optEffectWrapper.isPresent()) {
+            worldType = optEffectWrapper.get().getName();
+        }
+
+        if (!src.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport")) {
+            src.sendMessage(Text.of(TextColors.RED, "You do not have permission to access worlds of this type."));
+            return CommandResult.empty();
+        }
+
+        ((Player) src).setLocation(optWorld.get().getSpawnLocation());
+        src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
+
         return CommandResult.success();
     }
 
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Teleport to a different world"))
-                .permission("skree.world.teleport")
                 .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
                 .executor(new WorldCommand()).build();
     }
