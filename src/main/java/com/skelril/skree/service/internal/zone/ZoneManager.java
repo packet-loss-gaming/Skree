@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface ZoneManager<T extends Zone> {
-    void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback);
+    void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback);
     Collection<T> getActiveZones();
 
     default Optional<Integer> getMaxGroupSize() {

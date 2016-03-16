@@ -11,7 +11,6 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
 import com.skelril.skree.content.zone.ZonePvPListener;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -45,7 +44,7 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<GoldRushInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
             ZoneRegion region = clause.getKey();
 

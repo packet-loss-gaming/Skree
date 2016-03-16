@@ -8,7 +8,6 @@ package com.skelril.skree.content.zone.group.example;
 
 import com.google.inject.Singleton;
 import com.skelril.nitro.Clause;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -26,7 +25,7 @@ public class ExampleManager extends GroupZoneManager<ExampleInstance> {
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<ExampleInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
             ZoneRegion region = clause.getKey();
 

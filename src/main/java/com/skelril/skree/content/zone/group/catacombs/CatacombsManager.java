@@ -20,7 +20,6 @@ import com.skelril.skree.content.zone.group.catacombs.instruction.CatacombsHealt
 import com.skelril.skree.content.zone.group.catacombs.instruction.CheckedSpawnWave;
 import com.skelril.skree.content.zone.group.catacombs.instruction.WaveDamageModifier;
 import com.skelril.skree.content.zone.group.catacombs.instruction.bossmove.NamedBindInstruction;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -104,7 +103,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<CatacombsInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
             ZoneRegion region = clause.getKey();
 

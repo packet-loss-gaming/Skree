@@ -21,7 +21,6 @@ import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.*;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -201,7 +200,7 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<PatientXInstance>> callback) {
         Function<Clause<ZoneRegion, ZoneRegion.State>, PatientXInstance> initFunc = clause -> {
             ZoneRegion region = clause.getKey();
 

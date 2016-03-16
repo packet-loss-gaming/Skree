@@ -10,13 +10,12 @@ import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneManager;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T> {
     protected T zone;
+    protected Queue<Consumer<Optional<T>>> pendingCallbacks = new ArrayDeque<>();
 
     public abstract void init(ZoneSpaceAllocator allocator, Consumer<T> callback);
 
@@ -25,11 +24,16 @@ public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback) {
         if (!isActive()) {
-            init(allocator, returnedZone -> {
-                callback.accept(Optional.of(zone = returnedZone));
-            });
+            pendingCallbacks.add(callback);
+            if (pendingCallbacks.size() == 1) {
+                init(allocator, returnedZone -> {
+                    while (!pendingCallbacks.isEmpty()) {
+                        pendingCallbacks.poll().accept(Optional.of(zone = returnedZone));
+                    }
+                });
+            }
         } else {
             callback.accept(Optional.of(zone));
         }

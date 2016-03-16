@@ -20,7 +20,6 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.*;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -184,7 +183,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<ShnugglesPrimeInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
             ZoneRegion region = clause.getKey();
 

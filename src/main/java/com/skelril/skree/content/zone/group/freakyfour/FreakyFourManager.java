@@ -14,7 +14,6 @@ import com.skelril.skree.content.zone.group.freakyfour.boss.CharlotteBossManager
 import com.skelril.skree.content.zone.group.freakyfour.boss.DaBombBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.FrimusBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.SnipeeBossManager;
-import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -91,7 +90,7 @@ public class FreakyFourManager extends GroupZoneManager<FreakyFourInstance> impl
     }
 
     @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<Zone>> callback) {
+    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<FreakyFourInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
             ZoneRegion region = clause.getKey();
 
