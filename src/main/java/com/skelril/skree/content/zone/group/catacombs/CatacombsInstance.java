@@ -37,6 +37,7 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -45,6 +46,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
+import static com.skelril.skree.service.internal.zone.PlayerClassifier.SPECTATOR;
 
 public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
@@ -148,7 +150,16 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
             spawnNormalWave();
         }
 
-        getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.RED, "Starting wave: " + wave + "!"));
+        for (Player player : getPlayers(SPECTATOR)) {
+            player.sendTitle(
+                    Title.builder()
+                            .title(Text.of(TextColors.RED, "Wave"))
+                            .subtitle(Text.of(TextColors.RED, wave))
+                            .fadeIn(20)
+                            .fadeOut(20)
+                            .build()
+            );
+        }
     }
 
     private void spawnBossWave() {
