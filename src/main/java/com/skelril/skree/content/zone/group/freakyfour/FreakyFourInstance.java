@@ -323,9 +323,11 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     private void runCharlotte() {
-        Living charlotte = getBoss(FreakyFourBoss.CHARLOTTE).get();
-        for (int i = Probability.getRandom(10); i > 0; --i) {
-            spawnCharlotteMinion(charlotte.getLocation().getPosition());
+        Optional<Living> optBoss = getBoss(FreakyFourBoss.CHARLOTTE);
+        if (optBoss.isPresent()) {
+            for (int i = Probability.getRandom(10); i > 0; --i) {
+                spawnCharlotteMinion(optBoss.get().getLocation().getPosition());
+            }
         }
 
         ZoneBoundingBox charlotte_RG = regions.get(FreakyFourBoss.CHARLOTTE);
@@ -342,8 +344,8 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                 );
                 break;
             case 2:
-                if (charlotte instanceof Monster) {
-                    Optional<Entity> optTarget = ((Monster) charlotte).getTarget();
+                if (optBoss.isPresent() && optBoss.get() instanceof Monster) {
+                    Optional<Entity> optTarget = ((Monster) optBoss.get()).getTarget();
                     if (optTarget.isPresent() && contains(optTarget.get())) {
                         Entity target = optTarget.get();
                         ZoneBoundingBox targetArea = new ZoneBoundingBox(
@@ -362,8 +364,8 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                             }
                         });
                     }
+                    break;
                 }
-                break;
             case 3:
                 charlotte_RG.forAll(pt -> {
                     if (!Probability.getChance(config.charlotteWebSpider)) {
