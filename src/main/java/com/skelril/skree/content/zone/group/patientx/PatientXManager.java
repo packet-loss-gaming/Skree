@@ -158,7 +158,7 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
             }
 
             event.setBaseDamage(inst.getDifficulty() * config.baseBossHit);
-            return null;
+            return Optional.empty();
         });
 
 
