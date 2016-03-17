@@ -22,11 +22,15 @@ import com.skelril.skree.content.zone.group.freakyfour.boss.CharlotteBossManager
 import com.skelril.skree.content.zone.group.freakyfour.boss.DaBombBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.FrimusBossManager;
 import com.skelril.skree.content.zone.group.freakyfour.boss.SnipeeBossManager;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneBoundingBox;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
@@ -45,6 +49,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -187,7 +192,9 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                 e.remove();
             }
         });
-        return bosses.get(boss) != null;
+
+        Boss<Living, ZoneBossDetail<FreakyFourInstance>> bossDef = bosses.get(boss);
+        return bossDef != null && bossDef.getTargetEntity().isPresent();
     }
 
     public Optional<Living> getBoss(FreakyFourBoss boss) {
@@ -392,6 +399,17 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                 config.frimusWallDensity,
                 -1
         );
+
+        for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
+            List<PotionEffect> oldPotions = player.get(Keys.POTION_EFFECTS).orElse(new ArrayList<>());
+            List<PotionEffect> newPotions = oldPotions.stream().filter(
+                    effect -> effect.getType() != PotionEffectTypes.FIRE_RESISTANCE
+            ).collect(Collectors.toList());
+
+            if (oldPotions.size() != newPotions.size()) {
+                player.offer(Keys.POTION_EFFECTS, newPotions);
+            }
+        }
     }
 
     private void runSnipee() {

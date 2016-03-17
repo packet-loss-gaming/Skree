@@ -69,6 +69,7 @@ public class FrimusBossManager extends BossManager<Living, ZoneBossDetail<Freaky
                                 Probability.getRandom(EntityHealthUtil.getHealth((Living) attacked)) - 5
                         )
                 );
+                condition.getEvent().setBaseDamage(0);
             }
             return Optional.empty();
         });
