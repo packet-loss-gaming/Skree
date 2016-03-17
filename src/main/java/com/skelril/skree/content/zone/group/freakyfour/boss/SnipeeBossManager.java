@@ -70,6 +70,7 @@ public class SnipeeBossManager extends BossManager<Living, ZoneBossDetail<Freaky
                         (Living) attacked,
                         EntityHealthUtil.getMaxHealth((Living) attacked) * config.snipeeDamage
                 );
+                condition.getEvent().setBaseDamage(0);
             }
             return Optional.empty();
         });
