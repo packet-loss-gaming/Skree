@@ -73,7 +73,7 @@ public class FreakyFourListener {
                 if (boss == null) {
                     inst.setCurrentboss(FreakyFourBoss.CHARLOTTE);
                     player.sendMessage(Text.of(TextColors.RED, "You think you can beat us? Ha! we'll see about that..."));
-                } else if (!inst.getBoss(boss).isPresent()) {
+                } else if (!inst.isSpawned(boss)) {
                     switch (boss) {
                         case CHARLOTTE:
                             inst.setCurrentboss(FreakyFourBoss.FRIMUS);

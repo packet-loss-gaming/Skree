@@ -63,6 +63,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     private final DaBombBossManager daBombManager;
     private final SnipeeBossManager snipeeManager;
 
+    private boolean loadingBoss = false;
     private FreakyFourBoss currentboss = null;
 
     private EnumMap<FreakyFourBoss, BossManager<Living, ZoneBossDetail<FreakyFourInstance>>> bossManagers = new EnumMap<>(FreakyFourBoss.class);
@@ -181,6 +182,10 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     public boolean isSpawned(FreakyFourBoss boss) {
+        if (loadingBoss) {
+            return true;
+        }
+
         getContained(getRegion(boss), boss.getEntityType()).stream()
                 .filter(e -> !e.isRemoved())
                 .filter(e -> e instanceof Living)
@@ -223,6 +228,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     public void spawnBoss(FreakyFourBoss boss, long delay) {
+        loadingBoss = true;
         Task.builder().execute(() -> {
             Entity entity = getRegion().getExtent().createEntity(boss.getEntityType(), getCenter(boss)).get();
             getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
@@ -234,6 +240,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
 
             bossManagers.get(boss).bind(aBoss);
             bosses.put(boss, aBoss);
+            loadingBoss = false;
         }).delayTicks(delay).submit(SkreePlugin.inst());
     }
 
