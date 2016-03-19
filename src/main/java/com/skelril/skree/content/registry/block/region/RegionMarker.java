@@ -15,7 +15,11 @@ import com.skelril.skree.service.internal.region.RegionPoint;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
@@ -45,6 +49,25 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
         return "region_marker";
     }
 
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(net.minecraft.world.World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
+
+    @Override
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public boolean isFullCube() {
+        return false;
+    }
 
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
