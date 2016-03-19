@@ -6,10 +6,8 @@
 
 package com.skelril.skree.content.aid;
 
-import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -19,13 +17,18 @@ public class ChatCommandAid {
     public void onPlayerChat(MessageChannelEvent.Chat event) {
         String rawText = event.getRawMessage().toPlain();
         if (rawText.matches("\\./.*")) {
-            String command = rawText.replaceFirst("//.*", "").replaceFirst("\\./", "/").trim();
-            Task.builder().execute(() -> {
-                event.getOriginalChannel().send(Text.of(
-                        TextColors.YELLOW, "Command (click to type): ",
-                        Text.of(TextActions.showText(Text.of(command)), TextActions.suggestCommand(command), command)
-                ));
-            }).delayTicks(1).submit(SkreePlugin.inst());
+            String rawCommand = rawText.replaceFirst("//.*", "");
+            String command = rawCommand.replaceFirst("\\./", "/").trim();
+            String message = rawText.replaceFirst(rawCommand, "").replaceFirst("//", "");
+            event.getFormatter().setBody(Text.of(
+                    Text.of(
+                            TextColors.DARK_GREEN,
+                            TextActions.showText(Text.of("Click to type:\n", command)),
+                            TextActions.suggestCommand(command),
+                            command
+                    ),
+                    message
+            ));
         }
     }
 }
