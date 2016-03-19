@@ -17,9 +17,14 @@ public class ChatCommandAid {
     public void onPlayerChat(MessageChannelEvent.Chat event) {
         String rawText = event.getRawMessage().toPlain();
         if (rawText.matches("\\./.*")) {
+            // Remove the comment
             String rawCommand = rawText.replaceFirst("//.*", "");
+            // Replace the "./" with "/" and then trim the string
             String command = rawCommand.replaceFirst("\\./", "/").trim();
-            String message = rawText.replaceFirst(rawCommand, "").replaceFirst("//", "");
+            // Remove the command, and the comment block, as well as its spaces
+            String message = rawText.replaceFirst(rawCommand, "").replaceFirst("// *", "").trim();
+
+            // Send a composite message of the command, a space, and then the comment text
             event.getFormatter().setBody(Text.of(
                     Text.of(
                             TextColors.DARK_GREEN,
@@ -27,6 +32,7 @@ public class ChatCommandAid {
                             TextActions.suggestCommand(command),
                             command
                     ),
+                    " ",
                     message
             ));
         }
