@@ -115,7 +115,7 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                                         player.sendMessage(
                                                 Text.of(
                                                         TextColors.YELLOW,
-                                                        "Place the master block again to move this regions master block."
+                                                        "Place the master block again to move this region's master block."
                                                 )
                                         );
                                     }
