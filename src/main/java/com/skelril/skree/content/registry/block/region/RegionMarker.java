@@ -19,7 +19,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
@@ -36,6 +39,7 @@ import java.util.Optional;
 public class RegionMarker extends Block implements ICustomBlock, EventAwareContent {
     public RegionMarker() {
         super(new Material(MapColor.stoneColor));
+        this.setBlockBounds(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
         this.setCreativeTab(CreativeTabs.tabDecorations);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
@@ -67,6 +71,11 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
     @Override
     public boolean isFullCube() {
         return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public EnumWorldBlockLayer getBlockLayer() {
+        return EnumWorldBlockLayer.CUTOUT_MIPPED;
     }
 
     @Listener
