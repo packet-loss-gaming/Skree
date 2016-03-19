@@ -21,6 +21,7 @@ public interface Region {
     RegionPoint getMasterBlock();
 
     String getName();
+    void setName(String name);
 
     int getPowerLevel();
 

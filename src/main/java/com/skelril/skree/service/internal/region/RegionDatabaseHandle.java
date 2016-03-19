@@ -55,6 +55,13 @@ class RegionDatabaseHandle {
         return name;
     }
 
+    public void setName(String name) {
+        if (!name.matches("[A-Za-z ']+")) {
+            throw new IllegalArgumentException("Name did not match valid pattern.");
+        }
+        writeNameChangeToDB(this.name = name);
+    }
+
     public int getPowerLevel() {
         return powerLevel;
     }
@@ -76,6 +83,17 @@ class RegionDatabaseHandle {
     protected void writeInit(Connection con) throws SQLException {
         writeMemberAdditionToDBWithCon(getMembers(), con);
         writePointAdditionToDBWithCon(getFullPoints(), con);
+    }
+
+    private void writeNameChangeToDB(String newName) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            create.update(REGIONS).set(
+                    REGIONS.NAME, newName
+            ).where(REGIONS.UUID.equal(regionID.toString())).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void writeMemberAdditionToDB(Collection<UUID> newMembers) {

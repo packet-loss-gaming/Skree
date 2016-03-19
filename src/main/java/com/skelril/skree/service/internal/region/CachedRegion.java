@@ -55,6 +55,11 @@ class CachedRegion implements Region {
     }
 
     @Override
+    public void setName(String name) {
+        ref.setName(name);
+    }
+
+    @Override
     public double getArea() {
         return area;
     }
