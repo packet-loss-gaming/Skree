@@ -14,17 +14,35 @@ import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Pitfall extends Block implements ICustomBlock, Craftable {
 
     public Pitfall() {
         super(Material.clay);
-        this.setCreativeTab(CreativeTabs.tabBlock);
+        this.setBlockBounds(0F, .9375F, 0F, 1F, 1F, 1F);
+        this.setCreativeTab(CreativeTabs.tabDecorations);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.6F);
         this.setStepSound(soundTypePiston);
+    }
+
+    @Override
+    public boolean isFullCube() {
+        return false;
+    }
+
+    @Override
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
     }
 
     @Override
@@ -35,7 +53,7 @@ public class Pitfall extends Block implements ICustomBlock, Craftable {
     @Override
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
+                new ItemStack(this, 3),
                 new ItemStack(Blocks.clay),
                 new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
