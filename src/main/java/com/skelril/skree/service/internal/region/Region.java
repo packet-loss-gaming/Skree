@@ -19,6 +19,7 @@ public interface Region {
     String getWorldName();
 
     RegionPoint getMasterBlock();
+    void setMasterBlock(RegionPoint masterBlock);
 
     String getName();
     void setName(String name);

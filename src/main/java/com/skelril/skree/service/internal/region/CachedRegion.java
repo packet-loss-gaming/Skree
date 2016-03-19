@@ -50,6 +50,11 @@ class CachedRegion implements Region {
     }
 
     @Override
+    public void setMasterBlock(RegionPoint masterBlock) {
+        ref.setMasterBlock(masterBlock);
+    }
+
+    @Override
     public String getName() {
         return ref.getName();
     }

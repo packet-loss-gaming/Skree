@@ -19,7 +19,7 @@ import static com.skelril.skree.db.schema.Tables.*;
 class RegionDatabaseHandle {
     private final UUID regionID;
     private final String worldName;
-    private final RegionPoint masterBlock;
+    private RegionPoint masterBlock;
     private String name;
     private int powerLevel;
     private Set<UUID> members = new HashSet<>();
@@ -49,6 +49,10 @@ class RegionDatabaseHandle {
 
     public RegionPoint getMasterBlock() {
         return masterBlock;
+    }
+
+    public void setMasterBlock(RegionPoint masterBlock) {
+        writeMasterBlockChangeToDB(this.masterBlock = masterBlock);
     }
 
     public String getName() {
@@ -90,6 +94,21 @@ class RegionDatabaseHandle {
             DSLContext create = DSL.using(con);
             create.update(REGIONS).set(
                     REGIONS.NAME, newName
+            ).where(REGIONS.UUID.equal(regionID.toString())).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeMasterBlockChangeToDB(RegionPoint masterBlock) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            create.update(REGIONS).set(
+                    REGIONS.X, masterBlock.getX()
+            ).set(
+                    REGIONS.Y, masterBlock.getY()
+            ).set(
+                    REGIONS.Z, masterBlock.getZ()
             ).where(REGIONS.UUID.equal(regionID.toString())).execute();
         } catch (SQLException e) {
             e.printStackTrace();
