@@ -12,10 +12,14 @@ import com.skelril.skree.content.registry.block.region.RegionMarker;
 import com.skelril.skree.content.registry.block.region.RegionMaster;
 import com.skelril.skree.content.registry.block.terrain.JurackOre;
 import com.skelril.skree.content.registry.block.terrain.MagicStone;
+import com.skelril.skree.content.registry.block.trap.Pitfall;
 import com.skelril.skree.content.registry.block.utility.MagicLadder;
 import com.skelril.skree.content.registry.block.utility.MagicPlatform;
 
 public class CustomBlockTypes {
+    /* ** Pitfall ** */
+    public static final Pitfall PITFALL = new Pitfall();
+
     /* ** Region ** */
     public static final RegionMarker REGION_MARKER = new RegionMarker();
     public static final RegionMaster REGION_MASTER = new RegionMaster();
