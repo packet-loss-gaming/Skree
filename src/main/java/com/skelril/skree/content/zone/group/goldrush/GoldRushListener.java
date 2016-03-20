@@ -192,7 +192,7 @@ public class GoldRushListener {
             }
         } else if (state.getType() == BlockTypes.LEVER) {
             Task.builder().execute(() -> {
-                if (inst.checkLevers()) inst.unlockLevers();
+                if (inst.checkLevers()) inst.completeGame();
             }).delayTicks(1).submit(SkreePlugin.inst());
         } else if (targetBlock.equals(inst.getRewardChestLoc()) && inst.isComplete()) {
             event.setCancelled(true);
@@ -320,6 +320,7 @@ public class GoldRushListener {
         Player player = (Player) entity;
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
+            GoldRushInstance inst = optInst.get();
             String deathMessage;
             switch (Probability.getRandom(6)) {
                 case 1:
@@ -347,6 +348,7 @@ public class GoldRushListener {
             }
             event.setMessage(Text.of(player.getName(), deathMessage));
 
+            inst.invalidate(player);
             player.sendMessage(Text.of(TextColors.YELLOW, "Your partner posted bail as promised."));
         }
     }
