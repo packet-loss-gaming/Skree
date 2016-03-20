@@ -22,7 +22,7 @@ public class ChatCommandAid {
             // Replace the "./" with "/" and then trim the string
             String command = rawCommand.replaceFirst("\\./", "/").trim();
             // Remove the command, and the comment block, as well as its spaces
-            String message = rawText.replaceFirst(rawCommand, "").replaceFirst("// *", "").trim();
+            String message = rawText.replace(rawCommand, "").replaceFirst("// *", "").trim();
 
             // Send a composite message of the command, a space, and then the comment text
             event.getFormatter().setBody(Text.of(
