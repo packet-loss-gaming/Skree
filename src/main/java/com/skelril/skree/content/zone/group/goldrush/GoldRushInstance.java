@@ -31,6 +31,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -73,6 +75,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     // Session
     private long startTime = -1;
     private long matchTime = -1;
+    private boolean notifiedOfCops = false;
     private BigDecimal multiplier = BigDecimal.ONE;
     private BigDecimal lootSplit = BigDecimal.ZERO;
     private int playerMod = 0;
@@ -134,7 +137,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
 
         for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            if (!player.getInventory().isEmpty()) {
+            if (player.getInventory().query(HumanInventory.class, EquipmentInventory.class).size() > 0) {
                 getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
                         Text.of(TextColors.RED, "All players inventories must be empty.")
                 );
@@ -457,10 +460,11 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         if (getTimeSinceStart() > TimeUnit.MINUTES.toMillis(7)) {
             expire();
             return;
-        } else if (getTimeSinceStart() > TimeUnit.MINUTES.toMillis(6)) {
+        } else if (!notifiedOfCops && getTimeSinceStart() > TimeUnit.MINUTES.toMillis(6)) {
             getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
                     Text.of(TextColors.DARK_RED, "[Partner] The cops are almost here, hurry!")
             );
+            notifiedOfCops = true;
         }
 
         if (checkKeys()) {
