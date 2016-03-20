@@ -18,10 +18,7 @@ import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.ModifierService;
-import com.skelril.skree.service.internal.zone.Zone;
-import com.skelril.skree.service.internal.zone.ZoneBoundingBox;
-import com.skelril.skree.service.internal.zone.ZoneRegion;
-import com.skelril.skree.service.internal.zone.ZoneStatus;
+import com.skelril.skree.service.internal.zone.*;
 import net.minecraft.inventory.IInventory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -33,7 +30,9 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -329,6 +328,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     @Override
     public void forceEnd() {
+        remove(getPlayers(PlayerClassifier.PARTICIPANT));
         resetChestAndKeys();
     }
 
@@ -351,7 +351,11 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
-        // TODO remove any items given
+        cofferRisk.remove(player.getUniqueId());
+        CarriedInventory<? extends Carrier> pInv = player.getInventory();
+        while (!pInv.isEmpty()) {
+            pInv.poll();
+        }
         return super.remove(player);
     }
 
