@@ -422,6 +422,9 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             player.offer(Keys.SATURATION, 20D);
             player.offer(Keys.EXHAUSTION, 0D);
 
+            // Remove potion effects
+            player.offer(Keys.POTION_EFFECTS, new ArrayList<>());
+
             // Move player into the game
             moveToRoom(player, keyRoom);
         }
