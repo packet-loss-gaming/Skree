@@ -79,9 +79,9 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
-import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.Extent;
 
 import javax.annotation.Nullable;
@@ -163,6 +163,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                                                 newItemStack((ItemType) NETHER_BOW)
                                                         )
                                                 ), 10000
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack((ItemType) NETHER_BOWL)
+                                                        )
+                                                ), 20000
                                         )
                                 )
                         )
@@ -298,7 +305,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (entity instanceof Monster) {
             DropTable dropTable;
 
-            if (entity.getLocation().getExtent().getDimension() == DimensionTypes.NETHER || entity instanceof Wither) {
+            if (entity.getLocation().getExtent().getBiome(loc.getBlockX(), loc.getBlockZ()) == BiomeTypes.HELL || entity instanceof Wither) {
                 dropTable = netherMobDropTable;
             } else {
                 dropTable = commonDropTable;
