@@ -124,12 +124,23 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     public void tryToStart() {
         BigDecimal coffersNeeded = getCoffersNeeded();
+
         if (coffersNeeded.compareTo(BigDecimal.ZERO) >= 0) {
-            MessageChannel channel = MessageChannel.fixed(getContained(Player.class));
+            MessageChannel channel = getPlayerMessageChannel(PlayerClassifier.SPECTATOR);
             channel.send(Text.of(TextColors.RED, "Your party doesn't have a high enough coffer risk!"));
             channel.send(Text.of(TextColors.RED, "At least ", coffersNeeded, " more coffers must be risked."));
             return;
         }
+
+        for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
+            if (!player.getInventory().isEmpty()) {
+                getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                        Text.of(TextColors.RED, "All players inventories must be empty.")
+                );
+                return;
+            }
+        }
+
         readyPlayers();
         calculateLootSplit();
         startTime = System.currentTimeMillis(); // Reset tryToStart clock
