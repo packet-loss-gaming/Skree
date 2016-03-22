@@ -53,11 +53,11 @@ import static com.skelril.skree.content.registry.item.generic.PrizeBox.makePrize
 
 public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     // Constants
-    private static final BigDecimal MIN_START_RISK = new BigDecimal(100);
+    private static final BigDecimal MIN_START_RISK = new BigDecimal(20000);
     private static final BigDecimal GRAB_RATIO = new BigDecimal(.2);
-    private static final BigDecimal PIVOTAL_VALUE = new BigDecimal(5500);
+    private static final BigDecimal PIVOTAL_VALUE = new BigDecimal(70000);
     private static final BigDecimal PENALTY_INCREMENT = new BigDecimal(TimeUnit.SECONDS.toMillis(3));
-    private static final BigDecimal PENALTY_INCREMENT_VALUE = new BigDecimal(3);
+    private static final BigDecimal PENALTY_INCREMENT_VALUE = new BigDecimal(256);
 
     private ZoneBoundingBox startingRoom, keyRoom, flashMemoryRoom;
 
@@ -516,11 +516,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 ItemStack opened = optOpened.get();
                 Optional<BigDecimal> value = service.getPrice(opened);
                 if (value.isPresent()) {
+                    BigDecimal quantity = new BigDecimal(opened.getQuantity());
                     if (opened.getItem() == ItemTypes.GOLD_NUGGET || opened.getItem() == ItemTypes.GOLD_INGOT || opened.getItem() == BlockTypes.GOLD_BLOCK.getItem().get()) {
-                        goldValue = goldValue.add(value.get());
+                        goldValue = goldValue.add(value.get().multiply(quantity));
                         itemStacks[i] = null;
                     } else {
-                        itemValue = itemValue.add(value.get());
+                        itemValue = itemValue.add(value.get().multiply(quantity));
                         itemStacks[i] = tf(opened);
                     }
                 }
@@ -553,17 +554,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         player.sendMessage(Text.of(TextColors.YELLOW, "You obtain: "));
         player.sendMessage(Text.of(TextColors.YELLOW, " - Bail: ", format(fee)));
         player.sendMessage(Text.of(TextColors.YELLOW, " - Split: ", format(lootSplit), ", Boost: ", format(grabRatio.multiply(new BigDecimal(100))), "%"));
-        if (penaltyRatio.compareTo(BigDecimal.ZERO) > 0) {
+        if (penaltyRatio.compareTo(BigDecimal.ZERO) != 0) {
             player.sendMessage(Text.of(TextColors.YELLOW, "   - Boost time penalty: ", format(penaltyRatio.multiply(new BigDecimal(100))), "%"));
         }
         if (grabRatio.compareTo(BigDecimal.ZERO) != 0) {
             player.sendMessage(Text.of(TextColors.YELLOW, "   - Boost value: ", format(splitBoost)));
         }
-        if (goldValue.compareTo(BigDecimal.ZERO) > 0) {
-            player.sendMessage(Text.of(TextColors.YELLOW, " - Gold: ", format(goldValue)));
-        }
 
-        BigDecimal total = fee.add(personalLootSplit).add(goldValue);
+        BigDecimal total = fee.add(personalLootSplit);
         player.sendMessage(Text.of(TextColors.YELLOW, "Total: ", format(total)));
 
         MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.source(this).build());
@@ -706,7 +704,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private long getTimeTakenAfterFlood() {
-        return matchTime - getTimeTilFlood();
+        return Math.max(0, matchTime - getTimeTilFlood());
     }
 
     private long getTimeSinceStart() {
