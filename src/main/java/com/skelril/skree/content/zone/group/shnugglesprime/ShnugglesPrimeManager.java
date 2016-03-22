@@ -7,7 +7,6 @@
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossListener;
@@ -35,14 +34,14 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
 
 public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable, LocationZone<ShnugglesPrimeInstance> {
-
-    private final Queue<ZoneRegion> freeRegions = new LinkedList<>();
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager = new BossManager<>();
 
     public ShnugglesPrimeManager() {
@@ -184,7 +183,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
 
     @Override
     public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<ShnugglesPrimeInstance>> callback) {
-        Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
+        allocator.regionFor(getSystemName(), clause -> {
             ZoneRegion region = clause.getKey();
 
             ShnugglesPrimeInstance instance = new ShnugglesPrimeInstance(region, bossManager);
@@ -192,14 +191,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
             zones.add(instance);
 
             callback.accept(Optional.of(instance));
-        };
-
-        ZoneRegion region = freeRegions.poll();
-        if (region == null) {
-            allocator.regionFor(getSystemName(), consumer);
-        } else {
-            consumer.accept(new Clause<>(region, ZoneRegion.State.RELOADED));
-        }
+        });
     }
 
     @Override
@@ -217,7 +209,6 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                 continue;
             }
             next.forceEnd();
-            freeRegions.add(next.getRegion());
             it.remove();
         }
     }

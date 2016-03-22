@@ -6,7 +6,6 @@
 
 package com.skelril.skree.content.zone.group.catacombs;
 
-import com.skelril.nitro.Clause;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossListener;
 import com.skelril.openboss.BossManager;
@@ -27,12 +26,12 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.scheduler.Task;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implements Runnable, LocationZone<CatacombsInstance> {
-    private Queue<ZoneRegion> freeRegions = new LinkedList<>();
-
     private final BossManager<Zombie, CatacombsBossDetail> bossManager = new BossManager<>();
     private final BossManager<Zombie, CatacombsBossDetail> waveMobManager = new BossManager<>();
 
@@ -104,7 +103,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
 
     @Override
     public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<CatacombsInstance>> callback) {
-        Consumer<Clause<ZoneRegion, ZoneRegion.State>> consumer = clause -> {
+        allocator.regionFor(getSystemName(), clause -> {
             ZoneRegion region = clause.getKey();
 
             CatacombsInstance instance = new CatacombsInstance(region, bossManager, waveMobManager);
@@ -112,14 +111,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
             zones.add(instance);
 
             callback.accept(Optional.of(instance));
-        };
-
-        ZoneRegion region = freeRegions.poll();
-        if (region == null) {
-            allocator.regionFor(getSystemName(), consumer);
-        } else {
-            consumer.accept(new Clause<>(region, ZoneRegion.State.RELOADED));
-        }
+        });
     }
 
     @Override
@@ -137,7 +129,6 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
                 continue;
             }
             next.forceEnd();
-            freeRegions.add(next.getRegion());
             it.remove();
         }
     }
