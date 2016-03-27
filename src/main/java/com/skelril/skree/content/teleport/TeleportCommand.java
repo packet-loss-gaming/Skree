@@ -43,8 +43,16 @@ public class TeleportCommand implements CommandExecutor {
         String destStr;
 
         if (dest.isPresent()) {
+            if (!src.hasPermission("skree.teleport.teleport.coord")) {
+                src.sendMessage(Text.of(TextColors.RED, "You do not have permission to teleport by coordinates here."));
+                return CommandResult.empty();
+            }
             destStr = dest.get().toString();
         } else {
+            if (!src.hasPermission("skree.teleport.teleport.player")) {
+                src.sendMessage(Text.of(TextColors.RED, "You do not have permission to teleport to players here."));
+                return CommandResult.empty();
+            }
             Player player = args.<Player>getOne("dest-player").get();
             targetExtent = player.getWorld();
             rotation = player.getRotation();
@@ -69,7 +77,6 @@ public class TeleportCommand implements CommandExecutor {
     public static CommandSpec aquireSpec() {
         return CommandSpec.builder()
                 .description(Text.of("Teleport to a player or destination"))
-                .permission("skree.teleport.teleport")
                 .arguments(
                         onlyOne(
                                 firstParsing(
