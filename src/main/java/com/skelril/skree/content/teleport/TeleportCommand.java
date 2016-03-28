@@ -7,14 +7,13 @@
 package com.skelril.skree.content.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.block.BlockTypes;
+import com.skelril.nitro.entity.SafeTeleportHelper;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -60,16 +59,18 @@ public class TeleportCommand implements CommandExecutor {
             destStr = player.getName();
         }
 
-        Optional<Boolean> optIsFlying = target.get(Keys.IS_FLYING);
-        if (optIsFlying.isPresent() && !optIsFlying.get()) {
-            while (dest.get().getFloorY() > 0 && targetExtent.getBlock(dest.get().toInt()).getType().equals(BlockTypes.AIR)) {
-                dest = Optional.of(dest.get().add(0, -1, 0));
-            }
+        Optional<Location<World>> optSafeDest = SafeTeleportHelper.getSafeDest(
+                target,
+                new Location<>(targetExtent, dest.get())
+        );
+
+        if (optSafeDest.isPresent()) {
+            target.setLocationAndRotation(optSafeDest.get(), rotation);
+
+            src.sendMessage(Text.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
+        } else {
+            src.sendMessage(Text.of(TextColors.RED, "The requested destination is unsafe."));
         }
-
-        target.setLocationAndRotation(new Location<>(targetExtent, dest.get().add(0, 1, 0)), rotation);
-
-        src.sendMessage(Text.of(TextColors.YELLOW, "Teleported to " + destStr + '.'));
 
         return CommandResult.success();
     }

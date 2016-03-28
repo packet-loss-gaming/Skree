@@ -1,0 +1,44 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.skelril.nitro.entity;
+
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.util.Optional;
+
+public class SafeTeleportHelper {
+    public static Optional<Location<World>> getSafeDest(Location<World> dest) {
+        while (dest.getY() > 0 && dest.getBlockType().equals(BlockTypes.AIR)) {
+            dest = dest.add(0, -1, 0);
+        }
+
+        return Optional.of(dest.add(0, 1, 0));
+    }
+
+    public static Optional<Location<World>> getSafeDest(Entity entity, Location<World> dest) {
+        Optional<Boolean> optIsFlying = entity.get(Keys.IS_FLYING);
+        if (!optIsFlying.isPresent() || !optIsFlying.get()) {
+            dest = getSafeDest(dest).orElse(null);
+        }
+
+        return Optional.ofNullable(dest);
+    }
+
+    public static Optional<Location<World>> teleport(Entity entity, Location<World> dest) {
+        Optional<Location<World>> optDest = getSafeDest(entity, dest);
+
+        if (optDest.isPresent()) {
+            entity.setLocation(optDest.get());
+        }
+
+        return optDest;
+    }
+}
