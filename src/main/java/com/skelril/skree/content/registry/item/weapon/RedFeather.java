@@ -11,6 +11,7 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,6 +19,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -52,6 +54,12 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
         Entity target = event.getTargetEntity();
         if (target instanceof Player) {
             EntityPlayer player = tf((Player) target);
+
+            Optional<DamageSource> optDmgSrc  = event.getCause().first(DamageSource.class);
+            if (!optDmgSrc.isPresent() || !isBlockable(optDmgSrc.get())) {
+                return;
+            }
+
             Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
             if (!optFeatherDetail.isPresent()) {
                 return;
@@ -72,6 +80,13 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
             updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
             player.inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
         }
+    }
+
+    public boolean isBlockable(DamageSource source) {
+        if (source.getType() == WildernessTeleportCommand.DAMAGE_TYPE) {
+            return false;
+        }
+        return true;
     }
 
     public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {

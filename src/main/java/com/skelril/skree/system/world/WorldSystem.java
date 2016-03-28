@@ -50,6 +50,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "wtp");
+
 
         // Handle main world
         initMain();
