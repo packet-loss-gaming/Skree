@@ -11,6 +11,8 @@ import com.skelril.nitro.Clause;
 import com.skelril.nitro.item.ItemComparisonUtil;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
+import com.skelril.skree.content.world.build.BuildWorldWrapper;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.entity.player.EntityPlayer;
@@ -53,8 +55,8 @@ public class MarketImplUtil {
         if (optService.isPresent()) {
             WorldService service = optService.get();
             Collection<World> okayWorlds = new HashSet<>();
-            okayWorlds.addAll(service.getEffectWrapper("Main").getWorlds());
-            okayWorlds.addAll(service.getEffectWrapper("Build").getWorlds());
+            okayWorlds.addAll(service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds());
+            okayWorlds.addAll(service.getEffectWrapper(BuildWorldWrapper.class).get().getWorlds());
             return okayWorlds.contains(player.getWorld());
         }
         return true;

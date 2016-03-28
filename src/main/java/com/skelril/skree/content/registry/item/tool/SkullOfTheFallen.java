@@ -76,7 +76,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                 Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
                 if (optWorldService.isPresent()) {
                     WorldService worldService = optWorldService.get();
-                    WildernessWorldWrapper wrapper = (WildernessWorldWrapper) worldService.getEffectWrapper("Wilderness");
+                    WildernessWorldWrapper wrapper = worldService.getEffectWrapper(WildernessWorldWrapper.class).get();
                     Optional<Integer> optLevel = wrapper.getLevel(pLoc);
                     if (optLevel.isPresent()) {
                         int level = optLevel.get();

@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.world.instance;
 
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
@@ -35,7 +36,7 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
         if (isApplicable(player)) {
             Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
             if (optWorldService.isPresent()) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
                 player.setLocation(worlds.iterator().next().getSpawnLocation());
             }
         }
@@ -46,7 +47,7 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
         if (isApplicable(event.getToTransform().getExtent())) {
             Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
             if (optWorldService.isPresent()) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
                 event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
             }
         }

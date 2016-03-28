@@ -10,6 +10,8 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
@@ -78,10 +80,10 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
         Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
         if (optWorldService.isPresent()) {
             WorldService worldService = optWorldService.get();
-            WorldEffectWrapper wrapper = worldService.getEffectWrapper("Instance");
+            WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
 
             if (wrapper.getWorlds().contains(player.getLocation().getExtent())) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
                 player.setLocation(worlds.iterator().next().getSpawnLocation());
                 tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
                 tf(player).inventoryContainer.detectAndSendChanges();

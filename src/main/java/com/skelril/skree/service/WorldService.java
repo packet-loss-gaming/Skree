@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface WorldService {
-    void registerEffectWrapper(WorldEffectWrapper world);
-    WorldEffectWrapper getEffectWrapper(String name);
+    void registerEffectWrapper(WorldEffectWrapper wrapper);
+    <T extends WorldEffectWrapper> Optional<T> getEffectWrapper(Class<T> wrapperClass);
     Optional<WorldEffectWrapper> getEffectWrapperFor(World world);
     Collection<WorldEffectWrapper> getEffectWrappers();
 }

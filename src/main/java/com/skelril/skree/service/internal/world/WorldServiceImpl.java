@@ -16,16 +16,18 @@ import java.util.Optional;
 
 public class WorldServiceImpl implements WorldService {
 
-    private HashMap<String, WorldEffectWrapper> worlds = new HashMap<>();
+    private HashMap<Class<? extends WorldEffectWrapper>, WorldEffectWrapper> worlds = new HashMap<>();
 
     @Override
-    public void registerEffectWrapper(WorldEffectWrapper world) {
-        worlds.put(world.getName(), world);
+    public void registerEffectWrapper(WorldEffectWrapper wrapper) {
+        worlds.put(wrapper.getClass(), wrapper);
     }
 
     @Override
-    public WorldEffectWrapper getEffectWrapper(String name) {
-        return worlds.get(name);
+    public <T extends WorldEffectWrapper> Optional<T> getEffectWrapper(Class<T> wrapperClass) {
+        WorldEffectWrapper wrapper = worlds.get(wrapperClass);
+        //noinspection unchecked
+        return Optional.ofNullable(wrapper != null ? (T) wrapper : null);
     }
 
     @Override

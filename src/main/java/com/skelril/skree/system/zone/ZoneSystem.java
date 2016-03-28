@@ -11,6 +11,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.cursedmine.CursedMineManager;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
@@ -48,7 +49,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
     @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
     public void init() {
         Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
-        World world = optService.get().getEffectWrapper("Instance").getWorlds().iterator().next();
+        World world = optService.get().getEffectWrapper(InstanceWorldWrapper.class).get().getWorlds().iterator().next();
         Task.builder().execute(() -> {
             WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
 

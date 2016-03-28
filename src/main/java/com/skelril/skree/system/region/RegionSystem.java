@@ -10,6 +10,7 @@ import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.region.RegionCommand;
+import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.service.RegionService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.region.RegionManager;
@@ -31,7 +32,7 @@ public class RegionSystem implements ServiceProvider<RegionService> {
 
         Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
         if (optWorldService.isPresent()) {
-            for (World world : optWorldService.get().getEffectWrapper("Build").getWorlds()) {
+            for (World world : optWorldService.get().getEffectWrapper(BuildWorldWrapper.class).get().getWorlds()) {
                 RegionManager manager = new RegionManager(world.getName());
                 manager.load();
                 service.addManager(world, manager);

@@ -30,6 +30,7 @@ import com.skelril.nitro.time.TimedRunnable;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
@@ -228,7 +229,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (isApplicable(event.getToTransform().getExtent())) {
             Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
             if (optWorldService.isPresent()) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper("Main").getWorlds();
+                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
                 event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
             }
         }
@@ -531,7 +532,19 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
 
         // In Wilderness
-        return Optional.of(Math.max(0, Math.max(Math.abs(location.getBlockX()), Math.abs(location.getBlockZ())) / 500) + 1);
+        return Optional.of(
+                Math.max(
+                        0,
+                        Math.max(
+                                Math.abs(location.getBlockX()),
+                                Math.abs(location.getBlockZ())) / getLevelUnit(location.getExtent()
+                        )
+                ) + 1
+        );
+    }
+
+    public int getLevelUnit(World world) {
+        return 500;
     }
 
     public int getFirstPvPLevel() {

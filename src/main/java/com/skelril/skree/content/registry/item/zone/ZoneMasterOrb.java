@@ -12,6 +12,8 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
@@ -195,7 +197,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     private void moveToInstanceIsle(Player player) {
         WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
         Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
-        World targetWorld = service.getEffectWrapper("Main").getWorlds().iterator().next();
+        World targetWorld = service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds().iterator().next();
         Location<World> targetPos = targetWorld.getLocation(randomizedPos);
         player.setLocation(targetPos);
         player.sendMessage(Text.of(TextColors.YELLOW, "Your instance is building..."));
@@ -206,7 +208,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
         if (optWorldService.isPresent()) {
             WorldService worldService = optWorldService.get();
-            WorldEffectWrapper wrapper = worldService.getEffectWrapper("Instance");
+            WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
 
             if (wrapper.getWorlds().contains(player.getLocation().getExtent())) {
                 return true;
