@@ -14,6 +14,7 @@ import com.skelril.skree.content.world.*;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
@@ -50,7 +51,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "wtp");
+        Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessTeleportCommand.aquireSpec(), "wtp");
 
 
         // Handle main world
