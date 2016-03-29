@@ -8,6 +8,7 @@ package com.skelril.skree.content.world.wilderness;
 
 import com.skelril.nitro.entity.SafeTeleportHelper;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.WorldService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -18,8 +19,11 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -29,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static org.spongepowered.api.command.args.GenericArguments.choices;
 import static org.spongepowered.api.command.args.GenericArguments.integer;
 
@@ -83,7 +88,10 @@ public class WildernessTeleportCommand implements CommandExecutor {
         targetLevel += Probability.getRandom(variance) * negative;
 
         Player player = (Player) src;
-        player.damage(wrapper.getDamageMod(targetLevel) * 5, DamageSource.builder().type(DAMAGE_TYPE).build());
+        for (int i = 0; i < 2; ++i) {
+            tf(player).hurtResistantTime = 0;
+            player.damage(wrapper.getDamageMod(targetLevel) * 3, DamageSource.builder().type(DAMAGE_TYPE).build());
+        }
 
         if (player.get(Keys.HEALTH).orElse(0D) > 0) {
             int unit = wrapper.getLevelUnit(world);
@@ -102,6 +110,16 @@ public class WildernessTeleportCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
+    @Listener(order = Order.PRE)
+    public void onPlayerDeath(DestructEntityEvent.Death event) {
+        Optional<DamageSource> optDmgSrc = event.getCause().first(DamageSource.class);
+        if (optDmgSrc.isPresent() && event.getTargetEntity() instanceof Player) {
+            if (event.getMessage().toPlain().contains(DAMAGE_TYPE.getId())) {
+                event.setMessage(Text.of(((Player) event.getTargetEntity()).getName(), " was killed by an ancient enchantment"));
+            }
+        }
+    }
+
     private int getLevelCoord(int level, int unit) {
         return (unit * (level - 1)) + Probability.getRandom(unit);
     }
@@ -111,11 +129,12 @@ public class WildernessTeleportCommand implements CommandExecutor {
         worlds.put("overworld", "Wilderness");
         worlds.put("nether", "Wilderness_nether");
 
-        Sponge.getRegistry().register(DamageType.class, DAMAGE_TYPE);
+        WildernessTeleportCommand command = new WildernessTeleportCommand();
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), command);
 
         return CommandSpec.builder()
                 .description(Text.of("Teleports you closer to your requested wilderness level"))
                 .arguments(choices(Text.of("world type"), worlds), integer(Text.of("target level")))
-                .executor(new WildernessTeleportCommand()).build();
+                .executor(command).build();
     }
 }
