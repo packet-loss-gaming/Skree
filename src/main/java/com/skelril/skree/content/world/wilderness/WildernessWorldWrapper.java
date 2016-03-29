@@ -277,7 +277,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             @Override
             public void processMonsterAttack(Living attacker, Player defender) {
-                event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(level) - 1);
+                event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
             }
 
             @Override
@@ -285,7 +285,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Task.builder().delayTicks(1).execute(
                         () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
                 ).submit(SkreePlugin.inst());
-
             }
         }.parse(event);
     }
