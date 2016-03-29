@@ -8,9 +8,13 @@ package com.skelril.skree.content.world.wilderness;
 
 class WildernessPlayerMeta {
     private int level = -1;
-    private long attacks = 1;
-    private long hits = 1;
-    private long lastReset = System.currentTimeMillis();
+    private long attacks;
+    private long hits;
+    private long lastReset;
+
+    public WildernessPlayerMeta() {
+        reset();
+    }
 
     public void attack() {
         ++attacks;
@@ -28,17 +32,25 @@ class WildernessPlayerMeta {
         this.level = level;
     }
 
-    public long factors() {
+    public long getHits() {
+        return hits;
+    }
+
+    public long getAttacks() {
+        return attacks;
+    }
+
+    public long getFactors() {
         return attacks + hits;
     }
 
-    public double ratio() {
+    public double getRatio() {
         return ((double) attacks) / hits;
     }
 
     public void reset() {
-        attacks = 0;
-        hits = 0;
+        attacks = 1;
+        hits = 1;
         lastReset = System.currentTimeMillis();
     }
 

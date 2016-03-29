@@ -281,11 +281,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             public void processMonsterAttack(Living attacker, Player defender) {
                 event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
 
-                if (attacker.getType() != EntityTypes.ENDERMITE || Probability.getChance(3)) {
-                    WildernessPlayerMeta meta = playerMetaMap.get(defender);
-                    if (meta != null) {
-                        meta.hit();
-                    }
+                WildernessPlayerMeta meta = playerMetaMap.get(defender);
+                if (meta != null) {
+                    meta.hit();
                 }
             }
 
@@ -303,7 +301,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (meta != null) {
                     meta.attack();
 
-                    if (meta.ratio() > 4 && meta.factors() > 20) {
+                    if (meta.getRatio() > 5 && meta.getFactors() > 35) {
                         for (int i = Probability.getRandom(5); i > 0; --i) {
                             Optional<Entity> optEnt = attacker.getWorld().createEntity(
                                     EntityTypes.ENDERMITE,
@@ -571,6 +569,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
             }
         }
+    }
+
+    public Set<Map.Entry<Player, WildernessPlayerMeta>> getMetaInformation() {
+        return playerMetaMap.entrySet();
     }
 
     public Optional<Integer> getLevel(Location<World> location) {
