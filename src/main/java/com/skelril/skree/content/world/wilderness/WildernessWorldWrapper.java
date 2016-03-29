@@ -83,10 +83,12 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.Extent;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
@@ -99,7 +101,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private DropTable commonDropTable;
     private DropTable netherMobDropTable;
 
-    private Map<Player, Integer> playerLevelMap = new WeakHashMap<>();
+    private Map<Player, WildernessPlayerMeta> playerMetaMap = new WeakHashMap<>();
 
     public WildernessWorldWrapper() {
         this(new ArrayList<>());
@@ -278,6 +280,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             @Override
             public void processMonsterAttack(Living attacker, Player defender) {
                 event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
+
+                if (attacker.getType() != EntityTypes.ENDERMITE || Probability.getChance(3)) {
+                    WildernessPlayerMeta meta = playerMetaMap.get(defender);
+                    if (meta != null) {
+                        meta.hit();
+                    }
+                }
             }
 
             @Override
@@ -285,6 +294,35 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Task.builder().delayTicks(1).execute(
                         () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
                 ).submit(SkreePlugin.inst());
+
+                if (!(defender instanceof Monster)) {
+                    return;
+                }
+
+                WildernessPlayerMeta meta = playerMetaMap.get(attacker);
+                if (meta != null) {
+                    meta.attack();
+
+                    if (meta.ratio() > 4 && meta.factors() > 20) {
+                        for (int i = Probability.getRandom(5); i > 0; --i) {
+                            Optional<Entity> optEnt = attacker.getWorld().createEntity(
+                                    EntityTypes.ENDERMITE,
+                                    attacker.getLocation().getPosition()
+                            );
+
+                            if (optEnt.isPresent()) {
+                                attacker.getWorld().spawnEntity(
+                                        optEnt.get(),
+                                        Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                                );
+                            }
+                        }
+                    }
+
+                    if (System.currentTimeMillis() - meta.getLastReset() >= TimeUnit.MINUTES.toMillis(5)) {
+                        meta.reset();
+                    }
+                }
             }
         }.parse(event);
     }
@@ -359,6 +397,18 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         dropper.dropItems(drops, SpawnTypes.DROPPED_ITEM);
                     }
                 }
+            }
+
+            if (entity.getType() == EntityTypes.ENDERMITE && Probability.getChance(20)) {
+                entity.getWorld().triggerExplosion(
+                        Explosion.builder()
+                                .world(entity.getWorld())
+                                .origin(entity.getLocation().getPosition())
+                                .shouldBreakBlocks(true)
+                                .shouldDamageEntities(false)
+                                .radius(4F)
+                                .build()
+                );
             }
         }
         GRAVE_STONE.createGraveFromDeath(event);
@@ -565,6 +615,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 modifier *= 5;
             } else if (entityType == EntityTypes.SILVERFISH) {
                 modifier *= 2;
+            } else if (entityType == EntityTypes.ENDERMITE) {
+                modifier *= .1;
             }
         }
         return modifier;
@@ -651,7 +703,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 int currentLevel = getLevel(entity.getLocation()).get();
-                int lastLevel = playerLevelMap.getOrDefault(entity, -1);
+                WildernessPlayerMeta meta = playerMetaMap.getOrDefault(entity, new WildernessPlayerMeta());
+                int lastLevel = meta.getLevel();
                 if (currentLevel != lastLevel) {
                     TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
                     ((Player) entity).sendTitle(
@@ -662,7 +715,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                     .fadeOut(20)
                                     .build()
                     );
-                    playerLevelMap.put((Player) entity, currentLevel);
+                    meta.setLevel(currentLevel);
+                    playerMetaMap.putIfAbsent((Player) entity, meta);
                 }
             }
         }
