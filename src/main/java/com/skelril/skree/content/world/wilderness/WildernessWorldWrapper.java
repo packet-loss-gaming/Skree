@@ -302,10 +302,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     meta.attack();
 
                     if (meta.getRatio() > 5 && meta.getFactors() > 35) {
+                        Deque<Entity> spawned = new ArrayDeque<>();
                         for (int i = Probability.getRandom(5); i > 0; --i) {
                             Optional<Entity> optEnt = attacker.getWorld().createEntity(
                                     EntityTypes.ENDERMITE,
-                                    attacker.getLocation().getPosition()
+                                    defender.getLocation().getPosition()
                             );
 
                             if (optEnt.isPresent()) {
@@ -313,8 +314,31 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                         optEnt.get(),
                                         Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
                                 );
+                                spawned.add(optEnt.get());
                             }
                         }
+
+                        IntegratedRunnable runnable = new IntegratedRunnable() {
+                            @Override
+                            public boolean run(int times) {
+                                Entity mob = spawned.poll();
+                                if (mob.isLoaded() && mob.getWorld().equals(attacker.getWorld())) {
+                                    mob.setLocation(attacker.getLocation());
+                                }
+                                return true;
+                            }
+
+                            @Override
+                            public void end() {
+
+                            }
+                        };
+
+                        TimedRunnable timedRunnable = new TimedRunnable<>(runnable, spawned.size());
+
+                        timedRunnable.setTask(Task.builder().execute(
+                                timedRunnable
+                        ).delayTicks(40).intervalTicks(20).submit(SkreePlugin.inst()));
                     }
 
                     if (System.currentTimeMillis() - meta.getLastReset() >= TimeUnit.MINUTES.toMillis(5)) {
