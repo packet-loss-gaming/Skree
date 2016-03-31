@@ -212,14 +212,14 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                 switch (Probability.getRandom(6)) {
                     case 1:
                         player.sendMessage(Text.of(TextColors.YELLOW, "Caspher the friendly ghost drops some bread."));
-                        new ItemDropper(player.getLocation()).dropItems(
+                        new ItemDropper(player.getLocation()).dropStacks(
                                 Lists.newArrayList(newItemStack(ItemTypes.BREAD, Probability.getRandom(16))),
                                 SpawnTypes.DROPPED_ITEM
                         );
                         break;
                     case 2:
                         player.sendMessage(Text.of(TextColors.YELLOW, "COOKIE gives you a cookie."));
-                        new ItemDropper(player.getLocation()).dropItems(
+                        new ItemDropper(player.getLocation()).dropStacks(
                                 Lists.newArrayList(newItemStack(ItemTypes.COOKIE)),
                                 SpawnTypes.DROPPED_ITEM
                         );
@@ -233,11 +233,11 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             caspherLoot.add(newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64)));
                         }
 
-                        new ItemDropper(player.getLocation()).dropItems(caspherLoot, SpawnTypes.DROPPED_ITEM);
+                        new ItemDropper(player.getLocation()).dropStacks(caspherLoot, SpawnTypes.DROPPED_ITEM);
                         break;
                     case 4:
                         player.sendMessage(Text.of(TextColors.YELLOW, "John gives you a new jacket."));
-                        new ItemDropper(player.getLocation()).dropItems(
+                        new ItemDropper(player.getLocation()).dropStacks(
                                 Lists.newArrayList(newItemStack(ItemTypes.LEATHER_CHESTPLATE)),
                                 SpawnTypes.DROPPED_ITEM
                         );
@@ -252,7 +252,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                                 newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(64)),
                                 newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64))
                         );
-                        new ItemDropper(player.getLocation()).dropItems(teleportLootExtras, SpawnTypes.DROPPED_ITEM);
+                        new ItemDropper(player.getLocation()).dropStacks(teleportLootExtras, SpawnTypes.DROPPED_ITEM);
                         break;
                     case 6:
                         player.sendMessage(Text.of(TextColors.YELLOW, "Dan gives you a sparkling touch."));
@@ -432,7 +432,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                         for (int i = 0; i < tf(player).inventory.mainInventory.length * 1.5; i++) {
                             sticks.add(newItemStack(ItemTypes.STICK, 64));
                         }
-                        new ItemDropper(player.getLocation()).dropItems(sticks, SpawnTypes.DROPPED_ITEM);
+                        new ItemDropper(player.getLocation()).dropStacks(sticks, SpawnTypes.DROPPED_ITEM);
                         break;
                     case 5:
                         player.sendMessage(Text.of(TextColors.RED, "Ben dumps out your backpack."));

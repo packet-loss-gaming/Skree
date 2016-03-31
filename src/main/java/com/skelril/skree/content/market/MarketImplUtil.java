@@ -21,6 +21,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
@@ -28,7 +31,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
@@ -154,35 +156,26 @@ public class MarketImplUtil {
         }
 
         // Add remaining currency
-        new ItemDropper(player.getLocation()).dropItems(results, SpawnTypes.PLUGIN);
+        new ItemDropper(player.getLocation()).dropStacks(results, SpawnTypes.PLUGIN);
         return true;
     }
 
     public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
-        EntityPlayer playerEnt = tf(player);
-        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
-
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
-        Iterator<ItemStack> stackIt = stacks.iterator();
+        List<ItemStackSnapshot> droppedItems = new ArrayList<>();
+
+        HumanInventory inventory = player.getInventory().query(HumanInventory.class);
 
         // Loop through replacing empty space with the requested items
-        for (int i = 0; i < mainInv.length; ++i) {
-            if (mainInv[i] == null) {
-                if (!stackIt.hasNext()) {
-                    break;
-                }
+        for (ItemStack stack : stacks) {
+            InventoryTransactionResult result = inventory.offer(stack);
+            droppedItems.addAll(result.getRejectedItems());
 
-                ItemStack next = stackIt.next();
-                mainInv[i] = tf(next);
-                transactions.add(new Clause<>(next, next.getQuantity()));
-
-                stackIt.remove();
-            }
+            transactions.add(new Clause<>(stack, stack.getQuantity()));
         }
 
-        // Add remaining transactions
-        transactions.addAll(stacks.stream().map(stack -> new Clause<>(stack, stack.getQuantity())).collect(Collectors.toList()));
-        new ItemDropper(player.getLocation()).dropItems(stacks, SpawnTypes.PLUGIN);
+        // Drop remaining items
+        new ItemDropper(player.getLocation()).dropStackSnapshots(droppedItems, SpawnTypes.PLUGIN);
 
         return new Clause<>(true, transactions);
     }

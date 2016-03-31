@@ -118,7 +118,7 @@ public class PatientXListener {
 
         if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
             if (Probability.getChance(10)) {
-                new ItemDropper(entity.getLocation()).dropItems(
+                new ItemDropper(entity.getLocation()).dropStacks(
                         Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
                         SpawnTypes.DROPPED_ITEM
                 );

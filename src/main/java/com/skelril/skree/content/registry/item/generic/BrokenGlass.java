@@ -67,7 +67,7 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
     private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {
         Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
         if (optOrigin.isPresent()) {
-            new ItemDropper(optOrigin.get()).dropItems(
+            new ItemDropper(optOrigin.get()).dropStacks(
                     Collections.singleton(tf(new ItemStack(this, 1, variant))),
                     SpawnTypes.DROPPED_ITEM
             );

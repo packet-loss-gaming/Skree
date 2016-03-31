@@ -39,7 +39,7 @@ public class MagicBlockStateHelper {
         drops.addAll(newItemStackCollection(ladder, foundLadder));
         drops.addAll(newItemStackCollection(platform, foundPlatform));
 
-        new ItemDropper(loc).dropItems(drops, SpawnTypes.DROPPED_ITEM);
+        new ItemDropper(loc).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
 
         foundLadder = foundPlatform = 0;
     }

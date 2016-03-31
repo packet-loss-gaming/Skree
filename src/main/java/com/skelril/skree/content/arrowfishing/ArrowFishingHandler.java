@@ -89,7 +89,7 @@ public class ArrowFishingHandler {
                 }
             }
 
-            new ItemDropper(loc).dropItems(dropTable.getDrops(1, modifier), SpawnTypes.DROPPED_ITEM);
+            new ItemDropper(loc).dropStacks(dropTable.getDrops(1, modifier), SpawnTypes.DROPPED_ITEM);
         }
     }
 }

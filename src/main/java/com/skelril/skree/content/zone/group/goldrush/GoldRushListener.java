@@ -301,7 +301,7 @@ public class GoldRushListener {
                     }
 
                     if (!toReturn.isEmpty()) {
-                        new ItemDropper(player.getLocation()).dropItems(toReturn, SpawnTypes.PLUGIN);
+                        new ItemDropper(player.getLocation()).dropStacks(toReturn, SpawnTypes.PLUGIN);
                     }
 
                     player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));

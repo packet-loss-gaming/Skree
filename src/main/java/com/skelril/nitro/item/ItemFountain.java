@@ -46,7 +46,7 @@ public class ItemFountain implements IntegratedRunnable  {
     public boolean run(int times) {
         ItemStack stack = Probability.pickOneOf(options);
         for (int i = 0; i < amplifier.apply(i) + 1; i++) {
-            dropper.dropItems(Collections.singletonList(stack), spawnType);
+            dropper.dropStacks(Collections.singletonList(stack), spawnType);
         }
         return true;
     }

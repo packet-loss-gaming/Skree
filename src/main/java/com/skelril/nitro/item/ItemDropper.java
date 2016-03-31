@@ -15,11 +15,13 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ItemDropper {
 
@@ -37,14 +39,18 @@ public class ItemDropper {
         return location.getPosition();
     }
 
-    public void dropItems(Collection<ItemStack> stacks, SpawnType type) {
-        for (ItemStack stack : stacks) {
+    public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
+        for (ItemStackSnapshot stack : stacks) {
             Optional<Entity> optEntity = getExtent().createEntity(EntityTypes.ITEM, getPos());
             if (optEntity.isPresent()) {
                 Item item = (Item) optEntity.get();
-                item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot());
+                item.offer(Keys.REPRESENTED_ITEM, stack);
                 getExtent().spawnEntity(item, Cause.source(SpawnCause.builder().type(type).build()).build());
             }
         }
+    }
+
+    public void dropStacks(Collection<ItemStack> stacks, SpawnType type) {
+        dropStackSnapshots(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()), type);
     }
 }

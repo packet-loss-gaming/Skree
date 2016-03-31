@@ -416,7 +416,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                     ItemDropper dropper = new ItemDropper(loc);
                     for (int i = 0; i < times; ++i) {
-                        dropper.dropItems(drops, SpawnTypes.DROPPED_ITEM);
+                        dropper.dropStacks(drops, SpawnTypes.DROPPED_ITEM);
                     }
                 }
             }
