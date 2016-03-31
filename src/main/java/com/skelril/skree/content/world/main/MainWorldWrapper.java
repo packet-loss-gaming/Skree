@@ -129,6 +129,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             public void processNonLivingAttack(DamageSource attacker, Player defender) {
                 if (attacker.getType() == DamageTypes.VOID) {
                     defender.setLocation(defender.getWorld().getSpawnLocation());
+                    defender.offer(Keys.FALL_DISTANCE, 0F);
                     event.setCancelled(true);
                 }
             }
