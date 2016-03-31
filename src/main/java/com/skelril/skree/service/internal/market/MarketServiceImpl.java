@@ -326,7 +326,7 @@ public class MarketServiceImpl implements MarketService {
         return true;
     }
 
-    private Map<String, TypeDeducer> varientResolutionMap = new HashMap<>();
+    private static Map<String, TypeDeducer> varientResolutionMap = new HashMap<>();
 
     private TypeDeducer getDeducer(String type) {
         return varientResolutionMap.getOrDefault(type, new DeducerOfSimpleType());
