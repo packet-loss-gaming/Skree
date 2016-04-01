@@ -12,7 +12,6 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.event.world.LoadWorldEvent;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.skree.db.schema.Tables.PLAYERS;
-import static com.skelril.skree.db.schema.Tables.WORLDS;
 
 public class DatabaseServiceImpl implements DatabaseService {
     private HashMap<UUID, Long> sessionStartTime = new HashMap<>();
@@ -61,19 +59,6 @@ public class DatabaseServiceImpl implements DatabaseService {
             create.update(PLAYERS).set(PLAYERS.SECONDS_PLAYED, PLAYERS.SECONDS_PLAYED.add(diffSeconds)).where(
                     PLAYERS.UUID.equal(uuid.toString())
             ).execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Listener
-    public void onWorldLoad(LoadWorldEvent event) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            create.insertInto(WORLDS).columns(WORLDS.NAME)
-                    .values(event.getTargetWorld().getName())
-                    .onDuplicateKeyIgnore()
-                    .execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }

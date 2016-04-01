@@ -6,13 +6,25 @@
 
 package com.skelril.skree.service.internal.world;
 
+import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.WorldService;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.impl.DSL;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.World;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
+
+import static com.skelril.skree.db.schema.Tables.PLAYERS;
+import static com.skelril.skree.db.schema.Tables.WORLDS;
 
 public class WorldServiceImpl implements WorldService {
 
@@ -45,5 +57,49 @@ public class WorldServiceImpl implements WorldService {
     @Override
     public Collection<WorldEffectWrapper> getEffectWrappers() {
         return new HashSet<>(worlds.values());
+    }
+
+    private Map<UUID, Long> pendingResets = new HashMap<>();
+
+    @Listener(order = Order.PRE)
+    public void onPlayerAuth(ClientConnectionEvent.Auth event) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+
+            UUID uuid = event.getProfile().getUniqueId();
+
+            Record1<Timestamp> result = create.select(PLAYERS.LAST_LOGIN).from(PLAYERS).where(PLAYERS.UUID.equal(uuid.toString())).fetchOne();
+            Timestamp timestamp = result.getValue(PLAYERS.LAST_LOGIN);
+
+            pendingResets.put(uuid, timestamp.getTime());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Listener
+    public void onPlayerJoin(ClientConnectionEvent.Join event) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+
+            Player player = event.getTargetEntity();
+            UUID uuid = player.getUniqueId();
+            World world = player.getWorld();
+
+            Record1<Timestamp> result = create.select(WORLDS.CREATED_AT).from(WORLDS).where(WORLDS.NAME.equal(world.getName())).fetchOne();
+            Timestamp timestamp = result.getValue(WORLDS.CREATED_AT);
+
+            if (timestamp.getTime() > pendingResets.remove(uuid)) {
+                Collection<World> worlds = getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
+                player.setLocation(worlds.iterator().next().getSpawnLocation());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Listener
+    public void onPlayerQuit(ClientConnectionEvent.Disconnect event) {
+        pendingResets.remove(event.getTargetEntity().getUniqueId());
     }
 }

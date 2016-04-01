@@ -11,6 +11,7 @@ import org.jooq.*;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Worlds extends TableImpl<WorldsRecord> {
 
-	private static final long serialVersionUID = 1613653364;
+	private static final long serialVersionUID = -1883636681;
 
 	/**
 	 * The reference instance of <code>mc_db.worlds</code>
@@ -52,6 +53,11 @@ public class Worlds extends TableImpl<WorldsRecord> {
 	 * The column <code>mc_db.worlds.name</code>.
 	 */
 	public final TableField<WorldsRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR.length(50).nullable(false), this, "");
+
+	/**
+	 * The column <code>mc_db.worlds.created_at</code>.
+	 */
+	public final TableField<WorldsRecord, Timestamp> CREATED_AT = createField("created_at", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>mc_db.worlds</code> table reference

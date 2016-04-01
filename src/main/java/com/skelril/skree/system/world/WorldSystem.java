@@ -18,17 +18,25 @@ import com.skelril.skree.content.world.wilderness.WildernessMetaCommand;
 import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
+import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Random;
+
+import static com.skelril.skree.db.schema.Tables.WORLDS;
 
 @NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
@@ -48,6 +56,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         service = new WorldServiceImpl();
 
         // Register the service & command
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
         Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
@@ -90,6 +99,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
                     obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false)
                             .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
             );
+            registerWorld(BUILD);
         }
 
         if (curWorld.isPresent()) {
@@ -111,6 +121,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
                     obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false)
                             .generatorModifiers(new SolidWorldGeneratorModifier()).build()
             );
+            registerWorld(INSTANCE);
         }
 
         if (curWorld.isPresent()) {
@@ -132,6 +143,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
                     obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true)
                             .generatorModifiers(new WildernessWorldGeneratorModifier()).build()
             );
+            registerWorld(WILDERNESS);
         }
 
         if (curWorld.isPresent()) {
@@ -144,6 +156,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
             curWorld = instantiate(
                     obtainNetherworld().name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build()
             );
+            registerWorld(WILDERNESS_NETHER);
         }
 
         if (curWorld.isPresent()) {
@@ -177,6 +190,18 @@ public class WorldSystem implements ServiceProvider<WorldService> {
             return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(settings).get());
         } catch (Exception ex) {
             return Optional.empty();
+        }
+    }
+
+    private void registerWorld(String name) {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            create.insertInto(WORLDS).columns(WORLDS.NAME)
+                    .values(name)
+                    .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, new Timestamp(System.currentTimeMillis()))
+                    .execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
