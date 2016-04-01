@@ -27,6 +27,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -100,7 +101,7 @@ public class GoldRushListener {
         }
     }
 
-    @Listener
+    @Listener(order = Order.FIRST)
     public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
         Object obj = event.getCause().root();
         if (!(obj instanceof Player)) {
