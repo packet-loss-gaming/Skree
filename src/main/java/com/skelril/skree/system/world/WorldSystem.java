@@ -196,9 +196,12 @@ public class WorldSystem implements ServiceProvider<WorldService> {
     private void registerWorld(String name) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            create.insertInto(WORLDS).columns(WORLDS.NAME)
-                    .values(name)
-                    .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, new Timestamp(System.currentTimeMillis()))
+
+            Timestamp createdTime = new Timestamp(System.currentTimeMillis());
+
+            create.insertInto(WORLDS).columns(WORLDS.NAME, WORLDS.CREATED_AT)
+                    .values(name, createdTime)
+                    .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, createdTime)
                     .execute();
         } catch (SQLException e) {
             e.printStackTrace();
