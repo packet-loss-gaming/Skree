@@ -54,7 +54,7 @@ public class MarketBuyCommand implements CommandExecutor {
         Player player = (Player) src;
 
         if (!canBuyOrSell(player)) {
-            player.sendMessage(Text.of(TextColors.DARK_RED, "You cannot buy or sell from this area."));
+            player.sendMessage(Text.of(TextColors.RED, "You cannot buy or sell from this area."));
             return CommandResult.empty();
         }
 
@@ -77,7 +77,7 @@ public class MarketBuyCommand implements CommandExecutor {
         for (String anItem : targetItems) {
             Optional<BigDecimal> optPrice = service.getPrice(anItem);
             if (!optPrice.isPresent()) {
-                src.sendMessage(Text.of(TextColors.DARK_RED, "That item is not available for purchase."));
+                src.sendMessage(Text.of(TextColors.RED, "That item is not available for purchase."));
                 return CommandResult.empty();
             }
 
@@ -91,7 +91,13 @@ public class MarketBuyCommand implements CommandExecutor {
         BigDecimal newBalance = funds.subtract(price);
 
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "You do not have enough money to purchase that item(s)."));
+            BigDecimal neededAmt = newBalance.multiply(BigDecimal.valueOf(-1));
+
+            src.sendMessage(Text.of(TextColors.RED, "You do not have enough money to purchase that item(s)."));
+            src.sendMessage(Text.of(TextColors.RED, "You need an additional ",
+                    TextColors.WHITE, format(neededAmt), TextColors.RED, "."
+            ));
+
             return CommandResult.empty();
         }
 
@@ -101,7 +107,7 @@ public class MarketBuyCommand implements CommandExecutor {
             Optional<ItemStack> stack = service.getItem(anItem);
             if (!stack.isPresent()) {
                 // TODO Auto reporting
-                src.sendMessage(Text.of(TextColors.DARK_RED, "An item stack could not be resolved, please report this!"));
+                src.sendMessage(Text.of(TextColors.RED, "An item stack could not be resolved, please report this!"));
                 return CommandResult.empty();
             }
             int total = amt;
@@ -115,7 +121,7 @@ public class MarketBuyCommand implements CommandExecutor {
         // Alright, all items have been found
         if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
             // TODO Auto reporting
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
+            src.sendMessage(Text.of(TextColors.RED, "Failed to adjust your balance, please report this!"));
             return CommandResult.empty();
         }
 
@@ -125,14 +131,14 @@ public class MarketBuyCommand implements CommandExecutor {
 
         if (!transactions.getKey()) {
             // TODO Auto reporting
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to give all items, please report this!"));
+            src.sendMessage(Text.of(TextColors.RED, "Failed to give all items, please report this!"));
             return CommandResult.empty();
         }
 
         if (!service.logTransactionByStack(player.getUniqueId(), transactions.getValue())) {
             // TODO Auto reporting
             // Not critical, continue
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
+            src.sendMessage(Text.of(TextColors.RED, "Failed to log transactions, please report this!"));
         }
 
         player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) purchased for ", TextColors.WHITE, format(price), TextColors.YELLOW, "!"));

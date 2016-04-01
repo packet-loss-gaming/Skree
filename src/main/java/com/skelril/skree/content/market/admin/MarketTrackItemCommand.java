@@ -41,7 +41,7 @@ public class MarketTrackItemCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -50,7 +50,7 @@ public class MarketTrackItemCommand implements CommandExecutor {
         if (service.addItem(item)) {
             src.sendMessage(Text.of(TextColors.YELLOW, "Your held item is now being tracked."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is already tracked."));
+            src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
             return CommandResult.empty();
         }
 

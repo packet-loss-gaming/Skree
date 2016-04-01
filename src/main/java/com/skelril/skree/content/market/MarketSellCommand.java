@@ -69,7 +69,7 @@ public class MarketSellCommand implements CommandExecutor {
         if (mode != QueryMode.HELD && !args.hasAny("u")) {
             filter = player.getItemInHand();
             if (!filter.isPresent()) {
-                src.sendMessage(Text.of(TextColors.DARK_RED, "You're not holding an item to filter with!"));
+                src.sendMessage(Text.of(TextColors.RED, "You're not holding an item to filter with!"));
                 return CommandResult.empty();
             }
         }
@@ -77,7 +77,7 @@ public class MarketSellCommand implements CommandExecutor {
         Clause<BigDecimal, List<Integer>> changes = MarketImplUtil.getChanges(player, service, mode, filter.orElse(null));
 
         if (changes.getValue().isEmpty()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "No sellable items found" + (filter.isPresent() ? " that matched the filter" : "") + "!"));
+            src.sendMessage(Text.of(TextColors.RED, "No sellable items found" + (filter.isPresent() ? " that matched the filter" : "") + "!"));
             return CommandResult.empty();
         }
 

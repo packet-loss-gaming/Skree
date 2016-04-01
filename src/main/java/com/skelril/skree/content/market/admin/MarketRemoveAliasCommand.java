@@ -38,7 +38,7 @@ public class MarketRemoveAliasCommand implements CommandExecutor {
         if (service.remAlias(alias)) {
             src.sendMessage(Text.of(TextColors.YELLOW, alias + " removed from the market."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The alias was not in the market, and could not be removed."));
+            src.sendMessage(Text.of(TextColors.RED, "The alias was not in the market, and could not be removed."));
             return CommandResult.empty();
         }
 

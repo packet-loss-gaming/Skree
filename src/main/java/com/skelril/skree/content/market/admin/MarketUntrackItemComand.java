@@ -41,7 +41,7 @@ public class MarketUntrackItemComand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -50,7 +50,7 @@ public class MarketUntrackItemComand implements CommandExecutor {
         if (service.remItem(item)) {
             src.sendMessage(Text.of(TextColors.YELLOW, "Your held item is no longer being tracked."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is not tracked."));
+            src.sendMessage(Text.of(TextColors.RED, "Your held item is not tracked."));
             return CommandResult.empty();
         }
 

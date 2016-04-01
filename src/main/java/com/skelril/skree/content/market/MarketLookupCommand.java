@@ -65,7 +65,7 @@ public class MarketLookupCommand implements CommandExecutor {
         }
 
         if (!optPrice.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
+            src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
             return CommandResult.empty();
         }
 

@@ -45,7 +45,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -55,7 +55,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
         try {
             price = new BigDecimal(args.<String>getOne("price").get());
         } catch (NumberFormatException ex) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid price specified"));
+            src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
             return CommandResult.empty();
         }
 
@@ -68,13 +68,13 @@ public class MarketQuickAddCommand implements CommandExecutor {
                     }
                     // Same error, fall through
                 }
-                src.sendMessage(Text.of(TextColors.DARK_RED, alias + " is not a valid alias"));
+                src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias"));
                 return CommandResult.empty();
             }
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
             return CommandResult.empty();
         }
-        src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is already tracked."));
+        src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
         return CommandResult.empty();
     }
 

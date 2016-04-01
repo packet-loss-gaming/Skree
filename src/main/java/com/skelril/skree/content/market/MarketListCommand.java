@@ -61,7 +61,7 @@ public class MarketListCommand implements CommandExecutor {
         String filter = optFilter.isPresent() ? optFilter.get() : "";
 
         if (!filter.matches(MarketService.VALID_ALIAS_REGEX)) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid filter supplied."));
+            src.sendMessage(Text.of(TextColors.RED, "Invalid filter supplied."));
             return CommandResult.empty();
         }
 

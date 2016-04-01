@@ -39,7 +39,7 @@ public class MarketSetPrimaryAliasCommand implements CommandExecutor {
         if (service.setPrimaryAlias(alias)) {
             src.sendMessage(Text.of(TextColors.YELLOW, alias + " set as a primary alias."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, alias + " is not a valid alias."));
+            src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias."));
         }
 
         return CommandResult.success();

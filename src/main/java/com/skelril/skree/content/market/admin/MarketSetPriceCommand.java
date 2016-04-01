@@ -42,7 +42,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
         try {
             price = new BigDecimal(args.<String>getOne("price").get());
         } catch (NumberFormatException ex) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Invalid price specified"));
+            src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
             return CommandResult.empty();
         }
 
@@ -61,7 +61,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
             }
         }
 
-        src.sendMessage(Text.of(TextColors.DARK_RED, "No valid alias specified, and you're not holding a tracked item."));
+        src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
         return CommandResult.empty();
     }
 

@@ -43,7 +43,7 @@ public class MarketAddAliasCommand implements CommandExecutor {
 
         Optional<ItemStack> held = ((Player) src).getItemInHand();
         if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "You are not holding an item."));
+            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
             return CommandResult.empty();
         }
 
@@ -53,7 +53,7 @@ public class MarketAddAliasCommand implements CommandExecutor {
         if (service.addAlias(alias, item)) {
             src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Your held item is not currently tracked, or the alias is already in use."));
+            src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
             return CommandResult.empty();
         }
 
