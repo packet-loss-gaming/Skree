@@ -15,7 +15,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -42,10 +41,10 @@ public class GameModeCommand implements CommandExecutor {
         GameMode mode = args.<GameMode>getOne("mode").get();
         Player target = args.<Player>getOne("target").get();
 
-        GameModeData current = target.getGameModeData();
-        service.save(target, current.type().get().getId());
-        target.offer(current.set(Keys.GAME_MODE, mode));
-        service.load(target, current.type().get().getId());
+        service.save(target, target.get(Keys.GAME_MODE).get().getId());
+        target.offer(Keys.FALL_DISTANCE, 0F);
+        target.offer(Keys.GAME_MODE, mode);
+        service.load(target, mode.getId());
 
         target.sendMessage(Text.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
         return CommandResult.success();
