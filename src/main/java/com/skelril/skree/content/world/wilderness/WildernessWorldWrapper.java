@@ -53,6 +53,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Boss;
+import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.monster.Wither;
 import org.spongepowered.api.entity.living.player.Player;
@@ -293,7 +294,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
                 ).submit(SkreePlugin.inst());
 
-                if (!(defender instanceof Monster)) {
+                if (!(defender instanceof Monster) || defender instanceof Creeper) {
                     return;
                 }
 
