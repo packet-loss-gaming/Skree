@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.sql.Connection;
@@ -59,7 +60,7 @@ public class WorldServiceImpl implements WorldService {
         return new HashSet<>(worlds.values());
     }
 
-    private Map<UUID, Long> pendingResets = new HashMap<>();
+    private Map<UUID, Long> lastPlayerLogin = new HashMap<>();
 
     @Listener(order = Order.PRE)
     public void onPlayerAuth(ClientConnectionEvent.Auth event) {
@@ -71,7 +72,7 @@ public class WorldServiceImpl implements WorldService {
             Record1<Timestamp> result = create.select(PLAYERS.LAST_LOGIN).from(PLAYERS).where(PLAYERS.UUID.equal(uuid.toString())).fetchOne();
             Timestamp timestamp = result.getValue(PLAYERS.LAST_LOGIN);
 
-            pendingResets.put(uuid, timestamp.getTime());
+            lastPlayerLogin.put(uuid, timestamp.getTime());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -87,11 +88,17 @@ public class WorldServiceImpl implements WorldService {
             World world = player.getWorld();
 
             Record1<Timestamp> result = create.select(WORLDS.CREATED_AT).from(WORLDS).where(WORLDS.NAME.equal(world.getName())).fetchOne();
-            Timestamp timestamp = result.getValue(WORLDS.CREATED_AT);
+            Timestamp worldCreationTimestamp = result.getValue(WORLDS.CREATED_AT);
 
-            if (timestamp.getTime() > pendingResets.remove(uuid)) {
+            long worldCreationTime = 0;
+            if (worldCreationTimestamp != null) {
+                worldCreationTime = worldCreationTimestamp.getTime();
+            }
+
+            if (worldCreationTime > lastPlayerLogin.remove(uuid)) {
                 Collection<World> worlds = getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-                player.setLocation(worlds.iterator().next().getSpawnLocation());
+                Location<World> spawn = worlds.iterator().next().getSpawnLocation();
+                player.setLocation(spawn);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -100,6 +107,6 @@ public class WorldServiceImpl implements WorldService {
 
     @Listener
     public void onPlayerQuit(ClientConnectionEvent.Disconnect event) {
-        pendingResets.remove(event.getTargetEntity().getUniqueId());
+        lastPlayerLogin.remove(event.getTargetEntity().getUniqueId());
     }
 }
