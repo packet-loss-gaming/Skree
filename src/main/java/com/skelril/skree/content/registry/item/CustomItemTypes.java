@@ -120,6 +120,9 @@ public class CustomItemTypes {
     public static final DemonicSword DEMONIC_SWORD = new DemonicSword();
     public static final HolySword HOLY_SWORD = new HolySword();
 
+    public static final FearSword FEAR_SWORD = new FearSword();
+    public static final UnleashedSword UNLEASHED_SWORD = new UnleashedSword();
+
     public static final JurackSword JURACK_SWORD = new JurackSword();
     public static final CrystalSword CRYSTAL_SWORD = new CrystalSword();
     public static final TwoTailedSword TWO_TAILED_SWORD = new TwoTailedSword();
