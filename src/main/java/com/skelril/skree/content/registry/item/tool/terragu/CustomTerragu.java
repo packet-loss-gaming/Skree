@@ -87,7 +87,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
                         }
 
                         int maxDist = getMaxEditDist(stack);
-                        int dmg = destroyLine(optClickedDir.get(), maxDist - 1, snapshot.getOriginal());
+                        int dmg = destroyLine(player, optClickedDir.get(), maxDist - 1, snapshot.getOriginal());
                         stack.damageItem(dmg, tf(player));
                         player.setItemInHand(tf(stack));
                     }
@@ -136,7 +136,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
         tag.setInteger("edit_dist", dist);
     }
 
-    protected int destroyLine(Direction dir, int maxDist, BlockSnapshot state) {
+    protected int destroyLine(Player player, Direction dir, int maxDist, BlockSnapshot state) {
         Location<World> starting = state.getLocation().get();
         int i;
         for (i = 0; i < maxDist; ++i) {
@@ -144,6 +144,10 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
             if (starting.getBlockType() != state.getState().getType()) {
                 break;
             }
+
+            /*if (!starting.getExtent().digBlock(starting.getBlockPosition(), Cause.of(NamedCause.simulated(player)))) {
+                break;
+            }*/
 
             ((net.minecraft.world.World) starting.getExtent()).destroyBlock(
                     new BlockPos(starting.getX(), starting.getY(), starting.getZ()),
