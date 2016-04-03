@@ -14,6 +14,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DropTableImpl implements DropTable {
     private final DiceRoller roller;
@@ -59,6 +60,6 @@ public class DropTableImpl implements DropTable {
             results.addAll(entry.flush());
         }
 
-        return results;
+        return results.stream().map(ItemStack::copy).collect(Collectors.toList());
     }
 }
