@@ -18,25 +18,18 @@ import com.skelril.skree.content.world.wilderness.WildernessMetaCommand;
 import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
-import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Random;
-
-import static com.skelril.skree.db.schema.Tables.WORLDS;
 
 @NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
@@ -193,18 +186,9 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
     }
 
-    private void registerWorld(String name) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-
-            Timestamp createdTime = new Timestamp(System.currentTimeMillis());
-
-            create.insertInto(WORLDS).columns(WORLDS.NAME, WORLDS.CREATED_AT)
-                    .values(name, createdTime)
-                    .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, createdTime)
-                    .execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private void registerWorld(String worldName) {
+        if (Sponge.getPlatform().getType() == Platform.Type.SERVER) {
+            new ServerSideWorldRegistar().register(worldName);
         }
     }
 
