@@ -28,9 +28,7 @@ import com.skelril.skree.content.registry.item.tool.shovel.JurackShovel;
 import com.skelril.skree.content.registry.item.tool.terragu.*;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.bow.NetherBow;
-import com.skelril.skree.content.registry.item.weapon.sword.CrystalSword;
-import com.skelril.skree.content.registry.item.weapon.sword.JurackSword;
-import com.skelril.skree.content.registry.item.weapon.sword.TwoTailedSword;
+import com.skelril.skree.content.registry.item.weapon.sword.*;
 import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
@@ -66,9 +64,20 @@ public class CustomItemTypes {
     public static final SeaCrystal SEA_CRYSTAL = new SeaCrystal();
 
     /* Resources */
+    public static final AncientIngot ANCIENT_INGOT = new AncientIngot();
+    public static final AncientMetalFragment ANCIENT_METAL_FRAGMENT = new AncientMetalFragment();
+    public static final DemonicBlade DEMONIC_BLADE = new DemonicBlade();
+    public static final DemonicHilt DEMONIC_HILT = new DemonicHilt();
+    public static final DemonicIngot DEMONIC_INGOT = new DemonicIngot();
+    public static final EmblemOfHallow EMBLEM_OF_HALLOW = new EmblemOfHallow();
+    public static final EmblemOfTheForge EMBLEM_OF_THE_FORGE = new EmblemOfTheForge();
     public static final EnderFocus ENDER_FOCUS = new EnderFocus();
     public static final RedShard RED_SHARD = new RedShard();
     public static final FairyDust FAIRY_DUST = new FairyDust();
+    public static final HolyBlade HOLY_BLADE = new HolyBlade();
+    public static final HolyHilt HOLY_HILT = new HolyHilt();
+    public static final HolyIngot HOLY_INGOT = new HolyIngot();
+    public static final UnstableCatalyst UNSTABLE_CATALYST = new UnstableCatalyst();
 
     /* Food */
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();
@@ -85,8 +94,31 @@ public class CustomItemTypes {
     public static final CrystalLeggings CRYSTAL_LEGGINGS = new CrystalLeggings();
     public static final CrystalBoots CRYSTAL_BOOTS = new CrystalBoots();
 
+    public static final GuardianHelmet GUARDIAN_HELMET = new GuardianHelmet();
+    public static final GuardianChestplate GUARDIAN_CHESTPLATE = new GuardianChestplate();
+    public static final GuardianLeggings GUARDIAN_LEGGINGS = new GuardianLeggings();
+    public static final GuardianBoots GUARDIAN_BOOTS = new GuardianBoots();
+
+    public static final DivineHelmet DIVINE_HELMET = new DivineHelmet();
+    public static final DivineChestplate DIVINE_CHESTPLATE = new DivineChestplate();
+    public static final DivineLeggings DIVINE_LEGGINGS = new DivineLeggings();
+    public static final DivineBoots DIVINE_BOOTS = new DivineBoots();
+
+    public static final TormentorHelmet TORMENTOR_HELMET = new TormentorHelmet();
+    public static final TormentorChestplate TORMENTOR_CHESTPLATE = new TormentorChestplate();
+    public static final TormentorLeggings TORMENTOR_LEGGINGS = new TormentorLeggings();
+    public static final TormentorBoots TORMENTOR_BOOTS = new TormentorBoots();
+
+    public static final WraithHelmet WRAITH_HELMET = new WraithHelmet();
+    public static final WraithChestplate WRAITH_CHESTPLATE = new WraithChestplate();
+    public static final WraithLeggings WRAITH_LEGGINGS = new WraithLeggings();
+    public static final WraithBoots WRAITH_BOOTS = new WraithBoots();
+
     /* Weapons */
     public static final NetherBow NETHER_BOW = new NetherBow();
+
+    public static final DemonicSword DEMONIC_SWORD = new DemonicSword();
+    public static final HolySword HOLY_SWORD = new HolySword();
 
     public static final JurackSword JURACK_SWORD = new JurackSword();
     public static final CrystalSword CRYSTAL_SWORD = new CrystalSword();
