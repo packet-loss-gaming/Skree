@@ -17,7 +17,7 @@ public class AncientIngot extends CustomItem implements Craftable {
 
     @Override
     public String __getID() {
-        return "ancient_metal_fragment";
+        return "ancient_ingot";
     }
 
     @Override
