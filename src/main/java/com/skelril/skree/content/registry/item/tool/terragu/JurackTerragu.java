@@ -6,15 +6,17 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 
-public class JurackTerragu extends CustomTerragu {
+public class JurackTerragu extends CustomTerragu implements Craftable {
     @Override
     public String __getType() {
         return "jurack";
@@ -22,7 +24,7 @@ public class JurackTerragu extends CustomTerragu {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(CustomItemTypes.JURACK_GEM);
+        return null;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class JurackTerragu extends CustomTerragu {
 
     @Override
     public int __getMaxUses() {
-        return ItemTiers.JURACK.getDurability();
+        return ItemTiers.JURACK.getDurability() * 10;
     }
 
     @Listener
@@ -63,5 +65,16 @@ public class JurackTerragu extends CustomTerragu {
     @Listener
     public void process(ChangeBlockEvent.Break event) {
         super.process(event);
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addShapelessRecipe(
+                new ItemStack(this),
+                new ItemStack(CustomItemTypes.JURACK_PICKAXE),
+                new ItemStack(CustomItemTypes.JURACK_AXE),
+                new ItemStack(CustomItemTypes.JURACK_SHOVEL),
+                new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
+        );
     }
 }

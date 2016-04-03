@@ -6,15 +6,18 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
-import net.minecraft.init.Blocks;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 
-public class WoodTerragu extends CustomTerragu {
+public class WoodTerragu extends CustomTerragu implements Craftable {
     @Override
     public String __getType() {
         return "wooden";
@@ -22,7 +25,7 @@ public class WoodTerragu extends CustomTerragu {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(Blocks.planks);
+        return null;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class WoodTerragu extends CustomTerragu {
 
     @Override
     public int __getMaxUses() {
-        return ItemTiers.WOOD.getDurability();
+        return ItemTiers.WOOD.getDurability() * 10;
     }
 
     @Listener
@@ -63,5 +66,16 @@ public class WoodTerragu extends CustomTerragu {
     @Listener
     public void process(ChangeBlockEvent.Break event) {
         super.process(event);
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addShapelessRecipe(
+                new ItemStack(this),
+                new ItemStack(Items.wooden_pickaxe),
+                new ItemStack(Items.wooden_axe),
+                new ItemStack(Items.wooden_shovel),
+                new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
+        );
     }
 }

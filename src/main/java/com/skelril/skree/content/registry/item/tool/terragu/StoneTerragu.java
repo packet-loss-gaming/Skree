@@ -6,15 +6,18 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
+import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
-import net.minecraft.init.Blocks;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 
-public class StoneTerragu extends CustomTerragu {
+public class StoneTerragu extends CustomTerragu implements Craftable {
     @Override
     public String __getType() {
         return "stone";
@@ -22,7 +25,7 @@ public class StoneTerragu extends CustomTerragu {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(Blocks.cobblestone);
+        return null;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class StoneTerragu extends CustomTerragu {
 
     @Override
     public int __getMaxUses() {
-        return ItemTiers.STONE.getDurability();
+        return ItemTiers.STONE.getDurability() * 10;
     }
 
     @Listener
@@ -63,5 +66,16 @@ public class StoneTerragu extends CustomTerragu {
     @Listener
     public void process(ChangeBlockEvent.Break event) {
         super.process(event);
+    }
+
+    @Override
+    public void registerRecipes() {
+        GameRegistry.addShapelessRecipe(
+                new ItemStack(this),
+                new ItemStack(Items.stone_pickaxe),
+                new ItemStack(Items.stone_axe),
+                new ItemStack(Items.stone_shovel),
+                new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
+        );
     }
 }
