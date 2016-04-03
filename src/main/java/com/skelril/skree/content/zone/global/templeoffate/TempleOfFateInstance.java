@@ -38,18 +38,20 @@ public class TempleOfFateInstance extends LegacyZoneBase {
     private void setUp() {
         startingPoint = new Location<>(getRegion().getExtent(), getRegion().getMinimumPoint().add(4, 11, 58));
 
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller();
         dropTable = new MasterDropTable(
                 slipRoller,
                 Lists.newArrayList(
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
-                                        new DropTableEntryImpl(new SimpleDropResolver(
-                                                Lists.newArrayList(
-                                                        newItemStack(ANCIENT_METAL_FRAGMENT)
-                                                )
-                                        ), 1)
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                    Lists.newArrayList(
+                                                            newItemStack(ANCIENT_METAL_FRAGMENT)
+                                                    )
+                                                ), 1
+                                        )
                                 )
                         ),
                         new DropTableImpl(
