@@ -81,7 +81,7 @@ public class PatientXListener {
 
             // Nullify all modifiers
             for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-                event.setDamage(modifier.getFirst(), (a) -> a);
+                event.setDamage(modifier.getFirst(), (a) -> 0D);
             }
 
             event.setBaseDamage(ratio * inst.getDifficulty());
