@@ -20,6 +20,7 @@ import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
 import com.skelril.skree.content.registry.item.tool.axe.JurackAxe;
 import com.skelril.skree.content.registry.item.tool.hoe.CrystalHoe;
 import com.skelril.skree.content.registry.item.tool.hoe.JurackHoe;
+import com.skelril.skree.content.registry.item.tool.magic.MagicWand;
 import com.skelril.skree.content.registry.item.tool.pickaxe.CrystalPickaxe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.HardenedDiamondPickaxe;
 import com.skelril.skree.content.registry.item.tool.pickaxe.JurackPickaxe;
@@ -163,6 +164,7 @@ public class CustomItemTypes {
     public static final FocusTeleporter FOCUS_TELEPORTER = new FocusTeleporter();
     public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
     public static final Luminositor LUMINOSITOR = new Luminositor();
+    public static final MagicWand MAGIC_WAND = new MagicWand();
     public static final NetherBowl NETHER_BOWL = new NetherBowl();
     public static final PhantomClock PHANTOM_CLOCK = new PhantomClock();
     public static final PhantomHymn PHANTOM_HYMN = new PhantomHymn();

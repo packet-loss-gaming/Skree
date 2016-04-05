@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.block.utility;
+package com.skelril.skree.content.registry.item.tool.magic;
 
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemStackFactory;
@@ -41,6 +41,10 @@ public class MagicBlockStateHelper {
 
         new ItemDropper(loc).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
 
+        resetCounts();
+    }
+
+    protected static void resetCounts() {
         foundLadder = foundPlatform = 0;
     }
 
@@ -49,7 +53,7 @@ public class MagicBlockStateHelper {
             return;
         }
 
-        ++foundLadder;
+        ladder(block);
         ladderRecursion(block);
         workingLadder = foundLadder - 1;
         workingPlatform = foundPlatform;
@@ -60,7 +64,7 @@ public class MagicBlockStateHelper {
             return;
         }
 
-        ++foundPlatform;
+        platform(block);
         platformRecursion(block);
         workingLadder = foundLadder;
         workingPlatform = foundPlatform - 1;
