@@ -63,6 +63,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
@@ -81,6 +82,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -90,6 +92,7 @@ import org.spongepowered.api.world.extent.Extent;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
@@ -280,7 +283,16 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             @Override
             public void processMonsterAttack(Living attacker, Player defender) {
-                event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
+                // If they're endermites they hit through armor, otherwise they get a damage boost
+                if (attacker.getType() == EntityTypes.ENDERMITE) {
+                    for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
+                        event.setDamage(modifier.getFirst(), (a) -> 0D);
+                    }
+
+                    event.setBaseDamage(1);
+                } else {
+                    event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
+                }
 
                 WildernessPlayerMeta meta = playerMetaMap.get(defender);
                 if (meta != null) {
