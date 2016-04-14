@@ -109,12 +109,6 @@ public class RegionServiceImpl implements RegionService {
     private Map<Player, Long> recentNotices = new WeakHashMap<>();
 
     private boolean check(Player player, Location<World> loc) {
-        // WORK AROUND FOR SpongeCommon/626
-        if (loc.getBlockX() == 0 && loc.getBlockY() == 0 && loc.getBlockZ() == 0) {
-            return false;
-        }
-        // END WORK AROUND
-
         RegionPoint point = new RegionPoint(loc.getPosition());
         RegionManager manager = managerMap.get(loc.getExtent());
 
