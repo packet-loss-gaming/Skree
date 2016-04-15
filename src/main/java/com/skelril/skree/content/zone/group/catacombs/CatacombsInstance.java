@@ -135,7 +135,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
         }
 
         for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            if (!player.getInventory().query((ItemType) CustomItemTypes.PHANTOM_CLOCK).isEmpty()) {
+            if (player.getInventory().query((ItemType) CustomItemTypes.PHANTOM_CLOCK).size() > 0) {
                 return 2;
             }
         }
