@@ -18,6 +18,7 @@ import com.skelril.skree.content.zone.*;
 import com.skelril.skree.content.zone.group.catacombs.instruction.CatacombsHealthInstruction;
 import com.skelril.skree.content.zone.group.catacombs.instruction.CheckedSpawnWave;
 import com.skelril.skree.content.zone.group.catacombs.instruction.WaveDamageModifier;
+import com.skelril.skree.content.zone.group.catacombs.instruction.WaveDropInstruction;
 import com.skelril.skree.content.zone.group.catacombs.instruction.bossmove.NamedBindInstruction;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
@@ -83,6 +84,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
 
         List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
         unbindProcessor.add(new CheckedSpawnWave());
+        unbindProcessor.add(new WaveDropInstruction(2));
 
         List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
         damageProcessor.add(new WaveDamageModifier());
@@ -96,6 +98,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
 
         List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = waveMobManager.getUnbindProcessor();
         unbindProcessor.add(new CheckedSpawnWave());
+        unbindProcessor.add(new WaveDropInstruction(1));
 
         List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = waveMobManager.getDamageProcessor();
         damageProcessor.add(new WaveDamageModifier());
