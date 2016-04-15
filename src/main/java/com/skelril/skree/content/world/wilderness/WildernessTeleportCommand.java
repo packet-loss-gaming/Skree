@@ -101,7 +101,7 @@ public class WildernessTeleportCommand implements CommandExecutor {
                 int x = getLevelCoord(targetLevel, unit);
                 int z = getLevelCoord(targetLevel, unit);
 
-                dest = SafeTeleportHelper.getSafeDest(new Location<>(world, x, 90, z)).orElse(null);
+                dest = SafeTeleportHelper.getSafeDest(new Location<>(world, x, 60, z)).orElse(null);
             } while (dest == null);
 
             player.setLocation(dest);
