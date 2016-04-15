@@ -107,7 +107,6 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
     public void checkedSpawnWave() {
         if (!hasActiveMobs()) {
-            remove();
             spawnWave();
         }
     }
