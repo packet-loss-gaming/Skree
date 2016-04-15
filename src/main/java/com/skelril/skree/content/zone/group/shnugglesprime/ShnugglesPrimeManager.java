@@ -7,6 +7,14 @@
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.Lists;
+import com.skelril.nitro.droptable.DropTable;
+import com.skelril.nitro.droptable.DropTableEntryImpl;
+import com.skelril.nitro.droptable.DropTableImpl;
+import com.skelril.nitro.droptable.MasterDropTable;
+import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
+import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
+import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.BossListener;
@@ -16,6 +24,7 @@ import com.skelril.openboss.condition.BindCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.zone.*;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeInstance.AttackSeverity;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
@@ -29,19 +38,160 @@ import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
 public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable, LocationZone<ShnugglesPrimeInstance> {
+    private static final DropTable dropTable;
+
+    static {
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller();
+        dropTable = new MasterDropTable(
+                slipRoller,
+                Lists.newArrayList(
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(new CofferResolver(10000), 1)
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(FAIRY_DUST)
+                                                        )
+                                                ), 25
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(ItemTypes.DIAMOND)
+                                                        )
+                                                ), 35
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(JURACK_GEM)
+                                                        )
+                                                ), 50
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(SEA_CRYSTAL)
+                                                        )
+                                                ), 100
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(EMBLEM_OF_THE_FORGE)
+                                                        )
+                                                ), 250
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(HOLY_HILT)
+                                                        )
+                                                ), 1000
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(HOLY_BLADE)
+                                                        )
+                                                ), 1000
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(EMBLEM_OF_HALLOW)
+                                                        )
+                                                ), 250
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(DEMONIC_HILT)
+                                                        )
+                                                ), 1000
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(DEMONIC_BLADE)
+                                                        )
+                                                ), 1000
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(SCROLL_OF_SUMMATION, 3)
+                                                        )
+                                                ), 25
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(ANCIENT_METAL_FRAGMENT)
+                                                        )
+                                                ), 25
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(ANCIENT_INGOT)
+                                                        )
+                                                ), 150
+                                        ),
+                                        new DropTableEntryImpl(
+                                                new SimpleDropResolver(
+                                                        Lists.newArrayList(
+                                                                newItemStack(UNSTABLE_CATALYST)
+                                                        )
+                                                ), 10000
+                                        )
+                                )
+                        )
+                )
+        );
+    }
+
     private final BossManager<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> bossManager = new BossManager<>();
 
     public ShnugglesPrimeManager() {
@@ -110,6 +260,23 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
             inst.bossDied();
             // Buff babies
             inst.buffBabies();
+
+            return Optional.empty();
+        });
+        unbindProcessor.add((condition, boss) -> {
+            ShnugglesPrimeInstance inst = boss.getDetail().getZone();
+
+            int playerCount = inst.getPlayers(PlayerClassifier.PARTICIPANT).size();
+
+            Collection<ItemStack> drops = dropTable.getDrops(
+                    playerCount * 15,
+                    1
+            );
+
+            Optional<Giant> optEnt = boss.getTargetEntity();
+            if (optEnt.isPresent()) {
+                new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+            }
 
             return Optional.empty();
         });
