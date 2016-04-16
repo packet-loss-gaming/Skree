@@ -31,7 +31,7 @@ public class SafeTeleportHelper {
                 if (dest.getY() == dest.getExtent().getBlockMax().getY()) {
                     return Optional.empty();
                 }
-                dest.add(0, 1, 0);
+                dest = dest.add(0, 1, 0);
             }
         }
 
