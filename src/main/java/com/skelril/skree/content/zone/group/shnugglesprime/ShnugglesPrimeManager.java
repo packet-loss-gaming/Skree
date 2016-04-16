@@ -67,7 +67,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                         new DropTableImpl(
                                 slipRoller,
                                 Lists.newArrayList(
-                                        new DropTableEntryImpl(new CofferResolver(10000), 1)
+                                        new DropTableEntryImpl(new CofferResolver(100), 1)
                                 )
                         ),
                         new DropTableImpl(
@@ -111,21 +111,31 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                                         Lists.newArrayList(
                                                                 newItemStack(EMBLEM_OF_THE_FORGE)
                                                         )
-                                                ), 250
-                                        ),
+                                                ), 750
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(HOLY_HILT)
                                                         )
-                                                ), 1000
-                                        ),
+                                                ), 15000
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(HOLY_BLADE)
                                                         )
-                                                ), 1000
+                                                ), 15000
                                         )
                                 )
                         ),
@@ -137,21 +147,31 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                                         Lists.newArrayList(
                                                                 newItemStack(EMBLEM_OF_HALLOW)
                                                         )
-                                                ), 250
-                                        ),
+                                                ), 750
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(DEMONIC_HILT)
                                                         )
-                                                ), 1000
-                                        ),
+                                                ), 15000
+                                        )
+                                )
+                        ),
+                        new DropTableImpl(
+                                slipRoller,
+                                Lists.newArrayList(
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(DEMONIC_BLADE)
                                                         )
-                                                ), 1000
+                                                ), 15000
                                         )
                                 )
                         ),
@@ -163,28 +183,28 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                                         Lists.newArrayList(
                                                                 newItemStack(SCROLL_OF_SUMMATION, 3)
                                                         )
-                                                ), 25
+                                                ), 75
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(ANCIENT_METAL_FRAGMENT)
                                                         )
-                                                ), 25
+                                                ), 250
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(ANCIENT_INGOT)
                                                         )
-                                                ), 150
+                                                ), 500
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
                                                                 newItemStack(UNSTABLE_CATALYST)
                                                         )
-                                                ), 10000
+                                                ), 25000
                                         )
                                 )
                         )
@@ -269,7 +289,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
             int playerCount = inst.getPlayers(PlayerClassifier.PARTICIPANT).size();
 
             Collection<ItemStack> drops = dropTable.getDrops(
-                    playerCount * 15,
+                    Math.min(7000, playerCount * 1500),
                     1
             );
 
