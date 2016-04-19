@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.group.patientx;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.SkreePlugin;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.event.world.ExplosionEvent;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -28,6 +29,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -118,10 +120,12 @@ public class PatientXListener {
 
         if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
             if (Probability.getChance(10)) {
-                new ItemDropper(entity.getLocation()).dropStacks(
-                        Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
-                        SpawnTypes.DROPPED_ITEM
-                );
+                Task.builder().execute(() -> {
+                    new ItemDropper(entity.getLocation()).dropStacks(
+                            Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
+                            SpawnTypes.DROPPED_ITEM
+                    );
+                }).delayTicks(1).submit(SkreePlugin.inst());
             }
         }
     }

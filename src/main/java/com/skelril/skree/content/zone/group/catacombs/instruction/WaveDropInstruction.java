@@ -17,12 +17,14 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.Instruction;
 import com.skelril.openboss.condition.UnbindCondition;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsBossDetail;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -145,7 +147,9 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
 
         Optional<Zombie> optEnt = boss.getTargetEntity();
         if (optEnt.isPresent()) {
-            new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+            Task.builder().execute(() -> {
+                new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+            }).delayTicks(1).submit(SkreePlugin.inst());
         }
 
         return Optional.empty();

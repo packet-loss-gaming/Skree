@@ -295,7 +295,9 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
 
             Optional<Giant> optEnt = boss.getTargetEntity();
             if (optEnt.isPresent()) {
-                new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+                Task.builder().execute(() -> {
+                    new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+                }).delayTicks(1).submit(SkreePlugin.inst());
             }
 
             return Optional.empty();
