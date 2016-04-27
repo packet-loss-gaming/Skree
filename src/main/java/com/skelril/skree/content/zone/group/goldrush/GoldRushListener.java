@@ -117,6 +117,11 @@ public class GoldRushListener {
 
         BlockSnapshot snapshot = event.getTargetBlock();
         BlockState state = snapshot.getState();
+
+        if (!snapshot.getLocation().isPresent()) {
+            return;
+        }
+
         Location<World> targetBlock = snapshot.getLocation().get();
         if (state.getType() == BlockTypes.WALL_SIGN && inst.getLockLocations().contains(targetBlock)) {
             Optional<TileEntity> optTileEnt = snapshot.getLocation().get().getTileEntity();
