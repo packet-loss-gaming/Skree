@@ -39,7 +39,13 @@ public class TempleOfFateListener {
 
         TempleOfFateInstance inst = optInst.get();
 
-        Location<World> targetBlock = event.getTargetBlock().getLocation().get();
+        Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
+
+        if (!optLoc.isPresent()) {
+            return;
+        }
+
+        Location<World> targetBlock = optLoc.get();
         if (targetBlock.getBlockType() == BlockTypes.CHEST) {
             event.setCancelled(true);
 
