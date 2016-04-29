@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone;
 
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
@@ -30,7 +31,15 @@ public class ZoneNaturalSpawnBlocker extends ZoneApplicableListener {
                 Optional<SpawnCause> optSpawnCause = event.getCause().first(SpawnCause.class);
                 if (optSpawnCause.isPresent()) {
                     SpawnType spawnType = optSpawnCause.get().getType();
-                    if (/*spawnType == SpawnTypes.CUSTOM || */spawnType == SpawnTypes.WORLD_SPAWNER) {
+                    if (spawnType == SpawnTypes.CUSTOM || spawnType == SpawnTypes.WORLD_SPAWNER) {
+                        /* SpongeCommon/679 */
+                        if (entity.getType() != EntityTypes.EXPERIENCE_ORB) {
+                            event.setCancelled(true);
+                        }
+                    }
+
+                    /* SpongeCommon/584 */
+                    if (spawnType == SpawnTypes.DROPPED_ITEM && entity.getType() == EntityTypes.ZOMBIE) {
                         event.setCancelled(true);
                     }
                 }

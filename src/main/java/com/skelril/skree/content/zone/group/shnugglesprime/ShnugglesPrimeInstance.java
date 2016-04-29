@@ -464,7 +464,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     if (optEntity.isPresent()) {
                         Entity potion = optEntity.get();
                         potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
-                        getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+                        getRegion().getExtent().spawnEntity(potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                     }
                 }
                 return;
