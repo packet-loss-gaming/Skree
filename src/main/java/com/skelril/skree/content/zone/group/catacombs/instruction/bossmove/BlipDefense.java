@@ -47,6 +47,6 @@ public class BlipDefense implements Instruction<DamagedCondition, Boss<Zombie, C
             boss.setVelocity(vel);
         }
 
-        return null;
+        return Optional.empty();
     }
 }
