@@ -34,6 +34,10 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
+                new JungleRaidEffectListener(this)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
                 new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
         );
 
