@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.service.internal.zone.allocator;
+package com.skelril.skree.service.internal.zone.decorator;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.sk89q.worldedit.EditSession;
@@ -20,7 +20,7 @@ import com.sk89q.worldedit.world.registry.WorldData;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
-import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
+import com.skelril.skree.service.internal.zone.allocator.RunManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,24 +30,23 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
-
+public class WEDecorator implements Decorator {
     private final Path baseDir;
 
-    public WESchematicAllocator(Path baseDir) {
+    public WEDecorator(Path baseDir) {
         this.baseDir = baseDir;
     }
 
-    private String getFileName(String managerName) {
-        return managerName.replace(" ", "-");
+    private String getFileName(String resourceName) {
+        return resourceName.replace(" ", "-");
     }
 
-    private Path getFile(String managerName) {
-        return baseDir.resolve(getFileName(managerName) + ".schematic");
+    private Path getFile(String resourceName) {
+        return baseDir.resolve(getFileName(resourceName) + ".schematic");
     }
 
-    private ClipboardHolder getHolder(String managerName, WorldData worldData) throws IOException {
-        try (InputStream bis = Files.newInputStream(getFile(managerName))) {
+    private ClipboardHolder getHolder(String resourceName, WorldData worldData) throws IOException {
+        try (InputStream bis = Files.newInputStream(getFile(resourceName))) {
             ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
             Clipboard clipboard = reader.read(worldData);
             return new ClipboardHolder(clipboard, worldData);
@@ -56,21 +55,21 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
 
     private HashMap<String, HashRef> hashRefMap = new HashMap<>();
 
-    protected <T> ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callback) {
+    public <T> ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
         transaction.enableQueue();
 
-        hashRefMap.computeIfAbsent(managerName, (a) -> {
+        hashRefMap.computeIfAbsent(resourceName, (a) -> {
             HashRef ref = new HashRef();
             try {
-                ref.holder = getHolder(managerName, world.getWorldEditWorld().getWorldData());
+                ref.holder = getHolder(resourceName, world.getWorldEditWorld().getWorldData());
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return ref;
         });
 
-        HashRef ref = hashRefMap.get(managerName);
+        HashRef ref = hashRefMap.get(resourceName);
         if (ref == null) {
             callback.accept(null);
             return null;
@@ -101,7 +100,7 @@ public abstract class WESchematicAllocator implements ZoneSpaceAllocator {
             RunManager.runOperation(transaction.commit(), () -> {
                 callback.accept(returnVal);
                 if (--ref.refCount == 0) {
-                    hashRefMap.remove(managerName);
+                    hashRefMap.remove(resourceName);
                 }
             });
         });

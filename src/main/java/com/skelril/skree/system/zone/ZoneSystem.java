@@ -18,6 +18,7 @@ import com.skelril.skree.content.zone.global.templeoffate.TempleOfFateManager;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
 import com.skelril.skree.content.zone.group.freakyfour.FreakyFourManager;
 import com.skelril.skree.content.zone.group.goldrush.GoldRushManager;
+import com.skelril.skree.content.zone.group.jungleraid.JungleRaidManager;
 import com.skelril.skree.content.zone.group.patientx.PatientXManager;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeManager;
 import com.skelril.skree.service.WorldService;
@@ -25,27 +26,18 @@ import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
 import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
+import com.skelril.skree.service.internal.zone.decorator.Decorators;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 @NModule(name = "Zone System")
 public class ZoneSystem implements ServiceProvider<ZoneService> {
 
     private ZoneService service;
-
-    private Path getWorkingDir() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return Files.createDirectories(path.resolve("zones"));
-    }
 
     @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
     public void init() {
@@ -54,23 +46,20 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
         Task.builder().execute(() -> {
             WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
 
-            try {
-                service = new ZoneServiceImpl(new ChainPlacementAllocator(getWorkingDir(), instWorldResolver));
+            service = new ZoneServiceImpl(new ChainPlacementAllocator(Decorators.ZONE_PRIMARY_DECORATOR, instWorldResolver));
 
-                service.registerManager(new CursedMineManager());
-                service.registerManager(new TempleOfFateManager());
+            service.registerManager(new CursedMineManager());
+            service.registerManager(new TempleOfFateManager());
 
-                service.registerManager(new CatacombsManager());
-                service.registerManager(new FreakyFourManager());
-                service.registerManager(new GoldRushManager());
-                service.registerManager(new ShnugglesPrimeManager());
-                service.registerManager(new PatientXManager());
+            service.registerManager(new CatacombsManager());
+            service.registerManager(new FreakyFourManager());
+            service.registerManager(new GoldRushManager());
+            service.registerManager(new JungleRaidManager());
+            service.registerManager(new PatientXManager());
+            service.registerManager(new ShnugglesPrimeManager());
 
-                Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
-                Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
         }).delayTicks(1).submit(SkreePlugin.inst());
     }
 

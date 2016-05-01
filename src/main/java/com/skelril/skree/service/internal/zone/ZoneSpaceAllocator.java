@@ -13,6 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface ZoneSpaceAllocator {
+    WorldResolver getWorldResolver();
+
     float getLoad();
 
     default void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {

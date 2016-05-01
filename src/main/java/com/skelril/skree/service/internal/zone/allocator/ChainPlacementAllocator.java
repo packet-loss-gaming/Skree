@@ -11,20 +11,27 @@ import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
+import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
+import com.skelril.skree.service.internal.zone.decorator.Decorator;
 
-import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ChainPlacementAllocator extends WESchematicAllocator {
+public class ChainPlacementAllocator implements ZoneSpaceAllocator {
 
     private final WorldResolver worldResolver;
+    private Decorator decorator;
 
     private Vector2i lastEnd = new Vector2i(0, 0);
 
-    public ChainPlacementAllocator(Path baseDir, WorldResolver worldResolver) {
-        super(baseDir);
+    public ChainPlacementAllocator(Decorator decorator, WorldResolver worldResolver) {
+        this.decorator = decorator;
         this.worldResolver = worldResolver;
+    }
+
+    @Override
+    public WorldResolver getWorldResolver() {
+        return worldResolver;
     }
 
     @Override
@@ -34,7 +41,7 @@ public class ChainPlacementAllocator extends WESchematicAllocator {
 
     @Override
     public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack) {
-        ZoneRegion incompleteRegion = pasteAt(
+        ZoneRegion incompleteRegion = decorator.pasteAt(
                 worldResolver,
                 new Vector3i(lastEnd.getX(), 0, lastEnd.getY()),
                 managerName,
