@@ -49,7 +49,7 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onPlayerInteract(InteractBlockEvent.Primary event) {
+    public void onPlayerInteract(InteractBlockEvent event) {
         Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
         if (!optBlockLoc.isPresent()) {
             return;
@@ -64,12 +64,21 @@ public class JungleRaidListener {
 
         JungleRaidInstance inst = optInst.get();
         if (inst.getState() == JungleRaidState.LOBBY && event.getTargetBlock().getState().getType() == BlockTypes.WALL_SIGN) {
-            if (blockLoc.equals(optInst.get().getLeftActivationSign())) {
+            if (blockLoc.equals(inst.getLeftFlagActivationSign())) {
                 inst.leftFlagListSign();
-            } else if (blockLoc.equals(optInst.get().getRightActivationSign())) {
+            } else if (blockLoc.equals(inst.getRightFlagActivationSign())) {
                 inst.rightFlagListSign();
+            } else if (blockLoc.equals(inst.getLeftClassActivationSign())) {
+                inst.leftClassListSign();
+            } else if (blockLoc.equals(inst.getRightClassActivationSign())) {
+                inst.rightClassListSign();
             } else {
-                inst.toggleFlagSignAt(blockLoc);
+                inst.tryToggleFlagSignAt(blockLoc);
+
+                Optional<Player> optPlayer = event.getCause().first(Player.class);
+                if (optPlayer.isPresent()) {
+                    inst.tryUseClassSignAt(blockLoc, optPlayer.get());
+                }
             }
         }
     }

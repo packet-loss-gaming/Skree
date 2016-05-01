@@ -49,15 +49,22 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     private Set<Player> freeForAllPlayers = new HashSet<>();
     private Set<Player> blueTeamPlayers = new HashSet<>();
     private Set<Player> redTeamPlayers = new HashSet<>();
+    private Map<Player, JungleRaidClass> classMap = new HashMap<>();
 
     private JungleRaidState state = JungleRaidState.LOBBY;
     private long startTime;
 
     private Location<World> lobbySpawnLocation;
-    private Location<World> leftActivationSign;
-    private Location<World> rightActivationSign;
-    private List<Location<World>> scrollingSigns = new ArrayList<>();
-    private int signScrollStart;
+    private Location<World> leftFlagActivationSign;
+    private Location<World> rightFlagActivationSign;
+    private List<Location<World>> scrollingFlagSigns = new ArrayList<>();
+
+    private Location<World> leftClassActivationSign;
+    private Location<World> rightClassActivationSign;
+    private List<Location<World>> scrollingClassSigns = new ArrayList<>();
+
+    private int signScrollFlagStart;
+    private int signScrollClassStart;
 
     private FlagEffectData flagData = new FlagEffectData();
     private boolean[] flagState = new boolean[JungleRaidFlag.values().length];
@@ -77,49 +84,58 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         Vector3i offset = getRegion().getMinimumPoint();
 
         lobbySpawnLocation = new Location<>(getRegion().getExtent(), offset.add(216, 2, 29));
-        leftActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 29));
-        rightActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 18));
+        leftFlagActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 29));
+        rightFlagActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 23));
 
-        for (int z = 28; z > 18; --z) { // Do this in rerverse so left/right buttons are correct
-            scrollingSigns.add(new Location<>(getRegion().getExtent(), offset.add(209, 3, z)));
+        for (int z = 28; z > 23; --z) { // Do this in rerverse so left/right buttons are correct
+            scrollingFlagSigns.add(new Location<>(getRegion().getExtent(), offset.add(209, 3, z)));
         }
 
         for (JungleRaidFlag flag : JungleRaidFlag.values()) {
             flagState[flag.index] = flag.enabledByDefault;
         }
 
-        signPopulate();
+        flagSignPopulate();
+
+        leftClassActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 22));
+        rightClassActivationSign = new Location<>(getRegion().getExtent(), offset.add(209, 3, 18));
+
+        for (int z = 21; z > 18; --z) { // Do this in rerverse so left/right buttons are correct
+            scrollingClassSigns.add(new Location<>(getRegion().getExtent(), offset.add(209, 3, z)));
+        }
+
+        classSignPopulate();
     }
 
     private void updateFlagSign(int index) {
-        String title = JungleRaidFlag.values()[signScrollStart + index].toString();
+        String title = JungleRaidFlag.values()[signScrollFlagStart + index].toString();
         if (title.length() > 15) {
             title = title.substring(0, 15);
         }
         title = WordUtils.capitalizeFully(title.replace("_", " "));
 
-        scrollingSigns.get(index).getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+        scrollingFlagSigns.get(index).getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
                 Text.EMPTY,
                 Text.of(title),
-                Text.of(flagState[signScrollStart + index] ? Text.of(TextColors.DARK_GREEN, "Enabled") : Text.of(TextColors.RED, "Disabled")),
+                Text.of(flagState[signScrollFlagStart + index] ? Text.of(TextColors.DARK_GREEN, "Enabled") : Text.of(TextColors.RED, "Disabled")),
                 Text.EMPTY
         ));
     }
 
-    private void signPopulate() {
-        for (int i = 0; i < scrollingSigns.size(); ++i) {
+    private void flagSignPopulate() {
+        for (int i = 0; i < scrollingFlagSigns.size(); ++i) {
             updateFlagSign(i);
         }
 
-        boolean isLeftScrollable = signScrollStart == 0;
-        leftActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+        boolean isLeftScrollable = signScrollFlagStart == 0;
+        leftFlagActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
                 Text.EMPTY,
                 Text.of(isLeftScrollable ? "" : TextColors.BLUE, "<<"),
                 Text.EMPTY,
                 Text.EMPTY
         ));
-        boolean isRightScrollable = signScrollStart + scrollingSigns.size() == JungleRaidFlag.values().length;
-        rightActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+        boolean isRightScrollable = signScrollFlagStart + scrollingFlagSigns.size() == JungleRaidFlag.values().length;
+        rightFlagActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
                 Text.EMPTY,
                 Text.of(isRightScrollable ? "" : TextColors.BLUE, ">>"),
                 Text.EMPTY,
@@ -127,29 +143,95 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         ));
     }
 
-    public Location<World> getLeftActivationSign() {
-        return leftActivationSign;
+    public Location<World> getLeftFlagActivationSign() {
+        return leftFlagActivationSign;
     }
 
-    public Location<World> getRightActivationSign() {
-        return rightActivationSign;
+    public Location<World> getRightFlagActivationSign() {
+        return rightFlagActivationSign;
     }
 
     public void leftFlagListSign() {
-        signScrollStart = Math.max(0, signScrollStart - scrollingSigns.size());
-        signPopulate();
+        signScrollFlagStart = Math.max(0, signScrollFlagStart - scrollingFlagSigns.size());
+        flagSignPopulate();
     }
 
     public void rightFlagListSign() {
-        signScrollStart = Math.min(JungleRaidFlag.values().length - scrollingSigns.size(), signScrollStart + scrollingSigns.size());
-        signPopulate();
+        signScrollFlagStart = Math.min(JungleRaidFlag.values().length - scrollingFlagSigns.size(), signScrollFlagStart + scrollingFlagSigns.size());
+        flagSignPopulate();
     }
 
-    public void toggleFlagSignAt(Location<World> loc) {
-        for (int i = 0; i < scrollingSigns.size(); ++i) {
-            if (loc.equals(scrollingSigns.get(i))) {
-                flagState[signScrollStart + i] = !flagState[signScrollStart + i];
+    public void tryToggleFlagSignAt(Location<World> loc) {
+        for (int i = 0; i < scrollingFlagSigns.size(); ++i) {
+            if (loc.equals(scrollingFlagSigns.get(i))) {
+                flagState[signScrollFlagStart + i] = !flagState[signScrollFlagStart + i];
                 updateFlagSign(i);
+                break;
+            }
+        }
+    }
+
+    private void updateClassSign(int index) {
+        String title = JungleRaidClass.values()[signScrollClassStart + index].toString();
+        if (title.length() > 15) {
+            title = title.substring(0, 15);
+        }
+        title = WordUtils.capitalizeFully(title.replace("_", " "));
+
+        scrollingClassSigns.get(index).getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+                Text.EMPTY,
+                Text.of(title),
+                Text.EMPTY,
+                Text.EMPTY
+        ));
+    }
+
+    private void classSignPopulate() {
+        for (int i = 0; i < scrollingClassSigns.size(); ++i) {
+            updateClassSign(i);
+        }
+
+        boolean isLeftScrollable = signScrollClassStart == 0;
+        leftClassActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+                Text.EMPTY,
+                Text.of(isLeftScrollable ? "" : TextColors.BLUE, "<<"),
+                Text.EMPTY,
+                Text.EMPTY
+        ));
+        boolean isRightScrollable = signScrollClassStart + scrollingClassSigns.size() == JungleRaidClass.values().length;
+        rightClassActivationSign.getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
+                Text.EMPTY,
+                Text.of(isRightScrollable ? "" : TextColors.BLUE, ">>"),
+                Text.EMPTY,
+                Text.EMPTY
+        ));
+    }
+
+
+    public Location<World> getLeftClassActivationSign() {
+        return leftClassActivationSign;
+    }
+
+    public Location<World> getRightClassActivationSign() {
+        return rightClassActivationSign;
+    }
+
+    public void leftClassListSign() {
+        signScrollClassStart = Math.max(0, signScrollClassStart - scrollingClassSigns.size());
+        classSignPopulate();
+    }
+
+    public void rightClassListSign() {
+        signScrollClassStart = Math.min(JungleRaidClass.values().length - scrollingClassSigns.size(), signScrollClassStart + scrollingClassSigns.size());
+        classSignPopulate();
+    }
+
+    public void tryUseClassSignAt(Location<World> loc, Player player) {
+        for (int i = 0; i < scrollingClassSigns.size(); ++i) {
+            if (loc.equals(scrollingClassSigns.get(i))) {
+                JungleRaidClass targetClass = JungleRaidClass.values()[signScrollClassStart + i];
+                giveBaseEquipment(player, targetClass);
+                classMap.put(player, targetClass);
                 break;
             }
         }
@@ -253,7 +335,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         return new Clause<>(player, ZoneStatus.NO_REJOIN);
     }
 
-    private void addPlayer(Player player, Supplier<Location<World>> startingPos, Color armorColor, JungleRaidClass jrClass) {
+    private void giveBaseEquipment(Player player, JungleRaidClass jrClass) {
         player.getInventory().clear();
 
         List<ItemStack> gear = new ArrayList<>();
@@ -308,32 +390,39 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         for (ItemStack stack : gear) {
             player.getInventory().offer(stack);
         }
+    }
 
+    private void giveTeamEquipment(Player player, Color teamColor) {
         // EquipmentInventory playerEquipment = player.getInventory().query(EquipmentInventory.class);
 
         ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
         teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Hood"));
-        teamHood.offer(Keys.COLOR, armorColor);
+        teamHood.offer(Keys.COLOR, teamColor);
         // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
         tf(player).inventory.armorInventory[3] = tf(teamHood);
 
         ItemStack teamChestplate = newItemStack(ItemTypes.LEATHER_CHESTPLATE);
         teamChestplate.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Chestplate"));
-        teamChestplate.offer(Keys.COLOR, armorColor);
+        teamChestplate.offer(Keys.COLOR, teamColor);
         // playerEquipment.set(EquipmentTypes.CHESTPLATE, teamChestplate);
         tf(player).inventory.armorInventory[2] = tf(teamChestplate);
 
         ItemStack teamLeggings = newItemStack(ItemTypes.LEATHER_LEGGINGS);
         teamLeggings.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Leggings"));
-        teamLeggings.offer(Keys.COLOR, armorColor);
+        teamLeggings.offer(Keys.COLOR, teamColor);
         // playerEquipment.set(EquipmentTypes.LEGGINGS, teamLeggings);
         tf(player).inventory.armorInventory[1] = tf(teamLeggings);
 
         ItemStack teamBoots = newItemStack(ItemTypes.LEATHER_BOOTS);
         teamBoots.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Boots"));
-        teamBoots.offer(Keys.COLOR, armorColor);
+        teamBoots.offer(Keys.COLOR, teamColor);
         // playerEquipment.set(EquipmentTypes.BOOTS, teamBoots);
         tf(player).inventory.armorInventory[0] = tf(teamBoots);
+    }
+
+    private void addPlayer(Player player, Supplier<Location<World>> startingPos, Color teamColor, JungleRaidClass jrClass) {
+        giveBaseEquipment(player, jrClass);
+        giveTeamEquipment(player, teamColor);
 
         player.setLocation(startingPos.get());
     }
@@ -389,9 +478,9 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             }
         }
 
-        ffaList.stream().forEach(p -> addFFAPlayer(p, JungleRaidClass.BALANCED));
-        redList.stream().forEach(p -> addRedPlayer(p, JungleRaidClass.BALANCED));
-        blueList.stream().forEach(p -> addBluePlayer(p, JungleRaidClass.BALANCED));
+        ffaList.stream().forEach(p -> addFFAPlayer(p, classMap.getOrDefault(p, JungleRaidClass.BALANCED)));
+        redList.stream().forEach(p -> addRedPlayer(p, classMap.getOrDefault(p, JungleRaidClass.BALANCED)));
+        blueList.stream().forEach(p -> addBluePlayer(p, classMap.getOrDefault(p, JungleRaidClass.BALANCED)));
 
         state = JungleRaidState.INITIALIZE;
         startTime = System.currentTimeMillis();
