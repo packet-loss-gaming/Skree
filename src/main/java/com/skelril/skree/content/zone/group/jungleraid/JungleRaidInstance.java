@@ -15,6 +15,7 @@ import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
+import org.apache.commons.lang3.text.WordUtils;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.EnumTraits;
@@ -95,6 +96,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         if (title.length() > 15) {
             title = title.substring(0, 15);
         }
+        title = WordUtils.capitalizeFully(title.replace("_", " "));
 
         scrollingSigns.get(index).getTileEntity().get().offer(Keys.SIGN_LINES, Lists.newArrayList(
                 Text.EMPTY,
