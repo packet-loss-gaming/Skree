@@ -352,9 +352,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             case ARCHER:
                 ItemStack dmgBow = newItemStack(ItemTypes.BOW);
                 dmgBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-                        new ItemEnchantment(Enchantments.FIRE_ASPECT, 2),
-                        new ItemEnchantment(Enchantments.KNOCKBACK, 2),
-                        new ItemEnchantment(Enchantments.SHARPNESS, 3)
+                        new ItemEnchantment(Enchantments.PUNCH, 2)
                 ));
 
                 gear.add(dmgBow);

@@ -127,8 +127,9 @@ public class JungleRaidEffectProcessor {
                                     0,
                                     random.nextDouble() * 2.0 - 1
                             ));
+                            potion.offer(Keys.IS_SPLASH_POTION, true);
                             potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
-                                    PotionEffect.of(type, 1, type.isInstant() ? 0 : 20 * 10)
+                                    PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
                             ));
                             inst.getRegion().getExtent().spawnEntity(
                                     potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()

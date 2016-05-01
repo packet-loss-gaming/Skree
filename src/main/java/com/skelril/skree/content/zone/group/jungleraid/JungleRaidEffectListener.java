@@ -27,6 +27,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Arrow;
 import org.spongepowered.api.entity.projectile.Firework;
 import org.spongepowered.api.entity.projectile.Snowball;
+import org.spongepowered.api.entity.projectile.ThrownPotion;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -174,11 +175,17 @@ public class JungleRaidEffectListener {
             } else return;
         }
 
+        if (entity instanceof ThrownPotion) {
+            return;
+        }
+
         entity.getLocation().getExtent().triggerExplosion(
                 Explosion.builder()
                         .radius(explosionSize)
                         .world(entity.getLocation().getExtent())
                         .origin(entity.getLocation().getPosition())
+                        .shouldDamageEntities(true)
+                        .shouldBreakBlocks(true)
                         .build()
         );
     }
@@ -273,12 +280,11 @@ public class JungleRaidEffectListener {
                         }
                         event.setCancelled(true);
                     }
-                } else if (attacker.getType() == DamageTypes.EXPLOSIVE) {
-                    if ((inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) && !(attacker instanceof IndirectEntityDamageSource)) {
+                } else if (attacker.getType() == DamageTypes.CUSTOM) {
+                    if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
                         event.setBaseDamage(Math.min(event.getBaseDamage(), 2));
                     }
                 }
-
             }
         }.parse(event);
     }
