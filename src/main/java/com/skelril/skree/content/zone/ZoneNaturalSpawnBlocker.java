@@ -34,7 +34,7 @@ public class ZoneNaturalSpawnBlocker extends ZoneApplicableListener {
                     SpawnType spawnType = optSpawnCause.get().getType();
                     if (spawnType == SpawnTypes.CUSTOM || spawnType == SpawnTypes.WORLD_SPAWNER) {
                         /* SpongeCommon/679 */
-                        if (entity.getType() != EntityTypes.EXPERIENCE_ORB && !(entity instanceof Projectile)) {
+                        if (entity.getType() != EntityTypes.EXPERIENCE_ORB && entity.getType() != EntityTypes.PRIMED_TNT && !(entity instanceof Projectile)) {
                             event.setCancelled(true);
                         }
                     }
