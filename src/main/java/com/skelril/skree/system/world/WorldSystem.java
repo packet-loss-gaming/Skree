@@ -61,10 +61,32 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Handle main world
         initMain();
 
+        initCity();
+
         // Create worlds
         initBuild();
         initInstance();
         initWilderness();
+    }
+
+    private void initCity() {
+        // City World
+        MainWorldWrapper wrapper = new MainWorldWrapper();
+
+        Optional<World> curWorld = Sponge.getServer().getWorld("City");
+        if (!curWorld.isPresent()) {
+            curWorld = instantiate(
+                    obtainOverworld().name("City").seed(randy.nextLong()).usesMapFeatures(false)
+                            .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
+            );
+            // registerWorld("City");
+        }
+
+        if (curWorld.isPresent()) {
+            wrapper.addWorld(curWorld.get());
+        }
+
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
     }
 
     private void initMain() {

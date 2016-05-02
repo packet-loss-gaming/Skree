@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> implements Runnable, LocationZone<JungleRaidInstance> {
     private Queue<Vector3i> previousOrigins = new ArrayDeque<>();
     private Clause<ZoneRegion, ZoneRegion.State> preBuilt = null;
+    private boolean isBuilding = false;
 
     public JungleRaidManager() {
         Sponge.getEventManager().registerListeners(
@@ -67,12 +68,19 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
 
             callback.accept(Optional.of(instance));
 
-            if (preBuilt == null) {
+            if (preBuilt == null && !isBuilding) {
+                isBuilding = true;
                 Vector3i origin = previousOrigins.poll();
                 if (origin != null) {
-                    buildInstance(allocator.getWorldResolver(), origin, (preBuildClause) -> preBuilt = preBuildClause);
+                    buildInstance(allocator.getWorldResolver(), origin, (preBuildClause) -> {
+                        preBuilt = preBuildClause;
+                        isBuilding = false;
+                    });
                 } else {
-                    allocator.regionFor(getSystemName(), (preBuildClause) -> preBuilt = preBuildClause);
+                    allocator.regionFor(getSystemName(), (preBuildClause) -> {
+                        preBuilt = preBuildClause;
+                        isBuilding = false;
+                    });
                 }
             }
         };

@@ -16,7 +16,6 @@ import java.util.Optional;
 
 public class SafeTeleportHelper {
     public static Optional<Location<World>> getSafeDest(Location<World> dest) {
-        Location<World> startingDest = dest;
         while (dest.getY() > 0 && dest.getBlockType() == BlockTypes.AIR) {
             dest = dest.add(0, -1, 0);
         }
@@ -24,14 +23,8 @@ public class SafeTeleportHelper {
 
         // If its not air, restart at the starting destination, we failed
         if (dest.getBlockType() != BlockTypes.AIR) {
-            dest = startingDest;
-            // Move up until we find air or run out of world space
-            while (dest.getBlockType() != BlockTypes.AIR) {
-                // There is no free area in this column, abort
-                if (dest.getY() == dest.getExtent().getBlockMax().getY()) {
-                    return Optional.empty();
-                }
-                dest = dest.add(0, 1, 0);
+            if (dest.add(0, 1, 0).getBlockType() != BlockTypes.AIR) {
+                return Optional.empty();
             }
         }
 
