@@ -11,6 +11,7 @@ import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
+import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.decorator.Decorators;
@@ -26,6 +27,7 @@ import java.util.function.Consumer;
 
 public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> implements Runnable, LocationZone<JungleRaidInstance> {
     private Queue<Vector3i> previousOrigins = new ArrayDeque<>();
+    private Clause<ZoneRegion, ZoneRegion.State> preBuilt = null;
 
     public JungleRaidManager() {
         Sponge.getEventManager().registerListeners(
@@ -44,6 +46,16 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
     }
 
+    private void buildInstance(WorldResolver resolver, Vector3i origin, Consumer<Clause<ZoneRegion, ZoneRegion.State>> clause) {
+        Decorators.ZONE_PRIMARY_DECORATOR.pasteAt(
+                resolver,
+                origin,
+                getSystemName(),
+                (a) -> new Clause<>(a.getKey(), ZoneRegion.State.NEW),
+                clause
+        );
+    }
+
     @Override
     public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<JungleRaidInstance>> callback) {
         Consumer<Clause<ZoneRegion, ZoneRegion.State>> initializer = clause -> {
@@ -54,19 +66,28 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
             zones.add(instance);
 
             callback.accept(Optional.of(instance));
+
+            if (preBuilt == null) {
+                Vector3i origin = previousOrigins.poll();
+                if (origin != null) {
+                    buildInstance(allocator.getWorldResolver(), origin, (preBuildClause) -> preBuilt = preBuildClause);
+                } else {
+                    allocator.regionFor(getSystemName(), (preBuildClause) -> preBuilt = preBuildClause);
+                }
+            }
         };
 
-        Vector3i origin = previousOrigins.poll();
-        if (origin != null) {
-            Decorators.ZONE_PRIMARY_DECORATOR.pasteAt(
-                    allocator.getWorldResolver(),
-                    origin,
-                    getSystemName(),
-                    (a) -> new Clause<>(a.getKey(), ZoneRegion.State.NEW),
-                    initializer
-            );
+        if (preBuilt != null) {
+            Clause<ZoneRegion, ZoneRegion.State> tempPreBuilt = preBuilt;
+            preBuilt = null;
+            initializer.accept(tempPreBuilt);
         } else {
-            allocator.regionFor(getSystemName(), initializer);
+            Vector3i origin = previousOrigins.poll();
+            if (origin != null) {
+                buildInstance(allocator.getWorldResolver(), origin, initializer);
+            } else {
+                allocator.regionFor(getSystemName(), initializer);
+            }
         }
     }
 
