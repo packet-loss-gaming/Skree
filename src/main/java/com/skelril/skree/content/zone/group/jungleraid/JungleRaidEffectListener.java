@@ -145,9 +145,6 @@ public class JungleRaidEffectListener {
 
         if (entity.getType() == EntityTypes.ARROW) {
             if (inst.isFlagEnabled(JungleRaidFlag.TORMENT_ARROWS)) {
-                if (inst.isFlagEnabled(JungleRaidFlag.SUPER)) {
-                    explosionSize = 4;
-                }
                 ProjectileSource shooter = ((Arrow) entity).getShooter();
 
                 CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(entity.getLocation().getPosition(), 16, 16, 16);
