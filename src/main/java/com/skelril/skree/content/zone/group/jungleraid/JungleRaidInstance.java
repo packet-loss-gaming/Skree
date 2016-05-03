@@ -21,6 +21,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.living.player.Player;
@@ -342,13 +343,22 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         List<ItemStack> gear = new ArrayList<>();
         switch (jrClass) {
             case MELEE:
-                ItemStack enchantedSword = newItemStack(ItemTypes.DIAMOND_SWORD);
+                ItemStack enchantedSword = newItemStack(ItemTypes.IRON_SWORD);
                 enchantedSword.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.FIRE_ASPECT, 2),
                         new ItemEnchantment(Enchantments.KNOCKBACK, 2)
                 ));
 
                 gear.add(enchantedSword);
+                break;
+            case LUMBERJACK:
+                ItemStack enchantedAxe = newItemStack(ItemTypes.DIAMOND_AXE);
+                enchantedAxe.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
+                        new ItemEnchantment(Enchantments.SHARPNESS, 3),
+                        new ItemEnchantment(Enchantments.KNOCKBACK, 2)
+                ));
+
+                gear.add(enchantedAxe);
                 break;
             case ARCHER:
                 ItemStack dmgBow = newItemStack(ItemTypes.BOW);
@@ -365,6 +375,31 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
                 gear.add(fireBow);
                 break;
+            case SNIPER:
+                ItemStack superBow = newItemStack(ItemTypes.BOW);
+                superBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
+                        new ItemEnchantment(Enchantments.POWER, 5),
+                        new ItemEnchantment(Enchantments.PUNCH, 2),
+                        new ItemEnchantment(Enchantments.FLAME, 1)
+                ));
+
+                // If this happens things isn't available blow up
+                @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
+                int useLimit = ItemTypes.BOW.getDefaultProperty(UseLimitProperty.class).get().getValue();
+                superBow.offer(Keys.ITEM_DURABILITY, useLimit - jrClass.getArrowAmount());
+
+                gear.add(superBow);
+
+                ItemStack woodSword = newItemStack(ItemTypes.WOODEN_SWORD);
+                gear.add(woodSword);
+                break;
+            case ENGINEER:
+                ItemStack ironSword = newItemStack(ItemTypes.IRON_SWORD);
+                gear.add(ironSword);
+
+                ItemStack diamondPickaxe = newItemStack(ItemTypes.DIAMOND_PICKAXE);
+                gear.add(diamondPickaxe);
+                break;
             case BALANCED:
                 ItemStack standardSword = newItemStack(ItemTypes.IRON_SWORD);
                 gear.add(standardSword);
@@ -374,19 +409,36 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 break;
         }
 
-        for (int i = 0; i < 3; i++) {
-            gear.add(newItemStack(BlockTypes.TNT, 32));
+        int tntAmt = jrClass.getTNTAmount();
+        int tntStacks = tntAmt / 64;
+        int tntRemainder = tntAmt % 64;
+        for (int i = 0; i < tntStacks; ++i) {
+            gear.add(newItemStack(BlockTypes.TNT, 64));
         }
-        gear.add(newItemStack(ItemTypes.FLINT_AND_STEEL));
-        gear.add(newItemStack(ItemTypes.SHEARS));
-        gear.add(newItemStack(ItemTypes.IRON_AXE));
+        if (tntRemainder > 0) {
+            gear.add(newItemStack(BlockTypes.TNT, tntRemainder));
+        }
+
+        if (jrClass.hasFlintAndSteel()) {
+            gear.add(newItemStack(ItemTypes.FLINT_AND_STEEL));
+        }
+        if (jrClass.hasShears()) {
+            gear.add(newItemStack(ItemTypes.SHEARS));
+        }
+        if (jrClass.hasAxe()) {
+            gear.add(newItemStack(ItemTypes.IRON_AXE));
+        }
         gear.add(newItemStack(ItemTypes.COOKED_BEEF, 64));
         gear.add(newItemStack(ItemTypes.COMPASS));
 
-        if (jrClass.hasArrows()) {
-            for (int i = 0; i < 2; i++) {
-                gear.add(newItemStack(ItemTypes.ARROW, 64));
-            }
+        int arrowAmt = jrClass.getArrowAmount();
+        int arrowStacks = arrowAmt / 64;
+        int arrowRemainder = arrowAmt % 64;
+        for (int i = 0; i < arrowStacks; ++i) {
+            gear.add(newItemStack(ItemTypes.ARROW, 64));
+        }
+        if (arrowRemainder > 0) {
+            gear.add(newItemStack(ItemTypes.ARROW, arrowRemainder));
         }
 
         for (ItemStack stack : gear) {
