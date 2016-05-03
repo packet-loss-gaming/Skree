@@ -50,6 +50,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     private Set<Player> blueTeamPlayers = new HashSet<>();
     private Set<Player> redTeamPlayers = new HashSet<>();
     private Map<Player, JungleRaidClass> classMap = new HashMap<>();
+    private Map<Player, Player> lastAttackerMap = new HashMap<>();
 
     private JungleRaidState state = JungleRaidState.LOBBY;
     private long startTime;
@@ -536,6 +537,14 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
     private void payPlayer(Player player) {
 
+    }
+
+    public void recordAttack(Player attacker, Player defender) {
+        lastAttackerMap.put(defender, attacker);
+    }
+
+    public Optional<Player> getLastAttacker(Player defender) {
+        return Optional.ofNullable(lastAttackerMap.get(defender));
     }
 
     public boolean isFriendlyFire(Player attacker, Player defender) {

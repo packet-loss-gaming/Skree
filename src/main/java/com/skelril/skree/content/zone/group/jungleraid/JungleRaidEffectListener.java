@@ -306,7 +306,7 @@ public class JungleRaidEffectListener {
             // Normal Jungle Raid fireworks and stuff
             Color killerColor = Color.WHITE;
             Color teamColor = inst.getTeamColor(player);
-            Optional<Player> optKiller = event.getCause().first(Player.class);
+            Optional<Player> optKiller = inst.getLastAttacker(player);
             if (optKiller.isPresent()) {
                 Player killer = optKiller.get();
                 killerColor = inst.getTeamColor(killer);

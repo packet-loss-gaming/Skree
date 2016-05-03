@@ -15,6 +15,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -108,9 +109,22 @@ public class JungleRaidListener {
                     return;
                 }
 
+                inst.recordAttack(attacker, defender);
+
                 attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
             }
         }.parse(event);
+    }
+
+    @Listener
+    public void onClientLeave(ClientConnectionEvent.Disconnect event) {
+        Player player = event.getTargetEntity();
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+        if (optInst.isPresent()) {
+            JungleRaidInstance inst = optInst.get();
+
+            inst.playerLost(player);
+        }
     }
 
     @Listener
