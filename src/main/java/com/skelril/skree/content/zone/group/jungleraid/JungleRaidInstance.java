@@ -382,12 +382,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                         new ItemEnchantment(Enchantments.FLAME, 1)
                 ));
 
-                // If this happens things isn't available blow up
-                // @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
-                // int useLimit = ItemTypes.BOW.getDefaultProperty(UseLimitProperty.class).get().getValue();
-
-                int useLimit = 384;
-                superBow.offer(Keys.ITEM_DURABILITY, useLimit - jrClass.getArrowAmount());
+                superBow.offer(Keys.ITEM_DURABILITY, jrClass.getArrowAmount());
 
                 gear.add(superBow);
 
