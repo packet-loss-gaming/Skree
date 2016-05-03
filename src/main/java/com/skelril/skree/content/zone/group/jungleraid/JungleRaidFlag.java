@@ -7,7 +7,7 @@
 package com.skelril.skree.content.zone.group.jungleraid;
 
 public enum JungleRaidFlag {
-    BOUNCY(0),
+    TRAMPOLINE(0),
     SUPER(1),
     TITAN_MODE(2),
     RANDOM_ROCKETS(3),

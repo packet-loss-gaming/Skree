@@ -265,9 +265,13 @@ public class JungleRaidEffectListener {
             public void processNonLivingAttack(DamageSource attacker, Player defender) {
                 if (attacker.getType() == DamageTypes.FALL) {
                     BlockType belowType = defender.getLocation().add(0, -1, 0).getBlockType();
-                    if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2
-                            || (inst.isFlagEnabled(JungleRaidFlag.SUPER) && inst.isFlagEnabled(JungleRaidFlag.BOUNCY))) {
-                        if (Probability.getChance(2) || inst.isFlagEnabled(JungleRaidFlag.BOUNCY)) {
+                    if (inst.isFlagEnabled(JungleRaidFlag.TRAMPOLINE)) {
+                        Vector3d oldVel = defender.getVelocity();
+                        Vector3d newVel = new Vector3d(oldVel.getX(), 0, oldVel.getZ());
+                        defender.setVelocity(new Vector3d(0, .1, 0).mul(event.getBaseDamage()).add(newVel));
+                        event.setCancelled(true);
+                    } else if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2) {
+                        if (Probability.getChance(2)) {
                             Vector3d oldVel = defender.getVelocity();
                             Vector3d newVel = new Vector3d(
                                     oldVel.getX() > 0 ? -.5 : .5,
