@@ -382,8 +382,11 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         gear.add(newItemStack(ItemTypes.IRON_AXE));
         gear.add(newItemStack(ItemTypes.COOKED_BEEF, 64));
         gear.add(newItemStack(ItemTypes.COMPASS));
-        for (int i = 0; i < 2; i++) {
-            gear.add(newItemStack(ItemTypes.ARROW, 64));
+
+        if (jrClass.hasArrows()) {
+            for (int i = 0; i < 2; i++) {
+                gear.add(newItemStack(ItemTypes.ARROW, 64));
+            }
         }
 
         for (ItemStack stack : gear) {

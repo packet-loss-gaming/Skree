@@ -7,7 +7,17 @@
 package com.skelril.skree.content.zone.group.jungleraid;
 
 public enum JungleRaidClass {
-    BALANCED,
-    ARCHER,
-    MELEE
+    BALANCED(true),
+    ARCHER(true),
+    MELEE(false);
+
+    private boolean hasArrows;
+
+    JungleRaidClass(boolean hasArrows) {
+        this.hasArrows = hasArrows;
+    }
+
+    public boolean hasArrows() {
+        return hasArrows;
+    }
 }
