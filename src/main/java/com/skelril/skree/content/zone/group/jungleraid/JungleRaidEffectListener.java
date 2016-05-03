@@ -42,6 +42,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShapes;
 import org.spongepowered.api.item.ItemTypes;
@@ -286,6 +287,79 @@ public class JungleRaidEffectListener {
         }.parse(event);
     }
 
+
+    private void handleLoss(JungleRaidInstance inst, Player player) {
+        FlagEffectData data = inst.getFlagData();
+
+        boolean isTitanEnabled = inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE);
+        boolean isTitan = player.getUniqueId().equals(data.titan);
+
+        // Normal Jungle Raid fireworks and stuff
+        Color killerColor = Color.WHITE;
+        Color teamColor = inst.getTeamColor(player);
+        Optional<Player> optKiller = inst.getLastAttacker(player);
+        if (optKiller.isPresent()) {
+            Player killer = optKiller.get();
+            killerColor = inst.getTeamColor(killer);
+            if (isTitanEnabled) {
+                if (isTitan) {
+                    data.titan = killer.getUniqueId();
+
+                    ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
+                    teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
+                    teamHood.offer(Keys.COLOR, Color.BLACK);
+                    // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
+                    tf(player).inventory.armorInventory[3] = tf(teamHood);
+                } else if (killer.getUniqueId().equals(data.titan)) {
+                    killerColor = Color.BLACK;
+                }
+            }
+        }
+
+        if (isTitan && data.titan.equals(player.getUniqueId())) {
+            data.titan = null;
+        }
+
+        if (!inst.isFlagEnabled(JungleRaidFlag.DEATH_ROCKETS)) {
+            return;
+        }
+
+        Location<World> playerLoc = player.getLocation();
+
+        Color finalKillerColor = killerColor;
+        for (int i = 0; i < 12; i++) {
+            Task.builder().delayTicks(i * 4).execute(() -> {
+                Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
+                if (optEntity.isPresent()) {
+                    Firework firework = (Firework) optEntity.get();
+                    FireworkEffect fireworkEffect = FireworkEffect.builder()
+                            .flicker(Probability.getChance(2))
+                            .trail(Probability.getChance(2))
+                            .color(teamColor)
+                            .fade(finalKillerColor)
+                            .shape(FireworkShapes.CREEPER)
+                            .build();
+                    firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+                    firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
+                    inst.getRegion().getExtent().spawnEntity(
+                            firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                    );
+                }
+            }).submit(SkreePlugin.inst());
+        }
+    }
+
+    @Listener
+    public void onClientLeave(ClientConnectionEvent.Disconnect event) {
+        Player player = event.getTargetEntity();
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+        if (optInst.isPresent()) {
+            JungleRaidInstance inst = optInst.get();
+
+            handleLoss(inst, player);
+        }
+    }
+
     @Listener
     public void onPlayerDeath(DestructEntityEvent.Death event) {
         Entity entity = event.getTargetEntity();
@@ -297,61 +371,8 @@ public class JungleRaidEffectListener {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             JungleRaidInstance inst = optInst.get();
-            FlagEffectData data = inst.getFlagData();
 
-            // Enable disabled Checks
-            boolean isTitanEnabled = inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE);
-            boolean isTitan = player.getUniqueId().equals(data.titan);
-
-            // Normal Jungle Raid fireworks and stuff
-            Color killerColor = Color.WHITE;
-            Color teamColor = inst.getTeamColor(player);
-            Optional<Player> optKiller = inst.getLastAttacker(player);
-            if (optKiller.isPresent()) {
-                Player killer = optKiller.get();
-                killerColor = inst.getTeamColor(killer);
-                if (isTitanEnabled) {
-                    if (isTitan) {
-                        data.titan = killer.getUniqueId();
-
-                        ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
-                        teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
-                        teamHood.offer(Keys.COLOR, Color.BLACK);
-                        // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-                        tf(player).inventory.armorInventory[3] = tf(teamHood);
-                    } else if (killer.getUniqueId().equals(data.titan)) {
-                        killerColor = Color.BLACK;
-                    }
-                }
-            }
-
-            if (!inst.isFlagEnabled(JungleRaidFlag.DEATH_ROCKETS)) {
-                return;
-            }
-
-            Location<World> playerLoc = player.getLocation();
-
-            Color finalKillerColor = killerColor;
-            for (int i = 0; i < 12; i++) {
-                Task.builder().delayTicks(i * 4).execute(() -> {
-                    Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
-                    if (optEntity.isPresent()) {
-                        Firework firework = (Firework) optEntity.get();
-                        FireworkEffect fireworkEffect = FireworkEffect.builder()
-                                .flicker(Probability.getChance(2))
-                                .trail(Probability.getChance(2))
-                                .color(teamColor)
-                                .fade(finalKillerColor)
-                                .shape(FireworkShapes.CREEPER)
-                                .build();
-                        firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
-                        firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-                        inst.getRegion().getExtent().spawnEntity(
-                                firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                        );
-                    }
-                }).submit(SkreePlugin.inst());
-            }
+            handleLoss(inst, player);
         }
     }
 }
