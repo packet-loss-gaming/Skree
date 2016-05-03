@@ -21,7 +21,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
-import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.living.player.Player;
@@ -384,8 +383,10 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 ));
 
                 // If this happens things isn't available blow up
-                @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
-                int useLimit = ItemTypes.BOW.getDefaultProperty(UseLimitProperty.class).get().getValue();
+                // @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
+                // int useLimit = ItemTypes.BOW.getDefaultProperty(UseLimitProperty.class).get().getValue();
+
+                int useLimit = 384;
                 superBow.offer(Keys.ITEM_DURABILITY, useLimit - jrClass.getArrowAmount());
 
                 gear.add(superBow);
