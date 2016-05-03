@@ -27,8 +27,9 @@ import java.util.function.Consumer;
 
 public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> implements Runnable, LocationZone<JungleRaidInstance> {
     private Queue<Vector3i> previousOrigins = new ArrayDeque<>();
-    private Clause<ZoneRegion, ZoneRegion.State> preBuilt = null;
-    private boolean isBuilding = false;
+    private Queue<Consumer<Clause<ZoneRegion, ZoneRegion.State>>> pendingRequest = new ArrayDeque<>();
+    private Queue<Clause<ZoneRegion, ZoneRegion.State>> finishedJobs = new ArrayDeque<>();
+    private boolean jobInProgress = false;
 
     public JungleRaidManager() {
         Sponge.getEventManager().registerListeners(
@@ -57,9 +58,40 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         );
     }
 
+    private void processJobs(ZoneSpaceAllocator allocator) {
+        // If there's a pending request, and finished job, use that area
+        if (!pendingRequest.isEmpty()) {
+            Clause<ZoneRegion, ZoneRegion.State> finishedJob = finishedJobs.poll();
+            if (finishedJob != null) {
+                pendingRequest.poll().accept(finishedJob);
+            }
+        }
+
+        // If there are no finished jobs now, and there is not a job in progress
+        // execute a new job
+        if (finishedJobs.isEmpty() && !jobInProgress) {
+            Vector3i origin = previousOrigins.poll();
+            jobInProgress = true;
+
+            // This is executed after the job completes, it adds the area to the finished jobs
+            // reenables the creation of new jobs, and reprocesses the jobs
+            Consumer<Clause<ZoneRegion, ZoneRegion.State>> recheck = a -> {
+                finishedJobs.add(a);
+                jobInProgress = false;
+                processJobs(allocator);
+            };
+
+            if (origin != null) {
+                buildInstance(allocator.getWorldResolver(), origin, recheck);
+            } else {
+                allocator.regionFor(getSystemName(), recheck);
+            }
+        }
+    }
+
     @Override
     public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<JungleRaidInstance>> callback) {
-        Consumer<Clause<ZoneRegion, ZoneRegion.State>> initializer = clause -> {
+        pendingRequest.add(clause -> {
             ZoneRegion region = clause.getKey();
 
             JungleRaidInstance instance = new JungleRaidInstance(region);
@@ -67,36 +99,9 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
             zones.add(instance);
 
             callback.accept(Optional.of(instance));
+        });
 
-            if (preBuilt == null && !isBuilding) {
-                isBuilding = true;
-                Vector3i origin = previousOrigins.poll();
-                if (origin != null) {
-                    buildInstance(allocator.getWorldResolver(), origin, (preBuildClause) -> {
-                        preBuilt = preBuildClause;
-                        isBuilding = false;
-                    });
-                } else {
-                    allocator.regionFor(getSystemName(), (preBuildClause) -> {
-                        preBuilt = preBuildClause;
-                        isBuilding = false;
-                    });
-                }
-            }
-        };
-
-        if (preBuilt != null) {
-            Clause<ZoneRegion, ZoneRegion.State> tempPreBuilt = preBuilt;
-            preBuilt = null;
-            initializer.accept(tempPreBuilt);
-        } else {
-            Vector3i origin = previousOrigins.poll();
-            if (origin != null) {
-                buildInstance(allocator.getWorldResolver(), origin, initializer);
-            } else {
-                allocator.regionFor(getSystemName(), initializer);
-            }
-        }
+        processJobs(allocator);
     }
 
     @Override
