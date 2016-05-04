@@ -313,7 +313,7 @@ public class JungleRaidEffectListener {
                     teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
                     teamHood.offer(Keys.COLOR, Color.BLACK);
                     // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-                    tf(player).inventory.armorInventory[3] = tf(teamHood);
+                    tf(killer).inventory.armorInventory[3] = tf(teamHood);
                 } else if (killer.getUniqueId().equals(data.titan)) {
                     killerColor = Color.BLACK;
                 }
