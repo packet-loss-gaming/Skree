@@ -152,7 +152,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
             if (compound == null) {
                 compound = new NBTTagCompound();
             }
-            compound.setTag(saveName, null);
+            compound.removeTag(saveName);
             if (saveName.equals(GENERAL_STORE_NAME)) {
                 compound.setBoolean(saveName + RELEASE_STATE_STRING, false);
             }
