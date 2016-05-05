@@ -13,6 +13,7 @@ public enum ZoneStatus {
     REF_LOST,
 
     NO_REJOIN,
+    ERROR,
     MAX_GROUP_SIZE_EXCEEDED,
     CREATION_FAILED,
     EXIST_AND_ACTIVE,

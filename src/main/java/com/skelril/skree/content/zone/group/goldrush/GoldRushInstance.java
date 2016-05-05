@@ -18,6 +18,8 @@ import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.ModifierService;
+import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.*;
 import net.minecraft.inventory.IInventory;
 import org.spongepowered.api.Sponge;
@@ -136,12 +138,27 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             return;
         }
 
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
         for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            if (player.getInventory().query(HumanInventory.class, EquipmentInventory.class).size() > 0) {
-                getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-                        Text.of(TextColors.RED, "All players inventories must be empty.")
-                );
-                return;
+            if (optService.isPresent()) {
+                PlayerStateService service = optService.get();
+                try {
+                    service.storeInventory(player);
+                    service.releaseInventory(player);
+
+                    player.getInventory().clear();
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                    player.sendMessage(Text.of(TextColors.RED, "An error occurred while saving your inventory, contact an admin!"));
+                    return;
+                }
+            } else {
+                if (player.getInventory().query(HumanInventory.class, EquipmentInventory.class).size() > 0) {
+                    getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                            Text.of(TextColors.RED, "All players inventories must be empty.")
+                    );
+                    return;
+                }
             }
         }
 
@@ -368,6 +385,19 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
         invalidate(player);
+
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optService.isPresent()) {
+            PlayerStateService service = optService.get();
+            if (service.hasInventoryStored(player)) {
+                try {
+                    service.loadInventory(player);
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return super.remove(player);
     }
 
@@ -505,6 +535,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
         Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
 
+        List<ItemStack> returned = new ArrayList<>();
+
         for (int i = 0; i < itemStacks.length; ++i) {
             net.minecraft.item.ItemStack is = itemStacks[i];
 
@@ -519,13 +551,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     BigDecimal quantity = new BigDecimal(opened.getQuantity());
                     if (opened.getItem() == ItemTypes.GOLD_NUGGET || opened.getItem() == ItemTypes.GOLD_INGOT || opened.getItem() == BlockTypes.GOLD_BLOCK.getItem().get()) {
                         goldValue = goldValue.add(value.get().multiply(quantity));
-                        itemStacks[i] = null;
                     } else {
                         itemValue = itemValue.add(value.get().multiply(quantity));
-                        itemStacks[i] = tf(opened);
+                        returned.add(opened);
                     }
                 }
             }
+
+            itemStacks[i] = null;
         }
 
         // Get the original grab amount (The Sum of Gold & Items)
@@ -549,8 +582,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         // minus item value
         BigDecimal personalLootSplit = multiplier.multiply(lootSplit).add(splitBoost);
 
-        tf(player).inventoryContainer.detectAndSendChanges();
-
         player.sendMessage(Text.of(TextColors.YELLOW, "You obtain: "));
         player.sendMessage(Text.of(TextColors.YELLOW, " - Bail: ", format(fee)));
         player.sendMessage(Text.of(TextColors.YELLOW, " - Split: ", format(lootSplit), ", Boost: ", format(grabRatio.multiply(new BigDecimal(100))), "%"));
@@ -564,7 +595,22 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         BigDecimal total = fee.add(personalLootSplit);
         player.sendMessage(Text.of(TextColors.YELLOW, "Total: ", format(total)));
 
+        // Give the player their items
+        Optional<PlayerStateService> optInvService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optInvService.isPresent()) {
+            PlayerStateService invService = optInvService.get();
+            if (invService.hasInventoryStored(player)) {
+                try {
+                    invService.loadInventory(player);
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        returned.forEach(i -> player.getInventory().offer(i));
         MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.source(this).build());
+
         remove(player);
         return true;
     }

@@ -12,10 +12,13 @@ import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.SafeTeleportHelper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.apache.commons.lang3.text.WordUtils;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.EnumTraits;
@@ -335,6 +338,19 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     public Clause<Player, ZoneStatus> add(Player player) {
         if (state == JungleRaidState.LOBBY) {
             player.setLocation(lobbySpawnLocation);
+            Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+            if (optService.isPresent()) {
+                PlayerStateService service = optService.get();
+                try {
+                    service.storeInventory(player);
+                    service.releaseInventory(player);
+
+                    giveBaseEquipment(player, JungleRaidClass.BALANCED);
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                    return new Clause<>(player, ZoneStatus.ERROR);
+                }
+            }
             return new Clause<>(player, ZoneStatus.ADDED);
         }
         return new Clause<>(player, ZoneStatus.NO_REJOIN);
@@ -572,6 +588,19 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
         playerLost(player);
+
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optService.isPresent()) {
+            PlayerStateService service = optService.get();
+            if (service.hasInventoryStored(player)) {
+                try {
+                    service.loadInventory(player);
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return super.remove(player);
     }
 
@@ -581,7 +610,6 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             teamPlayers.remove(player);
 
             player.getInventory().clear();
-            payPlayer(player);
         }
     }
 
