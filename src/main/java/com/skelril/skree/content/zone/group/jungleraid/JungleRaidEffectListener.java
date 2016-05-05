@@ -38,10 +38,12 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShapes;
@@ -125,6 +127,19 @@ public class JungleRaidEffectListener {
                     player.sendMessage(Text.of(TextColors.RED, "You cannot mine this game."));
                     event.setCancelled(true);
                     return;
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onBlockDrop(DropItemEvent.Destruct event) {
+        for (Entity entity : event.getEntities()) {
+            Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
+            if (!optInst.isPresent()) {
+                Optional<EntitySpawnCause> optSpawnCause = event.getCause().first(EntitySpawnCause.class);
+                if (!optSpawnCause.isPresent()) {
+                    event.setCancelled(true);
                 }
             }
         }
