@@ -548,9 +548,9 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     public Location<World> getRandomLocation() {
         Vector3i offset = getRegion().getMinimumPoint();
         Vector3i boundingBox = getRegion().getBoundingBox();
-        Vector3i randomDest;
+
         while (true) {
-            randomDest = new Vector3i(
+            Vector3i randomDest = new Vector3i(
                     Probability.getRandom(boundingBox.getX()),
                     Probability.getRangedRandom(16, 80),
                     Probability.getRandom(boundingBox.getZ())
@@ -562,7 +562,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
             if (optSafeDest.isPresent()) {
                 Location<World> safeDest = optSafeDest.get();
-                if (safeDest.getY() > 16 && safeDest.getY() < 80) {
+                if (16 < safeDest.getY() && safeDest.getY() < 79) {
                     return safeDest;
                 }
             }
