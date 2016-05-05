@@ -199,6 +199,7 @@ public class JungleRaidEffectListener {
                         .origin(entity.getLocation().getPosition())
                         .shouldDamageEntities(true)
                         .shouldBreakBlocks(true)
+                        .shouldPlaySmoke(false)
                         .build()
         );
     }
