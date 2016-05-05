@@ -21,11 +21,9 @@ public class SafeTeleportHelper {
         }
         dest.add(0, 1, 0); // Move one back up to account for air
 
-        // If its not air, restart at the starting destination, we failed
-        if (dest.getBlockType() != BlockTypes.AIR) {
-            if (dest.add(0, 1, 0).getBlockType() != BlockTypes.AIR) {
-                return Optional.empty();
-            }
+        // If both blocks are not air, we failed
+        if (dest.getBlockType() != BlockTypes.AIR || dest.add(0, 1, 0).getBlockType() != BlockTypes.AIR) {
+            return Optional.empty();
         }
 
         return Optional.of(dest);
