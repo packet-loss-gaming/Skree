@@ -153,6 +153,9 @@ public class PlayerStateServiceImpl implements PlayerStateService {
                 compound = new NBTTagCompound();
             }
             compound.setTag(saveName, null);
+            if (saveName.equals(GENERAL_STORE_NAME)) {
+                compound.setBoolean(saveName + RELEASE_STATE_STRING, false);
+            }
 
             CompressedStreamTools.safeWrite(compound, getFile(player).toFile());
         } catch (IOException e) {

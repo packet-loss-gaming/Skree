@@ -26,6 +26,7 @@ public class PlayerStateSystem implements ServiceProvider<PlayerStateService> {
 
         // Register the service & command
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PlayerStateService.class, service);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
 
         Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("gamemode").get());
         Sponge.getCommandManager().register(SkreePlugin.inst(), GameModeCommand.aquireSpec(), "gamemode", "gm");
