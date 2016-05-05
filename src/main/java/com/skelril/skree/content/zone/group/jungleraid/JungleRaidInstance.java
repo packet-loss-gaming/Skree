@@ -298,13 +298,17 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     }
 
     public Optional<Clause<String, WinType>> getWinner() {
-        if (freeForAllPlayers.size() == 1 && blueTeamPlayers.isEmpty() && redTeamPlayers.isEmpty()) {
-            return Optional.of(new Clause<>(freeForAllPlayers.iterator().next().getName(), WinType.SOLO));
-        } else if (freeForAllPlayers.isEmpty() && !blueTeamPlayers.isEmpty() && redTeamPlayers.isEmpty()) {
+        return getWinner(freeForAllPlayers, blueTeamPlayers, redTeamPlayers);
+    }
+
+    private Optional<Clause<String, WinType>> getWinner(Collection<Player> ffa, Collection<Player> blue, Collection<Player> red) {
+        if (ffa.size() == 1 && blue.isEmpty() && red.isEmpty()) {
+            return Optional.of(new Clause<>(ffa.iterator().next().getName(), WinType.SOLO));
+        } else if (ffa.isEmpty() && !blue.isEmpty() && red.isEmpty()) {
             return Optional.of(new Clause<>("Blue", WinType.TEAM));
-        } else if (freeForAllPlayers.isEmpty() && blueTeamPlayers.isEmpty() && !redTeamPlayers.isEmpty()) {
+        } else if (ffa.isEmpty() && blue.isEmpty() && !red.isEmpty()) {
             return Optional.of(new Clause<>("Red", WinType.TEAM));
-        } else if (freeForAllPlayers.isEmpty() && blueTeamPlayers.isEmpty() && redTeamPlayers.isEmpty()) {
+        } else if (ffa.isEmpty() && blue.isEmpty() && red.isEmpty()) {
             return Optional.of(new Clause<>(null, WinType.DRAW));
         }
 
@@ -526,6 +530,11 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                     return;
                 }
             }
+        }
+
+        if (getWinner(ffaList, blueList, redList).isPresent()) {
+            getPlayerMessageChannel(PARTICIPANT).send(Text.of(TextColors.RED, "All players are on one team, the game will not start."));
+            return;
         }
 
         ffaList.stream().forEach(p -> addFFAPlayer(p, classMap.getOrDefault(p, JungleRaidClass.BALANCED)));
