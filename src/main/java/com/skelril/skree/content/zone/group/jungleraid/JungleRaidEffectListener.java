@@ -138,6 +138,29 @@ public class JungleRaidEffectListener {
     }
 
     @Listener
+    public void onBlockBurn(ChangeBlockEvent event) {
+        if (event.getCause().root() instanceof Player) {
+            return;
+        }
+
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            BlockType finalType = transaction.getFinal().getState().getType();
+            if (finalType != BlockTypes.FIRE) {
+                continue;
+            }
+
+            Optional<JungleRaidInstance> optInst = manager.getApplicableZone(transaction.getOriginal().getLocation().get());
+            if (optInst.isPresent()) {
+                JungleRaidInstance inst = optInst.get();
+                if (inst.isFlagEnabled(JungleRaidFlag.NO_FIRE_SPREAD)) {
+                    event.setCancelled(true);
+                }
+                break;
+            }
+        }
+    }
+
+    @Listener
     public void onBlockDrop(DropItemEvent.Destruct event) {
         for (Entity entity : event.getEntities()) {
             Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
