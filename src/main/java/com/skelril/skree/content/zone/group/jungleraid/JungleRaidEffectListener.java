@@ -96,6 +96,11 @@ public class JungleRaidEffectListener {
 
         JungleRaidInstance inst = optInst.get();
         if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && player.getUniqueId().equals(inst.getFlagData().titan)) {
+            if (blockLoc.getBlockType() == BlockTypes.BEDROCK) {
+                return;
+            }
+
+            // TODO Convert to the Sponge API
             ((net.minecraft.world.World) blockLoc.getExtent()).destroyBlock(
                     new BlockPos(blockLoc.getX(), blockLoc.getY(), blockLoc.getZ()),
                     true
