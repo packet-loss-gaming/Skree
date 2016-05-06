@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.modifier;
 
+import com.nearce.gamechatter.sponge.GameChatterPlugin;
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.skree.service.ModifierService;
 import org.apache.commons.lang3.StringUtils;
@@ -50,12 +51,11 @@ public class ModExtendCommand implements CommandExecutor {
         String friendlyTime = PrettyText.date(service.expiryOf(modifier));
 
         String change = wasActive ? " extended" : " enabled";
-        MessageChannel.TO_ALL.send(
-                Text.of(
-                        TextColors.GOLD,
-                        friendlyName + change + " till " + friendlyTime + "!"
-                )
-        );
+        String rawMessage = friendlyName + change + " till " + friendlyTime + "!";
+
+        MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawMessage));
+        GameChatterPlugin.inst().sendSystemMessage(rawMessage);
+
         return CommandResult.success();
     }
 
