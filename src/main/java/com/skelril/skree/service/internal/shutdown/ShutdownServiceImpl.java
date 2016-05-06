@@ -7,6 +7,7 @@
 package com.skelril.skree.service.internal.shutdown;
 
 
+import com.nearce.gamechatter.sponge.GameChatterPlugin;
 import com.skelril.nitro.text.PrettyText;
 import com.skelril.nitro.time.IntegratedRunnable;
 import com.skelril.nitro.time.TimeFilter;
@@ -78,19 +79,19 @@ public class ShutdownServiceImpl implements ShutdownService {
             @Override
             public boolean run(int times) {
                 if (filter.matchesFilter(times)) {
-                    MessageChannel.TO_ALL.send(
-                            Text.of(
-                                    TextColors.RED,
-                                    "Sever shutting down in " + times + " seconds - for " + reopenDate + "."
-                            )
-                    );
+                    String rawMessage = "Sever shutting down in " + times + " seconds - for " + reopenDate + ".";
+                    MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
+                    GameChatterPlugin.inst().sendSystemMessage(rawMessage);
                 }
                 return true;
             }
 
             @Override
             public void end() {
-                MessageChannel.TO_ALL.send(Text.of(TextColors.RED, "Server shutting down!"));
+                String rawMessage = "Server shutting down!";
+                MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
+                GameChatterPlugin.inst().sendSystemMessage(rawMessage);
+
                 forceShutdown(message);
             }
         };
