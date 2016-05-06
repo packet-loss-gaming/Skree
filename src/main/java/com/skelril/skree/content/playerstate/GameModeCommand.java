@@ -41,6 +41,12 @@ public class GameModeCommand implements CommandExecutor {
         GameMode mode = args.<GameMode>getOne("mode").get();
         Player target = args.<Player>getOne("target").get();
 
+        if (service.hasInventoryStored(target) && !args.hasAny("f")) {
+            src.sendMessage(Text.of(TextColors.RED, "Player has an omni-state stored, action denied."));
+            src.sendMessage(Text.of(TextColors.RED, "This can be overwritten using -f."));
+            return CommandResult.empty();
+        }
+
         service.save(target, target.get(Keys.GAME_MODE).get().getId());
         target.offer(Keys.FALL_DISTANCE, 0F);
         target.offer(Keys.GAME_MODE, mode);
@@ -62,9 +68,11 @@ public class GameModeCommand implements CommandExecutor {
                 .description(Text.of("Change gamemode"))
                 .permission("skree.gamemode")
                 .arguments(
-                        seq(
-                                onlyOne(choices(Text.of("mode"), map)),
-                                onlyOne(playerOrSource(Text.of("target")))
+                        flags().flag("f").buildWith(
+                                seq(
+                                        onlyOne(choices(Text.of("mode"), map)),
+                                        onlyOne(playerOrSource(Text.of("target")))
+                                )
                         )
                 ).executor(new GameModeCommand()).build();
     }
