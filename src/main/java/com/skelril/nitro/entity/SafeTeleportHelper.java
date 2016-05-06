@@ -19,7 +19,7 @@ public class SafeTeleportHelper {
         while (dest.getY() > 0 && dest.getBlockType() == BlockTypes.AIR) {
             dest = dest.add(0, -1, 0);
         }
-        dest.add(0, 1, 0); // Move one back up to account for air
+        dest = dest.add(0, 1, 0); // Move one back up to account for air
 
         // If both blocks are not air, we failed
         if (dest.getBlockType() != BlockTypes.AIR || dest.add(0, 1, 0).getBlockType() != BlockTypes.AIR) {
