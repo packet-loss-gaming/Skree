@@ -336,24 +336,25 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
-        if (state == JungleRaidState.LOBBY) {
-            player.setLocation(lobbySpawnLocation);
-            Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
-            if (optService.isPresent()) {
-                PlayerStateService service = optService.get();
-                try {
-                    service.storeInventory(player);
-                    service.releaseInventory(player);
-
-                    giveBaseEquipment(player, JungleRaidClass.BALANCED);
-                } catch (InventoryStorageStateException e) {
-                    e.printStackTrace();
-                    return new Clause<>(player, ZoneStatus.ERROR);
-                }
-            }
-            return new Clause<>(player, ZoneStatus.ADDED);
+        if (state != JungleRaidState.LOBBY) {
+            return new Clause<>(player, ZoneStatus.NO_REJOIN);
         }
-        return new Clause<>(player, ZoneStatus.NO_REJOIN);
+
+        player.setLocation(lobbySpawnLocation);
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optService.isPresent()) {
+            PlayerStateService service = optService.get();
+            try {
+                service.storeInventory(player);
+                service.releaseInventory(player);
+
+                giveBaseEquipment(player, JungleRaidClass.BALANCED);
+            } catch (InventoryStorageStateException e) {
+                e.printStackTrace();
+                return new Clause<>(player, ZoneStatus.ERROR);
+            }
+        }
+        return new Clause<>(player, ZoneStatus.ADDED);
     }
 
     private void giveBaseEquipment(Player player, JungleRaidClass jrClass) {
