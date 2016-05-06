@@ -494,6 +494,15 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         giveBaseEquipment(player, jrClass);
         giveTeamEquipment(player, teamColor);
 
+        // Reset vitals
+        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).orElse(20D));
+        player.offer(Keys.FOOD_LEVEL, 20);
+        player.offer(Keys.SATURATION, 20D);
+        player.offer(Keys.EXHAUSTION, 0D);
+
+        // Remove potion effects
+        player.offer(Keys.POTION_EFFECTS, new ArrayList<>());
+
         player.setLocation(startingPos.get());
     }
 
