@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.group.jungleraid;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
+import com.nearce.gamechatter.sponge.GameChatterPlugin;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.SafeTeleportHelper;
 import com.skelril.nitro.probability.Probability;
@@ -321,17 +322,23 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     private void processWin(Clause<String, WinType> winClause) {
         state = JungleRaidState.DONE;
 
+        String rawWinMessage;
         switch (winClause.getValue()) {
             case SOLO:
-                MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, winClause.getKey(), " has won the jungle raid!"));
+                rawWinMessage = winClause.getKey() + " has won the jungle raid!";
                 break;
             case TEAM:
-                MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, winClause.getKey(), " team has won the jungle raid!"));
+                rawWinMessage = winClause.getKey() + " team has won the jungle raid!";
                 break;
             case DRAW:
-                MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, "The jungle raid was a draw!"));
+                rawWinMessage = "The jungle raid was a draw!";
                 break;
+            default:
+                return;
         }
+
+        MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawWinMessage));
+        GameChatterPlugin.inst().sendSystemMessage(rawWinMessage);
     }
 
     @Override
