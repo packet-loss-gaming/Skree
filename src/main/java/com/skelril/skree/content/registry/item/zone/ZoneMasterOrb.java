@@ -121,7 +121,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Jungle Raid",
                 new ItemStack(this),
-                new ItemStack(Blocks.cocoa)
+                new ItemStack(Items.dye, 1, 3)
         ));
     }
 
