@@ -103,6 +103,26 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 new ItemStack(this),
                 new ItemStack(Items.gold_ingot)
         ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Cursed Mine",
+                new ItemStack(this),
+                new ItemStack(Items.iron_pickaxe)
+        ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Temple of Fate",
+                new ItemStack(this),
+                new ItemStack(Items.feather)
+        ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Catacombs",
+                new ItemStack(this),
+                new ItemStack(Items.bone)
+        ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Jungle Raid",
+                new ItemStack(this),
+                new ItemStack(Blocks.cocoa)
+        ));
     }
 
     @Override
