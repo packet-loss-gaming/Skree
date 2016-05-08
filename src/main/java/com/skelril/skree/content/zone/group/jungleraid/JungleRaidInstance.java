@@ -276,6 +276,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             return;
         }
 
+        outOfBoundsCheck();
+
         Optional<Clause<String, WinType>> optWinner = getWinner();
         if (optWinner.isPresent()) {
             processWin(optWinner.get());
@@ -283,6 +285,20 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             return;
         }
         JungleRaidEffectProcessor.run(this);
+    }
+
+    private void outOfBoundsCheck() {
+        for (Player player : getPlayers(PARTICIPANT)) {
+            if (contains(player)) {
+                continue;
+            }
+
+            if (player.getLocation().add(0, -1, 0).getBlockType() == BlockTypes.AIR) {
+                continue;
+            }
+
+            remove(player);
+        }
     }
 
     public JungleRaidState getState() {
