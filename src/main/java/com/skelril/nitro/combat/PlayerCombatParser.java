@@ -61,7 +61,7 @@ public interface PlayerCombatParser extends CombatParser {
 
     default void parse(CollideEntityEvent.Impact event) {
         Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (optProjectile.isPresent()) {
+        if (!optProjectile.isPresent()) {
             return;
         }
 
