@@ -7,16 +7,18 @@
 package com.skelril.skree.content.registry.item.zone;
 
 import com.google.common.collect.Lists;
-import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Snowball;
+import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -77,12 +79,12 @@ public class ZoneWaitingLobby {
         List<Text> endMessage = new ArrayList<>();
         if (hasSnowballs) {
             List<Map.Entry<Player, Integer>> results = Lists.newArrayList(localCounts.entrySet());
-            results.sort((a, b) -> a.getValue() - b.getValue());
+            results.sort((a, b) -> b.getValue() - a.getValue());
 
             endMessage.add(Text.of(TextColors.GOLD, "Top Snowball Fight Scores: "));
             for (int i = 0; i < Math.min(results.size(), 3); ++i) {
                 Map.Entry<Player, Integer> playerScore = results.get(i);
-                endMessage.add(Text.of(TextColors.YELLOW, i, ") ", playerScore.getKey().getName(), " - ", playerScore.getValue()));
+                endMessage.add(Text.of(TextColors.YELLOW, i + 1, ") ", playerScore.getKey().getName(), " - ", playerScore.getValue()));
             }
         }
 
@@ -126,20 +128,29 @@ public class ZoneWaitingLobby {
     }
 
     @Listener
-    public void onEntityDamage(DamageEntityEvent event) {
-        new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender) {
-                if (playingPlayers.containsKey(attacker) && playingPlayers.containsKey(defender)) {
-                    playingPlayers.merge(attacker, 1, (a, b) -> a + b);
-                    attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
-                    attacker.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(attacker)));
+    public void onSnowballHit(CollideEntityEvent.Impact event) {
+        Entity entity = event.getCause().first(Entity.class).get();
+        if (!(entity instanceof Snowball)) {
+            return;
+        }
 
-                    playingPlayers.merge(defender, 1, (a, b) -> a - b);
-                    defender.sendMessage(Text.of(TextColors.YELLOW, "You've been hit by ", attacker.getName(), "!"));
-                    defender.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(defender)));
-                }
+        ProjectileSource source = ((Snowball) entity).getShooter();
+        if (!(source instanceof Player)) {
+            return;
+        }
+
+        Player attacker = (Player) source;
+
+        for (Entity anEntity : event.getEntities()) {
+            if (anEntity instanceof Player) {
+                Player defender = (Player) anEntity;
+
+                playingPlayers.merge(attacker, 1, (a, b) -> a + b);
+                attacker.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(attacker)));
+
+                playingPlayers.merge(defender, 1, (a, b) -> a - b);
+                defender.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(defender)));
             }
-        }.parse(event);
+        }
     }
 }
