@@ -437,7 +437,6 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 ItemStack superBow = newItemStack(ItemTypes.BOW);
                 superBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.POWER, 5),
-                        new ItemEnchantment(Enchantments.PUNCH, 2),
                         new ItemEnchantment(Enchantments.FLAME, 1)
                 ));
 
