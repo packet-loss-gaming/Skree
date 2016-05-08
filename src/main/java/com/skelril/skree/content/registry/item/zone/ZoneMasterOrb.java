@@ -191,7 +191,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             service.requestZone(getZone(itemStack).get(), group, result -> {
                                 if (result.isPresent()) {
                                     result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
-                                        player.setLocation(player.getWorld().getSpawnLocation());
+                                        player.setLocation(getMainWorld().getSpawnLocation());
                                         player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
                                     });
                                 }
@@ -214,11 +214,15 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         }
     }
 
-    private void moveToInstanceIsle(Player player) {
+    private World getMainWorld() {
         WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+        return service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds().iterator().next();
+    }
+
+    private void moveToInstanceIsle(Player player) {
         Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
-        World targetWorld = service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds().iterator().next();
-        Location<World> targetPos = targetWorld.getLocation(randomizedPos);
+
+        Location<World> targetPos = getMainWorld().getLocation(randomizedPos);
         player.setLocation(targetPos);
         player.sendMessage(Text.of(TextColors.YELLOW, "Your instance is building..."));
         player.sendMessage(Text.of(TextColors.YELLOW, "You will automatically be teleported when it's finished."));
