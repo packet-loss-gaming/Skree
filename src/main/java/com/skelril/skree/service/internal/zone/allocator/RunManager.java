@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RunManager {
-    private static final long MAX_TIME = 100;
+    private static final long MAX_TIME = 75;
     private static final int MAX_TASK = 5;
 
     private static SupervisingRunContext supervisor = new SupervisingRunContext();
