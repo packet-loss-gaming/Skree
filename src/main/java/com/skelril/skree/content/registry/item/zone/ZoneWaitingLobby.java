@@ -19,6 +19,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -129,10 +130,14 @@ public class ZoneWaitingLobby {
         new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
-                if (playingPlayers.containsKey(attacker)) {
+                if (playingPlayers.containsKey(attacker) && playingPlayers.containsKey(defender)) {
                     playingPlayers.merge(attacker, 1, (a, b) -> a + b);
                     attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
-                    attacker.sendMessage(Text.of(TextColors.YELLOW, "You now have a total score of ",  playingPlayers.get(attacker), " hits!"));
+                    attacker.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(attacker)));
+
+                    playingPlayers.merge(defender, 1, (a, b) -> a - b);
+                    defender.sendMessage(Text.of(TextColors.YELLOW, "You've been hit by ", attacker.getName(), "!"));
+                    defender.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(defender)));
                 }
             }
         }.parse(event);
