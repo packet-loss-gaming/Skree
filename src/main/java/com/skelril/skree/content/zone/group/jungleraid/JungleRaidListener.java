@@ -103,9 +103,11 @@ public class JungleRaidListener {
                     return;
                 }
 
-                inst.recordAttack(attacker, defender);
+                if (event instanceof DamageEntityEvent) {
+                    inst.recordAttack(attacker, defender);
 
-                attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
+                    attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
+                }
             }
         };
     }
