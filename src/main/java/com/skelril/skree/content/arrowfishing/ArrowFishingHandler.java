@@ -7,6 +7,7 @@
 package com.skelril.skree.content.arrowfishing;
 
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.droptable.DropTable;
 import com.skelril.nitro.droptable.DropTableEntryImpl;
@@ -18,10 +19,10 @@ import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.MultiTypeRegistry;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.projectilewatcher.ProjectileTickEvent;
-import com.skelril.skree.service.internal.projectilewatcher.TrackedProjectileInfo;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.projectile.Arrow;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
@@ -64,19 +65,22 @@ public class ArrowFishingHandler {
         );
     }
 
+    private boolean checkVelocity(Vector3d velocity) {
+        return Math.abs(velocity.getX()) + Math.abs(velocity.getY()) > 2;
+    }
+
     @Listener
     public void onProjectileTickEvent(ProjectileTickEvent event) {
+        Projectile projectile = event.getTargetEntity();
 
-        if (!(event.getTargetEntity() instanceof Arrow) || Probability.getChance(3)) {
+        if (!(projectile instanceof Arrow) || Probability.getChance(3)) {
             return;
         }
 
-        Location<World> loc = event.getTargetEntity().getLocation();
-        TrackedProjectileInfo info = event.getProjectileInfo();
+        Location<World> loc = projectile.getLocation();
 
-        Optional<ProjectileSource> optSource = info.getCause().first(ProjectileSource.class);
-        if (optSource.isPresent() && MultiTypeRegistry.isWater(loc.getBlockType())) {
-            ProjectileSource source = optSource.get();
+        if (MultiTypeRegistry.isWater(loc.getBlockType()) && checkVelocity(projectile.getVelocity())) {
+            ProjectileSource source = projectile.getShooter();
             double modifier = 1;
 
             if (source instanceof Living) {

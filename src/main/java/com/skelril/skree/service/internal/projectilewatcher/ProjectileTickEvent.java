@@ -6,7 +6,7 @@
 
 package com.skelril.skree.service.internal.projectilewatcher;
 
-import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.event.impl.AbstractEvent;
@@ -19,7 +19,7 @@ public class ProjectileTickEvent extends AbstractEvent implements TargetEntityEv
     }
 
     @Override
-    public Entity getTargetEntity() {
+    public Projectile getTargetEntity() {
         return projectile.getProjectile();
     }
 

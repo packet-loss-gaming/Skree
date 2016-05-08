@@ -10,10 +10,11 @@ package com.skelril.skree.service.internal.projectilewatcher;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.ProjectileWatcherService;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.entity.projectile.LaunchProjectileEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 
@@ -28,8 +29,14 @@ public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, R
     private Task task = null;
 
     @Listener
-    public void onProjectileLaunch(LaunchProjectileEvent event) {
-        track(event.getTargetEntity(), event.getCause());
+    public void onProjectileLaunch(SpawnEntityEvent event) {
+        for (Entity entity : event.getEntities()) {
+            if (!(entity instanceof Projectile)) {
+                continue;
+            }
+
+            track((Projectile) entity, event.getCause());
+        }
     }
 
     public boolean hasChanged(TrackedProjectileInfo info) {
