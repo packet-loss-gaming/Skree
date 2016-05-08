@@ -15,6 +15,7 @@ import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
@@ -48,6 +49,8 @@ import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPA
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.SPECTATOR;
 
 public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable {
+
+    private List<Player> participants = new ArrayList<>();
 
     private Map<Player, Set<Player>> teamMapping = new HashMap<>();
     private Set<Player> freeForAllPlayers = new HashSet<>();
@@ -342,6 +345,15 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     }
 
     @Override
+    public Collection<Player> getPlayers(PlayerClassifier classifier) {
+        if (classifier == PARTICIPANT) {
+            return Lists.newArrayList(participants);
+        }
+        return super.getPlayers(classifier);
+    }
+
+
+    @Override
     public Clause<Player, ZoneStatus> add(Player player) {
         if (state != JungleRaidState.LOBBY) {
             return new Clause<>(player, ZoneStatus.NO_REJOIN);
@@ -361,6 +373,9 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 return new Clause<>(player, ZoneStatus.ERROR);
             }
         }
+
+        participants.add(player);
+
         return new Clause<>(player, ZoneStatus.ADDED);
     }
 
@@ -566,7 +581,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         }
 
         if (getWinner(ffaList, blueList, redList).isPresent()) {
-            getPlayerMessageChannel(PARTICIPANT).send(Text.of(TextColors.RED, "All players are on one team, the game will not start."));
+            getPlayerMessageChannel(SPECTATOR).send(Text.of(TextColors.RED, "All players are on one team, the game will not start."));
             return;
         }
 
@@ -622,6 +637,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     }
 
     public void playerLost(Player player) {
+        participants.remove(player);
+
         Set<Player> teamPlayers = teamMapping.remove(player);
         if (teamPlayers != null) {
             teamPlayers.remove(player);
