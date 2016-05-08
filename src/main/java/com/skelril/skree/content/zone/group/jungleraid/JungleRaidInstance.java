@@ -483,6 +483,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         for (ItemStack stack : gear) {
             player.getInventory().offer(stack);
         }
+
+        tf(player).inventoryContainer.detectAndSendChanges();
     }
 
     private void giveTeamEquipment(Player player, Color teamColor) {
