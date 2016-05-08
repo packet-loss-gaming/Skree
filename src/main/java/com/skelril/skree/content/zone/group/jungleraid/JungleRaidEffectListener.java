@@ -296,12 +296,28 @@ public class JungleRaidEffectListener {
         new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
-                if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan)) {
-                    event.setBaseDamage(event.getBaseDamage() * 2);
-                }
-
+                // Do Death Touch before anything else
                 if (inst.isFlagEnabled(JungleRaidFlag.DEATH_TOUCH)) {
                     event.setBaseDamage(Math.pow(defender.get(Keys.MAX_HEALTH).orElse(20D), 3));
+                    return;
+                }
+
+                Optional<JungleRaidClass> optClass = inst.getClass(attacker);
+                if (optClass.isPresent()) {
+                    JungleRaidClass jrClass = optClass.get();
+                    if (jrClass == JungleRaidClass.SNIPER) {
+                        double distSq = attacker.getLocation().getPosition().distanceSquared(
+                                defender.getLocation().getPosition()
+                        );
+                        double targetDistSq = Math.pow(70, 2);
+                        double ratio = Math.min(distSq, targetDistSq) / targetDistSq;
+
+                        event.setBaseDamage(event.getBaseDamage() * ratio);
+                    }
+                }
+
+                if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan)) {
+                    event.setBaseDamage(event.getBaseDamage() * 2);
                 }
             }
 
@@ -344,11 +360,11 @@ public class JungleRaidEffectListener {
 
         // Normal Jungle Raid fireworks and stuff
         Color killerColor = Color.WHITE;
-        Color teamColor = inst.getTeamColor(player);
+        Color teamColor = inst.getTeamColor(player).orElse(Color.WHITE);
         Optional<Player> optKiller = inst.getLastAttacker(player);
         if (optKiller.isPresent()) {
             Player killer = optKiller.get();
-            killerColor = inst.getTeamColor(killer);
+            killerColor = inst.getTeamColor(killer).orElse(Color.WHITE);
             if (isTitanEnabled) {
                 if (isTitan) {
                     data.titan = killer.getUniqueId();

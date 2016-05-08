@@ -630,14 +630,20 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         }
     }
 
-    public Color getTeamColor(Player player) {
+    public Optional<Color> getTeamColor(Player player) {
         Set<Player> playerTeam = teamMapping.get(player);
         if (playerTeam == redTeamPlayers) {
-            return Color.RED;
+            return Optional.of(Color.RED);
         } else if (playerTeam == blueTeamPlayers) {
-            return Color.BLUE;
+            return Optional.of(Color.BLUE);
+        } else if (playerTeam == freeForAllPlayers) {
+            return Optional.of(Color.WHITE);
         }
-        return Color.WHITE;
+        return Optional.empty();
+    }
+
+    public Optional<JungleRaidClass> getClass(Player player) {
+        return Optional.ofNullable(classMap.get(player));
     }
 
     private void payPlayer(Player player) {
