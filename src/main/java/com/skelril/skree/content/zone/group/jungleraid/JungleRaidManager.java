@@ -94,6 +94,9 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         pendingRequest.add(clause -> {
             ZoneRegion region = clause.getKey();
 
+            // The schematic is 1 too high
+            region = new ZoneRegion(region.getExtent(), region.getOrigin(), region.getBoundingBox().sub(0, 1, 0));
+
             JungleRaidInstance instance = new JungleRaidInstance(region);
             instance.init();
             zones.add(instance);
