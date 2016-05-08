@@ -148,7 +148,7 @@ public class ZoneWaitingLobby {
                 playingPlayers.merge(attacker, 1, (a, b) -> a + b);
                 attacker.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(attacker)));
 
-                playingPlayers.merge(defender, 1, (a, b) -> a - b);
+                playingPlayers.merge(defender, 1, (a, b) -> Math.max(0, a - b));
                 defender.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(defender)));
             }
         }
