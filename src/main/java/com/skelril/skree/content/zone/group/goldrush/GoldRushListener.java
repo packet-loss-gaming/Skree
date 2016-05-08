@@ -12,6 +12,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -37,6 +38,7 @@ import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -311,6 +313,8 @@ public class GoldRushListener {
                     }
 
                     player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));
+                    MessageChannel targetChannel = inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR);
+                    targetChannel.send(Text.of(TextColors.YELLOW, "Group risk of ", format(inst.getTotalRisk()), " coffers."));
                 }
             }
         }

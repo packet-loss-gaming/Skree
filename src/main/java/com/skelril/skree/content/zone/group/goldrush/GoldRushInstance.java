@@ -405,8 +405,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         cofferRisk.remove(player.getUniqueId());
     }
 
-    private BigDecimal getCoffersNeeded() {
-        Collection<Player> cPlayers = getContained(Player.class);
+    public BigDecimal getTotalRisk() {
+        Collection<Player> cPlayers = getPlayers(PlayerClassifier.PARTICIPANT);
         Iterator<Player> it = cPlayers.iterator();
 
         BigDecimal totalRisk = BigDecimal.ZERO;
@@ -420,7 +420,11 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             totalRisk = totalRisk.add(origCharge);
         }
 
-        return MIN_START_RISK.subtract(totalRisk);
+        return totalRisk;
+    }
+
+    private BigDecimal getCoffersNeeded() {
+        return MIN_START_RISK.subtract(getTotalRisk());
     }
 
     private void calculateLootSplit() {
