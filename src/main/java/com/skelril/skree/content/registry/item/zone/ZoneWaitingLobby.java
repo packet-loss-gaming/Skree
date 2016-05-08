@@ -133,7 +133,7 @@ public class ZoneWaitingLobby {
         new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
-                if (!(indirectSource instanceof Snowball)) {
+                if (!(indirectSource instanceof Snowball) || !contains(attacker) || !contains(defender)) {
                     return;
                 }
 

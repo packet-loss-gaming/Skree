@@ -136,9 +136,8 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
                 if (!(indirectSource instanceof Snowball) || !lobby.contains(attacker)) {
                     attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+                    event.setCancelled(true);
                 }
-
-                event.setCancelled(true);
             }
 
             @Override
