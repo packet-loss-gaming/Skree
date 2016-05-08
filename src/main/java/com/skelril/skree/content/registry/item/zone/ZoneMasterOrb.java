@@ -6,8 +6,6 @@
 
 package com.skelril.skree.content.registry.item.zone;
 
-import com.flowpowered.math.vector.Vector3i;
-import com.skelril.nitro.position.PositionRandomizer;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -185,17 +183,22 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             for (int i = group.size() - 1; i >= 0; --i) {
                                 purgeZoneItems(group.get(i), itemStack);
                                 // createLightningStrike(group.get(i)); SpongeCommon/420
-                                moveToInstanceIsle(group.get(i));
+                                getMainWorldWrapper().getLobby().add(group.get(i));
                             }
 
-                            service.requestZone(getZone(itemStack).get(), group, result -> {
-                                if (result.isPresent()) {
-                                    result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
-                                        player.setLocation(getMainWorld().getSpawnLocation());
-                                        player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
-                                    });
-                                }
-                            });
+                            service.requestZone(getZone(itemStack).get(), group,
+                                    () -> {
+                                        getMainWorldWrapper().getLobby().remove(group);
+                                    },
+                                    result -> {
+                                        if (result.isPresent()) {
+                                            result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
+                                                player.setLocation(getMainWorld().getSpawnLocation());
+                                                player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
+                                            });
+                                        }
+                                    }
+                            );
                         }
                     }
                     event.setCancelled(true);
@@ -214,18 +217,13 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         }
     }
 
-    private World getMainWorld() {
+    private MainWorldWrapper getMainWorldWrapper() {
         WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        return service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds().iterator().next();
+        return service.getEffectWrapper(MainWorldWrapper.class).get();
     }
 
-    private void moveToInstanceIsle(Player player) {
-        Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
-
-        Location<World> targetPos = getMainWorld().getLocation(randomizedPos);
-        player.setLocation(targetPos);
-        player.sendMessage(Text.of(TextColors.YELLOW, "Your instance is building..."));
-        player.sendMessage(Text.of(TextColors.YELLOW, "You will automatically be teleported when it's finished."));
+    private World getMainWorld() {
+        return getMainWorldWrapper().getWorlds().iterator().next();
     }
 
     private boolean isInInstanceWorld(Player player) {

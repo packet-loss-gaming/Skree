@@ -14,6 +14,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface PlayerCombatParser extends CombatParser {
@@ -26,8 +27,10 @@ public interface PlayerCombatParser extends CombatParser {
         Optional<DamageSource> optDamageSource = event.getCause().first(DamageSource.class);
         if (optDamageSource.isPresent()) {
             Entity srcEntity = null;
+            Entity indirectSrcEntity = null;
             if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
                 srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
+                indirectSrcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getSource();
             } else if (optDamageSource.get() instanceof EntityDamageSource) {
                 srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
             }
@@ -43,6 +46,7 @@ public interface PlayerCombatParser extends CombatParser {
             if (verify(living)) {
                 if (entity instanceof Player && living instanceof Player) {
                     processPvP((Player) living, (Player) entity);
+                    processPvP((Player) living, (Player) entity, indirectSrcEntity);
                 } else if (entity instanceof Player) {
                     processMonsterAttack(living, (Player) entity);
                 } else if (living instanceof Player) {
@@ -57,6 +61,7 @@ public interface PlayerCombatParser extends CombatParser {
     }
 
     default void processPvP(Player attacker, Player defender) { }
+    default void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) { }
 
     default void processMonsterAttack(Living attacker, Player defender) { }
 

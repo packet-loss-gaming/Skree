@@ -26,18 +26,14 @@ public interface ZoneService {
     Set<String> getManagerNames();
 
     Optional<Integer> getMaxGroupSize(String managerName);
-    default void requestZone(String managerName, Player player) {
-        requestZone(managerName, player, ignored -> {});
-    }
-    default void requestZone(String managerName, Collection<Player> players) {
-        requestZone(managerName, players, ignored -> {});
-    }
-    void requestZone(String managerName, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
-    void requestZone(String managerName, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
+
+    void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
+    void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
 
     <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager);
-    <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
-    <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
+
+    <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
+    <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
 
     Clause<Player, ZoneStatus> rejoin(Player player);
     Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players);

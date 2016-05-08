@@ -55,20 +55,20 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public void requestZone(String managerName, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
+    public void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
         ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         if (manager != null) {
-            requestZone(manager, player, callback);
+            requestZone(manager, player, preProcessCallback, callback);
         } else {
             callback.accept(Optional.empty());
         }
     }
 
     @Override
-    public void requestZone(String managerName, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
+    public void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
         ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
         if (manager != null) {
-            requestZone(manager, players, callback);
+            requestZone(manager, players, preProcessCallback, callback);
         } else {
             callback.accept(Optional.empty());
         }
@@ -94,20 +94,23 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
+    public <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
         manager.discover(pickAllocator(), optZone -> {
             if (optZone.isPresent()) {
+                preProcessCallback.run();
                 callback.accept(Optional.of(addToZone(optZone.get(), player)));
                 return;
             }
+            preProcessCallback.run();
             callback.accept(Optional.of(new Clause<>(player, ZoneStatus.CREATION_FAILED)));
         });
     }
 
     @Override
-    public <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
+    public <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
         Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
         if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
+            preProcessCallback.run();
             callback.accept(Optional.of(players.stream().map(player ->
                     new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList()
             )));
@@ -116,11 +119,13 @@ public class ZoneServiceImpl implements ZoneService {
 
         manager.discover(pickAllocator(), optZone -> {
             if (optZone.isPresent()) {
+                preProcessCallback.run();
                 callback.accept(Optional.of(players.stream().map(player ->
                         addToZone(optZone.get(), player)).collect(Collectors.toList()
                 )));
                 return;
             }
+            preProcessCallback.run();
             callback.accept(Optional.of(players.stream().map(player ->
                     new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList()
             )));

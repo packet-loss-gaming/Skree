@@ -7,8 +7,11 @@
 package com.skelril.skree.content.world.main;
 
 
+import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.combat.PlayerCombatParser;
+import com.skelril.nitro.position.PositionRandomizer;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.registry.item.zone.ZoneWaitingLobby;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
@@ -22,6 +25,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
@@ -35,6 +39,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,14 +48,25 @@ import java.util.concurrent.TimeUnit;
 
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
+    private ZoneWaitingLobby lobby = new ZoneWaitingLobby(() -> {
+        Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
+
+        return getWorlds().iterator().next().getLocation(randomizedPos);
+    });
+
     public MainWorldWrapper() {
         this(new ArrayList<>());
     }
 
     public MainWorldWrapper(Collection<World> worlds) {
         super("Main", worlds);
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), lobby);
 
         Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+    }
+
+    public ZoneWaitingLobby getLobby() {
+        return lobby;
     }
 
     @Listener
@@ -111,7 +127,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
         new PlayerCombatParser() {
             @Override
-            public void processPvP(Player attacker, Player defender) {
+            public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
                 Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
                 if (optService.isPresent()) {
                     PvPService service = optService.get();
@@ -120,7 +136,9 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
                     }
                 }
 
-                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+                if (!(indirectSource instanceof Snowball) || !lobby.contains(attacker)) {
+                    attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+                }
 
                 event.setCancelled(true);
             }

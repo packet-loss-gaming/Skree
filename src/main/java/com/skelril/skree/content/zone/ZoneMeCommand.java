@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone;
 
 import com.skelril.skree.service.ZoneService;
+import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -16,6 +17,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +30,15 @@ public class ZoneMeCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
-        service.requestZone(args.<String>getOne("zone").get(), (Player) src);
+        service.requestZone(args.<String>getOne("zone").get(), (Player) src, () -> {
+            src.sendMessage(Text.of(TextColors.YELLOW, "Job completed."));
+        }, (clause) -> {
+            if (clause.isPresent()) {
+                ZoneStatus status = clause.get().getValue();
+                src.sendMessage(Text.of(status == ZoneStatus.ADDED ? TextColors.GREEN : TextColors.RED, "Added with status: ", status));
+            }
+        });
+        src.sendMessage(Text.of(TextColors.YELLOW, "Creating requested zone."));
         return CommandResult.success();
     }
 
