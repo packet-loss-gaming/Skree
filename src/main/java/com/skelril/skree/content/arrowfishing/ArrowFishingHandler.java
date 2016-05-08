@@ -41,7 +41,7 @@ public class ArrowFishingHandler {
     private DropTable dropTable;
 
     public ArrowFishingHandler() {
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a * b));
+        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
         dropTable = new DropTableImpl(
                 slipRoller,
                 Lists.newArrayList(
@@ -51,7 +51,7 @@ public class ArrowFishingHandler {
                                                 newItemStack(ItemTypes.FISH)
                                         )
                                 ),
-                                32
+                                100
                         ),
                         new DropTableEntryImpl(
                                 new SimpleDropResolver(
@@ -84,16 +84,20 @@ public class ArrowFishingHandler {
             double modifier = 1;
 
             if (source instanceof Living) {
-                Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+                modifier = 50;
+            }
 
-                if (optService.isPresent() && optService.get().isActive(UBER_ARROW_FISHING)) {
-                    modifier *= 2;
+            Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+            int rolls = 1;
+            if (optService.isPresent() && optService.get().isActive(UBER_ARROW_FISHING)) {
+                if (source instanceof Living) {
+                    rolls = 15;
                 } else {
-                    modifier *= 1.25;
+                    rolls = 5;
                 }
             }
 
-            new ItemDropper(loc).dropStacks(dropTable.getDrops(1, modifier), SpawnTypes.DROPPED_ITEM);
+            new ItemDropper(loc).dropStacks(dropTable.getDrops(rolls, modifier), SpawnTypes.DROPPED_ITEM);
         }
     }
 }
