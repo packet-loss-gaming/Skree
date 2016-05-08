@@ -58,7 +58,9 @@ import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.monster.Wither;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
@@ -68,6 +70,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -252,15 +255,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
     );
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Optional<Integer> optLevel = getLevel(event.getTargetEntity().getLocation());
-        if (!optLevel.isPresent()) {
-            return;
-        }
 
-        int level = optLevel.get();
-        new PlayerCombatParser() {
+    private PlayerCombatParser createFor(Cancellable event, int level) {
+        return new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
                 if (allowsPvP(level)) {
@@ -283,15 +280,20 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             @Override
             public void processMonsterAttack(Living attacker, Player defender) {
+                if (!(event instanceof DamageEntityEvent)) {
+                    return;
+                }
+
+                DamageEntityEvent dEvent = (DamageEntityEvent) event;
                 // If they're endermites they hit through armor, otherwise they get a damage boost
                 if (attacker.getType() == EntityTypes.ENDERMITE) {
-                    for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-                        event.setDamage(modifier.getFirst(), (a) -> 0D);
+                    for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : dEvent.getModifiers()) {
+                        dEvent.setDamage(modifier.getFirst(), (a) -> 0D);
                     }
 
-                    event.setBaseDamage(1);
+                    dEvent.setBaseDamage(1);
                 } else {
-                    event.setBaseDamage(event.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
+                    dEvent.setBaseDamage(dEvent.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
                 }
 
                 WildernessPlayerMeta meta = playerMetaMap.get(defender);
@@ -359,7 +361,32 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     }
                 }
             }
-        }.parse(event);
+        };
+    }
+
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        Optional<Integer> optLevel = getLevel(event.getTargetEntity().getLocation());
+        if (!optLevel.isPresent()) {
+            return;
+        }
+
+        createFor(event, optLevel.get()).parse(event);
+    }
+
+    @Listener
+    public void onPlayerCombat(CollideEntityEvent.Impact event) {
+        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+        if (!optProjectile.isPresent()) {
+            return;
+        }
+
+        Optional<Integer> optLevel = getLevel(optProjectile.get().getLocation());
+        if (!optLevel.isPresent()) {
+            return;
+        }
+
+        createFor(event, optLevel.get()).parse(event);
     }
 
     @Listener

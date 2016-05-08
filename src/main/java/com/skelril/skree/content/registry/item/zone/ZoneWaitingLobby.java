@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.item.zone;
 
 import com.google.common.collect.Lists;
+import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import org.spongepowered.api.Sponge;
@@ -15,7 +16,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Snowball;
-import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
@@ -26,6 +26,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -129,21 +130,12 @@ public class ZoneWaitingLobby {
 
     @Listener
     public void onSnowballHit(CollideEntityEvent.Impact event) {
-        Entity entity = event.getCause().first(Entity.class).get();
-        if (!(entity instanceof Snowball)) {
-            return;
-        }
-
-        ProjectileSource source = ((Snowball) entity).getShooter();
-        if (!(source instanceof Player)) {
-            return;
-        }
-
-        Player attacker = (Player) source;
-
-        for (Entity anEntity : event.getEntities()) {
-            if (anEntity instanceof Player) {
-                Player defender = (Player) anEntity;
+        new PlayerCombatParser() {
+            @Override
+            public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
+                if (!(indirectSource instanceof Snowball)) {
+                    return;
+                }
 
                 playingPlayers.merge(attacker, 1, (a, b) -> a + b);
                 attacker.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(attacker)));
@@ -151,6 +143,6 @@ public class ZoneWaitingLobby {
                 playingPlayers.merge(defender, 1, (a, b) -> Math.max(0, a - b));
                 defender.sendMessage(ChatTypes.ACTION_BAR, Text.of("Total score: ", playingPlayers.get(defender)));
             }
-        }
+        }.parse(event);
     }
 }

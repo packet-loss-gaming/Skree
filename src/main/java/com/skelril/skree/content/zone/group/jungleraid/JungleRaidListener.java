@@ -10,9 +10,12 @@ import com.skelril.nitro.combat.PlayerCombatParser;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -84,17 +87,8 @@ public class JungleRaidListener {
         }
     }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
-
-        if (!optInst.isPresent()) {
-            return;
-        }
-
-        JungleRaidInstance inst = optInst.get();
-
-        new PlayerCombatParser() {
+    private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
+        return new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
                 if (inst.getState() != JungleRaidState.IN_PROGRESS) {
@@ -113,7 +107,38 @@ public class JungleRaidListener {
 
                 attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
             }
-        }.parse(event);
+        };
+    }
+
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
+
+        if (!optInst.isPresent()) {
+            return;
+        }
+
+        JungleRaidInstance inst = optInst.get();
+
+        createFor(event, inst).parse(event);
+    }
+
+    @Listener
+    public void onPlayerCombat(CollideEntityEvent.Impact event) {
+        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+        if (!optProjectile.isPresent()) {
+            return;
+        }
+
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(optProjectile.get());
+
+        if (!optInst.isPresent()) {
+            return;
+        }
+
+        JungleRaidInstance inst = optInst.get();
+
+        createFor(event, inst).parse(event);
     }
 
     @Listener

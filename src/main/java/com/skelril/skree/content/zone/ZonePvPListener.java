@@ -10,7 +10,10 @@ import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.skree.service.PvPService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -25,13 +28,8 @@ public class ZonePvPListener extends ZoneApplicableListener {
         super(isApplicable);
     }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity())) {
-            return;
-        }
-
-        new PlayerCombatParser() {
+    private PlayerCombatParser createFor(Cancellable event) {
+        return new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
                 Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
@@ -46,7 +44,29 @@ public class ZonePvPListener extends ZoneApplicableListener {
 
                 event.setCancelled(true);
             }
-        }.parse(event);
+        };
     }
 
+    @Listener
+    public void onPlayerCombat(DamageEntityEvent event) {
+        if (!isApplicable(event.getTargetEntity())) {
+            return;
+        }
+
+        createFor(event).parse(event);
+    }
+
+    @Listener
+    public void onPlayerCombat(CollideEntityEvent.Impact event) {
+        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+        if (!optProjectile.isPresent()) {
+            return;
+        }
+
+        if (!isApplicable(optProjectile.get())) {
+            return;
+        }
+
+        createFor(event).parse(event);
+    }
 }
