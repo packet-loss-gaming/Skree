@@ -460,13 +460,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     public int getChanceOfLava() {
-        BigDecimal increment = MAX_LAVA_TARGET.divide(new BigDecimal(MAX_LAVA_CHANCE), BigDecimal.ROUND_HALF_DOWN);
-        int rawReturn = MAX_LAVA_CHANCE - Math.min(
+        BigDecimal adjustedTarget = MAX_LAVA_TARGET.multiply(new BigDecimal(getPlayerMod()));
+        BigDecimal increment = adjustedTarget.divide(new BigDecimal(MAX_LAVA_CHANCE), BigDecimal.ROUND_HALF_DOWN);
+        return Math.max(1, Math.min(
                 MAX_LAVA_CHANCE,
                 getTotalRisk().divide(increment, BigDecimal.ROUND_DOWN).intValue()
-        );
-
-        return Math.max(1, rawReturn);
+        ));
     }
 
     private void runLavaChance() {
