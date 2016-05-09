@@ -313,8 +313,11 @@ public class GoldRushListener {
                     }
 
                     player.sendMessage(Text.of(TextColors.YELLOW, "You are now risking ", format(value), " coffers."));
+
                     MessageChannel targetChannel = inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR);
                     targetChannel.send(Text.of(TextColors.YELLOW, "Group risk of ", format(inst.getTotalRisk()), " coffers."));
+                    targetChannel.send(Text.of(TextColors.YELLOW, "Risk of lava ", inst.getChanceOfLava(), " / 100."));
+                    targetChannel.send(Text.of(TextColors.YELLOW, "Security system delay ", inst.getBaseTime(), " +/- ", inst.getTimeVariance(), " seconds."));
                 }
             }
         }

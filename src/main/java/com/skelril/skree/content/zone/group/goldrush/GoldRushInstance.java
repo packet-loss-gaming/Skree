@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.group.goldrush;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
@@ -52,10 +53,13 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.content.market.MarketImplUtil.format;
 import static com.skelril.skree.content.registry.item.generic.PrizeBox.makePrizeBox;
+import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     // Constants
     private static final BigDecimal MIN_START_RISK = new BigDecimal(20000);
+    private static final BigDecimal MAX_LAVA_TARGET = new BigDecimal(500000);
+    private static final int MAX_LAVA_CHANCE = 25;
     private static final BigDecimal GRAB_RATIO = new BigDecimal(.2);
     private static final BigDecimal PIVOTAL_VALUE = new BigDecimal(70000);
     private static final BigDecimal PENALTY_INCREMENT = new BigDecimal(TimeUnit.SECONDS.toMillis(3));
@@ -64,6 +68,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     private ZoneBoundingBox startingRoom, keyRoom, flashMemoryRoom;
 
     private ZoneBoundingBox flashMemoryDoor, rewardRoomDoor;
+
+    private List<Player> participants = new ArrayList<>();
 
     // Block - Should be flipped
     private ConcurrentHashMap<Location<World>, Boolean> leverBlocks = new ConcurrentHashMap<>();
@@ -77,10 +83,11 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     // Session
     private long startTime = -1;
     private long matchTime = -1;
+    private long floodStartDelay = -1;
     private boolean notifiedOfCops = false;
     private BigDecimal multiplier = BigDecimal.ONE;
     private BigDecimal lootSplit = BigDecimal.ZERO;
-    private int playerMod = 0;
+    private boolean foundPhantomHymn = false;
     private BlockType floodBlockType = BlockTypes.WATER;
     protected Map<UUID, BigDecimal> cofferRisk = new HashMap<>();
     private boolean keysTriggered = false;
@@ -166,6 +173,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         calculateLootSplit();
         startTime = System.currentTimeMillis(); // Reset tryToStart clock
         populateChest();                        // Add content
+        runLavaChance();
+        setFloodStartTime();
     }
 
     public boolean isLocked() {
@@ -373,10 +382,20 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     @Override
+    public Collection<Player> getPlayers(PlayerClassifier classifier) {
+        if (classifier == PARTICIPANT) {
+            return Lists.newArrayList(participants);
+        }
+        return super.getPlayers(classifier);
+    }
+
+    @Override
     public Clause<Player, ZoneStatus> add(Player player) {
         if (isLocked()) {
             return new Clause<>(player, ZoneStatus.NO_REJOIN);
         }
+
+        participants.add(player);
 
         moveToRoom(player, startingRoom);
         return new Clause<>(player, ZoneStatus.ADDED);
@@ -403,6 +422,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     public void invalidate(Player player) {
         cofferRisk.remove(player.getUniqueId());
+        participants.remove(player);
     }
 
     public BigDecimal getTotalRisk() {
@@ -427,10 +447,49 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         return MIN_START_RISK.subtract(getTotalRisk());
     }
 
+    public int getBaseTime() {
+        return (3 * 60) / getPlayerMod();
+    }
+
+    public int getTimeVariance() {
+        return getPlayers(PlayerClassifier.PARTICIPANT).size() * 30;
+    }
+
+    public int getPlayerMod() {
+        return Math.max(1, getPlayers(PlayerClassifier.PARTICIPANT).size() / 2);
+    }
+
+    public int getChanceOfLava() {
+        BigDecimal increment = MAX_LAVA_TARGET.divide(new BigDecimal(MAX_LAVA_CHANCE), BigDecimal.ROUND_HALF_DOWN);
+        int rawReturn = MAX_LAVA_CHANCE - Math.min(
+                MAX_LAVA_CHANCE,
+                getTotalRisk().divide(increment, BigDecimal.ROUND_DOWN).intValue()
+        );
+
+        return Math.max(1, rawReturn);
+    }
+
+    private void runLavaChance() {
+        if (Probability.getChance(getChanceOfLava(), 100)) {
+            floodBlockType = BlockTypes.FLOWING_LAVA;
+        }
+    }
+
+    private void setFloodStartTime() {
+        int baseTime = getBaseTime();
+        int variance = Probability.getRandom(getTimeVariance());
+
+        if (Probability.getChance(2)) {
+            variance = -variance;
+        }
+
+        floodStartDelay = TimeUnit.SECONDS.toMillis(baseTime + variance);
+    }
+
     private void calculateLootSplit() {
         multiplier = BigDecimal.ONE;
 
-        Collection<Player> cPlayers = getContained(Player.class);
+        Collection<Player> cPlayers = getPlayers(PlayerClassifier.PARTICIPANT);
         for (Player next : cPlayers) {
             BigDecimal origCharge = cofferRisk.get(next.getUniqueId());
             if (origCharge == null) {
@@ -441,7 +500,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
         lootSplit = lootSplit.divide(new BigDecimal(cPlayers.size()), RoundingMode.HALF_DOWN);
 
-        playerMod = Math.max(1, cPlayers.size() / 2);
         if (Probability.getChance(35)) multiplier = multiplier.multiply(BigDecimal.TEN);
         if (Probability.getChance(15)) multiplier = multiplier.multiply(new BigDecimal(2));
 
@@ -453,7 +511,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void readyPlayers() {
-        Collection<Player> players = getContained(Player.class);
+        Collection<Player> players = getPlayers(PlayerClassifier.PARTICIPANT);
         for (Player player : players) {
             // Reset vitals
             player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).orElse(20D));
@@ -503,7 +561,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
         if (checkKeys()) {
             unlockKeys();
-            if (getContained(Player.class).stream().filter(p -> keyRoom.contains(p.getLocation().getPosition())).count() > 0) {
+            if (getPlayers(PlayerClassifier.PARTICIPANT).stream().filter(p -> keyRoom.contains(p.getLocation().getPosition())).count() > 0) {
                 setDoor(flashMemoryDoor, BlockTypes.AIR);
             } else {
                 setDoor(flashMemoryDoor, BlockTypes.IRON_BLOCK);
@@ -574,21 +632,28 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         // Total grabbed is the original grab amount - the penalty value
         BigDecimal totalGrabbed = originalGrabbed.subtract(penaltyValue);
         // The ratio they would have recieved with no time penalty
-        // Calculated as the Grab Ratio * (Value of stuff (grab amount) / Pivotal value (target amount))
-        BigDecimal originalGrabRatio = GRAB_RATIO.multiply(originalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN));
+        // Calculated as the multiplier * (Grab Ratio * (Value of stuff (grab amount) / Pivotal value (target amount)))
+        BigDecimal originalGrabRatio = multiplier.multiply(GRAB_RATIO.multiply(originalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN)));
         // The same calculation as the original grab ratio, just using the time penalty modified grab amount
-        BigDecimal grabRatio = GRAB_RATIO.multiply(totalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN));
+        BigDecimal grabRatio = multiplier.multiply(GRAB_RATIO.multiply(totalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN)));
         // The penalty ratio is the percentage value loss from the original grab ratio
         BigDecimal penaltyRatio = originalGrabRatio.subtract(grabRatio);
         // The amount of money they gain from the their boosted risk
-        BigDecimal splitBoost = multiplier.multiply(fee.multiply(grabRatio));
+        BigDecimal splitBoost = fee.multiply(grabRatio);
+        // The loot split times the group modifier
+        BigDecimal multipliedLootSplit = multiplier.multiply(lootSplit);
         // The total amount of money they get, being the loot split + their boosted risk value
         // minus item value
-        BigDecimal personalLootSplit = multiplier.multiply(lootSplit).add(splitBoost);
+        BigDecimal personalLootSplit = multipliedLootSplit.add(splitBoost);
 
         player.sendMessage(Text.of(TextColors.YELLOW, "You obtain: "));
         player.sendMessage(Text.of(TextColors.YELLOW, " - Bail: ", format(fee)));
-        player.sendMessage(Text.of(TextColors.YELLOW, " - Split: ", format(lootSplit), ", Boost: ", format(grabRatio.multiply(new BigDecimal(100))), "%"));
+        player.sendMessage(Text.of(TextColors.YELLOW,
+                " - Split: ", format(multipliedLootSplit),
+                ", Multiplied by: ", format(multiplier),
+                "x, Boosted by: ", format(grabRatio.multiply(new BigDecimal(100))), "%")
+        );
+
         if (penaltyRatio.compareTo(BigDecimal.ZERO) != 0) {
             player.sendMessage(Text.of(TextColors.YELLOW, "   - Boost time penalty: ", format(penaltyRatio.multiply(new BigDecimal(100))), "%"));
         }
@@ -717,11 +782,11 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void checkFloodType() {
-        if (floodBlockType == BlockTypes.FLOWING_LAVA) {
+        if (foundPhantomHymn) {
             return;
         }
 
-        for (Player player : getContained(Player.class)) {
+        for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
             net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
             for (net.minecraft.item.ItemStack is : itemStacks) {
                 if (is == null || is.getItem() != CustomItemTypes.PRIZE_BOX) {
@@ -733,7 +798,8 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 if (optContained.isPresent() && optContained.get().getItem() == CustomItemTypes.PHANTOM_HYMN) {
                     drainAll(); // Force away all water
                     floodBlockType = BlockTypes.FLOWING_LAVA;
-                    multiplier = multiplier.multiply(new BigDecimal(1.1));
+                    multiplier = multiplier.multiply(new BigDecimal(1.35));
+                    foundPhantomHymn = true;
                     break;
                 }
             }
@@ -748,8 +814,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     }
                 }
             }*/
-
-            tf(player).inventoryContainer.detectAndSendChanges();
         }
     }
 
@@ -762,7 +826,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private long getTimeTilFlood() {
-        return TimeUnit.SECONDS.toMillis((3 * 60) / playerMod);
+        return floodStartDelay;
     }
 
     private void flood() {
@@ -777,7 +841,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 );
             }
 
-            if (System.currentTimeMillis() - lastFlood >= TimeUnit.SECONDS.toMillis(30 / Math.max(1, playerMod))) {
+            if (System.currentTimeMillis() - lastFlood >= TimeUnit.SECONDS.toMillis(30 / getPlayerMod())) {
 
                 Vector3i min = flashMemoryRoom.getMinimumPoint();
                 Vector3i max = flashMemoryRoom.getMaximumPoint();
