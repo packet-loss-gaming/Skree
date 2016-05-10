@@ -101,6 +101,7 @@ public class WEDecorator implements Decorator {
                 callback.accept(returnVal);
                 if (--ref.refCount == 0) {
                     hashRefMap.remove(resourceName);
+                    System.gc();
                 }
             });
         });
