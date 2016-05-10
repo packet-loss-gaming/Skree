@@ -637,10 +637,10 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         BigDecimal grabRatio = multiplier.multiply(GRAB_RATIO.multiply(totalGrabbed.divide(PIVOTAL_VALUE, 2, RoundingMode.DOWN)));
         // The penalty ratio is the percentage value loss from the original grab ratio
         BigDecimal penaltyRatio = originalGrabRatio.subtract(grabRatio);
-        // The amount of money they gain from the their boosted risk
-        BigDecimal splitBoost = fee.multiply(grabRatio);
         // The loot split times the group modifier
         BigDecimal multipliedLootSplit = multiplier.multiply(lootSplit);
+        // The amount of money they gain from the their boosted risk
+        BigDecimal splitBoost = multipliedLootSplit.multiply(grabRatio);
         // The total amount of money they get, being the loot split + their boosted risk value
         // minus item value
         BigDecimal personalLootSplit = multipliedLootSplit.add(splitBoost);
