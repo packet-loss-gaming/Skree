@@ -261,7 +261,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
     @Override
     public void run() {
-        if (isEmpty()) {
+        if (isEmpty() && state != JungleRaidState.IN_PROGRESS) {
             expire();
             return;
         }
