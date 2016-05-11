@@ -98,6 +98,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static com.skelril.skree.content.registry.block.CustomBlockTypes.GRAVE_STONE;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
@@ -187,6 +188,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         );
 
         Task.builder().execute(this).interval(1, SECONDS).submit(SkreePlugin.inst());
+    }
+
+    @Override
+    public void addWorld(World world) {
+        super.addWorld(world);
+        tf(world).setAllowedSpawnTypes(true, true);
     }
 
     @Listener

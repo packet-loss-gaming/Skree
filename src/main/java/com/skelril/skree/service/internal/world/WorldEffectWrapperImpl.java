@@ -11,6 +11,8 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     protected String name;
@@ -37,6 +39,7 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
     @Override
     public void addWorld(World world) {
+        tf(world).setAllowedSpawnTypes(false, true);
         worlds.add(world);
     }
 
