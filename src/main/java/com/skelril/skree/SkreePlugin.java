@@ -14,6 +14,7 @@ import com.skelril.skree.system.aid.AidSystem;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.maintenance.MaintenanceSystem;
 import com.skelril.skree.system.market.MarketSystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
@@ -75,6 +76,7 @@ public class SkreePlugin {
                 CustomRegisterySystem.class,
                 DatabaseSystem.class,
                 DropClearSystem.class,
+                MaintenanceSystem.class,
                 MarketSystem.class,
                 ModifierSystem.class,
                 PlayerStateSystem.class,
