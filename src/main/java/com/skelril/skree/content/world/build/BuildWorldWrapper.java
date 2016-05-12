@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     public BuildWorldWrapper() {
@@ -37,6 +39,12 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     public BuildWorldWrapper(Collection<World> worlds) {
         super("Build", worlds);
+    }
+
+    @Override
+    public void addWorld(World world) {
+        super.addWorld(world);
+        tf(world).setAllowedSpawnTypes(false, true);
     }
 
     @Listener

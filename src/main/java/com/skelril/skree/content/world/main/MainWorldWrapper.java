@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
     private ZoneWaitingLobby lobby = new ZoneWaitingLobby(() -> {
@@ -70,6 +72,12 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
     public ZoneWaitingLobby getLobby() {
         return lobby;
+    }
+
+    @Override
+    public void addWorld(World world) {
+        super.addWorld(world);
+        tf(world).setAllowedSpawnTypes(false, false);
     }
 
     @Listener

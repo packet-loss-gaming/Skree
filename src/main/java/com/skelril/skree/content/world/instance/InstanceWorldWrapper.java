@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
     public InstanceWorldWrapper() {
         this(new ArrayList<>());
@@ -28,6 +30,12 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
 
     public InstanceWorldWrapper(Collection<World> worlds) {
         super("Instance", worlds);
+    }
+
+    @Override
+    public void addWorld(World world) {
+        super.addWorld(world);
+        tf(world).setAllowedSpawnTypes(false, false);
     }
 
     @Listener
