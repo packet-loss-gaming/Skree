@@ -51,6 +51,7 @@ import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.*;
+import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Boss;
 import org.spongepowered.api.entity.living.monster.Creeper;
@@ -58,6 +59,7 @@ import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.monster.Wither;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.projectile.Egg;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.event.Cancellable;
@@ -200,6 +202,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onEntitySpawn(SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
 
+        Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
         for (Entity entity : entities) {
             Location<World> loc = entity.getLocation();
             Optional<Integer> optLevel = getLevel(loc);
@@ -207,6 +210,29 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             if (!optLevel.isPresent()) continue;
             int level = optLevel.get();
 
+            if (entity instanceof Egg && optBlockCause.isPresent()) {
+                Optional<Entity> optPrimedTNT = entity.getLocation().getExtent().createEntity(
+                        EntityTypes.PRIMED_TNT,
+                        entity.getLocation().getPosition()
+                );
+
+                if (optPrimedTNT.isPresent()) {
+                    PrimedTNT explosive = (PrimedTNT) optPrimedTNT.get();
+                    explosive.setVelocity(entity.getVelocity());
+                    // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
+                    // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
+                    tf(explosive).fuse = 20 * 4;
+
+                    // TODO used to have a 1/4 chance of creating fire
+                    entity.getLocation().getExtent().spawnEntity(
+                            explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.DISPENSE).build()).build()
+                    );
+                }
+
+                event.setCancelled(true);
+                return;
+            }
+            
             if (level > 1) {
                 // TODO move damage modification
                 if (entity instanceof Monster) {
