@@ -7,13 +7,20 @@
 package com.skelril.skree.content.zone.group.catacombs;
 
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
+
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class CatacombsListener {
 
@@ -21,6 +28,40 @@ public class CatacombsListener {
 
     public CatacombsListener(CatacombsManager manager) {
         this.manager = manager;
+    }
+
+    @Listener
+    public void onRightClick(InteractBlockEvent.Secondary event) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+
+        if (!optPlayer.isPresent()) return;
+
+        Player player = optPlayer.get();
+
+        Optional<CatacombsInstance> optInst = manager.getApplicableZone(player);
+        if (!optInst.isPresent()) {
+            return;
+        }
+
+        CatacombsInstance inst = optInst.get();
+
+        if (inst.hasUsedPhantomClock()) {
+            return;
+        }
+
+        Optional<ItemStack> optHeldItem = player.getItemInHand();
+
+        if (optHeldItem.isPresent()) {
+            ItemStack held = optHeldItem.get();
+            if (held.getItem() == CustomItemTypes.PHANTOM_CLOCK) {
+                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                inst.setUsedPhantomClock(true);
+
+                inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                        Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
+                );
+            }
+        }
     }
 
     @Listener

@@ -17,11 +17,9 @@ import com.skelril.openboss.condition.BindCondition;
 import com.skelril.openboss.condition.DamageCondition;
 import com.skelril.openboss.condition.DamagedCondition;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.group.catacombs.instruction.CatacombsHealthInstruction;
 import com.skelril.skree.content.zone.group.catacombs.instruction.bossmove.*;
-import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.block.BlockType;
@@ -33,7 +31,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -52,6 +49,8 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
     private final BossManager<Zombie, CatacombsBossDetail> bossManager;
     private final BossManager<Zombie, CatacombsBossDetail> waveMobManager;
+
+    private boolean phantomClockUsed = false;
 
     private int ticks = 0;
     private int wave = 0;
@@ -128,17 +127,19 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
     }
 
     public int getSpeed() {
-
         if ((wave + 1) % 5 == 0) {
             return 1;
         }
 
-        for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            if (player.getInventory().query((ItemType) CustomItemTypes.PHANTOM_CLOCK).size() > 0) {
-                return 2;
-            }
-        }
-        return 1;
+        return phantomClockUsed ? 2 : 1;
+    }
+
+    public boolean hasUsedPhantomClock() {
+        return phantomClockUsed;
+    }
+
+    public void setUsedPhantomClock(boolean phantomClockUsed) {
+        this.phantomClockUsed = phantomClockUsed;
     }
 
     public void spawnWave() {
