@@ -6,20 +6,26 @@
 
 package com.skelril.skree.content.world.build;
 
+import com.google.common.collect.Lists;
 import com.skelril.nitro.combat.PlayerCombatParser;
+import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Egg;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -29,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class BuildWorldWrapper extends WorldEffectWrapperImpl {
@@ -63,8 +70,17 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     public void onEntitySpawn(SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
 
+        Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
         for (Entity entity : entities) {
             if (!isApplicable(entity)) continue;
+
+            if (entity instanceof Egg && optBlockCause.isPresent()) {
+                new ItemDropper(entity.getLocation()).dropStacks(
+                        Lists.newArrayList(newItemStack(ItemTypes.EGG)), SpawnTypes.DISPENSE
+                );
+                event.setCancelled(true);
+                return;
+            }
 
             if (entity instanceof Monster) {
                 event.setCancelled(true);
