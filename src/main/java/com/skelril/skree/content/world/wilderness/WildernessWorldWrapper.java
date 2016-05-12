@@ -232,7 +232,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (level > 1) {
                 // TODO move damage modification
                 if (entity instanceof Monster) {
