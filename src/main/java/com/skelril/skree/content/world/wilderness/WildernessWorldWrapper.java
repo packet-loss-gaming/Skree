@@ -329,6 +329,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     dEvent.setBaseDamage(dEvent.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
                 }
 
+                // Only apply scoring while in survival mode
+                if (defender.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.SURVIVAL) {
+                    return;
+                }
+
                 WildernessPlayerMeta meta = playerMetaMap.get(defender);
                 if (meta != null) {
                     meta.hit();
@@ -342,6 +347,11 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 ).submit(SkreePlugin.inst());
 
                 if (!(defender instanceof Monster) || defender instanceof Creeper) {
+                    return;
+                }
+
+                // Only apply scoring while in survival mode
+                if (attacker.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.SURVIVAL) {
                     return;
                 }
 
