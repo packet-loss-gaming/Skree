@@ -12,6 +12,7 @@ import com.skelril.openboss.EntityDetail;
 import com.skelril.openboss.Instruction;
 import com.skelril.openboss.condition.DamagedCondition;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 
 import java.util.Optional;
@@ -26,14 +27,14 @@ public abstract class DamageNearby<T extends Boss<? extends Living, ?>> implemen
     public void damage(T boss, Living entity) {
         entity.damage(
                 getDamage(boss.getDetail()),
-                EntityDamageSource.builder().entity(boss.getTargetEntity().get()).build()
+                EntityDamageSource.builder().type(DamageTypes.ATTACK).entity(boss.getTargetEntity().get()).build()
         );
     }
 
     @Override
     public Optional<Instruction<DamagedCondition, T>> apply(DamagedCondition damagedCondition, T bossDetail) {
         Living boss = bossDetail.getTargetEntity().get();
-        CuboidContainmentPredicate predicate =new CuboidContainmentPredicate(boss.getLocation().getPosition(), 2, 2, 2);
+        CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(boss.getLocation().getPosition(), 2, 2, 2);
         boss.getNearbyEntities(e -> predicate.test(e.getLocation().getPosition())).stream()
                 .filter(e -> e instanceof Living)
                 .map(e -> (Living) e)
