@@ -17,6 +17,7 @@ import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.*;
 import com.skelril.skree.content.registry.item.minigame.GoldRushKey;
+import com.skelril.skree.content.registry.item.minigame.SkyFeather;
 import com.skelril.skree.content.registry.item.tool.*;
 import com.skelril.skree.content.registry.item.tool.axe.CrystalAxe;
 import com.skelril.skree.content.registry.item.tool.axe.JurackAxe;
@@ -46,6 +47,7 @@ public class CustomItemTypes {
     /* ** Minigame ** */
     public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
     public static final PrizeBox PRIZE_BOX = new PrizeBox();
+    public static final SkyFeather SKY_FEATHER = new SkyFeather();
 
     /* ** Standard ** */
 
