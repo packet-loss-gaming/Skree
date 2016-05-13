@@ -503,31 +503,25 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     }
 
     private void giveTeamEquipment(Player player, Color teamColor) {
-        // EquipmentInventory playerEquipment = player.getInventory().query(EquipmentInventory.class);
-
         ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
         teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Hood"));
         teamHood.offer(Keys.COLOR, teamColor);
-        // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-        tf(player).inventory.armorInventory[3] = tf(teamHood);
+        player.setHelmet(teamHood);
 
         ItemStack teamChestplate = newItemStack(ItemTypes.LEATHER_CHESTPLATE);
         teamChestplate.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Chestplate"));
         teamChestplate.offer(Keys.COLOR, teamColor);
-        // playerEquipment.set(EquipmentTypes.CHESTPLATE, teamChestplate);
-        tf(player).inventory.armorInventory[2] = tf(teamChestplate);
+        player.setChestplate(teamChestplate);
 
         ItemStack teamLeggings = newItemStack(ItemTypes.LEATHER_LEGGINGS);
         teamLeggings.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Leggings"));
         teamLeggings.offer(Keys.COLOR, teamColor);
-        // playerEquipment.set(EquipmentTypes.LEGGINGS, teamLeggings);
-        tf(player).inventory.armorInventory[1] = tf(teamLeggings);
+        player.setLeggings(teamLeggings);
 
         ItemStack teamBoots = newItemStack(ItemTypes.LEATHER_BOOTS);
         teamBoots.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Team Boots"));
         teamBoots.offer(Keys.COLOR, teamColor);
-        // playerEquipment.set(EquipmentTypes.BOOTS, teamBoots);
-        tf(player).inventory.armorInventory[0] = tf(teamBoots);
+        player.setBoots(teamBoots);
     }
 
     private void addPlayer(Player player, Supplier<Location<World>> startingPos, Color teamColor, JungleRaidClass jrClass) {
