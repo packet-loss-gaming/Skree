@@ -80,14 +80,6 @@ public class CustomItemSystem {
             if (item instanceof EventAwareContent) {
                 Sponge.getEventManager().registerListeners(SkreePlugin.inst(), item);
             }
-
-            if (item instanceof Craftable) {
-                ((Craftable) item).registerRecipes();
-            }
-
-            if (item instanceof CookedItem) {
-                ((CookedItem) item).registerIngredients();
-            }
         } else {
             throw new IllegalArgumentException("Invalid custom item!");
         }
