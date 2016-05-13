@@ -150,9 +150,9 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
         BaseBlock targetBlock;
 
         if (present) {
-            targetBlock = new BaseBlock(BlockID.STAINED_GLASS, 15);
+            targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.STAINED_GLASS, 15);
         } else {
-            targetBlock = new BaseBlock(BlockID.AIR);
+            targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.AIR);
         }
 
         try {

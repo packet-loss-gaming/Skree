@@ -13,7 +13,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.item.ItemDropper;
@@ -320,7 +319,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
 
                                     ess.fillXZ(
                                             new Vector(pos.getX(), pos.getY(), pos.getZ()),
-                                            new BaseBlock(BlockID.FIRE),
+                                            WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.FIRE),
                                             20,
                                             20,
                                             true
