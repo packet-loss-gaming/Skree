@@ -34,6 +34,7 @@ import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
 public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>> {
     private static final DropTable dropTable;
+    private static final DropTable foodDropTable;
 
     static {
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller();
@@ -44,60 +45,6 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
                                 slipRoller,
                                 Lists.newArrayList(
                                         new DropTableEntryImpl(new CofferResolver(50), 12)
-                                )
-                        ),
-                        new DropTableImpl(
-                                slipRoller,
-                                Lists.newArrayList(
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                            newItemStack(ItemTypes.COOKED_BEEF)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(ItemTypes.COOKED_CHICKEN)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(ItemTypes.COOKED_FISH)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(ItemTypes.COOKED_MUTTON)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(ItemTypes.COOKED_PORKCHOP)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(ItemTypes.COOKED_RABBIT)
-                                                        )
-                                                ), 50
-                                        ),
-                                        new DropTableEntryImpl(
-                                                new SimpleDropResolver(
-                                                        Lists.newArrayList(
-                                                                newItemStack(COOKED_GOD_FISH)
-                                                        )
-                                                ), 500
-                                        )
                                 )
                         ),
                         new DropTableImpl(
@@ -128,6 +75,61 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
                         )
                 )
         );
+
+        foodDropTable = new DropTableImpl(
+                slipRoller,
+                Lists.newArrayList(
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_BEEF)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_CHICKEN)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_FISH)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_MUTTON)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_PORKCHOP)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(ItemTypes.COOKED_RABBIT)
+                                        )
+                                ), 50
+                        ),
+                        new DropTableEntryImpl(
+                                new SimpleDropResolver(
+                                        Lists.newArrayList(
+                                                newItemStack(COOKED_GOD_FISH)
+                                        )
+                                ), 500
+                        )
+                )
+        );
     }
 
     private double modifier;
@@ -144,6 +146,7 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
                 wave,
                 wave * .5 * modifier
         );
+        drops.addAll(foodDropTable.getDrops(1, .5 * modifier));
 
         Optional<Zombie> optEnt = boss.getTargetEntity();
         if (optEnt.isPresent()) {
