@@ -58,6 +58,7 @@ public class WEDecorator implements Decorator {
     public <T> ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
         transaction.enableQueue();
+        transaction.getChangeSet().setRecordChanges(false);
 
         hashRefMap.computeIfAbsent(resourceName, (a) -> {
             HashRef ref = new HashRef();
