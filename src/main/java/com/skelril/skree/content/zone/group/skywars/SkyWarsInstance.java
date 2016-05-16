@@ -54,7 +54,7 @@ import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPA
 
 public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
 
-    private static Map<Color, String> colorNameMapping = new HashMap<>();
+    private static Map<Color, String> colorNameMapping = new LinkedHashMap<>();
 
     static {
         colorNameMapping.put(Color.WHITE, "white");
@@ -106,7 +106,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void giveTeamHoods(Player player) {
-        for (Color teamColor : teams.keySet()) {
+        for (Color teamColor : colorNameMapping.keySet()) {
             ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
             teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
             teamHood.offer(Keys.COLOR, teamColor);
@@ -324,15 +324,17 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
         HashMap<Player, Color> colorMapping = new HashMap<>();
         for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
             Optional<ItemStack> optHelmet = player.getHelmet();
-            if (optHelmet.isPresent()) {
-                ItemStack helmet = optHelmet.get();
-                Optional<Color> optColor = helmet.get(Keys.COLOR);
-                if (!optColor.isPresent()) {
-                    return;
-                }
-
-                colorMapping.put(player, optColor.get());
+            if (!optHelmet.isPresent()) {
+                return;
             }
+
+            ItemStack helmet = optHelmet.get();
+            Optional<Color> optColor = helmet.get(Keys.COLOR);
+            if (!optColor.isPresent()) {
+                return;
+            }
+
+            colorMapping.put(player, optColor.get());
         }
 
         teams = createTeamsMapping(); // Reset the team mapping as it may have been corrupted by a bad run
