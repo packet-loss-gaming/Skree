@@ -106,6 +106,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void giveTeamHoods(Player player) {
+        player.getInventory().clear();
         for (Color teamColor : colorNameMapping.keySet()) {
             ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
             teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
