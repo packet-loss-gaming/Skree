@@ -20,8 +20,11 @@ import java.util.Optional;
 public class VelocityEntitySpawner {
     public static Optional<Entity> send(EntityType type, Location<World> loc, Vector3d dir, float speed, Cause cause) {
         Vector3d actualDir = dir.normalize();
+
+        // Shift the entity out two movements to prevent collision with the source entity
         Vector3d finalVecLoc = loc.getPosition().add(actualDir.mul(2));
-        loc.setPosition(finalVecLoc);
+        loc = loc.setPosition(finalVecLoc);
+
         Optional<Entity> optEnt = loc.getExtent().createEntity(type, loc.getPosition());
         if (optEnt.isPresent()) {
             Entity entity = optEnt.get();
