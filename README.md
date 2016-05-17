@@ -15,6 +15,7 @@
 ### Initial
 
 To build the project you should use the following commands:
+
 1. ```gradle setupDecompWorkspace```
 2. ```gradle build```
 
