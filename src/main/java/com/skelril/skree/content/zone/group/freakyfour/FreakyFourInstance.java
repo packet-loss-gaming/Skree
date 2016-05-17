@@ -29,6 +29,7 @@ import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.entity.EyeLocationProperty;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
@@ -42,6 +43,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
 
 import java.util.ArrayList;
@@ -249,6 +251,10 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     public void run(FreakyFourBoss boss) {
+        if (loadingBoss) {
+            return;
+        }
+
         switch (boss) {
             case CHARLOTTE:
                 runCharlotte();
@@ -323,11 +329,9 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     private void runCharlotte() {
-        Optional<Living> optBoss = getBoss(FreakyFourBoss.CHARLOTTE);
-        if (optBoss.isPresent()) {
-            for (int i = Probability.getRandom(10); i > 0; --i) {
-                spawnCharlotteMinion(optBoss.get().getLocation().getPosition());
-            }
+        Living boss = getBoss(FreakyFourBoss.CHARLOTTE).get();
+        for (int i = Probability.getRandom(10); i > 0; --i) {
+            spawnCharlotteMinion(boss.getLocation().getPosition());
         }
 
         ZoneBoundingBox charlotte_RG = regions.get(FreakyFourBoss.CHARLOTTE);
@@ -344,8 +348,8 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                 );
                 break;
             case 2:
-                if (optBoss.isPresent() && optBoss.get() instanceof Monster) {
-                    Optional<Entity> optTarget = ((Monster) optBoss.get()).getTarget();
+                if (boss instanceof Monster) {
+                    Optional<Entity> optTarget = ((Monster) boss).getTarget();
                     if (optTarget.isPresent() && contains(optTarget.get())) {
                         Entity target = optTarget.get();
                         ZoneBoundingBox targetArea = new ZoneBoundingBox(
@@ -422,12 +426,18 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     private void runSnipee() {
+        Living snipee = getBoss(FreakyFourBoss.SNIPEE).get();
+
+        Location<World> snipeeLocation = snipee.getLocation();
+        Vector3d eyePosition = snipee.getProperty(EyeLocationProperty.class).get().getValue();
+        snipeeLocation = snipeeLocation.setPosition(eyePosition);
+
         VelocityEntitySpawner.sendRadial(
                 EntityTypes.ARROW,
-                getBoss(FreakyFourBoss.SNIPEE).get().getLocation(),
+                snipeeLocation,
                 20,
                 1.6F,
-                Cause.source(this).build()
+                Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
         );
     }
 
