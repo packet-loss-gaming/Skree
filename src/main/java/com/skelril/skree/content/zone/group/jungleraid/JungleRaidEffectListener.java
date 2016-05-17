@@ -22,13 +22,12 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.Arrow;
-import org.spongepowered.api.entity.projectile.Firework;
-import org.spongepowered.api.entity.projectile.Snowball;
-import org.spongepowered.api.entity.projectile.ThrownPotion;
+import org.spongepowered.api.entity.projectile.*;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.CollideEvent;
@@ -41,9 +40,10 @@ import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDama
 import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShapes;
@@ -58,6 +58,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -161,10 +162,14 @@ public class JungleRaidEffectListener {
     }
 
     @Listener
-    public void onBlockDrop(DropItemEvent.Destruct event) {
+    public void onBlockDrop(SpawnEntityEvent event) {
         for (Entity entity : event.getEntities()) {
+            if (!(entity instanceof Item)) {
+                continue;
+            }
+
             Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
-            if (!optInst.isPresent()) {
+            if (optInst.isPresent()) {
                 Optional<EntitySpawnCause> optSpawnCause = event.getCause().first(EntitySpawnCause.class);
                 if (!optSpawnCause.isPresent()) {
                     event.setCancelled(true);
@@ -283,6 +288,86 @@ public class JungleRaidEffectListener {
         }
     }
 
+    private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
+        return new PlayerCombatParser() {
+            @Override
+            public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
+                final boolean isDamageEntityEvent = event instanceof DamageEntityEvent;
+
+                // Do Death Touch before anything else
+                if (inst.isFlagEnabled(JungleRaidFlag.DEATH_TOUCH) && isDamageEntityEvent) {
+                    ((DamageEntityEvent) event).setBaseDamage(Math.pow(defender.get(Keys.MAX_HEALTH).orElse(20D), 3));
+                    return;
+                }
+
+                Optional<JungleRaidClass> optClass = inst.getClass(attacker);
+                if (optClass.isPresent()) {
+                    JungleRaidClass jrClass = optClass.get();
+                    if (jrClass == JungleRaidClass.SNIPER) {
+                        Optional<ItemStack> optHeld = attacker.getItemInHand();
+                        boolean hasWoodenSword = optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.WOODEN_SWORD;
+
+                        if (indirectSource != null || !hasWoodenSword) {
+                            double distSq = attacker.getLocation().getPosition().distanceSquared(
+                                    defender.getLocation().getPosition()
+                            );
+                            double targetDistSq = Math.pow(70, 2);
+                            double ratio = Math.min(distSq, targetDistSq) / targetDistSq;
+
+                            if (isDamageEntityEvent) {
+                                // Handle damage modification
+                                ((DamageEntityEvent) event).setBaseDamage(
+                                        ((DamageEntityEvent) event).getBaseDamage() * ratio
+                                );
+                            } else {
+                                // Disable the arrow fire in the Impact event
+                                if (ratio < .7 && indirectSource != null) {
+                                    indirectSource.offer(Keys.FIRE_TICKS, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan) && isDamageEntityEvent) {
+                    ((DamageEntityEvent) event).setBaseDamage(((DamageEntityEvent) event).getBaseDamage() * 2);
+                }
+            }
+
+            @Override
+            public void processNonLivingAttack(DamageSource attacker, Player defender) {
+                if (!(event instanceof DamageEntityEvent)) {
+                    return;
+                }
+
+                if (attacker.getType() == DamageTypes.FALL) {
+                    BlockType belowType = defender.getLocation().add(0, -1, 0).getBlockType();
+                    if (inst.isFlagEnabled(JungleRaidFlag.TRAMPOLINE)) {
+                        Vector3d oldVel = defender.getVelocity();
+                        Vector3d newVel = new Vector3d(oldVel.getX(), 0, oldVel.getZ());
+                        defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
+                        event.setCancelled(true);
+                    } else if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2) {
+                        if (Probability.getChance(2)) {
+                            Vector3d oldVel = defender.getVelocity();
+                            Vector3d newVel = new Vector3d(
+                                    oldVel.getX() > 0 ? -.5 : .5,
+                                    0,
+                                    oldVel.getZ() > 0 ? -.5 : .5
+                            );
+                            defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
+                        }
+                        event.setCancelled(true);
+                    }
+                } else if (attacker.getType() == DamageTypes.CUSTOM) {
+                    if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
+                        ((DamageEntityEvent) event).setBaseDamage(Math.min(((DamageEntityEvent) event).getBaseDamage(), 2));
+                    }
+                }
+            }
+        };
+    }
+
     @Listener
     public void onPlayerCombat(DamageEntityEvent event) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
@@ -293,62 +378,25 @@ public class JungleRaidEffectListener {
 
         JungleRaidInstance inst = optInst.get();
 
-        new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender) {
-                // Do Death Touch before anything else
-                if (inst.isFlagEnabled(JungleRaidFlag.DEATH_TOUCH)) {
-                    event.setBaseDamage(Math.pow(defender.get(Keys.MAX_HEALTH).orElse(20D), 3));
-                    return;
-                }
+        createFor(event, inst).parse(event);
+    }
 
-                Optional<JungleRaidClass> optClass = inst.getClass(attacker);
-                if (optClass.isPresent()) {
-                    JungleRaidClass jrClass = optClass.get();
-                    if (jrClass == JungleRaidClass.SNIPER) {
-                        double distSq = attacker.getLocation().getPosition().distanceSquared(
-                                defender.getLocation().getPosition()
-                        );
-                        double targetDistSq = Math.pow(70, 2);
-                        double ratio = Math.min(distSq, targetDistSq) / targetDistSq;
+    @Listener
+    public void onPlayerCombat(CollideEntityEvent.Impact event) {
+        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+        if (!optProjectile.isPresent()) {
+            return;
+        }
 
-                        event.setBaseDamage(event.getBaseDamage() * ratio);
-                    }
-                }
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(optProjectile.get());
 
-                if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan)) {
-                    event.setBaseDamage(event.getBaseDamage() * 2);
-                }
-            }
+        if (!optInst.isPresent()) {
+            return;
+        }
 
-            @Override
-            public void processNonLivingAttack(DamageSource attacker, Player defender) {
-                if (attacker.getType() == DamageTypes.FALL) {
-                    BlockType belowType = defender.getLocation().add(0, -1, 0).getBlockType();
-                    if (inst.isFlagEnabled(JungleRaidFlag.TRAMPOLINE)) {
-                        Vector3d oldVel = defender.getVelocity();
-                        Vector3d newVel = new Vector3d(oldVel.getX(), 0, oldVel.getZ());
-                        defender.setVelocity(new Vector3d(0, .1, 0).mul(event.getBaseDamage()).add(newVel));
-                        event.setCancelled(true);
-                    } else if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2) {
-                        if (Probability.getChance(2)) {
-                            Vector3d oldVel = defender.getVelocity();
-                            Vector3d newVel = new Vector3d(
-                                    oldVel.getX() > 0 ? -.5 : .5,
-                                    0,
-                                    oldVel.getZ() > 0 ? -.5 : .5
-                            );
-                            defender.setVelocity(new Vector3d(0, .1, 0).mul(event.getBaseDamage()).add(newVel));
-                        }
-                        event.setCancelled(true);
-                    }
-                } else if (attacker.getType() == DamageTypes.CUSTOM) {
-                    if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
-                        event.setBaseDamage(Math.min(event.getBaseDamage(), 2));
-                    }
-                }
-            }
-        }.parse(event);
+        JungleRaidInstance inst = optInst.get();
+
+        createFor(event, inst).parse(event);
     }
 
 
