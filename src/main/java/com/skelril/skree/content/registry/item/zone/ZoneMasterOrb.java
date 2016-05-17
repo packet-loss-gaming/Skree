@@ -121,6 +121,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 new ItemStack(this),
                 new ItemStack(Items.dye, 1, 3)
         ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "Sky Wars",
+                new ItemStack(this),
+                new ItemStack(Items.feather),
+                new ItemStack(CustomItemTypes.FAIRY_DUST)
+        ));
     }
 
     @Override

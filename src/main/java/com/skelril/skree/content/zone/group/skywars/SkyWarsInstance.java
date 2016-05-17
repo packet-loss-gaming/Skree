@@ -50,6 +50,7 @@ import org.spongepowered.api.world.World;
 import java.util.*;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
@@ -290,7 +291,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
             pushBack = 6;
             MutableMessageChannel targets = getPlayerMessageChannel(PlayerClassifier.SPECTATOR).asMutable();
             targets.removeMember(player);
-            targets.send(Text.of(TextColors.RED, player.getName() + " has been given a Doom feather!"));
+            targets.send(Text.of(TextColors.RED, player.getName(), " has been given a Doom feather!"));
 
             player.getInventory().clear();
         }
@@ -299,6 +300,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
         SkyFeather.setFeatherProperties(powerup, uses, radius, flight, pushBack);
 
         player.getInventory().offer(powerup);
+        tf(player).inventoryContainer.detectAndSendChanges();
 
         // Display name doesn't need checked as all power ups have one assigned
         player.sendMessage(Text.of(TextColors.YELLOW, "You obtain a power-up!"));

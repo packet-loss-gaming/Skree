@@ -12,6 +12,7 @@ import com.sk89q.worldedit.sponge.SpongePlayer;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.skelril.nitro.combat.PlayerCombatParser;
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.minigame.SkyFeather;
@@ -79,7 +80,7 @@ public class SkyWarsListener {
 
         if (stack.getItem() == CustomItemTypes.SKY_FEATHER) {
 
-            Vector3d vel = player.getRotation();
+            Vector3d vel = EntityDirectionUtil.getFacingVector(player);
 
             Optional<SkyFeather.Data> optData = SkyFeather.getDataFor(stack);
             if (!optData.isPresent()) {
@@ -95,14 +96,13 @@ public class SkyWarsListener {
             if (event instanceof InteractBlockEvent.Primary) {
                 if (!playerData.canFly()) return;
 
-                vel.mul(flight);
+                vel = vel.mul(flight);
                 player.setVelocity(vel);
 
                 playerData.stopFlight(250);
-
             } else {
                 if (!playerData.canPushBack()) return;
-                vel.mul(pushBack * 2);
+                vel = vel.mul(pushBack * 2);
 
                 SpongePlayer spongePlayer = SpongeWorldEdit.inst().wrapPlayer(player);
 

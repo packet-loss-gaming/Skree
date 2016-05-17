@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone.group.freakyfour;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
@@ -14,7 +15,6 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.entity.living.player.Player;
@@ -131,8 +131,8 @@ public class FreakyFourListener {
         event.setCancelled(true);
     }
 
-    private void throwBack(Entity entity) {
-        Vector3d vel = entity.getRotation();
+    private void throwBack(Living entity) {
+        Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
         vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
         vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
         entity.setVelocity(vel);

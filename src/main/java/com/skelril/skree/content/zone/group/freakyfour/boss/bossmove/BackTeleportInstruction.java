@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.group.freakyfour.boss.bossmove;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.combat.PlayerCombatParser;
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
@@ -35,8 +36,8 @@ public class BackTeleportInstruction implements Instruction<DamagedCondition, Bo
         this.config = config;
     }
 
-    private void throwBack(Entity entity) {
-        Vector3d vel = entity.getRotation();
+    private void throwBack(Living entity) {
+        Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
         vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
         vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
         entity.setVelocity(vel);

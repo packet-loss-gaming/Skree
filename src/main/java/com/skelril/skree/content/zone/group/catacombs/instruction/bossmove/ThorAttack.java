@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.group.catacombs.instruction.bossmove;
 
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.Instruction;
 import com.skelril.openboss.condition.DamageCondition;
@@ -13,6 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsBossDetail;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
@@ -29,9 +31,9 @@ public class ThorAttack implements Instruction<DamageCondition, Boss<Zombie, Cat
     public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
             DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
     ) {
-        Entity bossEnt = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+        Living bossEnt = zombieCatacombsBossDetailBoss.getTargetEntity().get();
         Entity toHit = damageCondition.getAttacked();
-        toHit.setVelocity(bossEnt.getRotation().mul(2));
+        toHit.setVelocity(EntityDirectionUtil.getFacingVector(bossEnt).mul(2));
 
         Task.builder().execute(() -> {
             Location<World> targetLoc = toHit.getLocation();

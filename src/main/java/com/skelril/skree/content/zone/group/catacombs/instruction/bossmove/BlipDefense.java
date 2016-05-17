@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone.group.catacombs.instruction.bossmove;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.Instruction;
@@ -41,7 +42,7 @@ public class BlipDefense implements Instruction<DamagedCondition, Boss<Zombie, C
 
         if (activate(detail)) {
             Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
-            Vector3d vel = boss.getRotation();
+            Vector3d vel = EntityDirectionUtil.getFacingVector(boss);
             vel = vel.mul(getMultiplier());
             vel = new Vector3d(vel.getX(), Math.min(getYCiel(), Math.max(getYFloor(), vel.getY())), vel.getZ());
             boss.setVelocity(vel);
