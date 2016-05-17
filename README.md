@@ -14,14 +14,6 @@
 
 To build the project you should use the command ````gradle build````.
 
-### Open Boss
-
-Skree depends on an internal Skelril library 'Open Boss', Open Boss is currently not available in any maven remote repository so you must build and install it manually. You can find instructions on how to do this by reading the [Open Boss](https://github.com/Skelril/Open-Boss) project's [README](https://github.com/Skelril/Open-Boss/blob/sponge/README.md).
-
-### Game Chatter Server
-
-Skree depends on an external library 'GameChatterServer-Sponge', GameChatterServer-Sponge is currently not available in any maven remote repository so you must build and install it manually. You can find instructions on how to do this by reading the [Game Chatter Server](https://github.com/DarkArc/GameChatterServer) project's [README](https://github.com/DarkArc/GameChatterServer/blob/master/README.md).
-
 ## Database / jOOQ Schema Generation
 
 The jOOQ Schema is generated via the gradle task ````codegen````. This task should only be run if you have a mariadb server setup locally running the proper database configuration.

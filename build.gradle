@@ -39,6 +39,10 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
+        name 'Skelril Repository'
+        url 'http://service.skelril.com/maven/'
+    }
+    maven {
         name 'Sponge maven repo'
         url 'http://repo.spongepowered.org/maven'
     }
@@ -46,6 +50,7 @@ repositories {
         name 'sk89q-repo'
         url 'http://maven.sk89q.com/repo/'
     }
+
     mavenLocal()
 }
 
