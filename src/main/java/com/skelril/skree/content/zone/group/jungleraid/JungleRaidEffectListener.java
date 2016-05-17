@@ -170,7 +170,7 @@ public class JungleRaidEffectListener {
 
             Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
             if (optInst.isPresent()) {
-                // The Player cause should not be necissary, workaround for SpongeCommon/729
+                // The Player cause should not be necessary, workaround for SpongeCommon/729
                 Optional<EntitySpawnCause> optSpawnCause = event.getCause().first(EntitySpawnCause.class);
                 Optional<Player> optPlayerCause = event.getCause().first(Player.class);
                 if (!optSpawnCause.isPresent() && !optPlayerCause.isPresent()) {
