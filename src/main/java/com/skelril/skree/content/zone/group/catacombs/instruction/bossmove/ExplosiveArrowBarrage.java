@@ -18,6 +18,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -59,7 +61,9 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
 
         if (activate(detail)) {
             List<Entity> arrows = VelocityEntitySpawner.sendRadial(
-                    EntityTypes.ARROW, boss.getLocation(), Cause.source(inst).build()
+                    EntityTypes.ARROW,
+                    boss.getLocation(),
+                    Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
             );
 
             Task.builder().execute(() -> {

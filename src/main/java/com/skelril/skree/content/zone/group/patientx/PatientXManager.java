@@ -37,6 +37,8 @@ import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -177,7 +179,11 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                     if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
                         Location<World> curPos = inst.getBoss().get().getLocation();
                         Task.builder().execute(() -> {
-                            VelocityEntitySpawner.sendRadial(EntityTypes.SNOWBALL, curPos, Cause.source(inst).build());
+                            VelocityEntitySpawner.sendRadial(
+                                    EntityTypes.SNOWBALL,
+                                    curPos,
+                                    Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
+                            );
                         }).delayTicks(1).submit(SkreePlugin.inst());
                     } else {
                         Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
