@@ -16,7 +16,7 @@
 
 To build the project you should use the following commands:
 1. ```gradle setupDecompWorkspace```
-- ```gradle build```
+2. ```gradle build```
 
 ### Incremental
 
