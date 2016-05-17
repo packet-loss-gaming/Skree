@@ -12,7 +12,17 @@
 
 ## Building
 
-To build the project you should use the command ````gradle build````.
+### Initial
+
+To build the project you should use the following commands:
+1. ```gradle setupDecompWorkspace```
+- ```gradle build```
+
+### Incremental
+
+After initial setup you should be able to simply use ```gradle build```.
+
+Note: If our Forge dependency has been updated, you may have to use ```gradle setupDecompWorkspace --refresh-dependencies``` to refresh your deobfuscated Minecraft sources.
 
 ## Database / jOOQ Schema Generation
 
