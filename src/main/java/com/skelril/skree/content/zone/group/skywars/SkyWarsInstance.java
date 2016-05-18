@@ -398,9 +398,9 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
         List<Clause<String, WinType>> winners = new ArrayList<>();
         for (Map.Entry<Color, Set<Player>> entry : teams.entrySet()) {
             String colorName = colorNameMapping.get(entry.getKey());
-            if (colorName == null) {
+            if (colorName.equals("white")) {
                 entry.getValue().stream().forEach(p -> winners.add(new Clause<>(p.getName(), WinType.SOLO)));
-            } else {
+            } else if (!entry.getValue().isEmpty()) {
                 winners.add(new Clause<>(colorName, WinType.TEAM));
             }
         }
