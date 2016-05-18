@@ -7,8 +7,10 @@
 package com.skelril.nitro.entity;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.data.property.entity.EyeLocationProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -38,6 +40,10 @@ public class VelocityEntitySpawner {
         return sendRadial(type, loc, 12, .5F, cause);
     }
 
+    public static List<Entity> sendRadial(EntityType type, Living living, Cause cause) {
+        return sendRadial(type, living, 12, .5F, cause);
+    }
+
     public static List<Entity> sendRadial(EntityType type, Location<World> loc, int amt, float speed, Cause cause) {
         final double tau = 2 * Math.PI;
 
@@ -50,5 +56,16 @@ public class VelocityEntitySpawner {
             }
         }
         return resultSet;
+    }
+
+    public static List<Entity> sendRadial(EntityType type, Living living, int amt, float speed, Cause cause) {
+        Location<World> livingLocation = living.getLocation();
+        Optional<EyeLocationProperty> optEyeLoc = living.getProperty(EyeLocationProperty.class);
+        if (optEyeLoc.isPresent()) {
+            Vector3d eyePosition = optEyeLoc.get().getValue();
+            livingLocation = livingLocation.setPosition(eyePosition);
+        }
+
+        return sendRadial(type, livingLocation, amt, speed, cause);
     }
 }

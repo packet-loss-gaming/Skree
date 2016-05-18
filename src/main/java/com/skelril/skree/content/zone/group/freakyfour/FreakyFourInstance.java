@@ -29,7 +29,6 @@ import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.entity.EyeLocationProperty;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
@@ -43,7 +42,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
 
 import java.util.ArrayList;
@@ -428,13 +426,9 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     private void runSnipee() {
         Living snipee = getBoss(FreakyFourBoss.SNIPEE).get();
 
-        Location<World> snipeeLocation = snipee.getLocation();
-        Vector3d eyePosition = snipee.getProperty(EyeLocationProperty.class).get().getValue();
-        snipeeLocation = snipeeLocation.setPosition(eyePosition);
-
         VelocityEntitySpawner.sendRadial(
                 EntityTypes.ARROW,
-                snipeeLocation,
+                snipee,
                 20,
                 1.6F,
                 Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()

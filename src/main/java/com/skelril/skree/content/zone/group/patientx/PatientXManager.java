@@ -177,11 +177,10 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                 PatientXInstance inst = boss.getDetail().getZone();
                 if (optDamageSource.isPresent() && optDamageSource.get() instanceof EntityDamageSource) {
                     if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
-                        Location<World> curPos = inst.getBoss().get().getLocation();
                         Task.builder().execute(() -> {
                             VelocityEntitySpawner.sendRadial(
                                     EntityTypes.SNOWBALL,
-                                    curPos,
+                                    inst.getBoss().get(),
                                     Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
                             );
                         }).delayTicks(1).submit(SkreePlugin.inst());
