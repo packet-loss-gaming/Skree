@@ -38,6 +38,7 @@ import org.spongepowered.api.entity.living.monster.Giant;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -348,11 +349,12 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
             if (optDmgSource.isPresent()) {
                 DamageSource dmgSource = optDmgSource.get();
 
-                if (dmgSource instanceof EntityDamageSource) {
-                    Entity attacker = ((EntityDamageSource) dmgSource).getSource();
-                    if (Probability.getChance(3) && attacker instanceof Player) {
-                        inst.spawnMinions((Player) attacker);
-                    }
+                Entity attacker = null;
+                if (dmgSource instanceof IndirectEntityDamageSource) {
+                    attacker = ((IndirectEntityDamageSource) dmgSource).getIndirectSource();
+                } else if (dmgSource instanceof EntityDamageSource) {
+                    attacker = ((EntityDamageSource) dmgSource).getSource();
+
                     if (attacker instanceof Player) {
                     /* TODO Convert to Sponge
                     if (ItemUtil.hasForgeBook((Player) attacker)) {
@@ -363,6 +365,10 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                         }
                     }*/
                     }
+                }
+
+                if (Probability.getChance(3) && attacker instanceof Player) {
+                    inst.spawnMinions((Player) attacker);
                 }
             }
 
