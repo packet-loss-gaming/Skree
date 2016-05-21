@@ -73,6 +73,12 @@ public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> imp
                 return;
             }
             zone.forceEnd();
+
+            Optional<ZoneSpaceAllocator> optAllocator = zone.getRegion().getAllocator();
+            if (optAllocator.isPresent()) {
+                optAllocator.get().release(getSystemName(), zone.getRegion());
+            }
+
             zone = null;
         }
     }

@@ -6,15 +6,12 @@
 
 package com.skelril.skree.content.zone.group.jungleraid;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
-import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
-import com.skelril.skree.service.internal.zone.decorator.Decorators;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
@@ -26,7 +23,6 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> implements Runnable, LocationZone<JungleRaidInstance> {
-    private Queue<Vector3i> previousOrigins = new ArrayDeque<>();
     private Queue<Consumer<Clause<ZoneRegion, ZoneRegion.State>>> pendingRequest = new ArrayDeque<>();
     private Queue<Clause<ZoneRegion, ZoneRegion.State>> finishedJobs = new ArrayDeque<>();
     private boolean jobInProgress = false;
@@ -48,16 +44,6 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
     }
 
-    private void buildInstance(WorldResolver resolver, Vector3i origin, Consumer<Clause<ZoneRegion, ZoneRegion.State>> clause) {
-        Decorators.ZONE_PRIMARY_DECORATOR.pasteAt(
-                resolver,
-                origin,
-                getSystemName(),
-                (a) -> new Clause<>(a.getKey(), ZoneRegion.State.NEW),
-                clause
-        );
-    }
-
     private void processJobs(ZoneSpaceAllocator allocator) {
         // If there's a pending request, and finished job, use that area
         if (!pendingRequest.isEmpty()) {
@@ -70,7 +56,6 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
         // If there are no finished jobs now, and there is not a job in progress
         // execute a new job
         if (finishedJobs.isEmpty() && !jobInProgress) {
-            Vector3i origin = previousOrigins.poll();
             jobInProgress = true;
 
             // This is executed after the job completes, it adds the area to the finished jobs
@@ -81,11 +66,7 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
                 processJobs(allocator);
             };
 
-            if (origin != null) {
-                buildInstance(allocator.getWorldResolver(), origin, recheck);
-            } else {
-                allocator.regionFor(getSystemName(), recheck);
-            }
+            allocator.regionFor(getSystemName(), recheck);
         }
     }
 
@@ -95,7 +76,7 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
             ZoneRegion region = clause.getKey();
 
             // The schematic is 1 too high
-            region = new ZoneRegion(region.getExtent(), region.getOrigin(), region.getBoundingBox().sub(0, 1, 0));
+            region = new ZoneRegion(allocator, region.getExtent(), region.getOrigin(), region.getBoundingBox().sub(0, 1, 0));
 
             JungleRaidInstance instance = new JungleRaidInstance(region);
             instance.init();
@@ -122,8 +103,13 @@ public class JungleRaidManager extends GroupZoneManager<JungleRaidInstance> impl
                 continue;
             }
             next.forceEnd();
+
+            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+            if (optAllocator.isPresent()) {
+                optAllocator.get().release(getSystemName(), next.getRegion());
+            }
+
             it.remove();
-            next.getRegion().getMinimumPoint();
         }
     }
 

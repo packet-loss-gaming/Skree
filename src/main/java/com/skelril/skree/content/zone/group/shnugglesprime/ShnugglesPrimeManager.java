@@ -404,6 +404,12 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                 continue;
             }
             next.forceEnd();
+
+            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+            if (optAllocator.isPresent()) {
+                optAllocator.get().release(getSystemName(), next.getRegion());
+            }
+
             it.remove();
         }
     }

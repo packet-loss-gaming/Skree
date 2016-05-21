@@ -22,4 +22,6 @@ public interface ZoneSpaceAllocator {
     }
 
     <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack);
+
+    void release(String managerName, ZoneWorldBoundingBox region);
 }

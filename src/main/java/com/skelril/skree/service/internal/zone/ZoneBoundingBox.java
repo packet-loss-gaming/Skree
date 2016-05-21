@@ -15,7 +15,11 @@ import java.util.function.Consumer;
 public class ZoneBoundingBox {
     private final Vector3i origin;
     private final Vector3i boundingBox;
-    private CuboidContainmentPredicate predicate;
+    private transient CuboidContainmentPredicate predicate;
+
+    public ZoneBoundingBox(ZoneBoundingBox boundingBox) {
+        this(boundingBox.getOrigin(), boundingBox.getBoundingBox());
+    }
 
     public ZoneBoundingBox(Vector3i origin, Vector3i boundingBox) {
         this.origin = origin;

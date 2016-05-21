@@ -9,19 +9,24 @@ package com.skelril.skree.service.internal.zone;
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.World;
 
-public class ZoneRegion extends ZoneBoundingBox {
+import java.lang.ref.WeakReference;
+import java.util.Optional;
 
-    private final World world;
+public class ZoneRegion extends ZoneWorldBoundingBox {
+    private final WeakReference<ZoneSpaceAllocator> weakAllocator;
 
-    public ZoneRegion(World world, Vector3i origin, Vector3i boundingBox) {
-        super(origin, boundingBox);
-        this.world = world;
+    public ZoneRegion(ZoneSpaceAllocator allocator, ZoneWorldBoundingBox boundingBox) {
+        this(allocator, boundingBox.getExtent(), boundingBox.getOrigin(), boundingBox.getBoundingBox());
     }
 
-    public World getExtent() {
-        return world;
+    public ZoneRegion(ZoneSpaceAllocator allocator, World world, Vector3i origin, Vector3i boundingBox) {
+        super(world, origin, boundingBox);
+        this.weakAllocator = new WeakReference<>(allocator);
     }
 
+    public Optional<ZoneSpaceAllocator> getAllocator() {
+        return Optional.ofNullable(weakAllocator.get());
+    }
 
     public enum State {
         NEW,

@@ -26,7 +26,7 @@ import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.zone.WorldResolver;
 import com.skelril.skree.service.internal.zone.ZoneServiceImpl;
-import com.skelril.skree.service.internal.zone.allocator.ChainPlacementAllocator;
+import com.skelril.skree.service.internal.zone.allocator.CacheBasedAllocator;
 import com.skelril.skree.service.internal.zone.decorator.Decorators;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
@@ -47,7 +47,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
         Task.builder().execute(() -> {
             WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
 
-            service = new ZoneServiceImpl(new ChainPlacementAllocator(Decorators.ZONE_PRIMARY_DECORATOR, instWorldResolver));
+            service = new ZoneServiceImpl(new CacheBasedAllocator(Decorators.ZONE_PRIMARY_DECORATOR, instWorldResolver));
 
             service.registerManager(new CursedMineManager());
             service.registerManager(new TempleOfFateManager());

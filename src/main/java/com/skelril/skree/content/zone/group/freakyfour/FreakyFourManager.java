@@ -112,6 +112,12 @@ public class FreakyFourManager extends GroupZoneManager<FreakyFourInstance> impl
                 continue;
             }
             next.forceEnd();
+
+            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+            if (optAllocator.isPresent()) {
+                optAllocator.get().release(getSystemName(), next.getRegion());
+            }
+
             it.remove();
         }
     }

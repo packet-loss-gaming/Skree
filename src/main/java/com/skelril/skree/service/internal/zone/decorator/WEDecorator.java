@@ -17,9 +17,8 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.registry.WorldData;
-import com.skelril.nitro.Clause;
 import com.skelril.skree.service.internal.zone.WorldResolver;
-import com.skelril.skree.service.internal.zone.ZoneRegion;
+import com.skelril.skree.service.internal.zone.ZoneWorldBoundingBox;
 import com.skelril.skree.service.internal.zone.allocator.RunManager;
 
 import java.io.IOException;
@@ -55,7 +54,7 @@ public class WEDecorator implements Decorator {
 
     private HashMap<String, HashRef> hashRefMap = new HashMap<>();
 
-    public <T> ZoneRegion pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callback) {
+    public <T> ZoneWorldBoundingBox pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<ZoneWorldBoundingBox, T> initMapper, Consumer<T> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
         transaction.enableQueue();
         transaction.getChangeSet().setRecordChanges(false);
@@ -89,13 +88,13 @@ public class WEDecorator implements Decorator {
 
         Vector dimensions = clipboard.getDimensions();
 
-        ZoneRegion region = new ZoneRegion(
+        ZoneWorldBoundingBox region = new ZoneWorldBoundingBox(
                 world.getSpongeWorld(),
                 origin,
                 new Vector3i(dimensions.getX(), dimensions.getY(), dimensions.getZ())
         );
 
-        T returnVal = initMapper.apply(new Clause<>(region, ZoneRegion.State.NEW_LOADING));
+        T returnVal = initMapper.apply(region);
 
         RunManager.runOperation(operation, () -> {
             RunManager.runOperation(transaction.commit(), () -> {

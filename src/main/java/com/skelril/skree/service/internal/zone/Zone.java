@@ -39,7 +39,7 @@ public interface Zone {
         return players.stream().map(this::remove).collect(Collectors.toList());
     }
 
-    ZoneRegion getRegion();
+    ZoneWorldBoundingBox getRegion();
     Collection<Player> getPlayers(PlayerClassifier classifier);
     default MessageChannel getPlayerMessageChannel(PlayerClassifier classifier) {
         return MessageChannel.fixed(Sets.newHashSet(getPlayers(classifier)));
