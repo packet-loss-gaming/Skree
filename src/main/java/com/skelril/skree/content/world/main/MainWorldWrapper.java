@@ -121,18 +121,19 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
                     boolean preventedFromBuilding = check(player, optLoc.get());
 
                     // Block players that are allowed to build, otherwise send the no build message
+                    Text noEditMessage = Text.of(TextColors.RED, "You can't change blocks here!");
                     if (!preventedFromBuilding) {
                         if (player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.CREATIVE) {
-                            player.sendMessage(Text.of(TextColors.RED, "You must be in creative mode to edit!"));
                             preventedFromBuilding = true;
-                        }
-                    } else {
-                        if (event.getCause().root().equals(player)) {
-                            player.sendMessage(Text.of(TextColors.RED, "You can't change blocks here!"));
+                            noEditMessage = Text.of(TextColors.RED, "You must be in creative mode to edit!");
                         }
                     }
 
                     if (preventedFromBuilding) {
+                        if (event.getCause().root().equals(player)) {
+                            player.sendMessage(noEditMessage);
+                        }
+
                         event.setCancelled(true);
                         return;
                     }
