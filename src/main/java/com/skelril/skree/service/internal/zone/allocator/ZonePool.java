@@ -67,7 +67,7 @@ public class ZonePool {
         regionQueue.get(manager).push(boundingBox);
     }
 
-    public Optional<ZoneBoundingBox> getIfAvalible(String manager) {
+    public Optional<ZoneBoundingBox> getIfAvailable(String manager) {
         Deque<ZoneBoundingBox> queue = regionQueue.get(manager);
         if (queue != null) {
             return Optional.ofNullable(queue.poll());

@@ -51,7 +51,7 @@ public class CacheBasedAllocator implements ZoneSpaceAllocator {
 
     @Override
     public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack) {
-        Optional<ZoneBoundingBox> optBoundingBox = pool.getIfAvalible(managerName);
+        Optional<ZoneBoundingBox> optBoundingBox = pool.getIfAvailable(managerName);
 
         Vector3i origin = new Vector3i(lastEnd.getX(), 0, lastEnd.getY());
         if (optBoundingBox.isPresent()) {
