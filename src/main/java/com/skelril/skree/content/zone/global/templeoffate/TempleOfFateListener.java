@@ -11,6 +11,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -26,14 +27,7 @@ public class TempleOfFateListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
-        Object obj = event.getCause().root();
-        if (!(obj instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) obj;
-
+    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event, @Root Player player) {
         Optional<TempleOfFateInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) return;
 

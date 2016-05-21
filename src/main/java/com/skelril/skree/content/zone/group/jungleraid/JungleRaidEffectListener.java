@@ -44,6 +44,7 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShapes;
@@ -110,13 +111,7 @@ public class JungleRaidEffectListener {
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event) {
-        Object root = event.getCause().root();
-        if (!(root instanceof Player)) {
-            return;
-        }
-        Player player = (Player) root;
-
+    public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) {
             return;

@@ -34,6 +34,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
@@ -104,14 +105,7 @@ public class GoldRushListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event) {
-        Object obj = event.getCause().root();
-        if (!(obj instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) obj;
-
+    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event, @Root Player player) {
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) return;
 
@@ -215,40 +209,34 @@ public class GoldRushListener {
     }
 
     @Listener
-    public void onChestOpen(InteractInventoryEvent.Open event) {
-        Object optPlayer = event.getCause().root();
-        if (optPlayer instanceof Player) {
-            Player player = (Player) optPlayer;
+    public void onChestOpen(InteractInventoryEvent.Open event, @Root Player player) {
+        Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
+        if (!optInst.isPresent()) return;
 
-            Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
-            if (!optInst.isPresent()) return;
+        GoldRushInstance inst = optInst.get();
 
-            GoldRushInstance inst = optInst.get();
+        Inventory inventory = event.getTargetInventory();
+        if (!inst.isLocked() && inventory instanceof ContainerChest) {
+            IInventory chestInv = ((ContainerChest) inventory).getLowerChestInventory();
+            if (chestInv instanceof ILockableContainer) {
+                LockCode newLockCode = new LockCode(UUID.randomUUID().toString());
+                tileEntityClaimMap.put(newLockCode.getLock(), player);
+                ((ILockableContainer) chestInv).setLockCode(newLockCode);
 
-            Inventory inventory = event.getTargetInventory();
-            if (!inst.isLocked() && inventory instanceof ContainerChest) {
-                IInventory chestInv = ((ContainerChest) inventory).getLowerChestInventory();
-                if (chestInv instanceof ILockableContainer) {
-                    LockCode newLockCode = new LockCode(UUID.randomUUID().toString());
-                    tileEntityClaimMap.put(newLockCode.getLock(), player);
-                    ((ILockableContainer) chestInv).setLockCode(newLockCode);
+                BigDecimal risk = Optional.ofNullable(
+                        inst.cofferRisk.get(player.getUniqueId())
+                ).orElse(BigDecimal.ZERO);
 
-                    BigDecimal risk = Optional.ofNullable(
-                            inst.cofferRisk.get(player.getUniqueId())
-                    ).orElse(BigDecimal.ZERO);
-
-                    Collection<org.spongepowered.api.item.inventory.ItemStack> queue = CofferValueMap.inst().satisfy(risk.toBigInteger());
-                    Iterator<org.spongepowered.api.item.inventory.ItemStack> it = queue.iterator();
-                    for (int i = 0; i < chestInv.getSizeInventory(); ++i) {
-                        if (it.hasNext()) {
-                            chestInv.setInventorySlotContents(i, tf(it.next()));
-                            continue;
-                        }
-                        chestInv.setInventorySlotContents(i, null);
+                Collection<org.spongepowered.api.item.inventory.ItemStack> queue = CofferValueMap.inst().satisfy(risk.toBigInteger());
+                Iterator<org.spongepowered.api.item.inventory.ItemStack> it = queue.iterator();
+                for (int i = 0; i < chestInv.getSizeInventory(); ++i) {
+                    if (it.hasNext()) {
+                        chestInv.setInventorySlotContents(i, tf(it.next()));
+                        continue;
                     }
+                    chestInv.setInventorySlotContents(i, null);
                 }
             }
-
         }
     }
 
