@@ -30,6 +30,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.animal.Chicken;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -80,6 +81,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
 
     @Override
     public boolean init() {
+        remove();
         setup();
         return true;
     }
@@ -102,8 +104,14 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     @Override
-    public void forceEnd() {
+    public void remove() {
+        remove(Chicken.class, Item.class);
+    }
 
+    @Override
+    public void forceEnd() {
+        remove(getPlayers(PARTICIPANT));
+        remove();
     }
 
     private void giveTeamHoods(Player player) {
