@@ -16,11 +16,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-public class ZoneInventoryProtector extends ZoneApplicableListener {
-    public ZoneInventoryProtector(Predicate<Location<World>> isApplicable) {
-        super(isApplicable);
+public class ZoneInventoryProtector<T> extends ZoneApplicableListener<T> {
+    public ZoneInventoryProtector(Function<Location<World>, Optional<T>> applicabilityFunct) {
+        super(applicabilityFunct);
     }
 
     @Listener

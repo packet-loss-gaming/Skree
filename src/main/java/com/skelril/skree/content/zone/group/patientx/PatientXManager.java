@@ -66,19 +66,19 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
+                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZonePvPListener(a -> getApplicableZone(a).isPresent())
+                new ZonePvPListener<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneInventoryProtector(a -> getApplicableZone(a).isPresent())
+                new ZoneInventoryProtector<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneCreatureDropBlocker(a -> getApplicableZone(a).isPresent())
+                new ZoneCreatureDropBlocker<>(this::getApplicableZone)
         );
 
         setupBossManager();

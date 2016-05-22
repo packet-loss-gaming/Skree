@@ -18,11 +18,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-public class ZoneNaturalSpawnBlocker extends ZoneApplicableListener {
-    public ZoneNaturalSpawnBlocker(Predicate<Location<World>> isApplicable) {
-        super(isApplicable);
+public class ZoneNaturalSpawnBlocker<T> extends ZoneApplicableListener<T> {
+    public ZoneNaturalSpawnBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
+        super(applicabilityFunct);
     }
 
     @Listener

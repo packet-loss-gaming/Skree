@@ -13,11 +13,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-public class ZoneImmutableBlockListener extends ZoneApplicableListener {
-    public ZoneImmutableBlockListener(Predicate<Location<World>> isApplicable) {
-        super(isApplicable);
+public class ZoneImmutableBlockListener<T> extends ZoneApplicableListener<T> {
+    public ZoneImmutableBlockListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+        super(applicabilityFunct);
     }
 
     @Listener

@@ -22,9 +22,10 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.function.Predicate;
+import java.util.Optional;
+import java.util.function.Function;
 
-public class ZoneGlobalHealthPrinter extends ZoneApplicableListener {
+public class ZoneGlobalHealthPrinter<T> extends ZoneApplicableListener<T> {
     private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
             CombinedText.of(
                     TextColors.DARK_AQUA,
@@ -36,8 +37,8 @@ public class ZoneGlobalHealthPrinter extends ZoneApplicableListener {
             CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
     );
 
-    public ZoneGlobalHealthPrinter(Predicate<Location<World>> isApplicable) {
-        super(isApplicable);
+    public ZoneGlobalHealthPrinter(Function<Location<World>, Optional<T>> applicabilityFunct) {
+        super(applicabilityFunct);
     }
 
     @Listener

@@ -16,11 +16,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-public class ZoneCreatureDropBlocker extends ZoneApplicableListener {
-    public ZoneCreatureDropBlocker(Predicate<Location<World>> isApplicable) {
-        super(isApplicable);
+public class ZoneCreatureDropBlocker<T> extends ZoneApplicableListener<T> {
+    public ZoneCreatureDropBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
+        super(applicabilityFunct);
     }
 
     @Listener

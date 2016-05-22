@@ -43,27 +43,27 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
+                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZonePvPListener(a -> getApplicableZone(a).isPresent())
+                new ZonePvPListener<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneInventoryProtector(a -> getApplicableZone(a).isPresent())
+                new ZoneInventoryProtector<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneImmutableBlockListener(a -> getApplicableZone(a).isPresent())
+                new ZoneImmutableBlockListener<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneCreatureDropBlocker(a -> getApplicableZone(a).isPresent())
+                new ZoneCreatureDropBlocker<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneGlobalHealthPrinter(a -> getApplicableZone(a).isPresent())
+                new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
         );
 
         setUpBoss();

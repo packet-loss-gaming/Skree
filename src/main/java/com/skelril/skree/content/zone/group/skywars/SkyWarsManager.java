@@ -28,11 +28,11 @@ public class SkyWarsManager extends GroupZoneManager<SkyWarsInstance> implements
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker(a -> getApplicableZone(a).isPresent())
+                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
         );
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
-                new ZoneImmutableBlockListener(a -> getApplicableZone(a).isPresent())
+                new ZoneImmutableBlockListener<>(this::getApplicableZone)
         );
 
         Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
