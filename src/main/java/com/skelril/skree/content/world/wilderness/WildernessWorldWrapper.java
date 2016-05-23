@@ -463,7 +463,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     srcEntity = optDamageSource.get().getSource();
                 }
 
-                int baseLevelMod = level;
+                int dropTier = level;
 
                 if (srcEntity instanceof Player) {
                     Optional<ItemStack> optHeldItem = ((Player) srcEntity).getItemInHand();
@@ -474,14 +474,16 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         );
 
                         if (optLooting.isPresent()) {
-                            baseLevelMod += optLooting.get().getLevel();
+                            dropTier += optLooting.get().getLevel();
                         }
                     }
 
+                    dropTier = getDropTier(dropTier);
+
                     Collection<ItemStack> drops = dropTable.getDrops(
-                            (entity instanceof Boss ? 5 : 1) * baseLevelMod,
+                            (entity instanceof Boss ? 5 : 1) * dropTier,
                             getDropMod(
-                                    baseLevelMod,
+                                    dropTier,
                                     ((Monster) entity).getHealthData().maxHealth().get(),
                                     entity.getType()
                             )
@@ -713,12 +715,17 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return level >= getFirstPvPLevel();
     }
 
-    public double getDropMod(int level) {
-        return getDropMod(level, null, null);
+
+    public int getDropTier(int level) {
+        return Math.min(level, 30);
     }
 
-    public double getDropMod(int level, @Nullable Double mobHealth, @Nullable EntityType entityType) {
-        double modifier = (level * .2) + (mobHealth != null ? mobHealth * .04 : 0);
+    public double getDropMod(int dropTier) {
+        return getDropMod(dropTier, null, null);
+    }
+
+    public double getDropMod(int dropTier, @Nullable Double mobHealth, @Nullable EntityType entityType) {
+        double modifier = (dropTier * .2) + (mobHealth != null ? mobHealth * .04 : 0);
         if (entityType != null) {
             if (entityType == EntityTypes.WITHER || entityType == EntityTypes.CREEPER) {
                 modifier *= 5;
