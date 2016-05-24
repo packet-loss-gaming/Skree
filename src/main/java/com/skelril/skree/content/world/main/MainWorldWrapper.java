@@ -107,7 +107,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     }
 
     private boolean check(Player player, Location<World> loc) {
-        return isApplicable(loc) && !player.hasPermission("skree.admin.edit.main");
+        return !player.hasPermission("skree.admin.edit.main");
     }
 
     @Listener
@@ -117,7 +117,7 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
             Player player = optPlayer.get();
             for (Transaction<BlockSnapshot> block : event.getTransactions()) {
                 Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-                if (optLoc.isPresent()) {
+                if (optLoc.isPresent() && isApplicable(optLoc.get())) {
                     boolean preventedFromBuilding = check(player, optLoc.get());
 
                     // Block players that are allowed to build, otherwise send the no build message
