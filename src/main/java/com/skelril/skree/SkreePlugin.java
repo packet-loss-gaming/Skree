@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.skelril.nitro.module.NitroModuleManager;
+import com.skelril.skree.system.admin.AdminSystem;
 import com.skelril.skree.system.aid.AidSystem;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
@@ -71,6 +72,7 @@ public class SkreePlugin {
 
     private void registerModules() {
         ImmutableList<Class> initialized = ImmutableList.of(
+                AdminSystem.class,
                 AidSystem.class,
                 ArrowFishingSystem.class,
                 CustomRegisterySystem.class,
