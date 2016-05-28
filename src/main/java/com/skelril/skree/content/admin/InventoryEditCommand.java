@@ -31,7 +31,8 @@ import org.spongepowered.api.world.World;
 import java.util.*;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
-import static org.spongepowered.api.command.args.GenericArguments.*;
+import static org.spongepowered.api.command.args.GenericArguments.choices;
+import static org.spongepowered.api.command.args.GenericArguments.user;
 
 /**
  * Dear reader, this file may make you cry.
@@ -149,6 +150,10 @@ public class InventoryEditCommand implements CommandExecutor {
                 return false;
             }
 
+            for (int i = 0; i < container.getSizeInventory(); ++i) {
+                container.setInventorySlotContents(i, null);
+            }
+
             for (int i = 0; i < inventoryData.mainInventory.length; ++i) {
                 container.setInventorySlotContents(i, tf(inventoryData.mainInventory[i]));
             }
@@ -174,6 +179,10 @@ public class InventoryEditCommand implements CommandExecutor {
                 inventoryData.armorInventory[i] = tf(container.getStackInSlot(i + inventoryData.mainInventory.length));
             }
 
+            for (int i = 0; i < container.getSizeInventory(); ++i) {
+                container.setInventorySlotContents(i, null);
+            }
+
             return true;
         }
 
@@ -181,6 +190,10 @@ public class InventoryEditCommand implements CommandExecutor {
             int totalSize = inventoryData.enderInventory.length;
             if (totalSize > container.getSizeInventory()) {
                 return false;
+            }
+
+            for (int i = 0; i < container.getSizeInventory(); ++i) {
+                container.setInventorySlotContents(i, null);
             }
 
             for (int i = 0; i < inventoryData.enderInventory.length; ++i) {
@@ -198,6 +211,10 @@ public class InventoryEditCommand implements CommandExecutor {
 
             for (int i = 0; i < inventoryData.enderInventory.length; ++i) {
                 inventoryData.enderInventory[i] = tf(container.getStackInSlot(i));
+            }
+
+            for (int i = 0; i < container.getSizeInventory(); ++i) {
+                container.setInventorySlotContents(i, null);
             }
 
             return true;
