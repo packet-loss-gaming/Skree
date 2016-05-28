@@ -8,7 +8,6 @@ package com.skelril.skree.content.world;
 
 
 import com.skelril.skree.service.WorldService;
-import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -52,13 +51,7 @@ public class WorldCommand implements CommandExecutor {
         }
 
         World world = optWorld.get();
-        Optional<WorldEffectWrapper> optEffectWrapper = service.getEffectWrapperFor(world);
-        String worldType = "misc";
-        if (optEffectWrapper.isPresent()) {
-            worldType = optEffectWrapper.get().getName();
-        }
-
-        if (!src.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport")) {
+        if (!WorldEntryPermissionCheck.checkDestination((Player) src, world)) {
             src.sendMessage(Text.of(TextColors.RED, "You do not have permission to access worlds of this type."));
             return CommandResult.empty();
         }
