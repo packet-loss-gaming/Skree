@@ -56,7 +56,6 @@ public class WEDecorator implements Decorator {
 
     public <T> ZoneWorldBoundingBox pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<ZoneWorldBoundingBox, T> initMapper, Consumer<T> callback) {
         EditSession transaction = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world.getWorldEditWorld(), -1);
-        transaction.enableQueue();
         transaction.setFastMode(true);
         transaction.getChangeSet().setRecordChanges(false);
 
