@@ -45,7 +45,7 @@ public class RunManager {
             }
 
             callBacks.forEach(Runnable::run);
-        }).intervalTicks(10).submit(SkreePlugin.inst());
+        }).intervalTicks(20).submit(SkreePlugin.inst());
     }
 
     public static void runOperation(Operation operation, Runnable callBack) {

@@ -11,6 +11,7 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.Teleporter;
+import com.skelril.skree.content.world.WorldEntryPermissionCheck;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -21,6 +22,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -72,7 +75,13 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
-                setDestination(held, player.getLocation());
+                Location<World> destination = player.getLocation();
+                if (!WorldEntryPermissionCheck.checkDestination(player, destination.getExtent())) {
+                    player.sendMessage(Text.of(TextColors.RED, "You do not have permission to create a teleporter to this location."));
+                    return;
+                }
+
+                setDestination(held, destination);
                 player.setItemInHand(held);
                 event.setCancelled(true);
             }

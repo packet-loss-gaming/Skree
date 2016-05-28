@@ -8,6 +8,7 @@ package com.skelril.skree.content.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.skelril.nitro.entity.SafeTeleportHelper;
+import com.skelril.skree.content.world.WorldEntryPermissionCheck;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -51,6 +52,10 @@ public class BringCommand implements CommandExecutor {
         );
 
         if (optSafeDest.isPresent()) {
+            if (!WorldEntryPermissionCheck.checkDestination((Player) src, optSafeDest.get().getExtent())) {
+                src.sendMessage(Text.of(TextColors.RED, "You do not have permission to teleport players to worlds of this type."));
+                return CommandResult.empty();
+            }
             target.setLocationAndRotation(optSafeDest.get(), rotation);
 
             src.sendMessage(Text.of(TextColors.YELLOW, "Player brought to you, my lord."));
