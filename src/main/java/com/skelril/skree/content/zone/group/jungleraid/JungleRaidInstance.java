@@ -524,18 +524,20 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         player.setBoots(teamBoots);
     }
 
-    private void addPlayer(Player player, Supplier<Location<World>> startingPos, Color teamColor, JungleRaidClass jrClass) {
-        giveBaseEquipment(player, jrClass);
-        giveTeamEquipment(player, teamColor);
-
-        // Reset vitals
+    private void resetPlayerProperties(Player player) {
         player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).orElse(20D));
         player.offer(Keys.FOOD_LEVEL, 20);
         player.offer(Keys.SATURATION, 20D);
         player.offer(Keys.EXHAUSTION, 0D);
 
-        // Remove potion effects
         player.offer(Keys.POTION_EFFECTS, new ArrayList<>());
+    }
+
+    private void addPlayer(Player player, Supplier<Location<World>> startingPos, Color teamColor, JungleRaidClass jrClass) {
+        giveBaseEquipment(player, jrClass);
+        giveTeamEquipment(player, teamColor);
+
+        resetPlayerProperties(player);
 
         player.setLocation(startingPos.get());
     }
@@ -630,6 +632,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
+        resetPlayerProperties(player);
         playerLost(player);
 
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
