@@ -80,6 +80,10 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                 SkreePlugin.inst(),
                 new ZoneCreatureDropBlocker<>(this::getApplicableZone)
         );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+        );
 
         setupBossManager();
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());

@@ -240,6 +240,10 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                 SkreePlugin.inst(),
                 new ZoneCreatureDropBlocker<>(this::getApplicableZone)
         );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+        );
 
         setupBossManager();
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());

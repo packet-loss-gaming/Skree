@@ -10,6 +10,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneImmutableBlockListener;
 import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
+import com.skelril.skree.content.zone.ZoneTransitionalOrbListener;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -33,6 +34,10 @@ public class SkyWarsManager extends GroupZoneManager<SkyWarsInstance> implements
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZoneImmutableBlockListener<>(this::getApplicableZone)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
         );
 
         Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());

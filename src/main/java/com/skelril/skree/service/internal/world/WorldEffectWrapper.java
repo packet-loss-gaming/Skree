@@ -25,5 +25,6 @@ public interface WorldEffectWrapper {
 
     void addWorld(World world);
 
+    World getPrimaryWorld();
     Collection<World> getWorlds();
 }

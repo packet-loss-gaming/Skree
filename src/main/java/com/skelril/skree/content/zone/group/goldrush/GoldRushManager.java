@@ -10,6 +10,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
 import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
 import com.skelril.skree.content.zone.ZonePvPListener;
+import com.skelril.skree.content.zone.ZoneTransitionalOrbListener;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
@@ -33,6 +34,10 @@ public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implemen
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZonePvPListener<>(this::getApplicableZone)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
         );
 
         Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());

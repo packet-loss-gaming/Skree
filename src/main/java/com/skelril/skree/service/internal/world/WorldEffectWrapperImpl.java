@@ -41,6 +41,11 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
     }
 
     @Override
+    public World getPrimaryWorld() {
+        return worlds.iterator().next();
+    }
+
+    @Override
     public Collection<World> getWorlds() {
         return worlds;
     }

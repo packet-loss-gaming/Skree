@@ -7,10 +7,7 @@
 package com.skelril.skree.content.zone.global.templeoffate;
 
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.zone.LocationZone;
-import com.skelril.skree.content.zone.ZoneImmutableBlockListener;
-import com.skelril.skree.content.zone.ZoneNaturalSpawnBlocker;
-import com.skelril.skree.content.zone.ZonePvPListener;
+import com.skelril.skree.content.zone.*;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
@@ -36,6 +33,10 @@ public class TempleOfFateManager extends GlobalZoneManager<TempleOfFateInstance>
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZonePvPListener<>(this::getApplicableZone)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
         );
     }
 

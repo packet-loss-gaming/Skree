@@ -12,6 +12,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.service.RespawnService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
@@ -189,6 +190,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             for (int i = group.size() - 1; i >= 0; --i) {
                                 purgeZoneItems(group.get(i), itemStack);
                                 // createLightningStrike(group.get(i)); SpongeCommon/420
+                                saveLocation(group.get(i));
                                 getMainWorldWrapper().getLobby().add(group.get(i));
                             }
 
@@ -199,7 +201,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                                     result -> {
                                         if (result.isPresent()) {
                                             result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
-                                                player.setLocation(getMainWorld().getSpawnLocation());
+                                                player.setLocation(getRespawnLocation(player));
                                                 player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
                                             });
                                         }
@@ -211,6 +213,16 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 }
             }
         }
+    }
+
+    private void saveLocation(Player player) {
+        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+        respawnService.push(player, player.getLocation());
+    }
+
+    private Location<World> getRespawnLocation(Player player) {
+        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+        return respawnService.pop(player).orElse(respawnService.getDefault(player));
     }
 
     private void createLightningStrike(Player player) {

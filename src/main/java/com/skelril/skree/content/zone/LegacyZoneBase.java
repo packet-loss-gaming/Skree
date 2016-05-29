@@ -8,8 +8,7 @@ package com.skelril.skree.content.zone;
 
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
-import com.skelril.skree.content.world.main.MainWorldWrapper;
-import com.skelril.skree.service.WorldService;
+import com.skelril.skree.service.RespawnService;
 import com.skelril.skree.service.internal.zone.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -41,8 +40,11 @@ public abstract class LegacyZoneBase implements Zone {
 
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        player.setLocation(service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds().iterator().next().getSpawnLocation());
+        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+
+        Location<World> newLocation = respawnService.pop(player).orElse(respawnService.getDefault(player));
+        player.setLocation(newLocation);
+
         return new Clause<>(player, ZoneStatus.REMOVED);
     }
 

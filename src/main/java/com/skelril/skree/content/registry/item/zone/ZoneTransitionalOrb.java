@@ -11,7 +11,7 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
-import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.service.RespawnService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
@@ -24,9 +24,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
@@ -64,62 +64,64 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
             if (optItemStack.isPresent()) {
                 ItemStack itemStack = tf(optItemStack.get());
                 if (itemStack.getItem() == this) {
-                    if (returnToMain(event, player)) {
-                        return;
-                    }
-
-                    if (rejoinInstance(event, player)) {
-                        return;
+                    if (rejoinInstance(player)) {
+                        event.setCancelled(true);
                     }
                 }
             }
         }
     }
 
-    private boolean returnToMain(InteractBlockEvent.Secondary event, Player player) {
+    private boolean isInInstanceWorld(Player player) {
         Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-        if (optWorldService.isPresent()) {
-            WorldService worldService = optWorldService.get();
-            WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
-
-            if (wrapper.getWorlds().contains(player.getLocation().getExtent())) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-                player.setLocation(worlds.iterator().next().getSpawnLocation());
-                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                tf(player).inventoryContainer.detectAndSendChanges();
-                event.setCancelled(true);
-                return true;
-            }
+        if (!optWorldService.isPresent()) {
+            return false;
         }
-        return false;
+
+        WorldService worldService = optWorldService.get();
+        WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
+
+        return wrapper.getWorlds().contains(player.getLocation().getExtent());
     }
 
-    private boolean rejoinInstance(InteractBlockEvent.Secondary event, Player player) {
-        Optional<ZoneService> optZoneService = Sponge.getServiceManager().provide(ZoneService.class);
-        if (optZoneService.isPresent()) {
-            ZoneService zoneService = optZoneService.get();
+    private void saveLocation(Player player, Location<World> location) {
+        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+        respawnService.push(player, location);
+    }
 
-            switch (zoneService.rejoin(player).getValue()) {
-                case ADDED:
-                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                    tf(player).inventoryContainer.detectAndSendChanges();
-                    break;
-                case NO_REJOIN:
-                    player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
-                    break;
-                case REF_LOST:
-                    player.sendMessage(Text.of(TextColors.RED, "Your connection with your previous zone has been severed."));
-                    break;
-                case DESPAWNED:
-                    player.sendMessage(Text.of(TextColors.RED, "The your previous zone has despawned."));
-                    break;
-                default:
-                    player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin your previous zone."));
-                    break;
-            }
-            event.setCancelled(true);
-            return true;
+    private boolean rejoinInstance(Player player) {
+        Optional<ZoneService> optZoneService = Sponge.getServiceManager().provide(ZoneService.class);
+        if (!optZoneService.isPresent()) {
+            return false;
         }
-        return false;
+
+        if (isInInstanceWorld(player)) {
+            return false;
+        }
+
+        Location<World> priorLocation = player.getLocation();
+
+        ZoneService zoneService = optZoneService.get();
+        switch (zoneService.rejoin(player).getValue()) {
+            case ADDED:
+                saveLocation(player, priorLocation);
+                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                tf(player).inventoryContainer.detectAndSendChanges();
+                break;
+            case NO_REJOIN:
+                player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
+                break;
+            case REF_LOST:
+                player.sendMessage(Text.of(TextColors.RED, "Your connection with your previous zone has been severed."));
+                break;
+            case DESPAWNED:
+                player.sendMessage(Text.of(TextColors.RED, "The your previous zone has despawned."));
+                break;
+            default:
+                player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin your previous zone."));
+                break;
+        }
+
+        return true;
     }
 }

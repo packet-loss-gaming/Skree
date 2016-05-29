@@ -55,6 +55,10 @@ public class FreakyFourManager extends GroupZoneManager<FreakyFourInstance> impl
                 SkreePlugin.inst(),
                 new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
         );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+        );
 
         registerManagerListeners();
 
