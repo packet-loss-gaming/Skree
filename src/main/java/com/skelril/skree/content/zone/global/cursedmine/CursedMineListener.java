@@ -9,7 +9,6 @@ package com.skelril.skree.content.zone.global.cursedmine;
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.block.DropRegistry;
-import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
 import com.skelril.skree.content.zone.global.cursedmine.restoration.BlockRecord;
@@ -25,17 +24,20 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -64,6 +66,16 @@ public class CursedMineListener {
             if (optInst.isPresent() && triggerBlocks.contains(snapshot.getState().getType())) {
                 optInst.get().activatePumps();
                 break;
+            }
+        }
+    }
+
+    @Listener
+    public void onItemSpawn(SpawnEntityEvent event, @Root BlockSpawnCause spawnCause) {
+        for (Entity entity : event.getEntities()) {
+            if (entity instanceof Item && manager.getApplicableZone(entity).isPresent()) {
+                event.setCancelled(true);
+                return;
             }
         }
     }
@@ -178,22 +190,15 @@ public class CursedMineListener {
                         player.getInventory().addItem(BookUtil.Lore.Areas.theGreatMine());
                     }*/
 
-                    // TODO Work around for the item dropped by blocks being indiscernible
-                    // from items dropped from players
-                    event.setCancelled(true);
-                    Task.builder().execute(() -> {
-                        Optional<Entity> optXPOrb = player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
-                        if (optXPOrb.isPresent()) {
-                            ExperienceOrb xpOrb = (ExperienceOrb) optXPOrb.get();
-                            xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
-                        }
+                    Optional<Entity> optXPOrb = player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
+                    if (optXPOrb.isPresent()) {
+                        ExperienceOrb xpOrb = (ExperienceOrb) optXPOrb.get();
+                        xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
+                    }
 
-                        inst.eatFood(player);
-                        inst.poison(player, 6);
-                        inst.ghost(player, originalType);
-
-                        block.getOriginal().getLocation().get().setBlockType(BlockTypes.AIR);
-                    }).delayTicks(1).submit(SkreePlugin.inst());
+                    inst.eatFood(player);
+                    inst.poison(player, 6);
+                    inst.ghost(player, originalType);
                 }
             } else if (stealableFluids.contains(originalType)) {
                 inst.recordBlockBreak(player, new BlockRecord(block.getOriginal()));
