@@ -206,6 +206,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
 
     @Override
     public Clause<Player, ZoneStatus> remove(Player player) {
+        player.offer(Keys.FALL_DISTANCE, 0F);
         playerLost(player);
 
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
