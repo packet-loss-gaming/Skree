@@ -25,6 +25,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -45,25 +46,30 @@ public class InventoryEditCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
+            src.sendMessage(Text.of(TextColors.RED, "You must be a player to use this command!"));
             return CommandResult.empty();
         }
 
         User user = args.<User>getOne("user").get();
 
         if (Sponge.getServer().getPlayer(user.getUniqueId()).isPresent()) {
-            src.sendMessage(Text.of("The player MUST be offline."));
+            src.sendMessage(Text.of(TextColors.RED, "The player MUST be offline."));
             return CommandResult.empty();
         }
 
-        activelyEdited.add(((Player) src).getUniqueId());
+        if (activelyEdited.contains(user.getUniqueId())) {
+            src.sendMessage(Text.of(TextColors.RED, "Player already being edited."));
+            return CommandResult.empty();
+        }
+
+        activelyEdited.add(user.getUniqueId());
 
         DataDump.Type type = args.<DataDump.Type>getOne("type").get();
         PlayerInventoryReader.Data data = PlayerInventoryReader.getPlayerData(user.getUniqueId());
         dataDumpMap.put(((Player) src).getUniqueId(), new DataDump(user.getUniqueId(), data, type));
 
-        src.sendMessage(Text.of(user.getName(), " has been prevented from logging in while this operation is in progress."));
-        src.sendMessage(Text.of("Punch a large chest to dump the inventory contents."));
+        src.sendMessage(Text.of(TextColors.YELLOW, user.getName(), " has been prevented from logging in while this operation is in progress."));
+        src.sendMessage(Text.of(TextColors.GREEN, "Punch a large chest to dump the inventory contents."));
 
         return CommandResult.success();
     }
@@ -72,6 +78,16 @@ public class InventoryEditCommand implements CommandExecutor {
     public void onConnect(ClientConnectionEvent.Auth event) {
         if (activelyEdited.contains(event.getProfile().getUniqueId())) {
             event.setCancelled(true);
+        }
+    }
+
+    private void testOrFail(Player admin, UUID targetUser, boolean condition) throws IllegalStateException {
+        if (!condition) {
+            dataDumpMap.remove(admin.getUniqueId());
+            activelyEdited.remove(targetUser);
+
+            admin.sendMessage(Text.of(TextColors.RED, "Invalid storage dump option, aborting!"));
+            throw new IllegalStateException();
         }
     }
 
@@ -99,25 +115,29 @@ public class InventoryEditCommand implements CommandExecutor {
 
         boolean complete = false;
 
-        switch (dataDump.type) {
-            case PLAYER:
-                if (dataDump.dumped) {
-                    dataDump.readPInvFromContainer(container);
-                    complete = true;
-                } else {
-                    dataDump.writePInvToContainer(container);
-                    dataDump.dumped = true;
-                }
-                break;
-            case ENDER:
-                if (dataDump.dumped) {
-                    dataDump.readEInvFromContainer(container);
-                    complete = true;
-                } else {
-                    dataDump.writeEInvToContainer(container);
-                    dataDump.dumped = true;
-                }
-                break;
+        try {
+            switch (dataDump.type) {
+                case PLAYER:
+                    if (dataDump.dumped) {
+                        testOrFail(player, dataDump.targetUser, dataDump.readPInvFromContainer(container));
+                        complete = true;
+                    } else {
+                        testOrFail(player, dataDump.targetUser, dataDump.writePInvToContainer(container));
+                        dataDump.dumped = true;
+                    }
+                    break;
+                case ENDER:
+                    if (dataDump.dumped) {
+                        testOrFail(player, dataDump.targetUser, dataDump.readEInvFromContainer(container));
+                        complete = true;
+                    } else {
+                        testOrFail(player, dataDump.targetUser, dataDump.writeEInvToContainer(container));
+                        dataDump.dumped = true;
+                    }
+                    break;
+            }
+        } catch (IllegalStateException ex) {
+            return;
         }
 
         if (complete) {
@@ -125,9 +145,9 @@ public class InventoryEditCommand implements CommandExecutor {
             dataDumpMap.remove(player.getUniqueId());
             activelyEdited.remove(dataDump.targetUser);
 
-            player.sendMessage(Text.of("Inventory changes written."));
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "Inventory changes written."));
         } else if (dataDump.dumped) {
-            player.sendMessage(Text.of("Punch the chest when you've completed your changes."));
+            player.sendMessage(Text.of(TextColors.GREEN, "Punch the chest when you've completed your changes."));
         }
     }
 
