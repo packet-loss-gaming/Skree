@@ -33,7 +33,9 @@ class WildernessPlayerMeta {
 
     public void setLevel(int level) {
         this.level = level;
-        lastChange = System.currentTimeMillis();
+        if (level != -1) {
+            lastChange = System.currentTimeMillis();
+        }
     }
 
     public long getHits() {

@@ -830,27 +830,27 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     @Override
     public void run() {
-        for (World world : getWorlds()) {
-            for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
-                int currentLevel = getLevel(entity.getLocation()).get();
-                WildernessPlayerMeta meta = playerMetaMap.getOrDefault(entity.getUniqueId(), new WildernessPlayerMeta());
-                int lastLevel = meta.getLevel();
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            int currentLevel = getLevel(player.getLocation()).orElse(-1);
+            WildernessPlayerMeta meta = playerMetaMap.getOrDefault(player.getUniqueId(), new WildernessPlayerMeta());
+            int lastLevel = meta.getLevel();
 
-                // Always set the level so as to mark the player meta as relevant
-                meta.setLevel(currentLevel);
+            // Always set the level so as to mark the player meta as relevant
+            // if it is -1 no time stamp update shall be performed
+            meta.setLevel(currentLevel);
 
-                if (currentLevel != lastLevel) {
-                    TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
-                    ((Player) entity).sendTitle(
-                            Title.builder()
-                                    .title(Text.of(color, "Wilderness Level"))
-                                    .subtitle(Text.of(color, currentLevel))
-                                    .fadeIn(20)
-                                    .fadeOut(20)
-                                    .build()
-                    );
-                    playerMetaMap.putIfAbsent(entity.getUniqueId(), meta);
-                }
+            // Display a title change, unless the current level is -1 (outside of the Wilderness)
+            if (currentLevel != -1 && currentLevel != lastLevel) {
+                TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
+                player.sendTitle(
+                        Title.builder()
+                                .title(Text.of(color, "Wilderness Level"))
+                                .subtitle(Text.of(color, currentLevel))
+                                .fadeIn(20)
+                                .fadeOut(20)
+                                .build()
+                );
+                playerMetaMap.putIfAbsent(player.getUniqueId(), meta);
             }
         }
 
