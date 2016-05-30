@@ -359,7 +359,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 if (meta != null) {
                     meta.attack();
 
-                    if (meta.getRatio() > 5 && meta.getFactors() > 35) {
+                    if (meta.getRatio() > 30 && meta.getFactors() > 35) {
                         Deque<Entity> spawned = new ArrayDeque<>();
                         for (int i = Probability.getRandom(5); i > 0; --i) {
                             Optional<Entity> optEnt = attacker.getWorld().createEntity(
