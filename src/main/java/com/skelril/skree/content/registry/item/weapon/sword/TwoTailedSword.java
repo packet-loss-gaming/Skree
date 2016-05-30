@@ -59,7 +59,8 @@ public class TwoTailedSword extends CustomSword implements EventAwareContent {
 
                 Optional<org.spongepowered.api.item.inventory.ItemStack> optHeld = ((ArmorEquipable) living).getItemInHand();
                 if (optHeld.isPresent() && optHeld.get().getItem() == CustomItemTypes.TWO_TAILED_SWORD) {
-                    event.setBaseDamage(0);
+                    int diff = (int) (living.get(Keys.MAX_HEALTH).orElse(20D) - living.get(Keys.HEALTH).orElse(20D));
+                    event.setBaseDamage(Math.max(5, diff * 2));
                     return true;
                 }
                 return false;
