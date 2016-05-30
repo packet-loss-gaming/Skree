@@ -624,7 +624,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
             if (optSafeDest.isPresent()) {
                 Location<World> safeDest = optSafeDest.get();
                 if (16 < safeDest.getY() && safeDest.getY() < 79) {
-                    return safeDest;
+                    return safeDest.add(.5, 0, .5);
                 }
             }
         }
