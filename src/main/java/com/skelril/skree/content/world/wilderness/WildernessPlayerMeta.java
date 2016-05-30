@@ -11,6 +11,7 @@ class WildernessPlayerMeta {
     private long attacks;
     private long hits;
     private long lastReset;
+    private long lastChange;
 
     public WildernessPlayerMeta() {
         reset();
@@ -18,10 +19,12 @@ class WildernessPlayerMeta {
 
     public void attack() {
         ++attacks;
+        lastChange = System.currentTimeMillis();
     }
 
     public void hit() {
         ++hits;
+        lastChange = System.currentTimeMillis();
     }
 
     public int getLevel() {
@@ -30,6 +33,7 @@ class WildernessPlayerMeta {
 
     public void setLevel(int level) {
         this.level = level;
+        lastChange = System.currentTimeMillis();
     }
 
     public long getHits() {
@@ -51,10 +55,14 @@ class WildernessPlayerMeta {
     public void reset() {
         attacks = 1;
         hits = 1;
-        lastReset = System.currentTimeMillis();
+        lastChange = lastReset = System.currentTimeMillis();
     }
 
     public long getLastReset() {
         return lastReset;
+    }
+
+    public long getLastChange() {
+        return lastChange;
     }
 }

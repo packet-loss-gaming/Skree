@@ -111,7 +111,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private DropTable commonDropTable;
     private DropTable netherMobDropTable;
 
-    private Map<Player, WildernessPlayerMeta> playerMetaMap = new WeakHashMap<>();
+    private Map<UUID, WildernessPlayerMeta> playerMetaMap = new HashMap<>();
 
     public WildernessWorldWrapper() {
         this(new ArrayList<>());
@@ -334,7 +334,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     return;
                 }
 
-                WildernessPlayerMeta meta = playerMetaMap.get(defender);
+                WildernessPlayerMeta meta = playerMetaMap.get(defender.getUniqueId());
                 if (meta != null) {
                     meta.hit();
                 }
@@ -355,7 +355,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     return;
                 }
 
-                WildernessPlayerMeta meta = playerMetaMap.get(attacker);
+                WildernessPlayerMeta meta = playerMetaMap.get(attacker.getUniqueId());
                 if (meta != null) {
                     meta.attack();
 
@@ -681,7 +681,21 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public Set<Map.Entry<Player, WildernessPlayerMeta>> getMetaInformation() {
-        return playerMetaMap.entrySet();
+        Set<Map.Entry<Player, WildernessPlayerMeta>> resultSets = new HashSet<>();
+        for (Map.Entry<UUID, WildernessPlayerMeta> entry : playerMetaMap.entrySet()) {
+            Optional<Player> optPlayer = Sponge.getServer().getPlayer(entry.getKey());
+            if (!optPlayer.isPresent()) {
+                continue;
+            }
+
+            Player player = optPlayer.get();
+            if (!player.isOnline()) {
+                continue;
+            }
+
+            resultSets.add(new AbstractMap.SimpleEntry<>(player, entry.getValue()));
+        }
+        return resultSets;
     }
 
     public Optional<Integer> getLevel(Location<World> location) {
@@ -819,7 +833,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         for (World world : getWorlds()) {
             for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
                 int currentLevel = getLevel(entity.getLocation()).get();
-                WildernessPlayerMeta meta = playerMetaMap.getOrDefault(entity, new WildernessPlayerMeta());
+                WildernessPlayerMeta meta = playerMetaMap.getOrDefault(entity.getUniqueId(), new WildernessPlayerMeta());
                 int lastLevel = meta.getLevel();
                 if (currentLevel != lastLevel) {
                     TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
@@ -832,9 +846,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                     .build()
                     );
                     meta.setLevel(currentLevel);
-                    playerMetaMap.putIfAbsent((Player) entity, meta);
+                    playerMetaMap.putIfAbsent(entity.getUniqueId(), meta);
                 }
             }
         }
+
+        playerMetaMap.entrySet().removeIf(entry ->
+                System.currentTimeMillis() - entry.getValue().getLastChange() >= TimeUnit.MINUTES.toMillis(5)
+        );
     }
 }
