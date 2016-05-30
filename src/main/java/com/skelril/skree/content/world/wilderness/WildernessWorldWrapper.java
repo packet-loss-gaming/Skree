@@ -835,6 +835,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int currentLevel = getLevel(entity.getLocation()).get();
                 WildernessPlayerMeta meta = playerMetaMap.getOrDefault(entity.getUniqueId(), new WildernessPlayerMeta());
                 int lastLevel = meta.getLevel();
+
+                // Always set the level so as to mark the player meta as relevant
+                meta.setLevel(currentLevel);
+
                 if (currentLevel != lastLevel) {
                     TextColor color = (allowsPvP(currentLevel) ? TextColors.RED : TextColors.WHITE);
                     ((Player) entity).sendTitle(
@@ -845,7 +849,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                     .fadeOut(20)
                                     .build()
                     );
-                    meta.setLevel(currentLevel);
                     playerMetaMap.putIfAbsent(entity.getUniqueId(), meta);
                 }
             }
