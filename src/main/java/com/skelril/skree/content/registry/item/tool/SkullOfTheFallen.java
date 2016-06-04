@@ -88,7 +88,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                             Text.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
                             Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
                             Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
-                            Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(level))),
+                            Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(wrapper.getDropTier(level)))),
                             Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(wrapper.getDropTier(level))))
                         );
                     } else {

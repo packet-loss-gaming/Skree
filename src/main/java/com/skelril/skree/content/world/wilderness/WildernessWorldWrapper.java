@@ -759,8 +759,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return level > 1 ? (level - 1) * 2 : 0;
     }
 
-    public int getOreMod(int level) {
-        int modifier = (int) Math.round(Math.max(1, getDropTier(level) * 1.5));
+    public int getOreMod(int dropTier) {
+        int modifier = (int) Math.round(Math.max(1, dropTier * 1.5));
 
         Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
@@ -791,7 +791,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             fortune = 0;
         }
 
-        final int times = Probability.getRandom(getOreMod(level));
+        final int times = Probability.getRandom(getOreMod(getDropTier(level)));
         final int finalFortune = fortune;
         ItemFountain fountain = new ItemFountain(
                 new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
