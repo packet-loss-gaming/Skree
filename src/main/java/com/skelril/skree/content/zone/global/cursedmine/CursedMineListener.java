@@ -74,10 +74,10 @@ public class CursedMineListener {
 
     @Listener
     public void onItemSpawn(SpawnEntityEvent event, @Root BlockSpawnCause spawnCause) {
+        // SpongeCommon/#771
         for (Entity entity : event.getEntities()) {
             if (entity instanceof Item && manager.getApplicableZone(entity).isPresent()) {
-                event.setCancelled(true);
-                return;
+                entity.remove();
             }
         }
     }
