@@ -316,8 +316,8 @@ public class GoldRushListener {
     @Listener
     public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
         Player player = event.getTargetEntity();
-        Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
+        Optional<GoldRushInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
+        if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             GoldRushInstance inst = optInst.get();
 
             inst.invalidate(player);

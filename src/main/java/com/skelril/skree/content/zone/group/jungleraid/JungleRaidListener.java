@@ -158,8 +158,8 @@ public class JungleRaidListener {
     @Listener
     public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
         Player player = event.getTargetEntity();
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
+        if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             JungleRaidInstance inst = optInst.get();
 
             inst.playerLost(player);
