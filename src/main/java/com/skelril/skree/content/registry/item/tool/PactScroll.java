@@ -20,6 +20,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
@@ -98,7 +99,39 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
     }
 
     @Listener
-    public void onEntityInteract(InteractEntityEvent event, @Root Player player) {
+    public void onBlockInteract(InteractBlockEvent.Secondary event, @Root Player player) {
+        Optional<ItemStack> optItemStack = player.getItemInHand();
+        if (!optItemStack.isPresent()) {
+            return;
+        }
+
+        ItemStack itemStack = optItemStack.get();
+        if (itemStack.getItem() != this) {
+            return;
+        }
+
+        UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
+
+        List<Text> result = pactMap.getOrDefault(player.getUniqueId(), new ArrayList<>()).stream()
+                .map(userService::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
+                .map(a -> Text.of((a.isOnline() ? TextColors.GREEN : TextColors.RED), a.getName()))
+                .collect(Collectors.toList());
+
+        pagination.builder()
+                .contents(result)
+                .title(Text.of(TextColors.GOLD, "Pact Members"))
+                .padding(Text.of(" "))
+                .sendTo(player);
+
+        event.setCancelled(true);
+    }
+
+    @Listener
+    public void onEntityInteract(InteractEntityEvent.Primary event, @Root Player player) {
         Entity targetEntity = event.getTargetEntity();
         if (!(targetEntity instanceof Player)) {
             return;
@@ -116,35 +149,16 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
         }
 
         pactMap.putIfAbsent(player.getUniqueId(), new ArrayList<>());
-        if (event instanceof InteractEntityEvent.Primary) {
-            List<UUID> pacts = pactMap.get(player.getUniqueId());
-            if (pacts.contains(targetPlayer.getUniqueId())) {
-                pacts.remove(targetPlayer.getUniqueId());
-                player.sendMessage(Text.of(TextColors.YELLOW, "Your pact with ", targetPlayer.getName(), " has been broken!"));
-            } else {
-                pacts.add(targetPlayer.getUniqueId());
-                player.sendMessage(Text.of(TextColors.YELLOW, "You've formed a pact with ", targetPlayer.getName(), "."));
-                player.sendMessage(Text.of(TextColors.YELLOW, "You will no longer be able to damage ", targetPlayer.getName(), ", unless attacked first."));
-                player.sendMessage(Text.of(TextColors.YELLOW, "You must carry a pact scroll for the pact to remain in effect."));
-                player.sendMessage(Text.of(TextColors.YELLOW, "All pacts will automatically be reset upon disconnect."));
-            }
+        List<UUID> pacts = pactMap.get(player.getUniqueId());
+        if (pacts.contains(targetPlayer.getUniqueId())) {
+            pacts.remove(targetPlayer.getUniqueId());
+            player.sendMessage(Text.of(TextColors.YELLOW, "Your pact with ", targetPlayer.getName(), " has been broken!"));
         } else {
-            UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-            PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
-
-            List<Text> result = pactMap.get(player.getUniqueId()).stream()
-                    .map(userService::get)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
-                    .map(a -> Text.of((a.isOnline() ? TextColors.GREEN : TextColors.RED), a.getName()))
-                    .collect(Collectors.toList());
-
-            pagination.builder()
-                    .contents(result)
-                    .title(Text.of(TextColors.GOLD, "Ignored Players"))
-                    .padding(Text.of(" "))
-                    .sendTo(player);
+            pacts.add(targetPlayer.getUniqueId());
+            player.sendMessage(Text.of(TextColors.YELLOW, "You've formed a pact with ", targetPlayer.getName(), "."));
+            player.sendMessage(Text.of(TextColors.YELLOW, "You will no longer be able to damage ", targetPlayer.getName(), ", unless attacked first."));
+            player.sendMessage(Text.of(TextColors.YELLOW, "You must carry a pact scroll for the pact to remain in effect."));
+            player.sendMessage(Text.of(TextColors.YELLOW, "All pacts will automatically be reset upon disconnect."));
         }
 
         event.setCancelled(true);
