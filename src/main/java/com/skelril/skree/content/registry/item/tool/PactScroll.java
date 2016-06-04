@@ -25,6 +25,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -62,16 +63,25 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
         );
     }
 
+    private boolean hasPactScroll(Player player) {
+        return player.getInventory().query((ItemType) this).size() >= 1;
+    }
+
     private PlayerCombatParser createFor(Cancellable event) {
         return new PlayerCombatParser() {
             @Override
             public void processPvP(Player attacker, Player defender) {
                 if (pactMap.getOrDefault(attacker.getUniqueId(), new ArrayList<>()).contains(defender.getUniqueId())) {
-                    event.setCancelled(true);
+                    if (hasPactScroll(attacker) && hasPactScroll(defender)) {
+                        event.setCancelled(true);
+                    }
                 } else if (pactMap.getOrDefault(defender.getUniqueId(), new ArrayList<>()).contains(attacker.getUniqueId())) {
-                    pactMap.get(defender.getUniqueId()).remove(attacker.getUniqueId());
-                    event.setCancelled(true);
-                    defender.sendMessage(Text.of(TextColors.DARK_RED, "Your pact with ", attacker.getName(), " has been broken!"));
+                    if (hasPactScroll(attacker) && hasPactScroll(defender)) {
+                        event.setCancelled(true);
+                        pactMap.get(defender.getUniqueId()).remove(attacker.getUniqueId());
+
+                        defender.sendMessage(Text.of(TextColors.DARK_RED, "Your pact with ", attacker.getName(), " has been broken!"));
+                    }
                 }
             }
         };
@@ -115,7 +125,8 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
                 pacts.add(targetPlayer.getUniqueId());
                 player.sendMessage(Text.of(TextColors.YELLOW, "You've formed a pact with ", targetPlayer.getName(), "."));
                 player.sendMessage(Text.of(TextColors.YELLOW, "You will no longer be able to damage ", targetPlayer.getName(), ", unless attacked first."));
-                player.sendMessage(Text.of(TextColors.YELLOW, "This will automatically be reset upon disconnect."));
+                player.sendMessage(Text.of(TextColors.YELLOW, "You must carry a pact scroll for the pact to remain in effect."));
+                player.sendMessage(Text.of(TextColors.YELLOW, "All pacts will automatically be reset upon disconnect."));
             }
         } else {
             UserStorageService userService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
