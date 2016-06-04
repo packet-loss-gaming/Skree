@@ -43,6 +43,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.*;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class CursedMineListener {
     
     private final CursedMineManager manager;
@@ -183,6 +185,8 @@ public class CursedMineListener {
                                 }
                             }
                         }
+
+                        tf(player).inventoryContainer.detectAndSendChanges();
                     }
 
                     /*if (Probability.getChance(3000)) {
