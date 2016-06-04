@@ -23,6 +23,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.world.Location;
@@ -74,7 +75,7 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
         }
     }
 
-    @Listener
+    @Listener(order = Order.POST)
     public void onBlockBreak(ChangeBlockEvent.Break event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
