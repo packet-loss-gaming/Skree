@@ -33,6 +33,7 @@ import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.Enchantments;
@@ -244,9 +245,7 @@ public class CursedMineListener {
     }
 
     @Listener
-    public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
-        Player player = event.getTargetEntity();
-
+    public void onPlayerTeleport(DisplaceEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
         Optional<CursedMineInstance> optInst = manager.getApplicableZone(player);
         HitList hitList = manager.getHitList();
         if ((optInst.isPresent() && optInst.get().hasRecordForPlayer(player)) || hitList.isOnHitList(player)) {

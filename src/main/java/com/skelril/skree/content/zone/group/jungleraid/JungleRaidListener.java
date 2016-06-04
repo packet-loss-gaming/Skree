@@ -19,6 +19,7 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -156,8 +157,7 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
-        Player player = event.getTargetEntity();
+    public void onPlayerTeleport(DisplaceEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
         if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             JungleRaidInstance inst = optInst.get();

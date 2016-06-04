@@ -35,6 +35,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -314,8 +315,7 @@ public class GoldRushListener {
     }
 
     @Listener
-    public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
-        Player player = event.getTargetEntity();
+    public void onPlayerTeleport(DisplaceEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
         if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             GoldRushInstance inst = optInst.get();
