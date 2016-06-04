@@ -34,6 +34,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -309,6 +310,18 @@ public class GoldRushListener {
                     targetChannel.send(Text.of(TextColors.YELLOW, "Security system delay ", inst.getBaseTime(), " +/- ", inst.getTimeVariance(), " seconds."));
                 }
             }
+        }
+    }
+
+    @Listener
+    public void onPlayerTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event) {
+        Player player = event.getTargetEntity();
+        Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
+        if (optInst.isPresent()) {
+            GoldRushInstance inst = optInst.get();
+
+            inst.invalidate(player);
+            inst.tryInventoryRestore(player);
         }
     }
 

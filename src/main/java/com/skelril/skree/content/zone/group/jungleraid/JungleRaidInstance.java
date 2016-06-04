@@ -634,7 +634,12 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
     public Clause<Player, ZoneStatus> remove(Player player) {
         resetPlayerProperties(player);
         playerLost(player);
+        tryInventoryRestore(player);
 
+        return super.remove(player);
+    }
+
+    public void tryInventoryRestore(Player player) {
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
         if (optService.isPresent()) {
             PlayerStateService service = optService.get();
@@ -646,8 +651,6 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 }
             }
         }
-
-        return super.remove(player);
     }
 
     public void playerLost(Player player) {
