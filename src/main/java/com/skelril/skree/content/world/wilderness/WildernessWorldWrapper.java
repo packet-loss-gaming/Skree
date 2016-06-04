@@ -729,7 +729,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return level >= getFirstPvPLevel();
     }
 
-
     public int getDropTier(int level) {
         return Math.min(level, 30);
     }
@@ -761,7 +760,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public int getOreMod(int level) {
-        int modifier = (int) Math.round(Math.max(1, level * 1.5));
+        int modifier = (int) Math.round(Math.max(1, getDropTier(level) * 1.5));
 
         Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
         if (optService.isPresent()) {
