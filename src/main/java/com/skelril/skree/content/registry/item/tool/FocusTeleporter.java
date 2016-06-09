@@ -105,7 +105,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 if (optDestination.isPresent()) {
                     Inventory result = player.getInventory().query((ItemType) CustomItemTypes.ENDER_FOCUS);
                     if (result.size() > 0) {
-                        result.poll();
+                        result.poll(1);
                         player.setLocation(optDestination.get());
                         event.setCancelled(true);
                     }
