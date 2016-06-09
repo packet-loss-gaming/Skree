@@ -11,7 +11,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 
 public class OreHelper {
-    public static final Material CUSTOM_ORE_MATERIAL = new Material(MapColor.grayColor);
+    public static final Material CUSTOM_ORE_MATERIAL = new Material(MapColor.GRAY);
 
     static {
         // Refers to requiresNoTool

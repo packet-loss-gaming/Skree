@@ -7,14 +7,18 @@
 package com.skelril.nitro.registry.item.bow;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class CustomBow extends ItemBow implements ICustomBow {
@@ -27,23 +31,23 @@ public abstract class CustomBow extends ItemBow implements ICustomBow {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public net.minecraft.client.resources.model.ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining) {
-        return ICustomBow.super.getModel(stack, player, useRemaining);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
     public void getSubItems(net.minecraft.item.Item itemIn, CreativeTabs tab, List subItems) {
         ICustomBow.super.getSubItems(itemIn, tab, subItems);
     }
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityPlayer playerIn, int timeLeft) {
-        ICustomBow.super.onPlayerStoppedUsing(stack, worldIn, playerIn, timeLeft);
+    public boolean isArrow(@Nullable ItemStack stack) {
+        return ICustomBow.super.isArrow(stack);
     }
 
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-        return ICustomBow.super.onItemUseFinish(stack, worldIn, playerIn);
+    @Override
+    public ItemStack findAmmo(EntityPlayer player) {
+        return ICustomBow.super.findAmmo(player);
+    }
+
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
+        ICustomBow.super.onPlayerStoppedUsing(stack, worldIn, entityLiving, timeLeft);
     }
 
     @Override
@@ -57,8 +61,8 @@ public abstract class CustomBow extends ItemBow implements ICustomBow {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        return ICustomBow.super.onItemRightClick(itemStackIn, worldIn, playerIn);
+    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        return ICustomBow.super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
 
     @Override

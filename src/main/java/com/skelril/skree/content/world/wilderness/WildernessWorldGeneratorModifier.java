@@ -7,14 +7,14 @@
 package com.skelril.skree.content.world.wilderness;
 
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 public class WildernessWorldGeneratorModifier implements WorldGeneratorModifier {
 
     @Override
-    public void modifyWorldGenerator(WorldCreationSettings world, DataContainer settings, WorldGenerator worldGenerator) {
+    public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
         worldGenerator.getPopulators().add(new MagicMushroomPopulator(1));
         worldGenerator.getPopulators().add(new JurackOrePopulator());
     }

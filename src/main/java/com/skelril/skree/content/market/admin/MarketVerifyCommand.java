@@ -60,7 +60,7 @@ public class MarketVerifyCommand implements CommandExecutor {
                     continue;
                 }
 
-                String name = service.getAlias(tf(output)).orElse(output.getItem().getRegistryName());
+                String name = service.getAlias(tf(output)).orElse(output.getItem().getRegistryName().toString());
 
                 Collection<ItemStack> items = new ArrayList<>();
                 if (recipe instanceof ShapedRecipes) {

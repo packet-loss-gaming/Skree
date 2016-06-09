@@ -6,9 +6,11 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+
 public abstract class CustomBoots extends CustomArmor {
     public CustomBoots() {
-        super(3);
+        super(EntityEquipmentSlot.FEET);
     }
 
     @Override

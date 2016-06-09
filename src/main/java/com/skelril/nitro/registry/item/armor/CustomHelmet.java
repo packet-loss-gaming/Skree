@@ -6,9 +6,11 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+
 public abstract class CustomHelmet extends CustomArmor {
     public CustomHelmet() {
-        super(0);
+        super(EntityEquipmentSlot.HEAD);
     }
 
     @Override

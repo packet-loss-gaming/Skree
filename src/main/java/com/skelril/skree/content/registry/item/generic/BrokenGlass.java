@@ -56,13 +56,13 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
     public void registerIngredients() {
-        GameRegistry.addSmelting(new ItemStack(this, 1, 0), new ItemStack(Blocks.glass), 0);
-        GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(Blocks.glass_pane), 0);
+        GameRegistry.addSmelting(new ItemStack(this, 1, 0), new ItemStack(Blocks.GLASS), 0);
+        GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(Blocks.GLASS_PANE), 0);
     }
 
     private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {

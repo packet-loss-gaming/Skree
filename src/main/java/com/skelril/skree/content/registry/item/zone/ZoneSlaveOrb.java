@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -83,14 +84,14 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
+            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
                     if (!isAttuned(itemStack)) {
                         if (notifyGroupOwner(itemStack, player, true)) {
                             attune(itemStack);
-                            player.setItemInHand(itemStack);
+                            player.setItemInHand(HandTypes.MAIN_HAND, itemStack);
                             player.sendMessage(
                                     Text.of(TextColors.GOLD, "You've accepted your group invite.")
                             );

@@ -9,7 +9,7 @@ package com.skelril.skree.content.registry.item.generic;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -106,7 +106,7 @@ public class PrizeBox extends CustomItem {
         NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_held_prize_data");
 
         if (tag != null) {
-            ItemStack returned = new ItemStack(Blocks.air);
+            ItemStack returned = new ItemStack(Blocks.AIR);
             returned.readFromNBT(tag);
             return Optional.of(tf(returned));
         }

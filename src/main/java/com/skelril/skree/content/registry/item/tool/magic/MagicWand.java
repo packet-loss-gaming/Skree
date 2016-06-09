@@ -16,6 +16,7 @@ import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
@@ -40,7 +41,7 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Listener
@@ -52,7 +53,7 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
         Player player = optPlayer.get();
         boolean survival = player.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) == GameModes.SURVIVAL;
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             if (optHeldItem.get().getItem() == this) {
@@ -88,7 +89,7 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
         GameRegistry.addShapelessRecipe(
                 new net.minecraft.item.ItemStack(this),
                 new net.minecraft.item.ItemStack(CustomItemTypes.FAIRY_DUST),
-                new net.minecraft.item.ItemStack(Items.stick)
+                new net.minecraft.item.ItemStack(Items.STICK)
         );
     }
 }

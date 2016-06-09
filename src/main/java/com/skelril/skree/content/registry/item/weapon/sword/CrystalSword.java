@@ -50,7 +50,7 @@ public class CrystalSword extends CustomSword implements Craftable {
                 " A ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'B', new ItemStack(Items.stick)
+                'B', new ItemStack(Items.STICK)
         );
     }
 }

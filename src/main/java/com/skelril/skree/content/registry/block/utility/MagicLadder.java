@@ -10,9 +10,10 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.BlockLadder;
+import net.minecraft.block.SoundType;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,7 +25,7 @@ public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable 
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.4F);
-        this.setStepSound(soundTypeLadder);
+        this.setSoundType(SoundType.LADDER);
     }
 
     @Override
@@ -36,14 +37,14 @@ public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable 
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Blocks.ladder),
+                new ItemStack(Blocks.LADDER),
                 new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 }

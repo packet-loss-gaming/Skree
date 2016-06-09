@@ -27,7 +27,7 @@ public class SeaCrystal extends CustomItem implements Craftable {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class SeaCrystal extends CustomItem implements Craftable {
                 "ABA",
                 "BAB",
                 "ABA",
-                'A', new ItemStack(Items.diamond),
-                'B', new ItemStack(Items.prismarine_crystals)
+                'A', new ItemStack(Items.DIAMOND),
+                'B', new ItemStack(Items.PRISMARINE_CRYSTALS)
         );
     }
 }

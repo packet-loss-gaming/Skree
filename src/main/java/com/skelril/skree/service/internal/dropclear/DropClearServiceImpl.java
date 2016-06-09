@@ -84,7 +84,8 @@ public class DropClearServiceImpl implements DropClearService {
     static {
         HashSet<EntityType> checkedEntities = new HashSet<>();
         checkedEntities.add(EntityTypes.ITEM);
-        checkedEntities.add(EntityTypes.ARROW);
+        checkedEntities.add(EntityTypes.TIPPED_ARROW);
+        checkedEntities.add(EntityTypes.SPECTRAL_ARROW);
         checkedEntities.add(EntityTypes.FIREBALL);
         checkedEntities.add(EntityTypes.SMALL_FIREBALL);
         checkedEntities.add(EntityTypes.FIREWORK);

@@ -8,11 +8,13 @@ package com.skelril.skree.content.registry.block.mushroom;
 
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.IGrowable;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -20,13 +22,17 @@ import java.util.Random;
 public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock {
 
     public MagicMushroom() {
-        float f = 0.2F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
         this.setTickRandomly(true);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setLightLevel(0.3F);
-        this.setStepSound(soundTypeGrass);
+        this.setSoundType(SoundType.GROUND);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        float f = 0.2F;
+        return new AxisAlignedBB(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
     }
 
     @Override
@@ -55,7 +61,7 @@ public class MagicMushroom extends BlockBush implements IGrowable, ICustomBlock 
 
 
     @Override
-    protected boolean canPlaceBlockOn(Block ground) {
+    protected boolean canSustainBush(IBlockState ground) {
         return ground.isFullBlock();
     }
 

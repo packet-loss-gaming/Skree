@@ -23,6 +23,6 @@ public class HolyHilt extends CustomItem {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 }

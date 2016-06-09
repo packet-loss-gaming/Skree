@@ -17,6 +17,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -39,7 +40,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                 "BAB",
                 "B B",
                 'A', new net.minecraft.item.ItemStack(CustomItemTypes.BLOOD_DIAMOND),
-                'B', new net.minecraft.item.ItemStack(Items.bone)
+                'B', new net.minecraft.item.ItemStack(Items.BONE)
         );
     }
 
@@ -55,7 +56,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Listener
@@ -67,7 +68,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
         Player player = optPlayer.get();
 
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             if (this.equals(optHeldItem.get().getItem())) {

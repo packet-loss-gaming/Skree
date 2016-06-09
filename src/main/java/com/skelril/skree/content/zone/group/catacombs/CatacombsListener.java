@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone.group.catacombs;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -49,7 +50,7 @@ public class CatacombsListener {
             return;
         }
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             ItemStack held = optHeldItem.get();

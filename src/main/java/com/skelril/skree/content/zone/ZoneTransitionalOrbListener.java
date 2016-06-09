@@ -11,6 +11,7 @@ import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.item.ItemStack;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -32,7 +33,7 @@ public class ZoneTransitionalOrbListener<T extends Zone> extends ZoneApplicableL
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
+            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
             if (optItemStack.isPresent()) {
                 ItemStack itemStack = tf(optItemStack.get());
                 if (itemStack.getItem() == CustomItemTypes.ZONE_TRANSITIONAL_ORB) {

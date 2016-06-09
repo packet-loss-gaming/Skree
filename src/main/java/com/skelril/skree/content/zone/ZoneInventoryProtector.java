@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.zone;
 
-import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -27,13 +27,12 @@ public class ZoneInventoryProtector<T> extends ZoneApplicableListener<T> {
     public void onItemSpawn(DropItemEvent.Destruct event) {
         Optional<EntitySpawnCause> optSpawnCause = event.getCause().get(NamedCause.SOURCE, EntitySpawnCause.class);
         if (optSpawnCause.isPresent()) {
-            EntitySnapshot snapshot = optSpawnCause.get().getEntity();
-            if (snapshot.getType() != EntityTypes.PLAYER) {
+            Entity entity = optSpawnCause.get().getEntity();
+            if (entity.getType() != EntityTypes.PLAYER) {
                 return;
             }
 
-            Optional<Location<World>> optLoc = snapshot.getLocation();
-            if (optLoc.isPresent() && isApplicable(optLoc.get())) {
+            if (isApplicable(entity.getLocation())) {
                 event.setCancelled(true);
             }
         }

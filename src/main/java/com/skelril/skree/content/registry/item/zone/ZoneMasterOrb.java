@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
@@ -74,7 +75,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
@@ -85,12 +86,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 "BAB",
                 "BBB",
                 'A', new ItemStack(CustomItemTypes.FAIRY_DUST),
-                'B', new ItemStack(Blocks.glass)
+                'B', new ItemStack(Blocks.GLASS)
         );
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Shnuggles Prime",
                 new ItemStack(this),
-                new ItemStack(Items.rotten_flesh)
+                new ItemStack(Items.ROTTEN_FLESH)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Patient X",
@@ -100,32 +101,32 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Gold Rush",
                 new ItemStack(this),
-                new ItemStack(Items.gold_ingot)
+                new ItemStack(Items.GOLD_INGOT)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Cursed Mine",
                 new ItemStack(this),
-                new ItemStack(Items.iron_pickaxe)
+                new ItemStack(Items.IRON_PICKAXE)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Temple of Fate",
                 new ItemStack(this),
-                new ItemStack(Items.feather)
+                new ItemStack(Items.FEATHER)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Catacombs",
                 new ItemStack(this),
-                new ItemStack(Items.bone)
+                new ItemStack(Items.BONE)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Jungle Raid",
                 new ItemStack(this),
-                new ItemStack(Items.dye, 1, 3)
+                new ItemStack(Items.DYE, 1, 3)
         ));
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
                 "Sky Wars",
                 new ItemStack(this),
-                new ItemStack(Items.feather),
+                new ItemStack(Items.FEATHER),
                 new ItemStack(CustomItemTypes.FAIRY_DUST)
         ));
     }
@@ -154,7 +155,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
+            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
             if (optItemStack.isPresent()) {
                 ItemStack itemStack = tf(optItemStack.get());
                 if (isZoneMasterItem(itemStack)) {
@@ -263,7 +264,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
         Entity targetEntity = event.getTargetEntity();
         if (optPlayer.isPresent() && targetEntity instanceof Player) {
             Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand();
+            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (this.equals(itemStack.getItem()) && isAttuned(itemStack)) {

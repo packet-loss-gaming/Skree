@@ -26,21 +26,19 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.WorldArchetype;
 
 import java.util.Optional;
-import java.util.Random;
 
 @NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
 
     private static final String MAIN = "Main";
-    private static final String BUILD = "Sion";
+    private static final String BUILD = "Kalazben";
+    private static final String BUILD_OLD = "Sion";
     private static final String INSTANCE = "Instance";
     private static final String WILDERNESS = "Wilderness";
     private static final String WILDERNESS_NETHER = "Wilderness_nether";
-
-    private Random randy = new Random();
 
     private WorldService service;
 
@@ -57,6 +55,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessMetaCommand.aquireSpec(), "wmeta");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessTeleportCommand.aquireSpec(), "wtp");
 
+        initArchetypes();
 
         // Handle main world
         initMain();
@@ -69,6 +68,32 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         initWilderness();
     }
 
+    private void initArchetypes() {
+        Optional<WorldArchetype> optCityArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:city");
+        if (!optCityArchetype.isPresent()) {
+            obtainOverworld().usesMapFeatures(false).generatorModifiers(new NoOreWorldGeneratorModifier()).build("skree:city", "city");
+        }
+        Optional<WorldArchetype> optBuildArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:build");
+        if (!optBuildArchetype.isPresent()) {
+            obtainOverworld().usesMapFeatures(false)
+                    .generatorModifiers(new NoOreWorldGeneratorModifier()).build("skree:build", "build");
+        }
+        Optional<WorldArchetype> optVoidArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void");
+        if (!optVoidArchetype.isPresent()) {
+            obtainFlatworld().usesMapFeatures(false)
+                    .generatorModifiers(new VoidWorldGeneratorModifier()).build("skree:void", "void");
+        }
+        Optional<WorldArchetype> optWildArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness");
+        if (!optWildArchetype.isPresent()) {
+            obtainOverworld().usesMapFeatures(true)
+                    .generatorModifiers(new WildernessWorldGeneratorModifier()).build("skree:wilderness", "wilderness");
+        }
+        Optional<WorldArchetype> optWildNetherArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness_nether");
+        if (!optWildNetherArchetype.isPresent()) {
+            obtainNetherworld().usesMapFeatures(true).build("skree:wilderness_nether", "wilderness_nether");
+        }
+    }
+
     private void initCity() {
         // City World
         MainWorldWrapper wrapper = new MainWorldWrapper();
@@ -76,8 +101,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Optional<World> curWorld = Sponge.getServer().getWorld("City");
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
-                    obtainOverworld().name("City").seed(randy.nextLong()).usesMapFeatures(false)
-                            .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
+                    "City",
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:city").get()
             );
             // registerWorld("City");
         }
@@ -111,14 +136,27 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Optional<World> curWorld = Sponge.getServer().getWorld(BUILD);
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
-                    obtainOverworld().name(BUILD).seed(randy.nextLong()).usesMapFeatures(false)
-                            .generatorModifiers(new NoOreWorldGeneratorModifier()).build()
+                    BUILD,
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:build").get()
             );
             registerWorld(BUILD);
         }
 
         if (curWorld.isPresent()) {
             wrapper.addWorld(curWorld.get());
+        }
+
+        Optional<World> oldWorld = Sponge.getServer().getWorld(BUILD_OLD);
+        if (!oldWorld.isPresent()) {
+            oldWorld = instantiate(
+                    BUILD_OLD,
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void").get()
+            );
+            registerWorld(BUILD_OLD);
+        }
+
+        if (oldWorld.isPresent()) {
+            wrapper.addWorld(oldWorld.get());
         }
 
         // Build wrapper reg
@@ -133,8 +171,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Optional<World> curWorld = Sponge.getServer().getWorld(INSTANCE);
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
-                    obtainFlatworld().name(INSTANCE).seed(randy.nextLong()).usesMapFeatures(false)
-                            .generatorModifiers(new SolidWorldGeneratorModifier()).build()
+                    INSTANCE,
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void").get()
             );
             registerWorld(INSTANCE);
         }
@@ -155,8 +193,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         Optional<World> curWorld = Sponge.getServer().getWorld(WILDERNESS);
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
-                    obtainOverworld().name(WILDERNESS).seed(randy.nextLong()).usesMapFeatures(true)
-                            .generatorModifiers(new WildernessWorldGeneratorModifier()).build()
+                    WILDERNESS,
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness").get()
             );
             registerWorld(WILDERNESS);
         }
@@ -169,7 +207,8 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         curWorld = Sponge.getServer().getWorld(WILDERNESS_NETHER);
         if (!curWorld.isPresent()) {
             curWorld = instantiate(
-                    obtainNetherworld().name(WILDERNESS_NETHER).seed(randy.nextLong()).usesMapFeatures(true).build()
+                    WILDERNESS_NETHER,
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness_nether").get()
             );
             registerWorld(WILDERNESS_NETHER);
         }
@@ -183,26 +222,26 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         service.registerEffectWrapper(wrapper);
     }
 
-    private WorldCreationSettings.Builder obtainOverworld() {
-        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.OVERWORLD);
+    private WorldArchetype.Builder obtainOverworld() {
+        return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.LARGE_BIOMES);
     }
 
-    private WorldCreationSettings.Builder obtainFlatworld() {
+    private WorldArchetype.Builder obtainFlatworld() {
         return obtainAutoloadingWorld().dimension(DimensionTypes.OVERWORLD).generator(GeneratorTypes.FLAT);
     }
 
-    public WorldCreationSettings.Builder obtainNetherworld() {
+    public WorldArchetype.Builder obtainNetherworld() {
         return obtainAutoloadingWorld().dimension(DimensionTypes.NETHER).generator(GeneratorTypes.NETHER);
     }
 
-    private WorldCreationSettings.Builder obtainAutoloadingWorld() {
-        WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
+    private WorldArchetype.Builder obtainAutoloadingWorld() {
+        WorldArchetype.Builder builder = WorldArchetype.builder();
         return builder.enabled(true).loadsOnStartup(true);
     }
 
-    private Optional<World> instantiate(WorldCreationSettings settings) {
+    private Optional<World> instantiate(String name, WorldArchetype settings) {
         try {
-            return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(settings).get());
+            return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(name, settings));
         } catch (Exception ex) {
             return Optional.empty();
         }

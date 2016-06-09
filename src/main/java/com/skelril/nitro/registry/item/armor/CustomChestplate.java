@@ -6,9 +6,11 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+
 public abstract class CustomChestplate extends CustomArmor {
     public CustomChestplate() {
-        super(1);
+        super(EntityEquipmentSlot.CHEST);
     }
 
     @Override

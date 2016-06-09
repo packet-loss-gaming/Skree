@@ -12,11 +12,12 @@ import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -55,14 +56,14 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
 
         Player player = optPlayer.get();
 
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
                 int newDist = getMaxEditDist(held) % 9 + 1;
                 setMaxEditDist(held, newDist);
-                player.setItemInHand(held);
+                player.setItemInHand(HandTypes.MAIN_HAND, held);
                 player.sendMessage(Text.of(TextColors.YELLOW, "Distance set to: " + newDist));
             }
         }
@@ -77,7 +78,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();
             Optional<Direction> optClickedDir = Optional.ofNullable(clickMap.get(player));
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optStack = player.getItemInHand();
+            Optional<org.spongepowered.api.item.inventory.ItemStack> optStack = player.getItemInHand(HandTypes.MAIN_HAND);
             if (optStack.isPresent() && optClickedDir.isPresent()) {
                 if (optStack.get().getItem() == this) {
                     ItemStack stack = tf(optStack.get());
@@ -89,7 +90,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
                         int maxDist = getMaxEditDist(stack);
                         int dmg = destroyLine(player, optClickedDir.get(), maxDist - 1, snapshot.getOriginal());
                         stack.damageItem(dmg, tf(player));
-                        player.setItemInHand(tf(stack));
+                        player.setItemInHand(HandTypes.MAIN_HAND, tf(stack));
                     }
                 }
             }

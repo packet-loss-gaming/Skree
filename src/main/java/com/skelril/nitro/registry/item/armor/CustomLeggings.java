@@ -6,9 +6,11 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+
 public abstract class CustomLeggings extends CustomArmor {
     public CustomLeggings() {
-        super(2);
+        super(EntityEquipmentSlot.LEGS);
     }
 
     @Override

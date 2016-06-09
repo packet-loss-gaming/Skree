@@ -13,6 +13,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.content.registry.item.generic.*;
 import net.minecraft.creativetab.CreativeTabs;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -38,7 +39,7 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Listener
@@ -49,7 +50,7 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
 
         Player player = optPlayer.get();
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             ItemStack held = optHeldItem.get();

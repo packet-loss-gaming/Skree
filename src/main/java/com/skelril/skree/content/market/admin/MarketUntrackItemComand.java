@@ -14,6 +14,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -39,7 +40,7 @@ public class MarketUntrackItemComand implements CommandExecutor {
 
         MarketService service = optService.get();
 
-        Optional<ItemStack> held = ((Player) src).getItemInHand();
+        Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
         if (!held.isPresent()) {
             src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
             return CommandResult.empty();

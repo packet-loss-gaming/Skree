@@ -14,10 +14,12 @@ import com.skelril.skree.service.RegionService;
 import com.skelril.skree.service.internal.region.Region;
 import com.skelril.skree.service.internal.region.RegionPoint;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
@@ -42,13 +44,13 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
     private Map<Player, Vector3d> recentlyClicked = new WeakHashMap<>();
 
     public RegionMaster() {
-        super(new Material(MapColor.stoneColor));
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        super(new Material(MapColor.STONE));
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(1.5F);
         this.setResistance(6000000.0F);
-        this.setStepSound(soundTypePiston);
+        this.setSoundType(SoundType.GLASS);
     }
 
     @Override
@@ -57,13 +59,13 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     @Listener

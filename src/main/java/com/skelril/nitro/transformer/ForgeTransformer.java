@@ -7,12 +7,14 @@
 package com.skelril.nitro.transformer;
 
 import com.flowpowered.math.vector.Vector3i;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class ForgeTransformer {
@@ -70,5 +72,17 @@ public class ForgeTransformer {
 
     public static Player tf(EntityPlayer player) {
         return (Player) player;
+    }
+
+
+    /*
+     * Living transformations
+     */
+    public static EntityLivingBase tf(Living living) {
+        return (EntityLivingBase) living;
+    }
+
+    public static Living tf(EntityLivingBase living) {
+        return (Living) living;
     }
 }

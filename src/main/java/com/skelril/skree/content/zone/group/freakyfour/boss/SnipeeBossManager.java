@@ -22,6 +22,7 @@ import com.skelril.skree.content.zone.group.freakyfour.boss.bossmove.BackTelepor
 import com.skelril.skree.content.zone.group.freakyfour.boss.bossmove.FreakyFourBossDeath;
 import com.skelril.skree.content.zone.group.freakyfour.boss.bossmove.HealableInstruction;
 import com.skelril.skree.content.zone.group.freakyfour.boss.bossmove.HealthBindInstruction;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
@@ -50,7 +51,7 @@ public class SnipeeBossManager extends BossManager<Living, ZoneBossDetail<Freaky
         bindProcessor.add((condition, boss) -> {
             Living entity = boss.getTargetEntity().get();
             if (entity instanceof ArmorEquipable) {
-                ((ArmorEquipable) entity).setItemInHand(newItemStack(ItemTypes.BOW));
+                ((ArmorEquipable) entity).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
             }
             return Optional.empty();
         });

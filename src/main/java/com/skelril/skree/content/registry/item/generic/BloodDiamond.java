@@ -27,7 +27,7 @@ public class BloodDiamond extends CustomItem implements Craftable {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class BloodDiamond extends CustomItem implements Craftable {
                 "BBB",
                 "BAB",
                 "BBB",
-                'A', new ItemStack(Items.diamond),
-                'B', new ItemStack(Items.redstone)
+                'A', new ItemStack(Items.DIAMOND),
+                'B', new ItemStack(Items.REDSTONE)
         );
     }
 }

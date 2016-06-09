@@ -10,12 +10,15 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,17 +26,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MagicPlatform extends Block implements ICustomBlock, Craftable {
     public MagicPlatform() {
-        super(Material.wood);
-        this.setBlockBounds(0F, .9375F, 0F, 1F, 1F, 1F);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        super(Material.WOOD);
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.4F);
-        this.setStepSound(soundTypeWood);
+        this.setSoundType(SoundType.WOOD);
     }
 
     @Override
-    public boolean isFullCube() {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
@@ -43,7 +50,7 @@ public class MagicPlatform extends Block implements ICustomBlock, Craftable {
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
@@ -54,8 +61,8 @@ public class MagicPlatform extends Block implements ICustomBlock, Craftable {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     @Override
@@ -65,7 +72,7 @@ public class MagicPlatform extends Block implements ICustomBlock, Craftable {
                 "AAA",
                 " B ",
                 "   ",
-                'A', new ItemStack(Items.stick),
+                'A', new ItemStack(Items.STICK),
                 'B', new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
     }

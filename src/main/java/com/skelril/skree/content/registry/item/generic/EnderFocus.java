@@ -27,7 +27,7 @@ public class EnderFocus extends CustomItem implements Craftable {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
@@ -37,9 +37,9 @@ public class EnderFocus extends CustomItem implements Craftable {
                 " A ",
                 "BCB",
                 " B ",
-                'A', new ItemStack(Items.ghast_tear),
-                'B', new ItemStack(Items.gold_ingot),
-                'C', new ItemStack(Items.ender_eye)
+                'A', new ItemStack(Items.GHAST_TEAR),
+                'B', new ItemStack(Items.GOLD_INGOT),
+                'C', new ItemStack(Items.ENDER_EYE)
         );
     }
 }

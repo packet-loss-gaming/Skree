@@ -41,7 +41,7 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabCombat;
+        return CreativeTabs.COMBAT;
     }
 
     @Override

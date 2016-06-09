@@ -11,20 +11,22 @@ import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.UUID;
+import static com.skelril.nitro.registry.item.ICustomTool.ATTACK_DAMAGE_MODIFIER;
+import static com.skelril.nitro.registry.item.ICustomTool.ATTACK_SPEED_MODIFIER;
 
 public interface ICustomSword extends ICustomItem, DegradableItem {
     // Skelril Methods
@@ -42,7 +44,7 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
 
     @Override
     default CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabCombat;
+        return CreativeTabs.COMBAT;
     }
 
     // Repair
@@ -54,6 +56,9 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
     }
 
     double __getHitPower();
+    default double __getAttackSpeed() {
+        return -2.4000000953674316D;
+    }
 
     // Enchantability
     int __getEnchantability();
@@ -72,18 +77,21 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
 
     boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair);
 
-    Multimap __superGetItemAttributeModifiers();
-
-    UUID __itemModifierUUID();
+    Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot);
 
     // Modified Native ItemTool methods
 
-    default float getStrVsBlock(ItemStack stack, Block p_150893_2_) {
-        if (p_150893_2_ == Blocks.web) {
+    default float getStrVsBlock(ItemStack stack, IBlockState state) {
+        Block block = state.getBlock();
+
+        if (block == Blocks.WEB)
+        {
             return 15.0F;
-        } else {
-            Material material = p_150893_2_.getMaterial();
-            return material != Material.plants && material != Material.vine && material != Material.coral && material != Material.leaves && material != Material.gourd ? 1.0F : 1.5F;
+        }
+        else
+        {
+            Material material = state.getMaterial();
+            return material != Material.PLANTS && material != Material.VINE && material != Material.CORAL && material != Material.LEAVES && material != Material.GOURD ? 1.0F : 1.5F;
         }
     }
 
@@ -102,13 +110,14 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
     /**
      * Called when a Block is destroyed using this Item. Return true to trigger the "Use Item" statistic.
      */
-    default boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
-        if ((double) blockIn.getBlockHardness(worldIn, pos) != 0.0D) {
-            stack.damageItem(__getDamageForUseOnBlock(), playerIn);
+    default boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+        if ((double)state.getBlockHardness(worldIn, pos) != 0.0D) {
+            stack.damageItem(2, entityLiving);
         }
 
         return true;
     }
+
 
     /**
      * Returns True is the item is renderer in full 3D when hold.
@@ -133,18 +142,10 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
     }
 
     /**
-     * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-     */
-    default ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
-        return itemStackIn;
-    }
-
-    /**
      * Check whether this Item can harvest the given Block
      */
-    default boolean canHarvestBlock(Block blockIn) {
-        return blockIn == Blocks.web;
+    default boolean canHarvestBlock(IBlockState state) {
+        return state == Blocks.WEB;
     }
 
     /**
@@ -170,9 +171,15 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
      * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
      */
     @SuppressWarnings("unchecked")
-    default Multimap getItemAttributeModifiers() {
-        Multimap multimap = __superGetItemAttributeModifiers();
-        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(__itemModifierUUID(), "Weapon modifier", __getHitPower(), 0));
+    default Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        Multimap<String, AttributeModifier> multimap = __superGetItemAttributeModifiers(equipmentSlot);
+
+        if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
+        {
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", __getHitPower(), 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", __getAttackSpeed(), 0));
+        }
+
         return multimap;
     }
 }

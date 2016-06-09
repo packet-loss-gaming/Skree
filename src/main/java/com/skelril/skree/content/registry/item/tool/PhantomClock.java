@@ -23,6 +23,6 @@ public class PhantomClock extends CustomItem {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 }

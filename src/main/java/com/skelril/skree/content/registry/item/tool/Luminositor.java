@@ -14,6 +14,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -41,7 +42,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Listener
@@ -52,7 +53,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
         Player player = optPlayer.get();
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
             if (this.equals(optHeldItem.get().getItem())) {
@@ -91,9 +92,9 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
                 "ABA",
                 " C ",
                 " C ",
-                'A', new net.minecraft.item.ItemStack(Items.glowstone_dust),
-                'B', new net.minecraft.item.ItemStack(Items.redstone),
-                'C', new net.minecraft.item.ItemStack(Items.iron_ingot)
+                'A', new net.minecraft.item.ItemStack(Items.GLOWSTONE_DUST),
+                'B', new net.minecraft.item.ItemStack(Items.REDSTONE),
+                'C', new net.minecraft.item.ItemStack(Items.IRON_INGOT)
         );
     }
 }

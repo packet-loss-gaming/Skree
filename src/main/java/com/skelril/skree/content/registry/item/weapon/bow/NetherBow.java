@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item.weapon.bow;
 
 import com.skelril.nitro.registry.item.bow.CustomBow;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.Random;
@@ -25,7 +26,7 @@ public class NetherBow extends CustomBow {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(Items.nether_star);
+        return new ItemStack(Items.NETHER_STAR);
     }
 
     @Override
@@ -36,5 +37,10 @@ public class NetherBow extends CustomBow {
     @Override
     public Random __getItemRand() {
         return itemRand;
+    }
+
+    @Override
+    public Item __getBowItem() {
+        return this;
     }
 }

@@ -60,7 +60,7 @@ public class CrystalShovel extends CustomShovel implements Craftable {
                 " B ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'B', new ItemStack(Items.stick)
+                'B', new ItemStack(Items.STICK)
         );
     }
 }

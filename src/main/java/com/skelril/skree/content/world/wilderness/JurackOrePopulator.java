@@ -8,10 +8,10 @@ package com.skelril.skree.content.world.wilderness;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
-import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.PopulatorTypes;
@@ -25,10 +25,9 @@ public class JurackOrePopulator implements Populator {
     }
 
     @Override
-    public void populate(Chunk chunk, Random random) {
-        World world = (World) chunk.getWorld();
-        Vector3i min = chunk.getBlockMin();
-        Vector3i max = chunk.getBlockMax();
+    public void populate(World world, Extent volume, Random random) {
+        Vector3i min = volume.getBlockMin();
+        Vector3i max = volume.getBlockMax();
 
         for (int x = min.getX(); x <= max.getX(); ++x) {
             for (int z = min.getZ(); z <= max.getZ(); ++z) {
@@ -37,13 +36,13 @@ public class JurackOrePopulator implements Populator {
                 }
 
                 for (int y = min.getY(); y < 20; ++y) {
-                    BlockPos searchPoint = new BlockPos(x, y, z);
-                    if (world.getBlockState(searchPoint).getBlock() == Blocks.lava) {
-                        BlockPos above = searchPoint.add(0, 1, 0);
-                        if (world.getBlockState(above).getBlock() == Blocks.lava) {
-                            BlockPos lowPoint = searchPoint.add(0, -1, 0);
-                            if (world.getBlockState(lowPoint).getBlock() == Blocks.stone) {
-                                world.setBlockState(lowPoint, CustomBlockTypes.JURACK_ORE.getDefaultState(), 2);
+                    Vector3i searchPoint = new Vector3i(x, y, z);
+                    if (world.getBlockType(searchPoint) == BlockTypes.LAVA) {
+                        Vector3i above = searchPoint.add(0, 1, 0);
+                        if (world.getBlockType(above) == BlockTypes.LAVA) {
+                            Vector3i lowPoint = searchPoint.add(0, -1, 0);
+                            if (world.getBlockType(lowPoint) == BlockTypes.STONE) {
+                                world.setBlockType(lowPoint, (BlockType) CustomBlockTypes.JURACK_ORE, true);
                             }
                         }
                     }

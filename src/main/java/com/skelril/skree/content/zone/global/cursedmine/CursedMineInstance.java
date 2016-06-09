@@ -342,8 +342,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                                         player.getLocation().getExtent().triggerExplosion(
                                                 Explosion.builder()
                                                         .radius(3)
-                                                        .world(player.getLocation().getExtent())
-                                                        .origin(pos.toDouble().add(.5, .5, .5))
+                                                        .location(player.getLocation().setPosition(pos.toDouble().add(.5, .5, .5)))
                                                         .shouldBreakBlocks(false)
                                                         .canCauseFire(true)
                                                         .build()

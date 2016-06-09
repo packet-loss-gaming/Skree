@@ -59,8 +59,8 @@ public class HardenedDiamondPickaxe extends CustomPickaxe implements Craftable {
                 "AAA",
                 " B ",
                 "   ",
-                'A', new ItemStack(Blocks.obsidian),
-                'B', new ItemStack(Items.diamond_pickaxe)
+                'A', new ItemStack(Blocks.OBSIDIAN),
+                'B', new ItemStack(Items.DIAMOND_PICKAXE)
         );
     }
 }

@@ -45,7 +45,7 @@ public class CofferItem extends CustomItem {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMisc;
+        return CreativeTabs.MISC;
     }
 
     // Modified Native Item methods

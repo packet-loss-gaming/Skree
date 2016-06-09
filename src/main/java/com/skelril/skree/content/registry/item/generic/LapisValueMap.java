@@ -23,7 +23,7 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 public class LapisValueMap extends ItemStackBigIntegerValueMapping {
     public static final ImmutableList<PointValue<ItemStack, BigInteger>> LAPIS_VALUE_MAP = ImmutableList.of(
             new SimplePointValue<>(
-                    Lists.newArrayList(tf(new net.minecraft.item.ItemStack(Items.dye, 1, 4))),
+                    Lists.newArrayList(tf(new net.minecraft.item.ItemStack(Items.DYE, 1, 4))),
                     BigInteger.ONE
             ),
             new SimplePointValue<>(

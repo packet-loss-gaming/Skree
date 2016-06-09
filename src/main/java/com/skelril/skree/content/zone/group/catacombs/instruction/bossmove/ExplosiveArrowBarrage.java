@@ -61,7 +61,7 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
 
         if (activate(detail)) {
             List<Entity> arrows = VelocityEntitySpawner.sendRadial(
-                    EntityTypes.ARROW,
+                    EntityTypes.TIPPED_ARROW,
                     boss,
                     Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
             );
@@ -71,8 +71,7 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
                     Location<World> target = arrow.getLocation();
                     target.getExtent().triggerExplosion(
                             Explosion.builder()
-                                    .origin(target.getPosition())
-                                    .world(target.getExtent())
+                                    .location(target)
                                     .radius(explosionStrength(detail))
                                     .canCauseFire(allowFire(detail))
                                     .shouldBreakBlocks(allowBlockBreak(detail))

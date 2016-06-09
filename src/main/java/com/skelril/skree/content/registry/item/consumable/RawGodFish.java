@@ -7,7 +7,6 @@
 package com.skelril.skree.content.registry.item.consumable;
 
 import com.skelril.nitro.registry.item.food.CustomFood;
-import net.minecraft.creativetab.CreativeTabs;
 
 public class RawGodFish extends CustomFood {
 
@@ -19,11 +18,6 @@ public class RawGodFish extends CustomFood {
     @Override
     public int __getMaxStackSize() {
         return 16;
-    }
-
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabFood;
     }
 
     @Override

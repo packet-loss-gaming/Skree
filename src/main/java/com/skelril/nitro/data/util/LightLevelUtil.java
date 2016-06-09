@@ -7,12 +7,14 @@
 package com.skelril.nitro.data.util;
 
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
+
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class LightLevelUtil {
     public static Optional<Integer> getMaxLightLevel(Location<World> valueStore) {
@@ -31,7 +33,7 @@ public class LightLevelUtil {
     }
 
     private static int getMaxLightLevelNMS(Location<World> loc) {
-        BlockPos bpos = new BlockPos(loc.getX(), loc.getY(), loc.getZ());
+        BlockPos bpos = tf(loc.getBlockPosition());
 
         net.minecraft.world.World nmsWorld = ((net.minecraft.world.World) loc.getExtent());
 

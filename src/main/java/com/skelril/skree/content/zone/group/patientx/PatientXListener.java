@@ -101,8 +101,7 @@ public class PatientXListener {
                 entity.getLocation().getExtent().triggerExplosion(
                         Explosion.builder()
                                 .radius(3)
-                                .world(entity.getLocation().getExtent())
-                                .origin(entity.getLocation().getPosition())
+                                .location(entity.getLocation())
                                 .shouldBreakBlocks(false)
                                 .build()
                 );

@@ -35,17 +35,19 @@ import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -221,7 +223,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     explosive.setVelocity(entity.getVelocity());
                     // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
                     // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                    tf(explosive).fuse = 20 * 4;
+                    tf(explosive).setFuse(20 * 4);
 
                     // TODO used to have a 1/4 chance of creating fire
                     entity.getLocation().getExtent().spawnEntity(
@@ -259,8 +261,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int min = explosiveRadius.get();
 
                 entity.offer(
-                        Keys.EXPLOSIVE_RADIUS,
-                        MathExt.bound((min + level) / 2, min, entity instanceof Fireball ? 4 : 9)
+                        Keys.EXPLOSION_RADIUS,
+                        Optional.of(MathExt.bound((min + level) / 2, min, entity instanceof Fireball ? 4 : 9))
                 );
             }
         }
@@ -466,7 +468,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 int dropTier = level;
 
                 if (srcEntity instanceof Player) {
-                    Optional<ItemStack> optHeldItem = ((Player) srcEntity).getItemInHand();
+                    Optional<ItemStack> optHeldItem = ((Player) srcEntity).getItemInHand(HandTypes.MAIN_HAND);
                     if (optHeldItem.isPresent()) {
                         Optional<ItemEnchantment> optLooting = EnchantmentUtil.getHighestEnchantment(
                                 optHeldItem.get(),
@@ -509,8 +511,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             if (entity.getType() == EntityTypes.ENDERMITE && Probability.getChance(20)) {
                 entity.getWorld().triggerExplosion(
                         Explosion.builder()
-                                .world(entity.getWorld())
-                                .origin(entity.getLocation().getPosition())
+                                .location(entity.getLocation())
                                 .shouldBreakBlocks(true)
                                 .shouldDamageEntities(false)
                                 .radius(4F)
@@ -548,20 +549,21 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             int level = optLevel.get();
             Location<World> loc = optLoc.get();
 
-            BlockType type = original.getState().getType();
+            BlockState state = original.getState();
+            BlockType type = state.getType();
             if (ore().contains(type)) {
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
                 if (srcEnt instanceof ArmorEquipable) {
-                    Optional<ItemStack> held = ((ArmorEquipable) srcEnt).getItemInHand();
+                    Optional<ItemStack> held = ((ArmorEquipable) srcEnt).getItemInHand(HandTypes.MAIN_HAND);
                     if (held.isPresent()) {
                         ItemStack stack = held.get();
 
                         // TODO Currently abusing NMS to determine "breakability"
                         ItemType itemType = stack.getItem();
-                        if (itemType instanceof Item && type instanceof Block) {
-                            if (!((Item) stack.getItem()).canHarvestBlock((Block) type)) {
+                        if (itemType instanceof Item && state instanceof IBlockState) {
+                            if (!((Item) stack.getItem()).canHarvestBlock((IBlockState) state)) {
                                 continue;
                             }
                         }
@@ -802,7 +804,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             @Override
             public boolean run(int timesL) {
                 getExtent().playSound(
-                        SoundTypes.BLAZE_BREATH,
+                        SoundTypes.ENTITY_BLAZE_BURN,
                         getPos(),
                         Math.min(
                                 1,
@@ -815,7 +817,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             @Override
             public void end() {
-                getExtent().playSound(SoundTypes.BLAZE_DEATH, getPos(), .2F, 0);
+                getExtent().playSound(SoundTypes.ENTITY_BLAZE_DEATH, getPos(), .2F, 0);
             }
         };
 

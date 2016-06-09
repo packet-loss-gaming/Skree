@@ -12,6 +12,7 @@ import com.skelril.nitro.registry.block.OreHelper;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockOre;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 
@@ -26,7 +27,7 @@ public class JurackOre extends BlockOre implements ICustomBlock {
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(3.0F);
         this.setResistance(5.0F);
-        this.setStepSound(soundTypePiston);
+        this.setSoundType(SoundType.STONE);
     }
 
     @Override

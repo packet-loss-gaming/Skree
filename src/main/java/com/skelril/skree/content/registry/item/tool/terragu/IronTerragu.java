@@ -72,9 +72,9 @@ public class IronTerragu extends CustomTerragu implements Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Items.iron_pickaxe),
-                new ItemStack(Items.iron_axe),
-                new ItemStack(Items.iron_shovel),
+                new ItemStack(Items.IRON_PICKAXE),
+                new ItemStack(Items.IRON_AXE),
+                new ItemStack(Items.IRON_SHOVEL),
                 new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
         );
     }

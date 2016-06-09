@@ -34,7 +34,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -314,7 +314,7 @@ public class GoldRushListener {
     }
 
     @Listener
-    public void onPlayerTeleport(DisplaceEntityEvent.Teleport event) {
+    public void onPlayerTeleport(MoveEntityEvent.Teleport event) {
         Entity entity = event.getTargetEntity();
         if (!(entity instanceof Player)) {
             return;

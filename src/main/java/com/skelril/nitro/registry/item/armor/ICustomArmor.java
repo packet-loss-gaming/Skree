@@ -12,13 +12,16 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.world.World;
 
 public interface ICustomArmor extends ICustomItem, DegradableItem {
 
-    static final int[] maxDamageArray = new int[] {11, 16, 15, 13};
+    static final int[] maxDamageArray = new int[] {13, 15, 16, 11};
 
     // Skelril Methods
 
@@ -29,9 +32,22 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
         return 1;
     }
 
-    default int __getMaxUses() {
-        return maxDamageArray[__getArmorTypeIndex()] * __getMaxUsesBaseModifier();
+    @Override
+    default int __getMaxUses(ItemStack stack) {
+        return __getMaxUses(EntityLiving.getSlotForItemStack(stack));
     }
+
+    default int __getMaxUses(EntityEquipmentSlot slot) {
+        return maxDamageArray[slot.getIndex()] * __getMaxUsesBaseModifier();
+    }
+
+    @Override
+    @Deprecated
+    default int __getMaxUses() {
+        throw new UnsupportedOperationException();
+    }
+
+    EntityEquipmentSlot __getSlotType();
 
     int __getMaxUsesBaseModifier();
 
@@ -39,7 +55,7 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
 
     @Override
     default CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabCombat;
+        return CreativeTabs.COMBAT;
     }
 
     // Repair
@@ -59,8 +75,6 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
     String __getArmorCategory();
 
     // Native compatibility methods
-
-    int __getArmorTypeIndex();
 
     ItemArmor.ArmorMaterial __superGetArmorMaterial();
 
@@ -148,15 +162,19 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
     /**
      * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
-    default ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        int i = EntityLiving.getArmorPosition(itemStackIn) - 1;
-        ItemStack itemstack1 = playerIn.getCurrentArmor(i);
+    default ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
+        EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemStackIn);
+        ItemStack itemstack = playerIn.getItemStackFromSlot(entityequipmentslot);
 
-        if (itemstack1 == null) {
-            playerIn.setCurrentItemOrArmor(i + 1, itemStackIn.copy()); //Forge: Vanilla bug fix associated with fixed setCurrentItemOrArmor indexs for players.
+        if (itemstack == null)
+        {
+            playerIn.setItemStackToSlot(entityequipmentslot, itemStackIn.copy());
             itemStackIn.stackSize = 0;
+            return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
         }
-
-        return itemStackIn;
+        else
+        {
+            return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+        }
     }
 }

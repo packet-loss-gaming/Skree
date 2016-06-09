@@ -8,12 +8,18 @@ package com.skelril.nitro.registry.item.food;
 
 import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.StatList;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -26,7 +32,7 @@ public interface ICustomFood extends ICustomItem {
 
     @Override
     default CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabFood;
+        return CreativeTabs.FOOD;
     }
 
     ItemFood __getFoodItem();
@@ -48,18 +54,24 @@ public interface ICustomFood extends ICustomItem {
      * sets a potion effect on the item. Args: int potionId, int duration (will be multiplied by 20), int amplifier,
      * float probability of effect happening
      */
-    ItemFood __setPotionEffect(int p_77844_1_, int duration, int amplifier, float probability);
+    ItemFood __setPotionEffect(PotionEffect p_185070_1_, float p_185070_2_);
 
     /**
      * Called when the player finishes using this Item (E.g. finishes eating.). Not called when the player stops using
      * the Item before the action is complete.
      */
-    default ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+    default ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
         --stack.stackSize;
-        playerIn.getFoodStats().addStats(__getFoodItem(), stack);
-        worldIn.playSoundAtEntity(playerIn, "random.burp", 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
-        this.__onFoodEaten(stack, worldIn, playerIn);
-        playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(__getFoodItem())]);
+
+        if (entityLiving instanceof EntityPlayer)
+        {
+            EntityPlayer entityplayer = (EntityPlayer)entityLiving;
+            entityplayer.getFoodStats().addStats(__getFoodItem(), stack);
+            worldIn.playSound(null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
+            this.__onFoodEaten(stack, worldIn, entityplayer);
+            entityplayer.addStat(StatList.getObjectUseStats(__getFoodItem()));
+        }
+
         return stack;
     }
 
@@ -80,12 +92,13 @@ public interface ICustomFood extends ICustomItem {
     /**
      * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
-    default ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
+    default ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
         if (playerIn.canEat(__isAlwaysEditable())) {
-            playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
+            playerIn.setActiveHand(hand);
+            return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+        } else {
+            return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
         }
-
-        return itemStackIn;
     }
 
     default int getHealAmount(ItemStack itemStackIn) {

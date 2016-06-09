@@ -503,7 +503,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                     Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
                     if (optEntity.isPresent()) {
                         getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                        optEntity.get().setPassenger(player);
+                        optEntity.get().getPassengers().add(player);
                     }
                 }
                 attackDur = System.currentTimeMillis() + 20000;

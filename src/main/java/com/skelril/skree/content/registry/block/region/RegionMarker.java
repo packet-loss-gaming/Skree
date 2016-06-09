@@ -17,9 +17,9 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,14 +38,17 @@ import java.util.Optional;
 
 public class RegionMarker extends Block implements ICustomBlock, EventAwareContent {
     public RegionMarker() {
-        super(new Material(MapColor.stoneColor));
-        this.setBlockBounds(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        super(new Material(MapColor.STONE));
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(1.5F);
         this.setResistance(6000000.0F);
-        this.setStepSound(soundTypePiston);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return new AxisAlignedBB(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
     }
 
     @Override
@@ -54,12 +57,12 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(net.minecraft.world.World worldIn, BlockPos pos, IBlockState state) {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, net.minecraft.world.World worldIn, BlockPos pos) {
         return null;
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
@@ -69,13 +72,13 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
     }
 
     @Override
-    public boolean isFullCube() {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT_MIPPED;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT_MIPPED;
     }
 
     @Listener

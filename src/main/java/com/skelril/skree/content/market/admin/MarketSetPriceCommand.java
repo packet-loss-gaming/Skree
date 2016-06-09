@@ -14,6 +14,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -47,7 +48,7 @@ public class MarketSetPriceCommand implements CommandExecutor {
         }
 
         Optional<String> optAlias = args.getOne("alias");
-        Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand() : Optional.empty();
+        Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
         if (optAlias.isPresent()) {
             String alias = optAlias.get();
             if (service.setPrice(alias, price)) {

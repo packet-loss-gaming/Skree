@@ -26,6 +26,7 @@ import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.group.GroupZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
@@ -192,7 +193,7 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                         Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
 
                         if (srcEntity instanceof Player) {
-                            Optional<ItemStack> optHeld = ((Player) srcEntity).getItemInHand();
+                            Optional<ItemStack> optHeld = ((Player) srcEntity).getItemInHand(HandTypes.MAIN_HAND);
                             if (optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.BLAZE_ROD) {
                                 inst.modifyDifficulty(2);
                             }

@@ -23,6 +23,6 @@ public class HackBook extends CustomItem {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMisc;
+        return CreativeTabs.MISC;
     }
 }

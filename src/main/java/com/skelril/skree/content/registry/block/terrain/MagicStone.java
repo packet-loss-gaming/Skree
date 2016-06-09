@@ -10,6 +10,7 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,13 +25,13 @@ import java.util.Random;
 public class MagicStone extends Block implements ICustomBlock, Craftable {
 
     public MagicStone() {
-        super(new Material(MapColor.stoneColor));
-        this.setCreativeTab(CreativeTabs.tabBlock);
+        super(new Material(MapColor.STONE));
+        this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(1.5F);
         this.setResistance(10.0F);
-        this.setStepSound(soundTypePiston);
+        this.setSoundType(SoundType.STONE);
     }
 
     @Override
@@ -40,14 +41,14 @@ public class MagicStone extends Block implements ICustomBlock, Craftable {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return Item.getItemFromBlock(Blocks.cobblestone);
+        return Item.getItemFromBlock(Blocks.COBBLESTONE);
     }
 
     @Override
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Blocks.stone),
+                new ItemStack(Blocks.STONE),
                 new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
     }

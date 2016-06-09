@@ -21,6 +21,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
@@ -31,7 +32,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -128,7 +129,7 @@ public class CursedMineListener {
         }
 
         CursedMineInstance inst = optInst.get();
-        Optional<ItemStack> optHeldItem = player.getItemInHand();
+        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (!optHeldItem.isPresent()) {
             event.setCancelled(true);
@@ -248,7 +249,7 @@ public class CursedMineListener {
     }
 
     @Listener
-    public void onPlayerTeleport(DisplaceEntityEvent.Teleport event) {
+    public void onPlayerTeleport(MoveEntityEvent.Teleport event) {
         Entity entity = event.getTargetEntity();
         if (!(entity instanceof Player)) {
             return;

@@ -15,6 +15,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
@@ -52,14 +53,14 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Override
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new net.minecraft.item.ItemStack(this),
-                new net.minecraft.item.ItemStack(Items.paper),
+                new net.minecraft.item.ItemStack(Items.PAPER),
                 new net.minecraft.item.ItemStack(CustomItemTypes.RED_SHARD)
         );
     }
@@ -100,7 +101,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
 
     @Listener
     public void onBlockInteract(InteractBlockEvent.Secondary event, @Root Player player) {
-        Optional<ItemStack> optItemStack = player.getItemInHand();
+        Optional<ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
         if (!optItemStack.isPresent()) {
             return;
         }
@@ -138,7 +139,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
         }
         Player targetPlayer = (Player) targetEntity;
 
-        Optional<ItemStack> optItemStack = player.getItemInHand();
+        Optional<ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
         if (!optItemStack.isPresent()) {
             return;
         }

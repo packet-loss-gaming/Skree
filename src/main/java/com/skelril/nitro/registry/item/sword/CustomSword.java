@@ -8,22 +8,21 @@ package com.skelril.nitro.registry.item.sword;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.UUID;
-
 public abstract class CustomSword extends ItemSword implements ICustomSword {
     protected CustomSword() {
-        super(ToolMaterial.EMERALD);
+        super(ToolMaterial.DIAMOND);
         this.maxStackSize = __getMaxStackSize();
         this.setCreativeTab(__getCreativeTab());
 
@@ -38,19 +37,14 @@ public abstract class CustomSword extends ItemSword implements ICustomSword {
     }
 
     @Override
-    public Multimap __superGetItemAttributeModifiers() {
+    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
         return HashMultimap.create(); // Use functionality defined in Item
-    }
-
-    @Override
-    public UUID __itemModifierUUID() {
-        return itemModifierUUID;
     }
 
     // Modified Native ItemTool methods
     @Override
-    public float getStrVsBlock(ItemStack stack, Block p_150893_2_) {
-        return ICustomSword.super.getStrVsBlock(stack, p_150893_2_);
+    public float getStrVsBlock(ItemStack stack, IBlockState state) {
+        return ICustomSword.super.getStrVsBlock(stack, state);
     }
 
     @Override
@@ -59,8 +53,8 @@ public abstract class CustomSword extends ItemSword implements ICustomSword {
     }
 
     @Override
-    public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
-        return ICustomSword.super.onBlockDestroyed(stack, worldIn, blockIn, pos, playerIn);
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+        return ICustomSword.super.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
     }
 
     @SideOnly(Side.CLIENT)
@@ -80,13 +74,8 @@ public abstract class CustomSword extends ItemSword implements ICustomSword {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        return ICustomSword.super.onItemRightClick(itemStackIn, worldIn, playerIn);
-    }
-
-    @Override
-    public boolean canHarvestBlock(Block blockIn) {
-        return ICustomSword.super.canHarvestBlock(blockIn);
+    public boolean canHarvestBlock(IBlockState state) {
+        return ICustomSword.super.canHarvestBlock(state);
     }
 
     @Override
@@ -100,8 +89,7 @@ public abstract class CustomSword extends ItemSword implements ICustomSword {
     }
 
     @Override
-    public Multimap getItemAttributeModifiers() {
-        return ICustomSword.super.getItemAttributeModifiers();
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return ICustomSword.super.getItemAttributeModifiers(equipmentSlot);
     }
-
 }

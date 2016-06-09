@@ -8,23 +8,21 @@ package com.skelril.nitro.registry.item;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Set;
-import java.util.UUID;
 
 public abstract class CustomTool extends ItemTool implements ICustomTool {
 
     public CustomTool() {
-        super(0, ToolMaterial.EMERALD, Sets.newHashSet());
+        super(0, 0, ToolMaterial.DIAMOND, Sets.newHashSet());
         this.maxStackSize = __getMaxStackSize();
         this.setCreativeTab(__getCreativeTab());
 
@@ -39,16 +37,6 @@ public abstract class CustomTool extends ItemTool implements ICustomTool {
     }
 
     @Override
-    public Multimap __superGetItemAttributeModifiers() {
-        return super.getItemAttributeModifiers();
-    }
-
-    @Override
-    public UUID __itemModifierUUID() {
-        return itemModifierUUID;
-    }
-
-    @Override
     public int __superGetHarvestLevel(ItemStack stack, String toolClass) {
         return super.getHarvestLevel(stack, toolClass);
     }
@@ -59,23 +47,18 @@ public abstract class CustomTool extends ItemTool implements ICustomTool {
     }
 
     @Override
-    public float __superGetDigSpeed(ItemStack stack, IBlockState state) {
-        return super.getDigSpeed(stack, state);
+    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return super.getItemAttributeModifiers(equipmentSlot);
     }
 
     @Override
-    public float getStrVsBlock(ItemStack stack, Block block) {
+    public float getStrVsBlock(ItemStack stack, IBlockState block) {
         return ICustomTool.super.getStrVsBlock(stack, block);
     }
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
         return ICustomTool.super.hitEntity(stack, target, attacker);
-    }
-
-    @Override
-    public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
-        return ICustomTool.super.onBlockDestroyed(stack, worldIn, blockIn, pos, playerIn);
     }
 
     @SideOnly(Side.CLIENT)
@@ -95,8 +78,8 @@ public abstract class CustomTool extends ItemTool implements ICustomTool {
     }
 
     @Override
-    public Multimap getItemAttributeModifiers() {
-        return ICustomTool.super.getItemAttributeModifiers();
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return ICustomTool.super.getItemAttributeModifiers(equipmentSlot);
     }
 
     @Override
@@ -107,10 +90,5 @@ public abstract class CustomTool extends ItemTool implements ICustomTool {
     @Override
     public Set<String> getToolClasses(ItemStack stack) {
         return ICustomTool.super.getToolClasses(stack);
-    }
-
-    @Override
-    public float getDigSpeed(ItemStack stack, net.minecraft.block.state.IBlockState state) {
-        return ICustomTool.super.getDigSpeed(stack, state);
     }
 }

@@ -72,9 +72,9 @@ public class DiamondTerragu extends CustomTerragu implements Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Items.diamond_pickaxe),
-                new ItemStack(Items.diamond_axe),
-                new ItemStack(Items.diamond_shovel),
+                new ItemStack(Items.DIAMOND_PICKAXE),
+                new ItemStack(Items.DIAMOND_AXE),
+                new ItemStack(Items.DIAMOND_SHOVEL),
                 new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
         );
     }

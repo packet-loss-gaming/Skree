@@ -9,26 +9,34 @@ package com.skelril.nitro.registry.item.armor;
 import com.skelril.nitro.ReflectiveModifier;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
 
-    public CustomArmor(int armorType) {
-        super(ArmorMaterial.DIAMOND, 4, armorType); // 4 is allegedly used for net.minecraft.client.renderer.entity.RenderPlayer
+    public CustomArmor(EntityEquipmentSlot slotType) {
+        super(ArmorMaterial.DIAMOND, 4, slotType); // 4 is allegedly used for net.minecraft.client.renderer.entity.RenderPlayer
                                                     // to determine which model to use
                                                     // This just bases everything off the diamond armor model
 
         // Refers to damageReduceAmount
         ReflectiveModifier.modifyFieldValue(ItemArmor.class, this, "field_77879_b", __getDamageReductionAmount());
 
-        this.setMaxDamage(__getMaxUses());
+        this.setMaxDamage(__getMaxUses(slotType));
         this.maxStackSize = __getMaxStackSize();
         this.setCreativeTab(__getCreativeTab());
     }
+
+    @Override
+    public EntityEquipmentSlot __getSlotType() {
+        return armorType;
+    }
+
 
     // Native compatibility methods
 
@@ -40,11 +48,6 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
     @Override
     public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
         return false; // Use functionality defined in Item
-    }
-
-    @Override
-    public int __getArmorTypeIndex() {
-        return armorType;
     }
 
     // Modified Native ItemArmor methods
@@ -96,7 +99,7 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
         return ICustomArmor.super.onItemRightClick(itemStackIn, worldIn, playerIn);
     }
 }

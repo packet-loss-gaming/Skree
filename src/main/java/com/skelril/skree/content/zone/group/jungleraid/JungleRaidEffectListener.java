@@ -14,18 +14,23 @@ import com.skelril.nitro.position.CuboidContainmentPredicate;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.projectile.*;
+import org.spongepowered.api.entity.projectile.Firework;
+import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.entity.projectile.Snowball;
+import org.spongepowered.api.entity.projectile.ThrownPotion;
+import org.spongepowered.api.entity.projectile.arrow.Arrow;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
@@ -187,7 +192,7 @@ public class JungleRaidEffectListener {
 
         int explosionSize = 2;
 
-        if (entity.getType() == EntityTypes.ARROW) {
+        if (entity.getType() == EntityTypes.TIPPED_ARROW) {
             if (inst.isFlagEnabled(JungleRaidFlag.TORMENT_ARROWS)) {
                 ProjectileSource shooter = ((Arrow) entity).getShooter();
 
@@ -223,8 +228,7 @@ public class JungleRaidEffectListener {
         entity.getLocation().getExtent().triggerExplosion(
                 Explosion.builder()
                         .radius(explosionSize)
-                        .world(entity.getLocation().getExtent())
-                        .origin(entity.getLocation().getPosition())
+                        .location(entity.getLocation())
                         .shouldDamageEntities(true)
                         .shouldBreakBlocks(true)
                         .shouldPlaySmoke(false)
@@ -249,7 +253,7 @@ public class JungleRaidEffectListener {
 
         JungleRaidInstance inst = optInst.get();
 
-        Optional<ItemStack> optStack = player.getItemInHand();
+        Optional<ItemStack> optStack = player.getItemInHand(HandTypes.MAIN_HAND);
         if (!optStack.isPresent()) {
             return;
         }
@@ -299,7 +303,7 @@ public class JungleRaidEffectListener {
                 if (optClass.isPresent()) {
                     JungleRaidClass jrClass = optClass.get();
                     if (jrClass == JungleRaidClass.SNIPER) {
-                        Optional<ItemStack> optHeld = attacker.getItemInHand();
+                        Optional<ItemStack> optHeld = attacker.getItemInHand(HandTypes.MAIN_HAND);
                         boolean hasWoodenSword = optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.WOODEN_SWORD;
 
                         if (indirectSource != null || !hasWoodenSword) {

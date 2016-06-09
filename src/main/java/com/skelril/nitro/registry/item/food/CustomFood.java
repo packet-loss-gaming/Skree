@@ -6,10 +6,14 @@
 
 package com.skelril.nitro.registry.item.food;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -55,14 +59,14 @@ public abstract class CustomFood extends ItemFood implements ICustomFood {
     }
 
     @Override
-    public ItemFood __setPotionEffect(int p_77844_1_, int duration, int amplifier, float probability) {
-        return super.setPotionEffect(p_77844_1_, duration, amplifier, probability);
+    public ItemFood __setPotionEffect(PotionEffect p_185070_1_, float p_185070_2_) {
+        return super.setPotionEffect(p_185070_1_, p_185070_2_);
     }
 
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-        return ICustomFood.super.onItemUseFinish(stack, worldIn, playerIn);
+    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
+        return ICustomFood.super.onItemUseFinish(stack, worldIn, entityLiving);
     }
 
     @Override
@@ -81,8 +85,8 @@ public abstract class CustomFood extends ItemFood implements ICustomFood {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        return ICustomFood.super.onItemRightClick(itemStackIn, worldIn, playerIn);
+    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        return ICustomFood.super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
 
     @Override
@@ -101,8 +105,8 @@ public abstract class CustomFood extends ItemFood implements ICustomFood {
     }
 
     @Override
-    public ItemFood setPotionEffect(int p_77844_1_, int duration, int amplifier, float probability) {
-        return super.setPotionEffect(p_77844_1_, duration, amplifier, probability);
+    public ItemFood setPotionEffect(PotionEffect p_185070_1_, float p_185070_2_) {
+        return super.setPotionEffect(p_185070_1_, p_185070_2_);
     }
 
     @Override

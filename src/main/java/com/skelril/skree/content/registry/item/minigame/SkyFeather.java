@@ -6,11 +6,11 @@
 
 package com.skelril.skree.content.registry.item.minigame;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -59,10 +59,10 @@ public class SkyFeather extends CustomItem {
         Optional<Data> optData = getDataFor(stack);
         if (optData.isPresent()) {
             Data data = optData.get();
-            tooltip.add(EnumChatFormatting.GOLD + "Uses: " + (data.uses != -1 ? data.uses : "Infinite"));
-            tooltip.add(EnumChatFormatting.GOLD + "Radius: " + data.radius);
-            tooltip.add(EnumChatFormatting.GOLD + "Flight: " + data.flight);
-            tooltip.add(EnumChatFormatting.GOLD + "Push Back: " + data.pushBack);
+            tooltip.add(ChatFormatting.GOLD + "Uses: " + (data.uses != -1 ? data.uses : "Infinite"));
+            tooltip.add(ChatFormatting.GOLD + "Radius: " + data.radius);
+            tooltip.add(ChatFormatting.GOLD + "Flight: " + data.flight);
+            tooltip.add(ChatFormatting.GOLD + "Push Back: " + data.pushBack);
         }
     }
 

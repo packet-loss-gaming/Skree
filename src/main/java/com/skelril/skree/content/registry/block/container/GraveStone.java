@@ -14,7 +14,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -23,8 +23,11 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -42,12 +45,16 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     public static final PropertyDirection FACING_PROP = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
     public GraveStone() {
-        super(new Material(MapColor.stoneColor)); // Create a new non-burnable stone like block
-        this.setBlockBounds(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
+        super(new Material(MapColor.STONE)); // Create a new non-burnable stone like block
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING_PROP, EnumFacing.NORTH));
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setLightLevel(0.3F);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return new AxisAlignedBB(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
     }
 
     @Override
@@ -56,17 +63,17 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     }
 
     @Override
-    public int getRenderType() {
-        return 3;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    public boolean isFullCube() {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
@@ -114,8 +121,8 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     }
 
     @Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, FACING_PROP);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, FACING_PROP);
     }
 
     public List<ItemStack> createGrave(List<ItemStack> items, Location<org.spongepowered.api.world.World> pos) {

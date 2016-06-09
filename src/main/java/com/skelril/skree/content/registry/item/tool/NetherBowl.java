@@ -10,9 +10,13 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.Teleporter;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.world.Location;
@@ -44,7 +48,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override
@@ -64,22 +68,23 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
+    public ItemStack onItemUseFinish(ItemStack stack, net.minecraft.world.World worldIn, EntityLivingBase entityLiving) {
         Optional<Location<World>> optLoc = getDestination(stack);
         if (optLoc.isPresent()) {
-            tf(playerIn).setLocation(optLoc.get());
+            tf(entityLiving).setLocation(optLoc.get());
         }
 
         return new ItemStack(this);
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemStackIn, net.minecraft.world.World worldIn, EntityPlayer playerIn) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, net.minecraft.world.World worldIn, EntityPlayer playerIn, EnumHand hand) {
         if (getDestination(itemStackIn).isPresent()) {
-            playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
+            playerIn.setActiveHand(hand);
+            return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+        } else {
+            return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
         }
-
-        return itemStackIn;
     }
 
     @Override

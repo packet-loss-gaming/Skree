@@ -427,7 +427,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
         Living snipee = getBoss(FreakyFourBoss.SNIPEE).get();
 
         VelocityEntitySpawner.sendRadial(
-                EntityTypes.ARROW,
+                EntityTypes.TIPPED_ARROW,
                 snipee,
                 20,
                 1.6F,
@@ -454,8 +454,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                 if (Probability.getChance(config.daBombTNT)) {
                     getRegion().getExtent().triggerExplosion(
                             Explosion.builder()
-                                    .origin(new Vector3d(x, minY, z))
-                                    .world(getRegion().getExtent())
+                                    .location(new Location<>(getRegion().getExtent(), new Vector3d(x, minY, z)))
                                     .radius(dmgFact)
                                     .canCauseFire(false)
                                     .shouldBreakBlocks(false)

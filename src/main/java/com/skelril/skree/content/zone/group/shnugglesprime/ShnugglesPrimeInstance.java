@@ -34,6 +34,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
@@ -226,7 +227,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         Zombie zombie = (Zombie) spawned.get();
                         // TODO convert to Sponge Data API
                         ((EntityZombie) zombie).setChild(true);
-                        zombie.setItemInHand(weapon.copy());
+                        zombie.setItemInHand(HandTypes.MAIN_HAND, weapon.copy());
                         getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
                         if (target != null) {
@@ -424,9 +425,8 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             spawnPts.stream().filter(pt -> Probability.getChance(12)).forEach(pt -> {
                                 Explosion explosion = Explosion.builder()
                                         .shouldBreakBlocks(false)
-                                        .origin(pt.getPosition())
+                                        .location(pt)
                                         .radius(10)
-                                        .world(getRegion().getExtent())
                                         .build();
                                 
                                 getRegion().getExtent().triggerExplosion(explosion);

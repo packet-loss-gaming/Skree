@@ -72,9 +72,9 @@ public class StoneTerragu extends CustomTerragu implements Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Items.stone_pickaxe),
-                new ItemStack(Items.stone_axe),
-                new ItemStack(Items.stone_shovel),
+                new ItemStack(Items.STONE_PICKAXE),
+                new ItemStack(Items.STONE_AXE),
+                new ItemStack(Items.STONE_SHOVEL),
                 new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
         );
     }

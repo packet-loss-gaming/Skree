@@ -15,6 +15,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -53,7 +54,7 @@ public class MarketLookupCommand implements CommandExecutor {
             optPrice = service.getPrice(optAlias.get());
             optAlias = service.getAlias(optAlias.get());
         } else {
-            Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand() : Optional.empty();
+            Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
             if (held.isPresent()) {
                 optPrice = service.getPrice(held.get());
                 optAlias = service.getAlias(held.get());

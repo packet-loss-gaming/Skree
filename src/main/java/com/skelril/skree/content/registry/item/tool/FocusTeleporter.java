@@ -14,14 +14,16 @@ import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.content.world.WorldEntryPermissionCheck;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -29,8 +31,6 @@ import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class FocusTeleporter extends CustomItem implements Craftable, EventAwareContent, Teleporter {
 
@@ -46,7 +46,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabTools;
+        return CreativeTabs.TOOLS;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
 
         Player player = optPlayer.get();
 
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
@@ -82,7 +82,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 }
 
                 setDestination(held, destination);
-                player.setItemInHand(held);
+                player.setItemInHand(HandTypes.MAIN_HAND, held);
                 event.setCancelled(true);
             }
         }
@@ -96,18 +96,19 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
 
         Player player = optPlayer.get();
 
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand();
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
             org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
                 Optional<Location<World>> optDestination = getDestination(held);
-                InventoryPlayer playerInv = tf(player).inventory;
-                if (optDestination.isPresent() && playerInv.hasItem(CustomItemTypes.ENDER_FOCUS)) {
-                    playerInv.consumeInventoryItem(CustomItemTypes.ENDER_FOCUS);
-                    tf(player).inventoryContainer.detectAndSendChanges();
-                    player.setLocation(optDestination.get());
-                    event.setCancelled(true);
+                if (optDestination.isPresent()) {
+                    Inventory result = player.getInventory().query((ItemType) CustomItemTypes.ENDER_FOCUS);
+                    if (result.size() > 0) {
+                        result.poll();
+                        player.setLocation(optDestination.get());
+                        event.setCancelled(true);
+                    }
                 }
             }
         }

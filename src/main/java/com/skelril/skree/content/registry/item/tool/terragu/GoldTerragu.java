@@ -72,9 +72,9 @@ public class GoldTerragu extends CustomTerragu implements Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Items.golden_pickaxe),
-                new ItemStack(Items.golden_axe),
-                new ItemStack(Items.golden_shovel),
+                new ItemStack(Items.GOLDEN_PICKAXE),
+                new ItemStack(Items.GOLDEN_AXE),
+                new ItemStack(Items.GOLDEN_SHOVEL),
                 new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
         );
     }

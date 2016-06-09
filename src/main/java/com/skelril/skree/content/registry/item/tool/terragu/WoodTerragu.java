@@ -72,9 +72,9 @@ public class WoodTerragu extends CustomTerragu implements Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
-                new ItemStack(Items.wooden_pickaxe),
-                new ItemStack(Items.wooden_axe),
-                new ItemStack(Items.wooden_shovel),
+                new ItemStack(Items.WOODEN_PICKAXE),
+                new ItemStack(Items.WOODEN_AXE),
+                new ItemStack(Items.WOODEN_SHOVEL),
                 new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
         );
     }

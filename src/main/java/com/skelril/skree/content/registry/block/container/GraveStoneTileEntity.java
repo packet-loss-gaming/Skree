@@ -166,7 +166,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
         }
     }
 
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         NBTTagList nbttaglist = new NBTTagList();
 
@@ -184,5 +184,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
         if (this.hasCustomName()) {
             compound.setString("CustomName", this.customName);
         }
+
+        return compound;
     }
 }

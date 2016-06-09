@@ -9,11 +9,17 @@ package com.skelril.nitro.registry.item.shovel;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.registry.item.ICustomTool;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
 import java.util.Collection;
 
 public interface ICustomShovel extends ICustomTool {
+    @Override
+    default double __getAttackSpeed() {
+        return -3.0F; // TODO
+    }
+
     @Override
     default String __getToolClass() {
         return "shovel";
@@ -22,16 +28,16 @@ public interface ICustomShovel extends ICustomTool {
     @Override
     default Collection<Block> __getEffectiveBlocks() {
         return Lists.newArrayList(
-                Blocks.clay,
-                Blocks.dirt,
-                Blocks.farmland,
-                Blocks.grass,
-                Blocks.gravel,
-                Blocks.mycelium,
-                Blocks.sand,
-                Blocks.snow,
-                Blocks.snow_layer,
-                Blocks.soul_sand
+                Blocks.CLAY,
+                Blocks.DIRT,
+                Blocks.FARMLAND,
+                Blocks.GRASS,
+                Blocks.GRAVEL,
+                Blocks.MYCELIUM,
+                Blocks.SAND,
+                Blocks.SNOW,
+                Blocks.SNOW_LAYER,
+                Blocks.SOUL_SAND
         );
     }
 
@@ -40,7 +46,8 @@ public interface ICustomShovel extends ICustomTool {
     /**
      * Check whether this Item can harvest the given Block
      */
-    default boolean canHarvestBlock(Block blockIn) {
-        return blockIn == Blocks.snow_layer || blockIn == Blocks.snow;
+    default boolean canHarvestBlock(IBlockState blockIn) {
+        Block block = blockIn.getBlock();
+        return block == Blocks.SNOW_LAYER || block == Blocks.SNOW;
     }
 }

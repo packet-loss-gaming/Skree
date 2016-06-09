@@ -26,7 +26,7 @@ public class DemonicIngot extends CustomItem implements Craftable {
 
     @Override
     public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.tabMaterials;
+        return CreativeTabs.MATERIALS;
     }
 
     @Override

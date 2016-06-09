@@ -60,7 +60,7 @@ public class JurackPickaxe extends CustomPickaxe implements Craftable {
                 " B ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.JURACK_GEM),
-                'B', new ItemStack(Items.stick)
+                'B', new ItemStack(Items.STICK)
         );
     }
 }

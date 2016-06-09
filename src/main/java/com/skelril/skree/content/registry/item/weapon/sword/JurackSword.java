@@ -50,7 +50,7 @@ public class JurackSword extends CustomSword implements Craftable {
                 " A ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.JURACK_GEM),
-                'B', new ItemStack(Items.stick)
+                'B', new ItemStack(Items.STICK)
         );
     }
 }

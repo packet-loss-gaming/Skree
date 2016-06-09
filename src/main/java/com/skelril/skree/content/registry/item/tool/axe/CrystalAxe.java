@@ -60,7 +60,7 @@ public class CrystalAxe extends CustomAxe implements Craftable {
                 "AB ",
                 " B ",
                 'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'B', new ItemStack(Items.stick)
+                'B', new ItemStack(Items.STICK)
         );
     }
 }

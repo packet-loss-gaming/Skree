@@ -10,12 +10,15 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -24,17 +27,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Pitfall extends Block implements ICustomBlock, Craftable {
 
     public Pitfall() {
-        super(Material.clay);
-        this.setBlockBounds(0F, .9375F, 0F, 1F, 1F, 1F);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        super(Material.CLAY);
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
 
         // Data applied for Vanilla blocks in net.minecraft.block.Block
         this.setHardness(0.6F);
-        this.setStepSound(soundTypePiston);
+        this.setSoundType(SoundType.STONE);
     }
 
     @Override
-    public boolean isFullCube() {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
@@ -44,14 +51,14 @@ public class Pitfall extends Block implements ICustomBlock, Craftable {
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     @Override
@@ -63,7 +70,7 @@ public class Pitfall extends Block implements ICustomBlock, Craftable {
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this, 3),
-                new ItemStack(Blocks.clay),
+                new ItemStack(Blocks.CLAY),
                 new ItemStack(CustomItemTypes.FAIRY_DUST)
         );
     }

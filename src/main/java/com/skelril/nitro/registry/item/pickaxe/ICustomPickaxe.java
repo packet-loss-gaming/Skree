@@ -11,6 +11,7 @@ import com.skelril.nitro.registry.item.ICustomTool;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -25,70 +26,75 @@ public interface ICustomPickaxe extends ICustomTool {
     @Override
     default Collection<Block> __getEffectiveBlocks() {
         return Lists.newArrayList(
-                Blocks.activator_rail,
-                Blocks.coal_ore,
-                Blocks.cobblestone,
-                Blocks.detector_rail,
-                Blocks.diamond_block,
-                Blocks.diamond_ore,
+                Blocks.ACTIVATOR_RAIL,
+                Blocks.COAL_ORE,
+                Blocks.COBBLESTONE,
+                Blocks.DETECTOR_RAIL,
+                Blocks.DIAMOND_BLOCK,
+                Blocks.DIAMOND_ORE,
                 CustomBlockTypes.JURACK_ORE,
-                Blocks.double_stone_slab,
-                Blocks.golden_rail,
-                Blocks.gold_block,
-                Blocks.gold_ore,
-                Blocks.ice,
-                Blocks.iron_block,
-                Blocks.iron_ore,
-                Blocks.lapis_block,
-                Blocks.lapis_ore,
-                Blocks.lit_redstone_ore,
-                Blocks.mossy_cobblestone,
-                Blocks.netherrack,
-                Blocks.packed_ice,
-                Blocks.rail,
-                Blocks.redstone_ore,
-                Blocks.sandstone,
-                Blocks.red_sandstone,
-                Blocks.stone,
-                Blocks.stone_slab
+                Blocks.DOUBLE_STONE_SLAB,
+                Blocks.GOLDEN_RAIL,
+                Blocks.GOLD_BLOCK,
+                Blocks.GOLD_ORE,
+                Blocks.ICE,
+                Blocks.IRON_BLOCK,
+                Blocks.IRON_ORE,
+                Blocks.LAPIS_BLOCK,
+                Blocks.LAPIS_ORE,
+                Blocks.LIT_REDSTONE_ORE,
+                Blocks.MOSSY_COBBLESTONE,
+                Blocks.NETHERRACK,
+                Blocks.PACKED_ICE,
+                Blocks.RAIL,
+                Blocks.REDSTONE_ORE,
+                Blocks.SANDSTONE,
+                Blocks.RED_SANDSTONE,
+                Blocks.STONE,
+                Blocks.STONE_SLAB
         );
     }
 
     // Modified Native ItemTool methods
 
-    default boolean canHarvestBlock(Block blockIn) {
+    default boolean canHarvestBlock(IBlockState blockIn) {
         if (blockIn == CustomBlockTypes.JURACK_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 3;
         }
-        if (blockIn == Blocks.obsidian) {
+        if (blockIn == Blocks.OBSIDIAN) {
             return __getHarvestTier().getHarvestLevel() >= 3;
         }
-        if (blockIn == Blocks.diamond_block || blockIn == Blocks.diamond_ore) {
+        if (blockIn == Blocks.DIAMOND_BLOCK || blockIn == Blocks.DIAMOND_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 2;
         }
-        if (blockIn == Blocks.emerald_ore || blockIn == Blocks.emerald_block) {
+        if (blockIn == Blocks.EMERALD_ORE || blockIn == Blocks.EMERALD_BLOCK) {
             return __getHarvestTier().getHarvestLevel() >= 2;
         }
-        if (blockIn == Blocks.gold_block || blockIn == Blocks.gold_ore) {
+        if (blockIn == Blocks.GOLD_BLOCK || blockIn == Blocks.GOLD_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 2;
         }
-        if (blockIn == Blocks.iron_block || blockIn == Blocks.iron_ore) {
+        if (blockIn == Blocks.IRON_BLOCK || blockIn == Blocks.IRON_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 1;
         }
-        if (blockIn == Blocks.lapis_block || blockIn == Blocks.lapis_ore) {
+        if (blockIn == Blocks.LAPIS_BLOCK || blockIn == Blocks.LAPIS_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 1;
         }
-        if (blockIn == Blocks.redstone_ore || blockIn == Blocks.lit_redstone_ore) {
+        if (blockIn == Blocks.REDSTONE_ORE || blockIn == Blocks.LIT_REDSTONE_ORE) {
             return __getHarvestTier().getHarvestLevel() >= 2;
         }
-        return (blockIn.getMaterial() == Material.rock || (blockIn.getMaterial() == Material.iron || blockIn.getMaterial() == Material.anvil));
+        return (blockIn.getMaterial() == Material.ROCK || (blockIn.getMaterial() == Material.IRON || blockIn.getMaterial() == Material.ANVIL));
     }
 
     @Override
-    default float getStrVsBlock(ItemStack stack, Block p_150893_2_) {
-        return p_150893_2_.getMaterial() != Material.iron && p_150893_2_.getMaterial() != Material.anvil && p_150893_2_.getMaterial() != Material.rock ? ICustomTool.super.getStrVsBlock(
+    default double __getAttackSpeed() {
+        return -2.8F;
+    }
+
+    @Override
+    default float getStrVsBlock(ItemStack stack, IBlockState state) {
+        return state.getMaterial() != Material.IRON && state.getMaterial() != Material.ANVIL && state.getMaterial() != Material.ROCK ? ICustomTool.super.getStrVsBlock(
                 stack,
-                p_150893_2_
+                state
         ) : __getSpecializedSpeed();
     }
 }

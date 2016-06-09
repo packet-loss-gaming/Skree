@@ -8,22 +8,22 @@ package com.skelril.nitro.registry.item.pickaxe;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Set;
-import java.util.UUID;
 
 public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickaxe {
     protected CustomPickaxe() {
-        super(ToolMaterial.EMERALD);
+        super(ToolMaterial.DIAMOND);
         this.maxStackSize = __getMaxStackSize();
         this.setCreativeTab(__getCreativeTab());
 
@@ -38,13 +38,8 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public Multimap __superGetItemAttributeModifiers() {
+    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
         return HashMultimap.create(); // Use functionality defined in Item
-    }
-
-    @Override
-    public UUID __itemModifierUUID() {
-        return itemModifierUUID;
     }
 
     @Override
@@ -58,18 +53,13 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public float __superGetDigSpeed(ItemStack stack, IBlockState state) {
-        return super.getDigSpeed(stack, state);
-    }
-
-    @Override
-    public boolean canHarvestBlock(Block blockIn) {
+    public boolean canHarvestBlock(IBlockState blockIn) {
         return ICustomPickaxe.super.canHarvestBlock(blockIn);
     }
     
     @Override
-    public float getStrVsBlock(ItemStack stack, Block block) {
-        return ICustomPickaxe.super.getStrVsBlock(stack, block);
+    public float getStrVsBlock(ItemStack stack, IBlockState state) {
+        return ICustomPickaxe.super.getStrVsBlock(stack, state);
     }
 
     @Override
@@ -78,8 +68,8 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos, EntityLivingBase playerIn) {
-        return ICustomPickaxe.super.onBlockDestroyed(stack, worldIn, blockIn, pos, playerIn);
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+        return ICustomPickaxe.super.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
     }
 
     @SideOnly(Side.CLIENT)
@@ -99,8 +89,8 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public Multimap getItemAttributeModifiers() {
-        return ICustomPickaxe.super.getItemAttributeModifiers();
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return ICustomPickaxe.super.getItemAttributeModifiers(equipmentSlot);
     }
 
     @Override
@@ -111,11 +101,6 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     @Override
     public Set<String> getToolClasses(ItemStack stack) {
         return ICustomPickaxe.super.getToolClasses(stack);
-    }
-
-    @Override
-    public float getDigSpeed(ItemStack stack, net.minecraft.block.state.IBlockState state) {
-        return ICustomPickaxe.super.getDigSpeed(stack, state);
     }
 }
 

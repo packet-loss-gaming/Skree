@@ -13,6 +13,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
@@ -57,7 +58,7 @@ public class TwoTailedSword extends CustomSword implements EventAwareContent {
                     return false;
                 }
 
-                Optional<org.spongepowered.api.item.inventory.ItemStack> optHeld = ((ArmorEquipable) living).getItemInHand();
+                Optional<org.spongepowered.api.item.inventory.ItemStack> optHeld = ((ArmorEquipable) living).getItemInHand(HandTypes.MAIN_HAND);
                 if (optHeld.isPresent() && optHeld.get().getItem() == CustomItemTypes.TWO_TAILED_SWORD) {
                     int diff = (int) (living.get(Keys.MAX_HEALTH).get() - living.get(Keys.HEALTH).get());
                     double randomRelative = Probability.getRandom(Probability.getRandom(Math.pow(diff, 2)));

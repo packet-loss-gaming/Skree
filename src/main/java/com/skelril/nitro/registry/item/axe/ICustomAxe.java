@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.skelril.nitro.registry.item.ICustomTool;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -25,24 +26,29 @@ public interface ICustomAxe extends ICustomTool {
     }
 
     @Override
+    default double __getAttackSpeed() {
+        return -3.0F; // TODO
+    }
+
+    @Override
     default Collection<Block> __getEffectiveBlocks() {
         return Lists.newArrayList(
-                Blocks.planks,
-                Blocks.bookshelf,
-                Blocks.log,
-                Blocks.log2,
-                Blocks.chest,
-                Blocks.pumpkin,
-                Blocks.lit_pumpkin,
-                Blocks.melon_block,
-                Blocks.ladder
+                Blocks.PLANKS,
+                Blocks.BOOKSHELF,
+                Blocks.LOG,
+                Blocks.LOG2,
+                Blocks.CHEST,
+                Blocks.PUMPKIN,
+                Blocks.LIT_PUMPKIN,
+                Blocks.MELON_BLOCK,
+                Blocks.LADDER
         );
     }
 
     @Override
-    default float getStrVsBlock(ItemStack stack, Block block) {
-        if (block.getMaterial() != Material.wood && block.getMaterial() != Material.plants && block.getMaterial() != Material.vine) {
-            return ICustomTool.super.getStrVsBlock(stack, block);
+    default float getStrVsBlock(ItemStack stack, IBlockState state) {
+        if (state.getMaterial() != Material.WOOD && state.getMaterial() != Material.PLANTS && state.getMaterial() != Material.VINE) {
+            return ICustomTool.super.getStrVsBlock(stack, state);
         } else {
             return __getSpecializedSpeed();
         }
