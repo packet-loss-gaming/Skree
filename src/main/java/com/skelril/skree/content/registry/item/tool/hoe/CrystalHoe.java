@@ -28,10 +28,8 @@ public class CrystalHoe extends CustomHoe implements Craftable {
 
     @Override
     public ItemTier __getHarvestTier() {
-        return null;
+        return ItemTiers.CRYSTAL;
     }
-
-
 
     @Override
     public void registerRecipes() {
