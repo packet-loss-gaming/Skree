@@ -96,8 +96,7 @@ public class WorldServiceImpl implements WorldService {
             }
 
             if (worldCreationTime > lastPlayerLogin.remove(uuid)) {
-                Collection<World> worlds = getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-                Location<World> spawn = worlds.iterator().next().getSpawnLocation();
+                Location<World> spawn = getEffectWrapper(MainWorldWrapper.class).get().getPrimaryWorld().getSpawnLocation();
                 player.setLocation(spawn);
             }
         } catch (SQLException e) {

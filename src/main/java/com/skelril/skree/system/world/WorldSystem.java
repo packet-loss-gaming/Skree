@@ -60,7 +60,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Handle main world
         initMain();
 
-        initCity();
+        // initCity();
 
         // Create worlds
         initBuild();
