@@ -52,8 +52,9 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
 
     // Modified Native ItemArmor methods
 
+    @SideOnly(Side.CLIENT)
     @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
         return ICustomArmor.super.getArmorTexture(stack, entity, slot, type);
     }
 
