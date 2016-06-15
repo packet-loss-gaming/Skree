@@ -57,7 +57,7 @@ public interface ICustomSword extends ICustomItem, DegradableItem {
 
     double __getHitPower();
     default double __getAttackSpeed() {
-        return -2.4000000953674316D;
+        return 1.6;
     }
 
     // Enchantability
