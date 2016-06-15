@@ -87,7 +87,7 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
         String texture = __getType();
         String domain = "skree";
 
-        return String.format("%s:textures/models/armor/%s_layer_%d%s.png", domain, texture, (slot.getIndex() == 2 ? 2 : 1), type == null ? "" : String.format("_%s", type));
+        return String.format("%s:textures/models/armor/%s_layer_%d%s.png", domain, texture, (slot == EntityEquipmentSlot.LEGS ? 2 : 1), "");
     }
 
     default int getColorFromItemStack(ItemStack stack, int renderPass) {
