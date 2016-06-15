@@ -94,14 +94,14 @@ public class SkyWarsListener {
             double flight = data.flight;
             double pushBack = data.pushBack;
 
-            if (event instanceof InteractBlockEvent.Primary) {
+            if (event instanceof InteractBlockEvent.Primary.MainHand) {
                 if (!playerData.canFly()) return;
 
                 vel = vel.mul(flight);
                 player.setVelocity(vel);
 
                 playerData.stopFlight(250);
-            } else {
+            } else if (event instanceof InteractBlockEvent.Secondary.MainHand) {
                 if (!playerData.canPushBack()) return;
                 vel = vel.mul(pushBack * 2);
 

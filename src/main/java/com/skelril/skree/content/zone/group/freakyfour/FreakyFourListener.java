@@ -53,7 +53,7 @@ public class FreakyFourListener {
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary event) {
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
 
         if (!optPlayer.isPresent()) return;

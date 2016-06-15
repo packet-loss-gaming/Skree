@@ -60,7 +60,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary event) {
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;

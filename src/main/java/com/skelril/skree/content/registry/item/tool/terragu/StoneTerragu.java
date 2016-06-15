@@ -54,12 +54,12 @@ public class StoneTerragu extends CustomTerragu implements Craftable {
     }
 
     @Listener
-    public void process(InteractBlockEvent.Primary event) {
+    public void process(InteractBlockEvent.Primary.MainHand event) {
         super.process(event);
     }
 
     @Listener
-    public void process(InteractBlockEvent.Secondary event) {
+    public void process(InteractBlockEvent.Secondary.MainHand event) {
         super.process(event);
     }
 

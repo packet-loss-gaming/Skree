@@ -63,7 +63,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     @Listener
-    public void onLeftClick(InteractBlockEvent.Primary event) {
+    public void onLeftClick(InteractBlockEvent.Primary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;
@@ -89,7 +89,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary event) {
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;

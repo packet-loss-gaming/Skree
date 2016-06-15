@@ -42,14 +42,14 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
 
     private Map<Player, Direction> clickMap = new WeakHashMap<>();
 
-    public void process(InteractBlockEvent.Primary event) {
+    public void process(InteractBlockEvent.Primary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
             clickMap.put(optPlayer.get(), event.getTargetSide().getOpposite());
         }
     }
 
-    public void process(InteractBlockEvent.Secondary event) {
+    public void process(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;

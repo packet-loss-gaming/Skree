@@ -100,7 +100,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary event, @Root Player player) {
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @Root Player player) {
         Optional<ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
         if (!optItemStack.isPresent()) {
             return;

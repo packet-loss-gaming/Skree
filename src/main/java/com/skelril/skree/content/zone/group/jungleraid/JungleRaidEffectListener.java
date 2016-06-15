@@ -81,7 +81,7 @@ public class JungleRaidEffectListener {
     }
 
     @Listener(order = Order.LATE)
-    public void onPlayerInteract(InteractBlockEvent.Primary event) {
+    public void onPlayerInteract(InteractBlockEvent.Primary.MainHand event) {
         Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
         if (!optBlockLoc.isPresent()) {
             return;
@@ -238,7 +238,7 @@ public class JungleRaidEffectListener {
 
 
     @Listener
-    public void onPlayerInteract(InteractBlockEvent.Secondary event) {
+    public void onPlayerInteract(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (!optPlayer.isPresent()) {
             return;

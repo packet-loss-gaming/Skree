@@ -107,7 +107,7 @@ public class GoldRushListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event, @Root Player player) {
+    public void onPlayerInteractEvent(InteractBlockEvent.Secondary.MainHand event, @Root Player player) {
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) return;
 

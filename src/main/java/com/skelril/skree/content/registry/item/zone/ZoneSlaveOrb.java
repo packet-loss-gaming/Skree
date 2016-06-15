@@ -80,7 +80,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary event) {
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
             Player player = optPlayer.get();

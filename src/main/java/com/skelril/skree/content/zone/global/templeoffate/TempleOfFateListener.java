@@ -27,7 +27,7 @@ public class TempleOfFateListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerInteractEvent(InteractBlockEvent.Secondary event, @Root Player player) {
+    public void onPlayerInteractEvent(InteractBlockEvent.Secondary.MainHand event, @Root Player player) {
         Optional<TempleOfFateInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) return;
 

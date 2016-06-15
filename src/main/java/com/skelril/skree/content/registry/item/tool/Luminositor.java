@@ -46,7 +46,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary event) {
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
 
         if (!optPlayer.isPresent()) return;
