@@ -27,6 +27,7 @@ import com.skelril.skree.system.respawn.RespawnSystem;
 import com.skelril.skree.system.respawnqueue.RespawnQueueSystem;
 import com.skelril.skree.system.shutdown.ShutdownSystem;
 import com.skelril.skree.system.teleport.TeleportSystem;
+import com.skelril.skree.system.tweaker.TweakerSystem;
 import com.skelril.skree.system.weather.WeatherCommandSystem;
 import com.skelril.skree.system.world.WorldGeneratorSystem;
 import com.skelril.skree.system.world.WorldSystem;
@@ -90,9 +91,10 @@ public class SkreePlugin {
                 RespawnQueueSystem.class,
                 ShutdownSystem.class,
                 TeleportSystem.class,
+                TweakerSystem.class,
+                WeatherCommandSystem.class,
                 WorldGeneratorSystem.class,
                 WorldSystem.class,
-                WeatherCommandSystem.class,
                 ZoneSystem.class
         );
 
