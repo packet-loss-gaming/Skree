@@ -6,14 +6,14 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.skelril.nitro.ReflectiveModifier;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,6 +48,11 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
     @Override
     public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
         return false; // Use functionality defined in Item
+    }
+
+    @Override
+    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return HashMultimap.create();
     }
 
     // Modified Native ItemArmor methods
@@ -100,7 +105,7 @@ public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        return ICustomArmor.super.onItemRightClick(itemStackIn, worldIn, playerIn);
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        return ICustomArmor.super.getItemAttributeModifiers(equipmentSlot);
     }
 }

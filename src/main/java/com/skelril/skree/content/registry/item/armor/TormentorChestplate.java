@@ -29,11 +29,6 @@ public class TormentorChestplate extends CustomChestplate implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 11;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

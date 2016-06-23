@@ -29,11 +29,6 @@ public class DivineHelmet extends CustomHelmet implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 5;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

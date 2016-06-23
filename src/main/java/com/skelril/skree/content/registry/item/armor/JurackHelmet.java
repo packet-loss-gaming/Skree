@@ -29,11 +29,6 @@ public class JurackHelmet extends CustomHelmet implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 4;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

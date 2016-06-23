@@ -29,11 +29,6 @@ public class TormentorLeggings extends CustomLeggings implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 8;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

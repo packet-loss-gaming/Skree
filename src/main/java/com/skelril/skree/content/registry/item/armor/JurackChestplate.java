@@ -29,11 +29,6 @@ public class JurackChestplate extends CustomChestplate implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 9;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

@@ -14,6 +14,17 @@ public abstract class CustomHelmet extends CustomArmor {
     }
 
     @Override
+    public int __getDamageReductionAmount() {
+        return 3;
+    }
+
+    @Override
+    public int __getToughness() {
+        return 2;
+    }
+
+
+    @Override
     public String __getArmorCategory() {
         return "helmet";
     }

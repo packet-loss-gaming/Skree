@@ -29,11 +29,6 @@ public class JurackLeggings extends CustomLeggings implements Craftable {
     }
 
     @Override
-    public int __getDamageReductionAmount() {
-        return 7;
-    }
-
-    @Override
     public int __getEnchantability() {
         return 10;
     }

@@ -6,22 +6,29 @@
 
 package com.skelril.nitro.registry.item.armor;
 
+import com.google.common.collect.Multimap;
 import com.skelril.nitro.registry.item.DegradableItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.world.World;
+
+import java.util.UUID;
 
 public interface ICustomArmor extends ICustomItem, DegradableItem {
+    UUID[] ARMOR_MODIFIERS = new UUID[] {
+            UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"),
+            UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"),
+            UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"),
+            UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")
+    };
 
-    static final int[] maxDamageArray = new int[] {13, 15, 16, 11};
+    int[] maxDamageArray = new int[] {13, 15, 16, 11};
 
     // Skelril Methods
 
@@ -63,6 +70,7 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
 
     // Combat Data
     int __getDamageReductionAmount();
+    int __getToughness();
 
     // Enchantability
     int __getEnchantability();
@@ -79,6 +87,8 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
     ItemArmor.ArmorMaterial __superGetArmorMaterial();
 
     boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair);
+
+    Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot);
 
     // Modified Native ItemArmor methods
 
@@ -159,22 +169,16 @@ public interface ICustomArmor extends ICustomItem, DegradableItem {
         return __superGetIsRepairable(toRepair, repair);
     }
 
-    /**
-     * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-     */
-    default ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
-        EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemStackIn);
-        ItemStack itemstack = playerIn.getItemStackFromSlot(entityequipmentslot);
+    default Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
+    {
+        Multimap<String, AttributeModifier> multimap = __superGetItemAttributeModifiers(equipmentSlot);
 
-        if (itemstack == null)
+        if (equipmentSlot == __getSlotType())
         {
-            playerIn.setItemStackToSlot(entityequipmentslot, itemStackIn.copy());
-            itemStackIn.stackSize = 0;
-            return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+            multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double) __getDamageReductionAmount(), 0));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", (double) __getToughness(), 0));
         }
-        else
-        {
-            return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
-        }
+
+        return multimap;
     }
 }

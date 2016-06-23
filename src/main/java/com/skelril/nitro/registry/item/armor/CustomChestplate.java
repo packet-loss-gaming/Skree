@@ -14,6 +14,16 @@ public abstract class CustomChestplate extends CustomArmor {
     }
 
     @Override
+    public int __getDamageReductionAmount() {
+        return 8;
+    }
+
+    @Override
+    public int __getToughness() {
+        return 2;
+    }
+
+    @Override
     public String __getArmorCategory() {
         return "chestplate";
     }
