@@ -328,7 +328,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                     dEvent.setBaseDamage(1);
                 } else {
-                    dEvent.setBaseDamage(dEvent.getBaseDamage() + Probability.getRandom(getDamageMod(level) * 2) - 1);
+                    dEvent.setBaseDamage(dEvent.getBaseDamage() + getDamageMod(level));
                 }
 
                 // Only apply scoring while in survival mode
