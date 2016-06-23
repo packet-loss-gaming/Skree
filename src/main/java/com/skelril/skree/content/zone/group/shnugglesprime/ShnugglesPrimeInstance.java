@@ -11,6 +11,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.EntityHealthPrinter;
+import com.skelril.nitro.entity.EntityHealthUtil;
 import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.text.CombinedText;
@@ -227,6 +228,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         Zombie zombie = (Zombie) spawned.get();
                         // TODO convert to Sponge Data API
                         ((EntityZombie) zombie).setChild(true);
+                        EntityHealthUtil.setMaxHealth(zombie, 1);
                         zombie.setItemInHand(HandTypes.MAIN_HAND, weapon.copy());
                         getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
@@ -320,7 +322,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     player.offer(Keys.VELOCITY,
                             new Vector3d(
                                     random.nextDouble() * 3 - 1.5,
-                                    random.nextDouble() * 1 + 1.3,
+                                    random.nextDouble() * 1 + .5,
                                     random.nextDouble() * 3 - 1.5
                             )
                     );
@@ -329,7 +331,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                 break;
             case CORRUPTION:
                 sendAttackBroadcast("Embrace my corruption!", AttackSeverity.NORMAL);
-                PotionEffect witherEffect = PotionEffect.of(PotionEffectTypes.WITHER, 1, 20 * 12);
+                PotionEffect witherEffect = PotionEffect.of(PotionEffectTypes.WITHER, 1, 20 * 3);
                 for (Player player : contained) {
                     List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
                     potionEffects.add(witherEffect);
@@ -400,7 +402,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
             case FIRE:
                 sendAttackBroadcast("Fire is your friend...", AttackSeverity.NORMAL);
                 for (Player player : contained) {
-                    player.offer(Keys.FIRE_TICKS, 20 * 30);
+                    player.offer(Keys.FIRE_TICKS, 20 * 5);
                 }
                 break;
             case BASK_IN_MY_GLORY:

@@ -39,6 +39,10 @@ public class EntityHealthUtil {
     }
 
     public static void setMaxHealth(Living living, double amt, boolean fill) {
+        if (amt < living.get(Keys.MAX_HEALTH).get()) {
+            living.offer(Keys.HEALTH, amt);
+        }
+
         living.offer(Keys.MAX_HEALTH, amt);
         if (fill) {
             toFullHealth(living);
