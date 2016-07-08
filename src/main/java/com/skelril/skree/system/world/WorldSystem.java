@@ -78,6 +78,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
             obtainOverworld().usesMapFeatures(false)
                     .generatorModifiers(new NoOreWorldGeneratorModifier()).build("skree:build", "build");
         }
+        Optional<WorldArchetype> optBarrierArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:barrier");
+        if (!optBarrierArchetype.isPresent()) {
+            obtainFlatworld().usesMapFeatures(false)
+                    .generatorModifiers(new BarrierWorldGeneratorModifier()).build("skree:barrier", "barrier");
+        }
         Optional<WorldArchetype> optVoidArchetype = Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void");
         if (!optVoidArchetype.isPresent()) {
             obtainFlatworld().usesMapFeatures(false)
@@ -150,7 +155,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         if (!oldWorld.isPresent()) {
             oldWorld = instantiate(
                     BUILD_OLD,
-                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void").get()
+                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:barrier").get()
             );
             registerWorld(BUILD_OLD);
         }

@@ -8,6 +8,7 @@ package com.skelril.skree.system.world;
 
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
+import com.skelril.skree.content.world.BarrierWorldGeneratorModifier;
 import com.skelril.skree.content.world.NoOreWorldGeneratorModifier;
 import com.skelril.skree.content.world.SolidWorldGeneratorModifier;
 import com.skelril.skree.content.world.VoidWorldGeneratorModifier;
@@ -21,6 +22,7 @@ public class WorldGeneratorSystem {
     public void init() {
         Sponge.getRegistry().register(WorldGeneratorModifier.class, new VoidWorldGeneratorModifier());
         Sponge.getRegistry().register(WorldGeneratorModifier.class, new SolidWorldGeneratorModifier());
+        Sponge.getRegistry().register(WorldGeneratorModifier.class, new BarrierWorldGeneratorModifier());
         Sponge.getRegistry().register(WorldGeneratorModifier.class, new NoOreWorldGeneratorModifier());
         Sponge.getRegistry().register(WorldGeneratorModifier.class, new WildernessWorldGeneratorModifier());
     }
