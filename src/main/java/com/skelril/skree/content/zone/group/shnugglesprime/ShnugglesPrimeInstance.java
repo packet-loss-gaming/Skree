@@ -481,7 +481,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
 
                                 entity.damage(realDamage, source, Cause.source(boss).build());
                             }
-                            toHeal += realDamage / 3;
+                            toHeal += Math.min(1, realDamage / 3);
                         }
                         if (new TimeFilter(-1, 2).matchesFilter(times + 1)) {
                             getPlayerMessageChannel(SPECTATOR).send(
