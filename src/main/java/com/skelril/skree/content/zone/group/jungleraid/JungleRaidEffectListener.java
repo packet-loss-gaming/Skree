@@ -157,7 +157,7 @@ public class JungleRaidEffectListener {
             }
         }
     }
-    
+
     @Listener
     public void onProjectileHit(CollideEvent.Impact event) {
         Entity entity = event.getCause().first(Entity.class).get();

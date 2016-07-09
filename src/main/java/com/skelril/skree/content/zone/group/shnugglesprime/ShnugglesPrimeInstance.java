@@ -279,7 +279,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         double bossHealth = getHealth(boss);
         double maxBossHealth = getMaxHealth(boss);
 
-        double delay = Math.max(5000, Probability.getRangedRandom(15 * bossHealth, 25 * bossHealth));
+        double delay = 5000;
         if (lastAttackTime != 0 && System.currentTimeMillis() - lastAttackTime <= delay) {
             return;
         }
