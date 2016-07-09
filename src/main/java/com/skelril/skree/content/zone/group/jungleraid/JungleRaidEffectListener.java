@@ -23,7 +23,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Firework;
@@ -42,13 +41,11 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.FireworkEffect;
@@ -160,24 +157,7 @@ public class JungleRaidEffectListener {
             }
         }
     }
-
-    @Listener
-    public void onBlockDrop(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            if (!(entity instanceof Item)) {
-                continue;
-            }
-
-            Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
-            if (optInst.isPresent()) {
-                Optional<EntitySpawnCause> optSpawnCause = event.getCause().first(EntitySpawnCause.class);
-                if (!optSpawnCause.isPresent()) {
-                    event.setCancelled(true);
-                }
-            }
-        }
-    }
-
+    
     @Listener
     public void onProjectileHit(CollideEvent.Impact event) {
         Entity entity = event.getCause().first(Entity.class).get();
