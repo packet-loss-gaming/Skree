@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.entity.EntityHealthUtil;
-import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.text.CombinedText;
 import com.skelril.nitro.text.PlaceHolderText;
@@ -34,8 +33,6 @@ import net.minecraft.entity.monster.EntityZombie;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
@@ -50,9 +47,6 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.item.Enchantments;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -212,12 +206,6 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         healthPrinter.print(getPlayerMessageChannel(SPECTATOR), optBoss.get());
     }
 
-    private static final ItemStack weapon = ItemStackFactory.newItemStack(ItemTypes.BONE);
-
-    static {
-        weapon.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(new ItemEnchantment(Enchantments.SHARPNESS, 2)));
-    }
-
     public void spawnMinions(@Nullable Living target) {
         int spawnCount = Math.max(3, getPlayers(PARTICIPANT).size());
         for (Location<World> spawnPt : spawnPts) {
@@ -229,7 +217,6 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         // TODO convert to Sponge Data API
                         ((EntityZombie) zombie).setChild(true);
                         EntityHealthUtil.setMaxHealth(zombie, 1);
-                        zombie.setItemInHand(HandTypes.MAIN_HAND, weapon.copy());
                         getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
                         if (target != null) {
