@@ -27,7 +27,7 @@ import com.skelril.skree.content.zone.ZoneBossDetail;
 import com.skelril.skree.service.internal.zone.Zone;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import org.spongepowered.api.block.BlockType;
@@ -466,7 +466,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                         if (!isBossSpawned()) return true;
                         for (Living entity : getContained(Living.class)) {
                             // TODO convert to Sponge
-                            if (entity instanceof Giant || !Probability.getChance(5) || !((EntityGiantZombie) boss).canEntityBeSeen((EntityLiving) entity)) {
+                            if (entity instanceof Giant || !Probability.getChance(5) || !((EntityGiantZombie) boss).canEntityBeSeen((EntityLivingBase) entity)) {
                                 continue;
                             }
 
