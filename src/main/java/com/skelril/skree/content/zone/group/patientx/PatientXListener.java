@@ -102,7 +102,7 @@ public class PatientXListener {
                         Explosion.builder()
                                 .radius(3)
                                 .location(entity.getLocation())
-                                .shouldBreakBlocks(false)
+                                .shouldDamageEntities(true)
                                 .build()
                 );
             }

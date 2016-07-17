@@ -75,6 +75,7 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
                                     .radius(explosionStrength(detail))
                                     .canCauseFire(allowFire(detail))
                                     .shouldBreakBlocks(allowBlockBreak(detail))
+                                    .shouldDamageEntities(true)
                                     .build()
                     );
                 }

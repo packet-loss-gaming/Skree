@@ -413,7 +413,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                             damageHeals = true;
                             spawnPts.stream().filter(pt -> Probability.getChance(12)).forEach(pt -> {
                                 Explosion explosion = Explosion.builder()
-                                        .shouldBreakBlocks(false)
+                                        .shouldDamageEntities(true)
                                         .location(pt)
                                         .radius(10)
                                         .build();

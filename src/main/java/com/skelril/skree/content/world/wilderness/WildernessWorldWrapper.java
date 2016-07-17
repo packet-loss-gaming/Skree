@@ -513,7 +513,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         Explosion.builder()
                                 .location(entity.getLocation())
                                 .shouldBreakBlocks(true)
-                                .shouldDamageEntities(false)
                                 .radius(4F)
                                 .build()
                 );

@@ -457,7 +457,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                                     .location(new Location<>(getRegion().getExtent(), new Vector3d(x, minY, z)))
                                     .radius(dmgFact)
                                     .canCauseFire(false)
-                                    .shouldBreakBlocks(false)
+                                    .shouldDamageEntities(true)
                                     .build()
                     );
                 }
