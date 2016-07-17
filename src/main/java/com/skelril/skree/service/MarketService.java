@@ -7,6 +7,7 @@
 package com.skelril.skree.service;
 
 import com.skelril.nitro.Clause;
+import com.skelril.skree.service.internal.market.ItemDescriptor;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -19,10 +20,19 @@ public interface MarketService {
 
     BigDecimal getSellFactor(BigDecimal buyPrice);
 
+    void updatePrices();
+
+    Optional<Integer> getStock(String alias);
+    Optional<Integer> getStock(ItemStack stack);
+    boolean setStock(String alias, int quantity);
+    boolean setStock(ItemStack stack, int quantity);
+
     Optional<BigDecimal> getPrice(String alias);
     Optional<BigDecimal> getPrice(ItemStack stack);
-    boolean setPrice(String alias, BigDecimal price);
-    boolean setPrice(ItemStack stack, BigDecimal price);
+    Optional<BigDecimal> getBasePrice(String alias);
+    Optional<BigDecimal> getBasePrice(ItemStack stack);
+    boolean setBasePrice(String alias, BigDecimal price);
+    boolean setBasePrice(ItemStack stack, BigDecimal price);
 
     boolean addItem(ItemStack stack);
     boolean remItem(ItemStack stack);
@@ -38,8 +48,8 @@ public interface MarketService {
      * A mapping of the primary alias to the price
      * @return
      */
-    List<Clause<String, BigDecimal>> getPrices();
-    List<Clause<String, BigDecimal>> getPrices(String aliasConstraint);
+    List<ItemDescriptor> getPrices();
+    List<ItemDescriptor> getPrices(String aliasConstraint);
 
     /** Transactions **/
     default boolean logTransactionByName(UUID user, Clause<String, Integer> itemQuantity) {

@@ -101,6 +101,17 @@ public class MarketBuyCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
+        List<Clause<String, Integer>> newStocks = new ArrayList<>();
+        for (String anItem : targetItems) {
+            Optional<Integer> optStock = service.getStock(anItem);
+            if (optStock.orElse(0) < amt) {
+                src.sendMessage(Text.of(TextColors.RED, "There is not enough stock to satisfy your order."));
+                return CommandResult.empty();
+            }
+
+            newStocks.add(new Clause<>(anItem, optStock.get() - amt));
+        }
+
         // Accumulate items
         List<ItemStack> itemStacks = new ArrayList<>(targetItems.size());
         for (String anItem : targetItems) {
@@ -133,6 +144,11 @@ public class MarketBuyCommand implements CommandExecutor {
             // TODO Auto reporting
             src.sendMessage(Text.of(TextColors.RED, "Failed to give all items, please report this!"));
             return CommandResult.empty();
+        }
+
+        // Items have been given process stocks
+        for (Clause<String, Integer> stock : newStocks) {
+            service.setStock(stock.getKey(), stock.getValue());
         }
 
         if (!service.logTransactionByStack(player.getUniqueId(), transactions.getValue())) {

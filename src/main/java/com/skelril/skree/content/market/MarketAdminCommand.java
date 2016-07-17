@@ -23,6 +23,7 @@ public class MarketAdminCommand {
                 .child(MarketTrackItemCommand.aquireSpec(), "track")
                 .child(MarketUntrackItemComand.aquireSpec(), "untrack", "remove")
                 .child(MarketVerifyCommand.aquireSpec(), "verify")
+                .child(MarketSimulateCommand.aquireSpec(), "simulate")
                 .build();
     }
 }

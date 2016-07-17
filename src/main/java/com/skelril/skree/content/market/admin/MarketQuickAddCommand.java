@@ -62,7 +62,7 @@ public class MarketQuickAddCommand implements CommandExecutor {
 
         if (service.addItem(item)) {
             if (service.addAlias(alias, item)) {
-                if (service.setPrice(alias, price)) {
+                if (service.setBasePrice(alias, price)) {
                     if (service.setPrimaryAlias(alias)) {
                         src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
                         return CommandResult.success();

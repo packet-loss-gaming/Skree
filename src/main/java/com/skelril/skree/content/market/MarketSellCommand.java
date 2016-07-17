@@ -97,6 +97,11 @@ public class MarketSellCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
+        // Process new stocks
+        for (Clause<ItemStack, Integer> transaction : transactions) {
+            service.setStock(transaction.getKey(), service.getStock(transaction.getKey()).orElse(0) + transaction.getKey().getQuantity());
+        }
+
         player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) sold for: ", TextColors.WHITE, MarketImplUtil.format(changes.getKey()), TextColors.YELLOW, "!"));
 
         return CommandResult.success();

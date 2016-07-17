@@ -186,7 +186,7 @@ import org.spongepowered.api.text.Text;
             List<ItemPricePair> items = itemDatabase.getItemList();
             for (ItemPricePair item : items) {
                 itemDatabase.addItem(sender.getName(), item.getName(),
-                        item.getPrice() * factor, !item.isBuyable(), !item.isSellable());
+                        item.getBasePrice() * factor, !item.isBuyable(), !item.isSellable());
             }
             itemDatabase.save();
 

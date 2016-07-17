@@ -51,12 +51,12 @@ public class MarketSetPriceCommand implements CommandExecutor {
         Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
         if (optAlias.isPresent()) {
             String alias = optAlias.get();
-            if (service.setPrice(alias, price)) {
+            if (service.setBasePrice(alias, price)) {
                 src.sendMessage(Text.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
                 return CommandResult.success();
             }
         } else if (held.isPresent()) {
-            if (service.setPrice(held.get(), price)) {
+            if (service.setBasePrice(held.get(), price)) {
                 src.sendMessage(Text.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
                 return CommandResult.success();
             }

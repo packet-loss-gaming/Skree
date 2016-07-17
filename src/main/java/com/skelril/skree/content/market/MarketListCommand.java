@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.market;
 
-import com.skelril.nitro.Clause;
 import com.skelril.skree.service.MarketService;
+import com.skelril.skree.service.internal.market.ItemDescriptor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -31,17 +31,18 @@ import static org.spongepowered.api.command.args.GenericArguments.remainingJoine
 
 public class MarketListCommand implements CommandExecutor {
 
-    private Text createLine(Clause<String, BigDecimal> entry, MarketService service) {
-        String buy = format(entry.getValue());
-        String sell = format(entry.getValue().multiply(service.getSellFactor(entry.getValue())));
+    private Text createLine(ItemDescriptor entry, MarketService service) {
+        String buy = format(entry.getCurrentValue());
+        String sell = format(entry.getCurrentValue().multiply(service.getSellFactor(entry.getCurrentValue())));
 
         Text buyText = Text.of(TextColors.WHITE, buy);
         Text sellText = Text.of(TextColors.WHITE, sell);
 
         return Text.of(
-                TextActions.runCommand("/market lookup " + entry.getKey()),
+                TextActions.runCommand("/market lookup " + entry.getName()),
                 TextActions.showText(Text.of("Show detailed item information")),
-                TextColors.BLUE, entry.getKey().toUpperCase(),
+                TextColors.BLUE, entry.getName().toUpperCase(),
+                TextColors.GRAY, " x", format(new BigDecimal(entry.getStock())),
                 TextColors.YELLOW, " (Quick Price: ", buyText, " - ", sellText, ")"
         );
     }
@@ -65,8 +66,8 @@ public class MarketListCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        List<Clause<String, BigDecimal>> prices = filter.isEmpty() ? service.getPrices()
-                                                                   : service.getPrices(filter + "%");
+        List<ItemDescriptor> prices = filter.isEmpty() ? service.getPrices()
+                                                       : service.getPrices(filter + "%");
 
         if (prices.isEmpty()) {
             src.sendMessage(Text.of(TextColors.YELLOW, "No items matched."));
@@ -74,8 +75,8 @@ public class MarketListCommand implements CommandExecutor {
         }
 
         List<Text> result = prices.stream()
-                .filter(a -> filter.isEmpty() || a.getKey().startsWith(filter))
-                .sorted((a, b) -> a.getValue().compareTo(b.getValue()))
+                .filter(a -> filter.isEmpty() || a.getName().startsWith(filter))
+                .sorted((a, b) -> a.getCurrentValue().compareTo(b.getCurrentValue()))
                 .map(a -> createLine(a, service))
                 .collect(Collectors.toList());
 

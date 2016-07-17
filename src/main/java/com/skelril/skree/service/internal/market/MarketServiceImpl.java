@@ -1,17 +1,17 @@
 package com.skelril.skree.service.internal.market;
 
 import com.skelril.nitro.Clause;
+import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.db.SQLHandle;
+import com.skelril.skree.db.schema.tables.records.ItemDataRecord;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.internal.market.deducer.DeducerOfSimpleType;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Result;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -62,8 +62,180 @@ public class MarketServiceImpl implements MarketService {
         return new BigDecimal(0.7);
     }
 
+    private BigDecimal getNewValue(BigDecimal baseValue) {
+        double random = 1D / (5 + Probability.getRandom(5));
+
+        BigDecimal multiplier = new BigDecimal(random);
+        BigDecimal change = baseValue.multiply(multiplier);
+
+        if (Probability.getChance(2)) {
+            change = change.negate();
+        }
+
+        return baseValue.add(change);
+    }
+
+    private int getNewStock(BigDecimal baseValue, int existingStock) {
+        int adjustedBaseValue;
+        try {
+            adjustedBaseValue = baseValue.round(MathContext.DECIMAL64).intValueExact();
+        } catch (ArithmeticException ex) {
+            adjustedBaseValue = Integer.MAX_VALUE;
+        }
+
+        adjustedBaseValue = (int) Math.sqrt(adjustedBaseValue);
+        adjustedBaseValue = Math.max(2, adjustedBaseValue);
+
+        int changeUnit = 10000;
+        int baseChange = Probability.getChance(32) ? Probability.getRandom(20) * changeUnit : changeUnit;
+        int change = Probability.getRandom(Probability.getRandom(Math.max(1, baseChange - adjustedBaseValue)));
+
+        if (Probability.getChance(adjustedBaseValue)) {
+            existingStock += change;
+        } else {
+            existingStock -= change;
+        }
+
+        return Math.max(0, existingStock);
+    }
+
+    @Override
+    public void updatePrices() {
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Result<Record3<Integer, BigDecimal, Integer>> results = create.select(ITEM_DATA.ID, ITEM_DATA.VALUE, ITEM_DATA.STOCK)
+                    .from(ITEM_DATA)
+                    .fetch();
+
+            Collection<UpdateConditionStep<ItemDataRecord>> updates = new ArrayList<>();
+
+            for (Record3<Integer, BigDecimal, Integer> result : results) {
+                int itemId = result.getValue(ITEM_DATA.ID);
+                BigDecimal baseValue = result.getValue(ITEM_DATA.VALUE);
+                BigDecimal newValue = getNewValue(baseValue);
+                int newStock = getNewStock(baseValue, result.getValue(ITEM_DATA.STOCK));
+
+                updates.add(create.update(ITEM_DATA)
+                        .set(ITEM_DATA.CURRENT_VALUE, newValue)
+                        .set(ITEM_DATA.STOCK, newStock)
+                        .where(ITEM_DATA.ID.equal(itemId)));
+            }
+
+            create.batch(updates).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Optional<Integer> getStock(String alias) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
+                    ITEM_DATA.ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES)
+                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    )
+            ).fetchOne();
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> getStock(ItemStack stack) {
+        try (Connection con = SQLHandle.getConnection()) {
+            Clause<String, String> idVariant = getIDVariant(stack);
+
+            DSLContext create = DSL.using(con);
+            Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
+                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+            ).fetchOne();
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean setStock(String alias, int quantity) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
+                    ITEM_DATA.ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    )
+            ).execute();
+            return changed > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setStock(ItemStack stack, int quantity) {
+        try (Connection con = SQLHandle.getConnection()) {
+            Clause<String, String> idVariant = getIDVariant(stack);
+
+            DSLContext create = DSL.using(con);
+            int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
+                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+            ).execute();
+            return changed > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     @Override
     public Optional<BigDecimal> getPrice(String alias) {
+        validateAlias(alias);
+
+        try (Connection con = SQLHandle.getConnection()) {
+            DSLContext create = DSL.using(con);
+            Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
+                    ITEM_DATA.ID.equal(
+                            create.select(ITEM_ALIASES.ITEM_ID)
+                                    .from(ITEM_ALIASES)
+                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+                    )
+            ).fetchOne();
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<BigDecimal> getPrice(ItemStack stack) {
+        try (Connection con = SQLHandle.getConnection()) {
+            Clause<String, String> idVariant = getIDVariant(stack);
+
+            DSLContext create = DSL.using(con);
+            Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
+                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+            ).fetchOne();
+            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<BigDecimal> getBasePrice(String alias) {
         validateAlias(alias);
 
         try (Connection con = SQLHandle.getConnection()) {
@@ -83,7 +255,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public Optional<BigDecimal> getPrice(ItemStack stack) {
+    public Optional<BigDecimal> getBasePrice(ItemStack stack) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 
@@ -99,7 +271,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public boolean setPrice(String alias, BigDecimal price) {
+    public boolean setBasePrice(String alias, BigDecimal price) {
         validateAlias(alias);
 
         try (Connection con = SQLHandle.getConnection()) {
@@ -118,7 +290,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public boolean setPrice(ItemStack stack, BigDecimal price) {
+    public boolean setBasePrice(ItemStack stack, BigDecimal price) {
         try (Connection con = SQLHandle.getConnection()) {
             Clause<String, String> idVariant = getIDVariant(stack);
 
@@ -130,7 +302,8 @@ public class MarketServiceImpl implements MarketService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;    }
+        return false;
+    }
 
     @Override
     public boolean addItem(ItemStack stack) {
@@ -275,15 +448,15 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<Clause<String, BigDecimal>> getPrices() {
+    public List<ItemDescriptor> getPrices() {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
+            Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
                     .from(ITEM_DATA, ITEM_ALIASES)
                     .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID))
                     .fetch();
 
-            return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
+            return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -291,15 +464,15 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<Clause<String, BigDecimal>> getPrices(String aliasConstraint) {
+    public List<ItemDescriptor> getPrices(String aliasConstraint) {
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            Result<Record2<String, BigDecimal>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.VALUE)
+            Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
                     .from(ITEM_DATA, ITEM_ALIASES)
                     .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID)).and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
                     .fetch();
 
-            return result.stream().map(entry -> new Clause<>(entry.value1(), entry.value2())).collect(Collectors.toList());
+            return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
         } catch (SQLException e) {
             e.printStackTrace();
         }
