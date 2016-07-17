@@ -84,9 +84,9 @@ public class MarketServiceImpl implements MarketService {
         }
 
         adjustedBaseValue = (int) Math.sqrt(adjustedBaseValue);
-        adjustedBaseValue = Math.max(2, adjustedBaseValue);
+        adjustedBaseValue = Math.max(3, adjustedBaseValue);
 
-        int changeUnit = 10000;
+        int changeUnit = Math.max(100, (Probability.getRangedRandom(20, 200) - adjustedBaseValue) * 100);
         int baseChange = Probability.getChance(32) ? Probability.getRandom(20) * changeUnit : changeUnit;
         int change = Probability.getRandom(Probability.getRandom(Math.max(1, baseChange - adjustedBaseValue)));
 
