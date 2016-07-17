@@ -48,16 +48,19 @@ public class MarketLookupCommand implements CommandExecutor {
 
         Optional<String> optAlias = args.getOne("alias");
         Optional<BigDecimal> optPrice = Optional.empty();
+        Optional<Integer> optStock = Optional.empty();
         double percentageSale = 1;
 
         if (optAlias.isPresent()) {
             optPrice = service.getPrice(optAlias.get());
             optAlias = service.getAlias(optAlias.get());
+            optStock = service.getStock(optAlias.get());
         } else {
             Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
             if (held.isPresent()) {
                 optPrice = service.getPrice(held.get());
                 optAlias = service.getAlias(held.get());
+                optStock = service.getStock(held.get());
                 net.minecraft.item.ItemStack stack = tf(held.get());
                 if (stack.isItemStackDamageable()) {
                     percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
@@ -71,11 +74,13 @@ public class MarketLookupCommand implements CommandExecutor {
         }
 
         BigDecimal price = optPrice.get();
+        Integer stockCount = optStock.orElse(0);
         BigDecimal sellPrice = price.multiply(service.getSellFactor(price));
 
         DecimalFormat df = new DecimalFormat("#,###.##");
 
         String buyPrice = df.format(price);
+        String stock = df.format(stockCount);
         String sellUsedPrice = df.format(sellPrice.multiply(new BigDecimal(percentageSale)));
         String sellNewPrice = df.format(sellPrice);
 
@@ -106,6 +111,7 @@ public class MarketLookupCommand implements CommandExecutor {
         Collections.addAll(
                 information,
                 Text.of(TextColors.GOLD, "Price information for: ", itemDisplay),
+                Text.of(TextColors.YELLOW, "There are currently ", TextColors.GRAY, stock, TextColors.YELLOW, " in stock."),
                 Text.of(TextColors.YELLOW, "When you buy it you pay:"),
                 Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
                 Text.of(TextColors.YELLOW, "When you sell it you get:"),
