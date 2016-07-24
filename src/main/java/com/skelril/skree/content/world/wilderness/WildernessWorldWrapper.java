@@ -90,6 +90,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tuple;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -613,7 +614,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                 }
 
                                 if (world.getBlockType(x, y, z) == BlockTypes.STONE) {
-                                    world.setBlockType(x, y, z, BlockTypes.MONSTER_EGG);
+                                    world.setBlockType(
+                                            x,
+                                            y,
+                                            z,
+                                            BlockTypes.MONSTER_EGG,
+                                            BlockChangeFlag.NONE,
+                                            Cause.source(SkreePlugin.container()).build()
+                                    );
                                 }
                             }
                         }

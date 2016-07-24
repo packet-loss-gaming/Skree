@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item.tool.magic;
 
 import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemStackFactory;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -89,7 +90,7 @@ public class MagicBlockStateHelper {
         }
 
         ++foundLadder;
-        block.setBlockType(BlockTypes.AIR);
+        block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
 
         ladderRecursion(block);
     }
@@ -108,7 +109,7 @@ public class MagicBlockStateHelper {
         }
 
         ++foundPlatform;
-        block.setBlockType(BlockTypes.AIR);
+        block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
 
         platformRecursion(block);
     }

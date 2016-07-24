@@ -307,7 +307,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                         loc.getExtent().setBlock(
                                 loc.getBlockPosition(),
                                 state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-                                true,
                                 Cause.source(SkreePlugin.container()).build()
                         );
 
@@ -357,7 +356,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             entry.getExtent().setBlock(
                     entry.getBlockPosition(),
                     state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-                    true,
                     Cause.source(SkreePlugin.container()).build()
             );
 
@@ -719,14 +717,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     private void setDoor(ZoneBoundingBox door, BlockType type) {
-        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, true, Cause.source(SkreePlugin.container()).build()));
+        door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, Cause.source(SkreePlugin.container()).build()));
     }
 
     private void drainAll() {
         flashMemoryRoom.forAll((pt) -> {
             BlockType type = getRegion().getExtent().getBlockType(pt);
             if (type == BlockTypes.WATER || type == BlockTypes.FLOWING_WATER || type == BlockTypes.LAVA || type == BlockTypes.FLOWING_LAVA) {
-                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
             }
         });
     }
@@ -739,7 +737,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 entry.getExtent().setBlock(
                         entry.getBlockPosition(),
                         state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-                        true,
                         Cause.source(SkreePlugin.container()).build()
                 );
                 leverBlocks.put(entry, !Probability.getChance(3));
@@ -752,7 +749,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 targLoc.getExtent().setBlockType(
                         targLoc.getBlockPosition(),
                         BlockTypes.STONEBRICK,
-                        true,
                         Cause.source(SkreePlugin.container()).build()
                 );
             }
@@ -763,7 +759,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     targLoc.getExtent().setBlockType(
                             targLoc.getBlockPosition(),
                             entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK,
-                            true,
                             Cause.source(SkreePlugin.container()).build()
                     );
                 }
@@ -776,7 +771,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 targLoc.getExtent().setBlockType(
                         targLoc.getBlockPosition(),
                         BlockTypes.STONEBRICK,
-                        true,
                         Cause.source(SkreePlugin.container()).build()
                 );
             }
@@ -838,7 +832,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 floodBlock.getExtent().setBlockType(
                         floodBlock.getBlockPosition(),
                         floodBlockType,
-                        true,
                         Cause.source(SkreePlugin.container()).build()
                 );
             }
@@ -863,7 +856,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                                 getRegion().getExtent().setBlockType(
                                         x, y, z,
                                         floodBlockType,
-                                        true,
                                         Cause.source(SkreePlugin.container()).build()
                                 );
                                 break;

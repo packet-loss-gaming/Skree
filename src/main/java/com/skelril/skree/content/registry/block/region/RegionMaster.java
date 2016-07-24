@@ -32,6 +32,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -101,7 +102,7 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                                         optLoc.get().getExtent().setBlockType(
                                                 masterBlock.toInt(),
                                                 BlockTypes.AIR,
-                                                false,
+                                                BlockChangeFlag.NONE,
                                                 Cause.source(SkreePlugin.container()).build()
                                         );
 

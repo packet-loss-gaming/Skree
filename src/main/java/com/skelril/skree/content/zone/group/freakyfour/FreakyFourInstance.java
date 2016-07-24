@@ -140,7 +140,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
         ZoneBoundingBox charlotte_RG = regions.get(FreakyFourBoss.CHARLOTTE);
         charlotte_RG.forAll(pt -> {
             if (getRegion().getExtent().getBlockType(pt) == BlockTypes.WEB) {
-                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
             }
         });
     }
@@ -150,7 +150,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
         frimus_RG.forAll(pt -> {
             BlockType originalType = getRegion().getExtent().getBlockType(pt);
             if (originalType == BlockTypes.FIRE || originalType == BlockTypes.FLOWING_LAVA || originalType == BlockTypes.LAVA) {
-                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, true, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
             }
         });
     }
@@ -293,9 +293,9 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                         for (int y = minY; y <= maxY; ++y) {
                             BlockType block = getRegion().getExtent().getBlockType(x, y, z);
                             if (z == startZ && newExpr.test(block)) {
-                                getRegion().getExtent().setBlockType(x, y, z, oldType, true, Cause.source(SkreePlugin.container()).build());
+                                getRegion().getExtent().setBlockType(x, y, z, oldType, Cause.source(SkreePlugin.container()).build());
                             } else if (flood && oldExpr.test(block)) {
-                                getRegion().getExtent().setBlockType(x, y, z, newType, true, Cause.source(SkreePlugin.container()).build());
+                                getRegion().getExtent().setBlockType(x, y, z, newType, Cause.source(SkreePlugin.container()).build());
                             }
                         }
                     }
@@ -311,7 +311,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                             if (!Probability.getChance(floodFloor)) continue;
                             BlockType block = getRegion().getExtent().getBlockType(x, minY, z);
                             if (oldExpr.test(block)) {
-                                getRegion().getExtent().setBlockType(x, minY, z, newType, true, Cause.source(SkreePlugin.container()).build());
+                                getRegion().getExtent().setBlockType(x, minY, z, newType, Cause.source(SkreePlugin.container()).build());
                             }
                         }
                     }
@@ -360,7 +360,6 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                                 getRegion().getExtent().setBlockType(
                                         pt,
                                         BlockTypes.WEB,
-                                        true,
                                         Cause.source(SkreePlugin.container()).build()
                                 );
                             }
@@ -377,7 +376,6 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                         getRegion().getExtent().setBlockType(
                                 pt,
                                 BlockTypes.AIR,
-                                true,
                                 Cause.source(SkreePlugin.container()).build()
                         );
                         spawnCharlotteMinion(pt.toDouble().add(.5, 0, .5));

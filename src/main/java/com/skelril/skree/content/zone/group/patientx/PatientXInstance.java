@@ -254,7 +254,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             if (aboveType == BlockTypes.AIR && belowType == BlockTypes.WATER || belowType == BlockTypes.FLOWING_WATER) {
                 if (percentage >= 100) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.ICE, true, Cause.source(SkreePlugin.container()).build()
+                            pt, BlockTypes.ICE, Cause.source(SkreePlugin.container()).build()
                     );
                     return;
                 }
@@ -263,7 +263,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
 
                 if (curType == BlockTypes.PACKED_ICE || curType == BlockTypes.ICE) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.WATER, true, Cause.source(SkreePlugin.container()).build()
+                            pt, BlockTypes.WATER, Cause.source(SkreePlugin.container()).build()
                     );
                     if (!Probability.getChance(config.snowBallChance) || !throwExplosives) return;
                     Location target = new Location<>(getRegion().getExtent(), pt.add(0, 1, 0));
@@ -281,7 +281,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                     }
                 } else if (Probability.getChance(percentage, 100)) {
                     getRegion().getExtent().setBlockType(
-                            pt, BlockTypes.PACKED_ICE, true, Cause.source(SkreePlugin.container()).build()
+                            pt, BlockTypes.PACKED_ICE, Cause.source(SkreePlugin.container()).build()
                     );
                 }
             }

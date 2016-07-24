@@ -7,7 +7,9 @@
 package com.skelril.skree.content.world;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -21,7 +23,7 @@ public class BarrierBlockTerrainGenerator implements GenerationPopulator {
         for (int y = min.getY(); y <= max.getY(); ++y) {
             for (int x = min.getX(); x <= max.getX(); ++x) {
                 for (int z = min.getZ(); z <= max.getZ(); ++z) {
-                    buffer.setBlockType(x, y, z, BlockTypes.BARRIER);
+                    buffer.setBlockType(x, y, z, BlockTypes.BARRIER, Cause.source(SkreePlugin.container()).build());
                 }
             }
         }

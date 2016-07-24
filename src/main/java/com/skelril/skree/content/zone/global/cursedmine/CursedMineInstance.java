@@ -629,7 +629,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
         final BlockType finalTarget = targetType;
         floodGate.forAll((pt) -> {
             if (replaceableTypes.contains(getRegion().getExtent().getBlockType(pt))) {
-                getRegion().getExtent().setBlockType(pt, finalTarget, true, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(pt, finalTarget, Cause.source(SkreePlugin.container()).build());
             }
         });
     }
