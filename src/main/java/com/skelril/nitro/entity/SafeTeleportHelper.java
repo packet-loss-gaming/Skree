@@ -6,23 +6,53 @@
 
 package com.skelril.nitro.entity;
 
+import com.google.common.collect.Sets;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class SafeTeleportHelper {
+    private final static Set<BlockType> BLACK_LISTED_BLOCK = Sets.newHashSet(
+            BlockTypes.LAVA, BlockTypes.FLOWING_LAVA
+    );
+
+    private static boolean isSafePassableBlock(BlockType blockType) {
+        boolean isPassable = blockType.getProperty(PassableProperty.class).orElse(new PassableProperty(false)).getValue();
+
+        return isPassable && !isBlacklistedBlock(blockType);
+    }
+
+    private static boolean isBlacklistedBlock(BlockType blockType) {
+        return BLACK_LISTED_BLOCK.contains(blockType);
+    }
+
     public static Optional<Location<World>> getSafeDest(Location<World> dest) {
-        while (dest.getY() > 0 && dest.getBlockType() == BlockTypes.AIR) {
+        // Move down through the air, if we hit a non-air block stop
+        int blocksMoved;
+        for (blocksMoved = 0; dest.getY() > 0 && dest.getBlockType() == BlockTypes.AIR; ++blocksMoved) {
             dest = dest.add(0, -1, 0);
         }
-        dest = dest.add(0, 1, 0); // Move one back up to account for air
 
-        // If both blocks are not air, we failed
-        if (dest.getBlockType() != BlockTypes.AIR || dest.add(0, 1, 0).getBlockType() != BlockTypes.AIR) {
+        // Move one back up to account for air if the player was moved
+        if (blocksMoved > 0) {
+            dest = dest.add(0, 1, 0);
+        }
+
+        // Check the blocks where the player model would be located
+        // If both blocks are not safe passable block types, we failed
+        if (!isSafePassableBlock(dest.getBlockType()) || !isSafePassableBlock(dest.add(0, 1, 0).getBlockType())) {
+            return Optional.empty();
+        }
+
+        // Check the block immediately below the player, if it's blacklisted, we failed
+        if (isBlacklistedBlock(dest.add(0, -1, 0).getBlockType())) {
             return Optional.empty();
         }
 

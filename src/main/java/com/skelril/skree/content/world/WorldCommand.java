@@ -7,6 +7,7 @@
 package com.skelril.skree.content.world;
 
 
+import com.skelril.nitro.entity.SafeTeleportHelper;
 import com.skelril.skree.service.WorldService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -15,9 +16,11 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -56,8 +59,15 @@ public class WorldCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        ((Player) src).setLocation(optWorld.get().getSpawnLocation());
-        src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
+        Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Entity) src, optWorld.get().getSpawnLocation());
+        if (optLoc.isPresent()) {
+            src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
+        } else if (args.hasAny("f")) {
+            ((Player) src).setLocation(optWorld.get().getSpawnLocation());
+            src.sendMessage(Text.of(TextColors.YELLOW, "Force entered world: " + world.getName() + " successfully!"));
+        } else {
+            src.sendMessage(Text.of(TextColors.YELLOW, "Failed to enter " + world.getName()  + " please report this!"));
+        }
 
         return CommandResult.success();
     }
