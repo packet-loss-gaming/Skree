@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.Snowball;
+import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -100,6 +101,11 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
         for (Entity entity : entities) {
             if (!isApplicable(entity)) continue;
+
+            if (entity instanceof Lightning) {
+                ((Lightning) entity).setEffect(true);
+                continue;
+            }
 
             if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
                 event.setCancelled(true);
