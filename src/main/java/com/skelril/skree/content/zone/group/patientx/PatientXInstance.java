@@ -174,14 +174,12 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
         resetDifficulty();
         freezeBlocks(false);
 
-        Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, getRegion().getCenter());
-        if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+        Zombie zombie = (Zombie) getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, getRegion().getCenter());
+        getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
-            Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = new Boss<>((Zombie) spawned.get(), new ZoneBossDetail<>(this));
-            bossManager.bind(boss);
-            this.boss = boss;
-        }
+        Boss<Zombie, ZoneBossDetail<PatientXInstance>> boss = new Boss<>(zombie, new ZoneBossDetail<>(this));
+        bossManager.bind(boss);
+        this.boss = boss;
     }
 
     public Location<World> getCenter() {
@@ -268,16 +266,13 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                     if (!Probability.getChance(config.snowBallChance) || !throwExplosives) return;
                     Location target = new Location<>(getRegion().getExtent(), pt.add(0, 1, 0));
                     for (int i = Probability.getRandom(3); i > 0; i--) {
-                        Optional<Entity> optEnt = getRegion().getExtent().createEntity(EntityTypes.SNOWBALL, target.getPosition());
-                        if (optEnt.isPresent()) {
-                            Snowball melivn = (Snowball) optEnt.get();
-                            melivn.setVelocity(new Vector3d(
-                                    0,
-                                    Probability.getRangedRandom(.25, 1),
-                                    0
-                            ));
-                            getRegion().getExtent().spawnEntity(melivn, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                        }
+                        Snowball melvin = (Snowball) getRegion().getExtent().createEntity(EntityTypes.SNOWBALL, target.getPosition());
+                        melvin.setVelocity(new Vector3d(
+                                0,
+                                Probability.getRangedRandom(.25, 1),
+                                0
+                        ));
+                        getRegion().getExtent().spawnEntity(melvin, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                     }
                 } else if (Probability.getChance(percentage, 100)) {
                     getRegion().getExtent().setBlockType(
@@ -308,14 +303,11 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
         double amt = getPlayers(PARTICIPANT).size() * difficulty;
         Location l = getCenter();
         for (int i = 0; i < amt; i++) {
-            Optional<Entity> optEnt = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, l.getPosition());
-            if (optEnt.isPresent()) {
-                Entity zombie = optEnt.get();
-                // TODO convert to Sponge Data API
-                ((EntityZombie) zombie).setCanPickUpLoot(false);
-                ((EntityZombie) zombie).setChild(true);
-                getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-            }
+            Entity zombie = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, l.getPosition());
+            // TODO convert to Sponge Data API
+            ((EntityZombie) zombie).setCanPickUpLoot(false);
+            ((EntityZombie) zombie).setChild(true);
+            getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
         }
     }
 
@@ -452,17 +444,14 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 double tntQuantity = Math.max(2, difficulty / 2.4);
                 for (Player player : contained) {
                     for (double i = Probability.getRangedRandom(tntQuantity, Math.pow(2, Math.min(9, tntQuantity))); i > 0; i--) {
-                        Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, player.getLocation().getPosition());
-                        if (optEntity.isPresent()) {
-                            PrimedTNT explosive = (PrimedTNT) optEntity.get();
-                            explosive.setVelocity(new Vector3d(
-                                    random.nextDouble() * 1 - .5,
-                                    random.nextDouble() * .8 + .2,
-                                    random.nextDouble() * 1 - .5
-                            ));
-                            explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                            getRegion().getExtent().spawnEntity(explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                        }
+                        PrimedTNT explosive = (PrimedTNT) getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, player.getLocation().getPosition());
+                        explosive.setVelocity(new Vector3d(
+                                random.nextDouble() * 1 - .5,
+                                random.nextDouble() * .8 + .2,
+                                random.nextDouble() * 1 - .5
+                        ));
+                        explosive.offer(Keys.FUSE_DURATION, 20 * 4);
+                        getRegion().getExtent().spawnEntity(explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                     }
                 }
                 attackDur = System.currentTimeMillis() + 5000;
@@ -500,11 +489,9 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             case IM_JUST_BATTY:
                 for (Player player : contained) {
                     // player.chat("I love Patient X!");
-                    Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
-                    if (optEntity.isPresent()) {
-                        getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                        optEntity.get().getPassengers().add(player);
-                    }
+                    Entity bat = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
+                    getRegion().getExtent().spawnEntity(bat, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+                    bat.getPassengers().add(player);
                 }
                 attackDur = System.currentTimeMillis() + 20000;
                 sendAttackBroadcast("Awe, I love you too!", AttackSeverity.NORMAL);
@@ -561,20 +548,17 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 PotionEffectTypes.POISON, PotionEffectTypes.WEAKNESS
         };
 
-        Optional<Entity> optEntity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
-        if (optEntity.isPresent()) {
-            PotionEffectType type = Probability.pickOneOf(thrownTypes);
-            PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
+        Entity entity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
+        entity.setVelocity(new Vector3d(
+                random.nextDouble() * .5 - .25,
+                random.nextDouble() * .4 + .1,
+                random.nextDouble() * .5 - .25
+        ));
 
-            Entity entity = optEntity.get();
-            entity.setVelocity(new Vector3d(
-                    random.nextDouble() * .5 - .25,
-                    random.nextDouble() * .4 + .1,
-                    random.nextDouble() * .5 - .25
-            ));
-            entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
+        PotionEffectType type = Probability.pickOneOf(thrownTypes);
+        PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
+        entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
 
-            getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-        }
+        getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
     }
 }

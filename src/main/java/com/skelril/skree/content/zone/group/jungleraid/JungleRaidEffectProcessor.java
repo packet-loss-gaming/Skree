@@ -19,7 +19,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,7 +38,10 @@ import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
@@ -101,42 +103,36 @@ public class JungleRaidEffectProcessor {
                 if (testLoc.getBlockType() != BlockTypes.AIR) continue;
 
                 if (inst.isFlagEnabled(JungleRaidFlag.END_OF_DAYS) || isSuddenDeath) {
-                    Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, testLoc.getPosition());
-                    if (optEntity.isPresent()) {
-                        PrimedTNT explosive = (PrimedTNT) optEntity.get();
-                        explosive.setVelocity(new Vector3d(
-                                random.nextDouble() * 2.0 - 1,
-                                random.nextDouble() * 2 * -1,
-                                random.nextDouble() * 2.0 - 1
-                        ));
-                        // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
-                        // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                        tf(explosive).setFuse(20 * 4);
+                    PrimedTNT explosive = (PrimedTNT) inst.getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, testLoc.getPosition());
+                    explosive.setVelocity(new Vector3d(
+                            random.nextDouble() * 2.0 - 1,
+                            random.nextDouble() * 2 * -1,
+                            random.nextDouble() * 2.0 - 1
+                    ));
+                    // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
+                    // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
+                    tf(explosive).setFuse(20 * 4);
 
-                        // TODO used to have a 1/4 chance of creating fire
-                        inst.getRegion().getExtent().spawnEntity(
-                                explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                        );
-                    }
+                    // TODO used to have a 1/4 chance of creating fire
+                    inst.getRegion().getExtent().spawnEntity(
+                            explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                    );
                 }
                 if (inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET)) {
                     PotionEffectType type = Probability.pickOneOf(Sponge.getRegistry().getAllOf(PotionEffectType.class));
                     for (int ii = Probability.getRandom(5); ii > 0; --ii) {
-                        Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.SPLASH_POTION, testLoc.getPosition());
-                        if (optEntity.isPresent()) {
-                            ThrownPotion potion = (ThrownPotion) optEntity.get();
-                            potion.setVelocity(new Vector3d(
-                                    random.nextDouble() * 2.0 - 1,
-                                    0,
-                                    random.nextDouble() * 2.0 - 1
-                            ));
-                            potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
-                                    PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
-                            ));
-                            inst.getRegion().getExtent().spawnEntity(
-                                    potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                            );
-                        }
+                        ThrownPotion potion = (ThrownPotion) inst.getRegion().getExtent().createEntity(EntityTypes.SPLASH_POTION, testLoc.getPosition());
+                        potion.setVelocity(new Vector3d(
+                                random.nextDouble() * 2.0 - 1,
+                                0,
+                                random.nextDouble() * 2.0 - 1
+                        ));
+                        potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
+                                PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
+                        ));
+                        inst.getRegion().getExtent().spawnEntity(
+                                potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                        );
                     }
                 }
                 if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
@@ -157,22 +153,19 @@ public class JungleRaidEffectProcessor {
                 for (int i = 0; i < 5; i++) {
                     Task.builder().delayTicks(i * 4).execute(() -> {
                         Location targetLocation = player.getLocation();
-                        Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, targetLocation.getPosition());
-                        if (optEntity.isPresent()) {
-                            Firework firework = (Firework) optEntity.get();
-                            FireworkEffect fireworkEffect = FireworkEffect.builder()
-                                    .flicker(Probability.getChance(2))
-                                    .trail(Probability.getChance(2))
-                                    .color(Color.RED)
-                                    .fade(Color.YELLOW)
-                                    .shape(FireworkShapes.BURST)
-                                    .build();
-                            firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
-                            firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-                            inst.getRegion().getExtent().spawnEntity(
-                                    firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                            );
-                        }
+                        Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, targetLocation.getPosition());
+                        FireworkEffect fireworkEffect = FireworkEffect.builder()
+                                .flicker(Probability.getChance(2))
+                                .trail(Probability.getChance(2))
+                                .color(Color.RED)
+                                .fade(Color.YELLOW)
+                                .shape(FireworkShapes.BURST)
+                                .build();
+                        firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+                        firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
+                        inst.getRegion().getExtent().spawnEntity(
+                                firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                        );
                     }).submit(SkreePlugin.inst());
                 }
             }

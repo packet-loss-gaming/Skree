@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Zombie;
+import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
@@ -38,10 +39,8 @@ public class ThorAttack implements Instruction<DamageCondition, Boss<Zombie, Cat
         Task.builder().execute(() -> {
             Location<World> targetLoc = toHit.getLocation();
             Task.builder().execute(() -> {
-                Optional<Entity> optEnt = toHit.getWorld().createEntity(EntityTypes.LIGHTNING, targetLoc.getPosition());
-                if (optEnt.isPresent()) {
-                    toHit.getWorld().spawnEntity(optEnt.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                }
+                Lightning lightning = (Lightning) toHit.getWorld().createEntity(EntityTypes.LIGHTNING, targetLoc.getPosition());
+                toHit.getWorld().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
             }).delay(750, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
         }).delay(1500, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
         return Optional.empty();

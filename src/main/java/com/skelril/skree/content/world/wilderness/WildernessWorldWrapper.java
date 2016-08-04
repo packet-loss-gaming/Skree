@@ -214,23 +214,20 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             int level = optLevel.get();
 
             if (entity instanceof Egg && optBlockCause.isPresent()) {
-                Optional<Entity> optPrimedTNT = entity.getLocation().getExtent().createEntity(
+                PrimedTNT explosive = (PrimedTNT) entity.getLocation().getExtent().createEntity(
                         EntityTypes.PRIMED_TNT,
                         entity.getLocation().getPosition()
                 );
 
-                if (optPrimedTNT.isPresent()) {
-                    PrimedTNT explosive = (PrimedTNT) optPrimedTNT.get();
-                    explosive.setVelocity(entity.getVelocity());
-                    // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
-                    // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                    tf(explosive).setFuse(20 * 4);
+                explosive.setVelocity(entity.getVelocity());
+                // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
+                // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
+                tf(explosive).setFuse(20 * 4);
 
-                    // TODO used to have a 1/4 chance of creating fire
-                    entity.getLocation().getExtent().spawnEntity(
-                            explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.DISPENSE).build()).build()
-                    );
-                }
+                // TODO used to have a 1/4 chance of creating fire
+                entity.getLocation().getExtent().spawnEntity(
+                        explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.DISPENSE).build()).build()
+                );
 
                 event.setCancelled(true);
                 return;
@@ -365,18 +362,16 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     if (meta.getRatio() > 30 && meta.getFactors() > 35) {
                         Deque<Entity> spawned = new ArrayDeque<>();
                         for (int i = Probability.getRandom(5); i > 0; --i) {
-                            Optional<Entity> optEnt = attacker.getWorld().createEntity(
+                            Entity entity = attacker.getWorld().createEntity(
                                     EntityTypes.ENDERMITE,
                                     defender.getLocation().getPosition()
                             );
 
-                            if (optEnt.isPresent()) {
-                                attacker.getWorld().spawnEntity(
-                                        optEnt.get(),
-                                        Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                                );
-                                spawned.add(optEnt.get());
-                            }
+                            entity.getWorld().spawnEntity(
+                                    entity,
+                                    Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                            );
+                            spawned.add(entity);
                         }
 
                         IntegratedRunnable runnable = new IntegratedRunnable() {
@@ -598,10 +593,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 Extent world = loc.getExtent();
 
                 if (Probability.getChance(3)) {
-                    Optional<Entity> optEntity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
-                    if (optEntity.isPresent()) {
-                        world.spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
-                    }
+                    Entity entity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
+                    world.spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
                 }
 
                 // Do this one tick later to guarantee no collision with transaction data

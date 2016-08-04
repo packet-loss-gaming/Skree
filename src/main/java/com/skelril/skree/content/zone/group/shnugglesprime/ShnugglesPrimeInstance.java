@@ -135,14 +135,12 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
     }
 
     public void spawnBoss() {
-        Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
-        if (spawned.isPresent()) {
-            getRegion().getExtent().spawnEntity(spawned.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+        Giant spawned = (Giant) getRegion().getExtent().createEntity(EntityTypes.GIANT, getRegion().getCenter());
+        getRegion().getExtent().spawnEntity(spawned, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
-            Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>((Giant) spawned.get(), new ZoneBossDetail<>(this));
-            bossManager.bind(boss);
-            this.boss = boss;
-        }
+        Boss<Giant, ZoneBossDetail<ShnugglesPrimeInstance>> boss = new Boss<>(spawned, new ZoneBossDetail<>(this));
+        bossManager.bind(boss);
+        this.boss = boss;
     }
 
 
@@ -211,17 +209,14 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
         for (Location<World> spawnPt : spawnPts) {
             if (Probability.getChance(11)) {
                 for (int i = spawnCount; i > 0; --i) {
-                    Optional<Entity> spawned = getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, spawnPt.getPosition());
-                    if (spawned.isPresent()) {
-                        Zombie zombie = (Zombie) spawned.get();
-                        // TODO convert to Sponge Data API
-                        ((EntityZombie) zombie).setChild(true);
-                        EntityHealthUtil.setMaxHealth(zombie, 1);
-                        getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+                    Zombie zombie = (Zombie) getRegion().getExtent().createEntity(EntityTypes.ZOMBIE, spawnPt.getPosition());
+                    // TODO convert to Sponge Data API
+                    ((EntityZombie) zombie).setChild(true);
+                    EntityHealthUtil.setMaxHealth(zombie, 1);
+                    getRegion().getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
-                        if (target != null) {
-                            zombie.setTarget(target);
-                        }
+                    if (target != null) {
+                        zombie.setTarget(target);
                     }
                 }
             }
@@ -445,16 +440,13 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                     entity.offer(Keys.HEALTH, 0D);
 
                     Location targetLoc = entity.getLocation();
-                    Optional<Entity> optEntity = getRegion().getExtent().createEntity(
+                    Entity potion = getRegion().getExtent().createEntity(
                             EntityTypes.SPLASH_POTION,
                             targetLoc.getPosition()
                     );
 
-                    if (optEntity.isPresent()) {
-                        Entity potion = optEntity.get();
-                        potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
-                        getRegion().getExtent().spawnEntity(potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-                    }
+                    potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(instantDamageEffect));
+                    getRegion().getExtent().spawnEntity(potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
                 }
                 return;
             case MINION_LEECH:

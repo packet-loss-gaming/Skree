@@ -29,7 +29,9 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -135,6 +137,32 @@ public class RegionMaster extends Block implements ICustomBlock, EventAwareConte
                     break;
                 }
             }
+        }
+    }
+
+    @Listener
+    public void onBlockInteract(InteractBlockEvent.Primary event, @Root Player player) {
+        BlockSnapshot targetBlock = event.getTargetBlock();
+        if (targetBlock.getState().getType() != this) {
+            return;
+        }
+
+        Optional<Location<World>> optLoc = targetBlock.getLocation();
+        if (!optLoc.isPresent()) {
+            return;
+        }
+
+        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+        if (!optService.isPresent()) {
+            return;
+        }
+
+        RegionService service = optService.get();
+        Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+        if (optRef.isPresent()) {
+            Region ref = optRef.get();
+            service.setSelectedRegion(player, ref);
+            player.sendMessage(Text.of(TextColors.YELLOW, "Region selected!"));
         }
     }
 

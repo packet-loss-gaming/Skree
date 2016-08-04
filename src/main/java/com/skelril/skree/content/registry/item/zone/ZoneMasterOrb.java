@@ -228,12 +228,9 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
     private void createLightningStrike(Player player) {
         Location<World> loc = player.getLocation();
-        Optional<Entity> optLightning = loc.getExtent().createEntity(EntityTypes.LIGHTNING, loc.getPosition());
-        if (optLightning.isPresent()) {
-            Lightning lightning = (Lightning) optLightning.get();
-            lightning.setEffect(true);
-            loc.getExtent().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-        }
+        Lightning lightning = (Lightning) loc.getExtent().createEntity(EntityTypes.LIGHTNING, loc.getPosition());
+        lightning.setEffect(true);
+        loc.getExtent().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
     }
 
     private MainWorldWrapper getMainWorldWrapper() {

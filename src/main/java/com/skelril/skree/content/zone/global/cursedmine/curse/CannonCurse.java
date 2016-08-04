@@ -13,15 +13,12 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CannonCurse implements Consumer<Player> {
     @Override
     public void accept(Player player) {
-        Optional<Entity> optEntity = player.getWorld().createEntity(EntityTypes.FIREBALL, player.getLocation().getPosition());
-        if (optEntity.isPresent()) {
-            player.getWorld().spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-        }
+        Entity entity = player.getWorld().createEntity(EntityTypes.FIREBALL, player.getLocation().getPosition());
+        player.getWorld().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
     }
 }

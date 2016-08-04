@@ -195,11 +195,8 @@ public class CursedMineListener {
                         player.getInventory().addItem(BookUtil.Lore.Areas.theGreatMine());
                     }*/
 
-                    Optional<Entity> optXPOrb = player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
-                    if (optXPOrb.isPresent()) {
-                        ExperienceOrb xpOrb = (ExperienceOrb) optXPOrb.get();
-                        xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
-                    }
+                    ExperienceOrb xpOrb = (ExperienceOrb) player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
+                    xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
 
                     inst.eatFood(player);
                     inst.poison(player, 6);

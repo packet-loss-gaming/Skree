@@ -526,23 +526,17 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                     case 9:
                         player.sendMessage(Text.of(TextColors.RED, "Hallow declares war on YOU!"));
                         for (int i = 0; i < Probability.getRangedRandom(10, 30); i++) {
-                            Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BLAZE, player.getLocation().getPosition());
-                            if (optEntity.isPresent()) {
-                                Blaze blaze = (Blaze) optEntity.get();
-                                blaze.setTarget(player);
-                                getRegion().getExtent().spawnEntity(blaze, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
-                            }
+                            Blaze blaze = (Blaze) getRegion().getExtent().createEntity(EntityTypes.BLAZE, player.getLocation().getPosition());
+                            blaze.setTarget(player);
+                            getRegion().getExtent().spawnEntity(blaze, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
                         }
                         break;
                     case 10:
                         player.sendMessage(Text.of(TextColors.RED, "A legion of hell hounds appears!"));
                         for (int i = 0; i < Probability.getRangedRandom(10, 30); i++) {
-                            Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.WOLF, player.getLocation().getPosition());
-                            if (optEntity.isPresent()) {
-                                Wolf wolf = (Wolf) optEntity.get();
-                                wolf.setTarget(player);
-                                getRegion().getExtent().spawnEntity(wolf, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
-                            }
+                            Wolf wolf = (Wolf) getRegion().getExtent().createEntity(EntityTypes.WOLF, player.getLocation().getPosition());
+                            wolf.setTarget(player);
+                            getRegion().getExtent().spawnEntity(wolf, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
                         }
                         break;
                     case 11:
@@ -670,10 +664,8 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             targetPos = randomizer.createPosition3i(playerLoc.getPosition());
                         } while (getRegion().getExtent().getBlockType(targetPos) != BlockTypes.AIR);
 
-                        Optional<Entity> optEntity = getRegion().getExtent().createEntity(EntityTypes.BLAZE, targetPos);
-                        if (optEntity.isPresent()) {
-                            getRegion().getExtent().spawnEntity(optEntity.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.MOB_SPAWNER).build()).build());
-                        }
+                        Entity entity = getRegion().getExtent().createEntity(EntityTypes.BLAZE, targetPos);
+                        getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.MOB_SPAWNER).build()).build());
                     }
                 }
             }

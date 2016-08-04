@@ -22,7 +22,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -36,21 +35,18 @@ public class DeadlyPotionCurse implements Consumer<Player> {
                 PotionEffectTypes.POISON, PotionEffectTypes.WEAKNESS
         };
 
-        Optional<Entity> optEntity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
-        if (optEntity.isPresent()) {
-            PotionEffectType type = Probability.pickOneOf(thrownTypes);
-            PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
+        Entity entity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
+        entity.setVelocity(new Vector3d(
+                random.nextDouble() * .5 - .25,
+                random.nextDouble() * .4 + .1,
+                random.nextDouble() * .5 - .25
+        ));
 
-            Entity entity = optEntity.get();
-            entity.setVelocity(new Vector3d(
-                    random.nextDouble() * .5 - .25,
-                    random.nextDouble() * .4 + .1,
-                    random.nextDouble() * .5 - .25
-            ));
-            entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
+        PotionEffectType type = Probability.pickOneOf(thrownTypes);
+        PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
+        entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
 
-            location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-        }
+        location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
     }
 
     @Override

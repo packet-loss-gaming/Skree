@@ -419,22 +419,19 @@ public class JungleRaidEffectListener {
         Color finalKillerColor = killerColor;
         for (int i = 0; i < 12; i++) {
             Task.builder().delayTicks(i * 4).execute(() -> {
-                Optional<Entity> optEntity = inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
-                if (optEntity.isPresent()) {
-                    Firework firework = (Firework) optEntity.get();
-                    FireworkEffect fireworkEffect = FireworkEffect.builder()
-                            .flicker(Probability.getChance(2))
-                            .trail(Probability.getChance(2))
-                            .color(teamColor)
-                            .fade(finalKillerColor)
-                            .shape(FireworkShapes.CREEPER)
-                            .build();
-                    firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
-                    firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-                    inst.getRegion().getExtent().spawnEntity(
-                            firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                    );
-                }
+                Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
+                FireworkEffect fireworkEffect = FireworkEffect.builder()
+                        .flicker(Probability.getChance(2))
+                        .trail(Probability.getChance(2))
+                        .color(teamColor)
+                        .fade(finalKillerColor)
+                        .shape(FireworkShapes.CREEPER)
+                        .build();
+                firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+                firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
+                inst.getRegion().getExtent().spawnEntity(
+                        firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                );
             }).submit(SkreePlugin.inst());
         }
     }

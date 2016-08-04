@@ -27,13 +27,9 @@ public class VelocityEntitySpawner {
         Vector3d finalVecLoc = loc.getPosition().add(actualDir.mul(2));
         loc = loc.setPosition(finalVecLoc);
 
-        Optional<Entity> optEnt = loc.getExtent().createEntity(type, loc.getPosition());
-        if (optEnt.isPresent()) {
-            Entity entity = optEnt.get();
-            entity.setVelocity(dir.mul(speed));
-            return loc.getExtent().spawnEntity(entity, cause) ? Optional.of(entity) : Optional.empty();
-        }
-        return Optional.empty();
+        Entity entity = loc.getExtent().createEntity(type, loc.getPosition());
+        entity.setVelocity(dir.mul(speed));
+        return loc.getExtent().spawnEntity(entity, cause) ? Optional.of(entity) : Optional.empty();
     }
 
     public static List<Entity> sendRadial(EntityType type, Location<World> loc, Cause cause) {

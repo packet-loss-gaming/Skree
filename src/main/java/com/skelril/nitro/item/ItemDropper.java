@@ -8,7 +8,6 @@ package com.skelril.nitro.item;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.event.cause.Cause;
@@ -20,7 +19,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ItemDropper {
@@ -41,12 +39,9 @@ public class ItemDropper {
 
     public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
         for (ItemStackSnapshot stack : stacks) {
-            Optional<Entity> optEntity = getExtent().createEntity(EntityTypes.ITEM, getPos());
-            if (optEntity.isPresent()) {
-                Item item = (Item) optEntity.get();
-                item.offer(Keys.REPRESENTED_ITEM, stack);
-                getExtent().spawnEntity(item, Cause.source(SpawnCause.builder().type(type).build()).build());
-            }
+            Item item = (Item)  getExtent().createEntity(EntityTypes.ITEM, getPos());
+            item.offer(Keys.REPRESENTED_ITEM, stack);
+            getExtent().spawnEntity(item, Cause.source(SpawnCause.builder().type(type).build()).build());
         }
     }
 

@@ -24,7 +24,6 @@ import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,7 +38,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
@@ -163,7 +161,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
     }
 
     private void spawnBossWave() {
-        Zombie zombie = checkedZombieSpawn(entryPoint);
+        Zombie zombie = spawnZombie(entryPoint);
         Boss<Zombie, CatacombsBossDetail> boss = new Boss<>(zombie, new CatacombsBossDetail(this, wave));
 
         List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = boss.getDamageProcessor();
@@ -237,17 +235,14 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
         waveMobManager.bind(waveMob);
     }
 
-    private Zombie checkedZombieSpawn(Location<World> loc) {
-        Optional<Entity> optEnt = loc.getExtent().createEntity(EntityTypes.ZOMBIE, loc.getPosition());
-        if (optEnt.isPresent()) {
-            loc.getExtent().spawnEntity(optEnt.get(), Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-            return (Zombie) optEnt.get();
-        }
-        throw new IllegalStateException("Zombie could not be spawned");
+    private Zombie spawnZombie(Location<World> loc) {
+        Zombie zombie = (Zombie) loc.getExtent().createEntity(EntityTypes.ZOMBIE, loc.getPosition());
+        loc.getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+        return zombie;
     }
 
     private Boss<Zombie, CatacombsBossDetail> spawnStrong(Location<World> loc) {
-        Zombie zombie = checkedZombieSpawn(loc);
+        Zombie zombie = spawnZombie(loc);
         Boss<Zombie, CatacombsBossDetail> boss = new Boss<>(zombie, new CatacombsBossDetail(this, wave * 2));
 
         List<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> bindProcessor = boss.getBindProcessor();
@@ -258,7 +253,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
     }
 
     private Boss<Zombie, CatacombsBossDetail> spawnNormal(Location<World> loc) {
-        Zombie zombie = checkedZombieSpawn(loc);
+        Zombie zombie = spawnZombie(loc);
         Boss<Zombie, CatacombsBossDetail> boss = new Boss<>(zombie, new CatacombsBossDetail(this, wave));
 
         List<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> bindProcessor = boss.getBindProcessor();

@@ -28,7 +28,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.animal.Chicken;
@@ -484,15 +483,12 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
                 continue;
             }
 
-            Optional<Entity> optEntity = testLoc.getExtent().createEntity(EntityTypes.CHICKEN, testLoc.getPosition());
-            if (optEntity.isPresent()) {
-                Chicken chicken = (Chicken) optEntity.get();
-                chicken.offer(Keys.PERSISTS, false);
-                testLoc.getExtent().spawnEntity(
-                        chicken,
-                        Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                );
-            }
+            Chicken chicken = (Chicken) testLoc.getExtent().createEntity(EntityTypes.CHICKEN, testLoc.getPosition());
+            chicken.offer(Keys.PERSISTS, false);
+            testLoc.getExtent().spawnEntity(
+                    chicken,
+                    Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+            );
         }
     }
 }

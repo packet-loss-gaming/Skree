@@ -230,7 +230,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     public void spawnBoss(FreakyFourBoss boss, long delay) {
         loadingBoss = true;
         Task.builder().execute(() -> {
-            Entity entity = getRegion().getExtent().createEntity(boss.getEntityType(), getCenter(boss)).get();
+            Entity entity = getRegion().getExtent().createEntity(boss.getEntityType(), getCenter(boss));
             getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
             Boss<Living, ZoneBossDetail<FreakyFourInstance>> aBoss = new Boss<>(
@@ -386,7 +386,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     }
 
     private void spawnCharlotteMinion(Vector3d position) {
-        Entity entity = getRegion().getExtent().createEntity(EntityTypes.CAVE_SPIDER, position).get();
+        Entity entity = getRegion().getExtent().createEntity(EntityTypes.CAVE_SPIDER, position);
         getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
 
         Boss<CaveSpider, ZoneBossDetail<FreakyFourInstance>> boss = new Boss<>(
