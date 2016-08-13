@@ -22,6 +22,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.List;
 import java.util.Optional;
@@ -101,7 +102,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
                                 Text.of(TextColors.RED, "You've already accepted your group invite.")
                         );
                     }
-                    event.setCancelled(true);
+                    event.setUseBlockResult(Tristate.FALSE);
                 }
             }
         }

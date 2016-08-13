@@ -43,6 +43,7 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -199,7 +200,8 @@ public class GoldRushListener {
                 if (inst.checkLevers()) inst.completeGame();
             }).delayTicks(1).submit(SkreePlugin.inst());
         } else if (targetBlock.equals(inst.getRewardChestLoc()) && inst.isComplete()) {
-            event.setCancelled(true);
+            event.setUseItemResult(Tristate.FALSE);
+            event.setUseBlockResult(Tristate.FALSE);
 
             player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully robbed the bank!"));
             inst.payPlayer(player);

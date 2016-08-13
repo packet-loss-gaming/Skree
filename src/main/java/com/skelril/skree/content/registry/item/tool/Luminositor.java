@@ -23,6 +23,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -81,6 +82,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
 
                 // TODO system message.color(color)
                 player.sendMessage(Text.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
+                event.setUseBlockResult(Tristate.FALSE);
             }
         }
     }

@@ -20,6 +20,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 
@@ -74,6 +75,7 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
                     }
                     tf(player).inventoryContainer.detectAndSendChanges();
                     player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
+                    event.setUseBlockResult(Tristate.FALSE);
                 }
             }
         }

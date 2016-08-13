@@ -15,6 +15,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -44,7 +45,7 @@ public class ZoneTransitionalOrbListener<T extends Zone> extends ZoneApplicableL
                             tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
                             tf(player).inventoryContainer.detectAndSendChanges();
                         }
-                        event.setCancelled(true);
+                        event.setUseBlockResult(Tristate.FALSE);
                     }
                 }
             }

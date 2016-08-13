@@ -57,6 +57,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -239,6 +240,8 @@ public class JungleRaidEffectListener {
 
         ItemStack stack = optStack.get();
         if (stack != null && stack.getItem() == ItemTypes.COMPASS) {
+            event.setUseBlockResult(Tristate.FALSE);
+
             if (inst.getState() == JungleRaidState.IN_PROGRESS) {
                 Set<Text> resultSet = new HashSet<>();
                 for (Player aPlayer : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {

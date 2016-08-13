@@ -33,6 +33,7 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,7 +129,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
                 .padding(Text.of(" "))
                 .sendTo(player);
 
-        event.setCancelled(true);
+        event.setUseBlockResult(Tristate.FALSE);
     }
 
     @Listener

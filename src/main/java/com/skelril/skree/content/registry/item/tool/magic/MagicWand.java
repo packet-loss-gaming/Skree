@@ -22,6 +22,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -57,6 +58,8 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
 
         if (optHeldItem.isPresent()) {
             if (optHeldItem.get().getItem() == this) {
+                event.setUseBlockResult(Tristate.FALSE);
+
                 Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
 
                 if (!optLoc.isPresent()) {

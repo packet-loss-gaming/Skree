@@ -18,6 +18,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 
@@ -61,6 +62,7 @@ public class CatacombsListener {
                 inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
                         Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
                 );
+                event.setUseBlockResult(Tristate.FALSE);
             }
         }
     }

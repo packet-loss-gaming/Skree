@@ -27,6 +27,7 @@ import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 
 import java.util.Optional;
@@ -63,6 +64,8 @@ public class FreakyFourListener {
 
         if (optHeldItem.isPresent()) {
             if (CustomItemTypes.PHANTOM_HYMN == optHeldItem.get().getItem()) {
+                event.setUseBlockResult(Tristate.FALSE);
+
                 Optional<FreakyFourInstance> optInst = manager.getApplicableZone(player);
                 if (!optInst.isPresent()) {
                     return;

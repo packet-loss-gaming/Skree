@@ -20,6 +20,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 
@@ -75,6 +76,7 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
                     tf(player).inventoryContainer.detectAndSendChanges();
                     tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
                     player.sendMessage(Text.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
+                    event.setUseBlockResult(Tristate.FALSE);
                 }
             }
         }

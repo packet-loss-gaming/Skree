@@ -14,6 +14,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -41,7 +42,8 @@ public class TempleOfFateListener {
 
         Location<World> targetBlock = optLoc.get();
         if (targetBlock.getBlockType() == BlockTypes.CHEST) {
-            event.setCancelled(true);
+            event.setUseItemResult(Tristate.FALSE);
+            event.setUseBlockResult(Tristate.FALSE);
 
             player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully completed the Temple of Fate!"));
             inst.rewardPlayer(player);

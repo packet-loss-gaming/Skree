@@ -26,6 +26,7 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -107,7 +108,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                     if (result.size() > 0) {
                         result.poll(1);
                         player.setLocation(optDestination.get());
-                        event.setCancelled(true);
+                        event.setUseBlockResult(Tristate.FALSE);
                     }
                 }
             }
