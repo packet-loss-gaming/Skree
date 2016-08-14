@@ -14,7 +14,6 @@ import com.skelril.skree.service.DropClearService;
 import com.skelril.skree.service.internal.dropclear.DropClearServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Task;
 
 @NModule(name = "Drop Clear System")
 public class DropClearSystem implements ServiceProvider<DropClearService> {
@@ -27,11 +26,9 @@ public class DropClearSystem implements ServiceProvider<DropClearService> {
 
         // Register the service & command
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
 
-        Task.builder().execute(
-                () -> Sponge.getServer().getWorlds().stream().forEach(service::checkedCleanup)
-        ).intervalTicks(10).submit(SkreePlugin.inst());
+        Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
     }
 
     @Override

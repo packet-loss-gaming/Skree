@@ -15,6 +15,9 @@ import com.skelril.skree.service.internal.entitystats.WorldStatisticsEntityColle
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -24,6 +27,7 @@ import org.spongepowered.api.world.World;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -33,6 +37,7 @@ public class DropClearServiceImpl implements DropClearService {
     private float panicMod;
 
     private Map<World, TimedRunnable<EntityCleanupTask>> timers = new HashMap<>();
+    private Map<World, Long> entityCount = new WeakHashMap<>();
 
     public DropClearServiceImpl(int autoAmt, float panicMod) {
         this.autoAmt = autoAmt;
@@ -46,10 +51,11 @@ public class DropClearServiceImpl implements DropClearService {
 
     @Override
     public boolean checkedCleanup(World world) {
-        WorldStatisticsEntityCollection profile = WorldStatisticsEntityCollection.createFor(world, checkPredicate);
-        int itemCount = profile.getEntities().size();
-        if (itemCount >= autoAmt) {
-            if (itemCount >= autoAmt * panicMod) {
+        WorldStatisticsEntityCollection profile = WorldStatisticsEntityCollection.createFor(world, CHECK_PREDICATE);
+        long discoveredEntityCount = profile.getEntities().size();
+        entityCount.put(world, discoveredEntityCount);
+        if (discoveredEntityCount >= autoAmt) {
+            if (discoveredEntityCount >= autoAmt * panicMod) {
                 forceCleanup(world);
             } else if (!isActiveFor(world)) {
                 cleanup(world);
@@ -79,7 +85,7 @@ public class DropClearServiceImpl implements DropClearService {
         dropClear(world, 0, true);
     }
 
-    private static Predicate<Entity> checkPredicate;
+    private static final Predicate<Entity> CHECK_PREDICATE;
 
     static {
         HashSet<EntityType> checkedEntities = new HashSet<>();
@@ -92,11 +98,22 @@ public class DropClearServiceImpl implements DropClearService {
         checkedEntities.add(EntityTypes.EXPERIENCE_ORB);
         checkedEntities.add(EntityTypes.SPLASH_POTION);
 
-        checkPredicate = new EntityTypePredicate(checkedEntities);
+        CHECK_PREDICATE = new EntityTypePredicate(checkedEntities);
+    }
+
+    @Listener(order = Order.POST)
+    public void onItemSpawn(SpawnEntityEvent event) {
+        long spawnedCount = event.getEntities().stream().filter(DropClearServiceImpl.CHECK_PREDICATE).count();
+
+        World targetWorld = event.getTargetWorld();
+        long newCount = entityCount.merge(targetWorld, spawnedCount, (a, b) -> a + b);
+        if (newCount > autoAmt) {
+            checkedCleanup(targetWorld);
+        }
     }
 
     private EntityCleanupTask pickDropClear(World world) {
-        return new EntityCleanupTask(world, checkPredicate) {
+        return new EntityCleanupTask(world, CHECK_PREDICATE) {
             @Override
             public void notifyCleanProgress(int times) {
                 MessageChannel.TO_ALL.send(
@@ -149,6 +166,8 @@ public class DropClearServiceImpl implements DropClearService {
             public void cancel(boolean withEnd) {
                 super.cancel(withEnd);
                 if (withEnd) {
+                    entityCount.put(world, 0L);
+
                     // TODO send to the yet to be made, Entity Stats service
                     // lastClear.put(world, getBaseTask().getLastProfile());
                 }
