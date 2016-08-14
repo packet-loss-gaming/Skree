@@ -62,9 +62,7 @@ public class CatacombsListener {
                 inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
                         Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
                 );
-
                 event.setUseBlockResult(Tristate.FALSE);
-                event.setUseItemResult(Tristate.FALSE);
             }
         }
     }

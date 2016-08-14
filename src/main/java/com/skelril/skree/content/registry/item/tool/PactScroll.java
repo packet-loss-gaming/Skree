@@ -130,7 +130,6 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
                 .sendTo(player);
 
         event.setUseBlockResult(Tristate.FALSE);
-        event.setUseItemResult(Tristate.FALSE);
     }
 
     @Listener

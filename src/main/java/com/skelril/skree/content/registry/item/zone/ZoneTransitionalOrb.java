@@ -68,7 +68,6 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
                 if (itemStack.getItem() == this) {
                     if (rejoinInstance(player)) {
                         event.setUseBlockResult(Tristate.FALSE);
-                        event.setUseItemResult(Tristate.FALSE);
                     }
                 }
             }

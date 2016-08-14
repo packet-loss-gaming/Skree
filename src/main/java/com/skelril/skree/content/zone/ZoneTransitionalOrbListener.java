@@ -46,7 +46,6 @@ public class ZoneTransitionalOrbListener<T extends Zone> extends ZoneApplicableL
                             tf(player).inventoryContainer.detectAndSendChanges();
                         }
                         event.setUseBlockResult(Tristate.FALSE);
-                        event.setUseItemResult(Tristate.FALSE);
                     }
                 }
             }

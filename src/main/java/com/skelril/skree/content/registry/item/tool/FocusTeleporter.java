@@ -109,7 +109,6 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                         result.poll(1);
                         player.setLocation(optDestination.get());
                         event.setUseBlockResult(Tristate.FALSE);
-                        event.setUseItemResult(Tristate.FALSE);
                     }
                 }
             }

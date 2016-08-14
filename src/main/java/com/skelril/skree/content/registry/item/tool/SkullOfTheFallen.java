@@ -97,7 +97,6 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                         player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));
                     }
                     event.setUseBlockResult(Tristate.FALSE);
-                    event.setUseItemResult(Tristate.FALSE);
                 }
             }
         }

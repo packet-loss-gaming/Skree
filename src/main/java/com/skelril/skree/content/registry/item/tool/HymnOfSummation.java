@@ -76,7 +76,6 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
                     tf(player).inventoryContainer.detectAndSendChanges();
                     player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
                     event.setUseBlockResult(Tristate.FALSE);
-                    event.setUseItemResult(Tristate.FALSE);
                 }
             }
         }

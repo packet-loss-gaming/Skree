@@ -42,8 +42,8 @@ public class TempleOfFateListener {
 
         Location<World> targetBlock = optLoc.get();
         if (targetBlock.getBlockType() == BlockTypes.CHEST) {
-            event.setUseBlockResult(Tristate.FALSE);
             event.setUseItemResult(Tristate.FALSE);
+            event.setUseBlockResult(Tristate.FALSE);
 
             player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully completed the Temple of Fate!"));
             inst.rewardPlayer(player);

@@ -241,7 +241,6 @@ public class JungleRaidEffectListener {
         ItemStack stack = optStack.get();
         if (stack != null && stack.getItem() == ItemTypes.COMPASS) {
             event.setUseBlockResult(Tristate.FALSE);
-            event.setUseItemResult(Tristate.FALSE);
 
             if (inst.getState() == JungleRaidState.IN_PROGRESS) {
                 Set<Text> resultSet = new HashSet<>();
