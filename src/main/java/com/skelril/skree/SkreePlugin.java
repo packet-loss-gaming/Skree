@@ -17,6 +17,7 @@ import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
 import com.skelril.skree.system.maintenance.MaintenanceSystem;
 import com.skelril.skree.system.market.MarketSystem;
+import com.skelril.skree.system.mobdensity.MobDensitySystem;
 import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
@@ -82,6 +83,7 @@ public class SkreePlugin {
                 DropClearSystem.class,
                 MaintenanceSystem.class,
                 MarketSystem.class,
+                MobDensitySystem.class,
                 ModifierSystem.class,
                 PlayerStateSystem.class,
                 ProjectileWatcherSystem.class,
