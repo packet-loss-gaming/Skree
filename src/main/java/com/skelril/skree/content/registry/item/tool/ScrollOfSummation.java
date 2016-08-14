@@ -77,6 +77,7 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
                     tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
                     player.sendMessage(Text.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
                     event.setUseBlockResult(Tristate.FALSE);
+                    event.setUseItemResult(Tristate.FALSE);
                 }
             }
         }

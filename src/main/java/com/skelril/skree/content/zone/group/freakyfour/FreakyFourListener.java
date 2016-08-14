@@ -65,6 +65,7 @@ public class FreakyFourListener {
         if (optHeldItem.isPresent()) {
             if (CustomItemTypes.PHANTOM_HYMN == optHeldItem.get().getItem()) {
                 event.setUseBlockResult(Tristate.FALSE);
+                event.setUseItemResult(Tristate.FALSE);
 
                 Optional<FreakyFourInstance> optInst = manager.getApplicableZone(player);
                 if (!optInst.isPresent()) {

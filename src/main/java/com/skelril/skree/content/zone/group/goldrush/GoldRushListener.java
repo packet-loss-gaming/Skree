@@ -200,8 +200,8 @@ public class GoldRushListener {
                 if (inst.checkLevers()) inst.completeGame();
             }).delayTicks(1).submit(SkreePlugin.inst());
         } else if (targetBlock.equals(inst.getRewardChestLoc()) && inst.isComplete()) {
-            event.setUseItemResult(Tristate.FALSE);
             event.setUseBlockResult(Tristate.FALSE);
+            event.setUseItemResult(Tristate.FALSE);
 
             player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully robbed the bank!"));
             inst.payPlayer(player);

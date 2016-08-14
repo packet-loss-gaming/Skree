@@ -89,6 +89,9 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
             if (optItemStack.isPresent()) {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
+                    event.setUseBlockResult(Tristate.FALSE);
+                    event.setUseItemResult(Tristate.FALSE);
+
                     if (!isAttuned(itemStack)) {
                         if (notifyGroupOwner(itemStack, player, true)) {
                             attune(itemStack);
@@ -102,7 +105,6 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
                                 Text.of(TextColors.RED, "You've already accepted your group invite.")
                         );
                     }
-                    event.setUseBlockResult(Tristate.FALSE);
                 }
             }
         }

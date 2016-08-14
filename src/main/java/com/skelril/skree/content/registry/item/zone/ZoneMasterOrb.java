@@ -160,10 +160,12 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
             if (optItemStack.isPresent()) {
                 ItemStack itemStack = tf(optItemStack.get());
                 if (isZoneMasterItem(itemStack)) {
+                    event.setUseBlockResult(Tristate.FALSE);
+                    event.setUseItemResult(Tristate.FALSE);
+
                     if (isAttuned(itemStack)) {
                         if (isInInstanceWorld(player)) {
                             player.sendMessage(Text.of(TextColors.RED, "You cannot start an instance from within an instance."));
-                            event.setCancelled(true);
                             return;
                         }
 
@@ -211,7 +213,6 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                             );
                         }
                     }
-                    event.setUseBlockResult(Tristate.FALSE);
                 }
             }
         }

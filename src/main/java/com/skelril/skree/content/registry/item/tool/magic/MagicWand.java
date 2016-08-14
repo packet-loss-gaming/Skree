@@ -59,6 +59,7 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
         if (optHeldItem.isPresent()) {
             if (optHeldItem.get().getItem() == this) {
                 event.setUseBlockResult(Tristate.FALSE);
+                event.setUseItemResult(Tristate.FALSE);
 
                 Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
 

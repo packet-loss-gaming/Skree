@@ -83,6 +83,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
                 // TODO system message.color(color)
                 player.sendMessage(Text.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
                 event.setUseBlockResult(Tristate.FALSE);
+                event.setUseItemResult(Tristate.FALSE);
             }
         }
     }
