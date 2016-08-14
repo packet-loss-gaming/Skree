@@ -6,19 +6,23 @@
 
 package com.skelril.skree.content.mobdensity;
 
-import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MobDensityListener {
     @Listener
     public void onEntityCollide(CollideEntityEvent event) {
-        event.getEntities().forEach(e -> {
-            if (e instanceof Animal && Probability.getChance(20) && event.getCause().containsType(e.getClass())) {
+        List<Entity> entities = event.getEntities().stream().filter(e -> e instanceof Animal).collect(Collectors.toList());
+        if (entities.size() > 5) {
+            entities.forEach(e -> {
                 e.offer(Keys.FIRE_TICKS, 20 * 20);
-            }
-        });
+            });
+        }
     }
 }
