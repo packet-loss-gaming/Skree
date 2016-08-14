@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.skelril.nitro.item.ItemCompactor;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.content.registry.item.generic.*;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,6 +19,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -69,12 +71,15 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
                 )).execute((ItemStack[]) (Object[]) pInv);
 
                 if (optCompacted.isPresent()) {
-                    ItemStack[] nInv = optCompacted.get();
-                    for (int i = 0; i < pInv.length; ++i) {
-                        pInv[i] = tf(nInv[i]);
-                    }
-                    tf(player).inventoryContainer.detectAndSendChanges();
-                    player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
+                    Task.builder().execute(() -> {
+                        ItemStack[] nInv = optCompacted.get();
+                        for (int i = 0; i < pInv.length; ++i) {
+                            pInv[i] = tf(nInv[i]);
+                        }
+                        tf(player).inventoryContainer.detectAndSendChanges();
+                        player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
+                    }).delayTicks(1).submit(SkreePlugin.inst());
+
                     event.setUseBlockResult(Tristate.FALSE);
                 }
             }

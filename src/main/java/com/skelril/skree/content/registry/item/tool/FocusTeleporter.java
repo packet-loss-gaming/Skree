@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.content.world.WorldEntryPermissionCheck;
@@ -24,6 +25,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -106,8 +108,11 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 if (optDestination.isPresent()) {
                     Inventory result = player.getInventory().query((ItemType) CustomItemTypes.ENDER_FOCUS);
                     if (result.size() > 0) {
-                        result.poll(1);
-                        player.setLocation(optDestination.get());
+                        Task.builder().execute(() -> {
+                            result.poll(1);
+                            player.setLocation(optDestination.get());
+                        }).delayTicks(1).submit(SkreePlugin.inst());
+
                         event.setUseBlockResult(Tristate.FALSE);
                     }
                 }

@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.zone;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
@@ -42,6 +43,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -169,46 +171,48 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
                         Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
                         if (optService.isPresent()) {
-                            ZoneService service = optService.get();
-                            List<Player> group = new ArrayList<>();
-                            group.add(player);
-                            for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
-                                ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
-                                for (ItemStack aStack : itemStacks) {
-                                    if (!hasSameZoneID(itemStack, aStack)) {
-                                        continue;
-                                    }
+                            Task.builder().execute(() -> {
+                                ZoneService service = optService.get();
+                                List<Player> group = new ArrayList<>();
+                                group.add(player);
+                                for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
+                                    ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
+                                    for (ItemStack aStack : itemStacks) {
+                                        if (!hasSameZoneID(itemStack, aStack)) {
+                                            continue;
+                                        }
 
-                                    if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
-                                        Optional<Player> optZoneOwner = getGroupOwner(aStack);
-                                        if (optZoneOwner.isPresent()) {
-                                            group.add(aPlayer);
-                                            break;
+                                        if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
+                                            Optional<Player> optZoneOwner = getGroupOwner(aStack);
+                                            if (optZoneOwner.isPresent()) {
+                                                group.add(aPlayer);
+                                                break;
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            for (int i = group.size() - 1; i >= 0; --i) {
-                                purgeZoneItems(group.get(i), itemStack);
-                                // createLightningStrike(group.get(i)); SpongeCommon/420
-                                saveLocation(group.get(i));
-                                getMainWorldWrapper().getLobby().add(group.get(i));
-                            }
+                                for (int i = group.size() - 1; i >= 0; --i) {
+                                    purgeZoneItems(group.get(i), itemStack);
+                                    // createLightningStrike(group.get(i)); SpongeCommon/420
+                                    saveLocation(group.get(i));
+                                    getMainWorldWrapper().getLobby().add(group.get(i));
+                                }
 
-                            service.requestZone(getZone(itemStack).get(), group,
-                                    () -> {
-                                        getMainWorldWrapper().getLobby().remove(group);
-                                    },
-                                    result -> {
-                                        if (result.isPresent()) {
-                                            result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
-                                                player.setLocation(getRespawnLocation(player));
-                                                player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
-                                            });
+                                service.requestZone(getZone(itemStack).get(), group,
+                                        () -> {
+                                            getMainWorldWrapper().getLobby().remove(group);
+                                        },
+                                        result -> {
+                                            if (result.isPresent()) {
+                                                result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
+                                                    player.setLocation(getRespawnLocation(player));
+                                                    player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
+                                                });
+                                            }
                                         }
-                                    }
-                            );
+                                );
+                            }).delayTicks(1).submit(SkreePlugin.inst());
                         }
                     }
                     event.setUseBlockResult(Tristate.FALSE);

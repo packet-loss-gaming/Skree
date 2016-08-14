@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item.zone;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,6 +21,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -90,17 +92,15 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
                 org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
                 if (isZoneSlaveItem(itemStack)) {
                     if (!isAttuned(itemStack)) {
-                        if (notifyGroupOwner(itemStack, player, true)) {
-                            attune(itemStack);
-                            player.setItemInHand(HandTypes.MAIN_HAND, itemStack);
-                            player.sendMessage(
-                                    Text.of(TextColors.GOLD, "You've accepted your group invite.")
-                            );
-                        }
+                        Task.builder().execute(() -> {
+                            if (notifyGroupOwner(itemStack, player, true)) {
+                                attune(itemStack);
+                                player.setItemInHand(HandTypes.MAIN_HAND, itemStack);
+                                player.sendMessage(Text.of(TextColors.GOLD, "You've accepted your group invite."));
+                            }
+                        }).delayTicks(1).submit(SkreePlugin.inst());
                     } else {
-                        player.sendMessage(
-                                Text.of(TextColors.RED, "You've already accepted your group invite.")
-                        );
+                        player.sendMessage(Text.of(TextColors.RED, "You've already accepted your group invite."));
                     }
                     event.setUseBlockResult(Tristate.FALSE);
                 }

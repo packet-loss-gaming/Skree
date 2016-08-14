@@ -7,6 +7,7 @@
 package com.skelril.skree.content.zone.group.catacombs;
 
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import org.spongepowered.api.data.type.HandTypes;
@@ -16,6 +17,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -56,12 +58,15 @@ public class CatacombsListener {
         if (optHeldItem.isPresent()) {
             ItemStack held = optHeldItem.get();
             if (held.getItem() == CustomItemTypes.PHANTOM_CLOCK) {
-                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                inst.setUsedPhantomClock(true);
+                Task.builder().execute(() -> {
+                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                    inst.setUsedPhantomClock(true);
 
-                inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-                        Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
-                );
+                    inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                            Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
+                    );
+                }).delayTicks(1).submit(SkreePlugin.inst());
+
                 event.setUseBlockResult(Tristate.FALSE);
             }
         }

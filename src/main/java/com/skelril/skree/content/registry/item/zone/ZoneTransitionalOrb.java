@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.zone;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.service.RespawnService;
@@ -23,6 +24,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -107,8 +109,10 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
         switch (zoneService.rejoin(player).getValue()) {
             case ADDED:
                 saveLocation(player, priorLocation);
-                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                tf(player).inventoryContainer.detectAndSendChanges();
+                Task.builder().execute(() -> {
+                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                    tf(player).inventoryContainer.detectAndSendChanges();
+                }).delayTicks(1).submit(SkreePlugin.inst());
                 break;
             case NO_REJOIN:
                 player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
