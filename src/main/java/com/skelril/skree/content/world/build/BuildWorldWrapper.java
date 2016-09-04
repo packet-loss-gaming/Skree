@@ -12,7 +12,6 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HorseVariants;
 import org.spongepowered.api.entity.Entity;
@@ -24,6 +23,7 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
@@ -74,7 +74,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     public void onEntitySpawn(SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
 
-        Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
+        Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
         for (Entity entity : entities) {
             if (!isApplicable(entity)) continue;
 

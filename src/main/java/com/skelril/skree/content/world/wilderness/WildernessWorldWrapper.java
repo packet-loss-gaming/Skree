@@ -72,6 +72,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
@@ -205,7 +206,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     public void onEntitySpawn(SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
 
-        Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
+        Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
         for (Entity entity : entities) {
             Location<World> loc = entity.getLocation();
             Optional<Integer> optLevel = getLevel(loc);
