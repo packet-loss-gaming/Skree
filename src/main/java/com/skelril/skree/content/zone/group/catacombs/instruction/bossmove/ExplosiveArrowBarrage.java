@@ -76,7 +76,8 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
                                     .canCauseFire(allowFire(detail))
                                     .shouldBreakBlocks(allowBlockBreak(detail))
                                     .shouldDamageEntities(true)
-                                    .build()
+                                    .build(),
+                            Cause.source(boss).build()
                     );
                 }
             }).delay(getDelay(detail), TimeUnit.SECONDS).submit(SkreePlugin.inst());

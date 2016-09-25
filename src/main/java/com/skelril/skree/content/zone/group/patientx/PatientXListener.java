@@ -22,6 +22,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.CollideEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
@@ -103,7 +104,8 @@ public class PatientXListener {
                                 .radius(3)
                                 .location(entity.getLocation())
                                 .shouldDamageEntities(true)
-                                .build()
+                                .build(),
+                        Cause.source(entity).build()
                 );
             }
         }

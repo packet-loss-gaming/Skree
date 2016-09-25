@@ -212,7 +212,8 @@ public class JungleRaidEffectListener {
                         .location(entity.getLocation())
                         .shouldDamageEntities(true)
                         .shouldBreakBlocks(true)
-                        .build()
+                        .build(),
+                Cause.source(SkreePlugin.inst()).build()
         );
     }
 

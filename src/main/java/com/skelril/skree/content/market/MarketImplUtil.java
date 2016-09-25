@@ -22,7 +22,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.world.World;
 
@@ -164,7 +164,7 @@ public class MarketImplUtil {
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
         List<ItemStackSnapshot> droppedItems = new ArrayList<>();
 
-        HumanInventory inventory = player.getInventory().query(HumanInventory.class);
+        PlayerInventory inventory = player.getInventory().query(PlayerInventory.class);
 
         // Loop through replacing empty space with the requested items
         for (ItemStack stack : stacks) {

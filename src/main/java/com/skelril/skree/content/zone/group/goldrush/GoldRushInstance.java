@@ -34,7 +34,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -160,7 +160,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     return;
                 }
             } else {
-                if (player.getInventory().query(HumanInventory.class, EquipmentInventory.class).size() > 0) {
+                if (player.getInventory().query(PlayerInventory.class, EquipmentInventory.class).size() > 0) {
                     getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
                             Text.of(TextColors.RED, "All players inventories must be empty.")
                     );

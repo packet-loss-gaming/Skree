@@ -345,7 +345,8 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                                                         .location(player.getLocation().setPosition(pos.toDouble().add(.5, .5, .5)))
                                                         .shouldDamageEntities(true)
                                                         .canCauseFire(true)
-                                                        .build()
+                                                        .build(),
+                                                Cause.source(SkreePlugin.inst()).build()
                                         );
                                     }).delayTicks(12 * i).submit(SkreePlugin.inst());
                                 }

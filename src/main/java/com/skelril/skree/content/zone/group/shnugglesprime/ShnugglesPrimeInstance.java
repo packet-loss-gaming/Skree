@@ -413,7 +413,10 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                         .radius(10)
                                         .build();
                                 
-                                getRegion().getExtent().triggerExplosion(explosion);
+                                getRegion().getExtent().triggerExplosion(
+                                        explosion,
+                                        Cause.source(boss).build()
+                                );
                             });
                             //Schedule Reset
                             Task.builder().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
