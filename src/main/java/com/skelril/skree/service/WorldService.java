@@ -8,6 +8,7 @@ package com.skelril.skree.service;
 
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldArchetype;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -17,4 +18,9 @@ public interface WorldService {
     <T extends WorldEffectWrapper> Optional<T> getEffectWrapper(Class<T> wrapperClass);
     Optional<WorldEffectWrapper> getEffectWrapperFor(World world);
     Collection<WorldEffectWrapper> getEffectWrappers();
+
+    Optional<World> loadWorld(String name, WorldArchetype archetype);
+    Optional<World> loadVanillaMapFromDisk(String name);
+
+    void registerWorld(String name);
 }

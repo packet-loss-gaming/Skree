@@ -21,7 +21,6 @@ import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
@@ -49,6 +48,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Register the service & command
         Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
         Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
+        Sponge.getCommandManager().register(SkreePlugin.inst(), LoadWorldCommand.aquireSpec(), "loadworld");
         Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
         Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
@@ -59,8 +59,6 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         // Handle main world
         initMain();
-
-        // initCity();
 
         // Create worlds
         initBuild();
@@ -99,26 +97,6 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
     }
 
-    private void initCity() {
-        // City World
-        MainWorldWrapper wrapper = new MainWorldWrapper();
-
-        Optional<World> curWorld = Sponge.getServer().getWorld("City");
-        if (!curWorld.isPresent()) {
-            curWorld = instantiate(
-                    "City",
-                    Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:city").get()
-            );
-            // registerWorld("City");
-        }
-
-        if (curWorld.isPresent()) {
-            wrapper.addWorld(curWorld.get());
-        }
-
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), wrapper);
-    }
-
     private void initMain() {
         // Main World
         MainWorldWrapper wrapper = new MainWorldWrapper();
@@ -140,11 +118,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = Sponge.getServer().getWorld(BUILD);
         if (!curWorld.isPresent()) {
-            curWorld = instantiate(
+            curWorld = service.loadWorld(
                     BUILD,
                     Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:build").get()
             );
-            registerWorld(BUILD);
+            service.registerWorld(BUILD);
         }
 
         if (curWorld.isPresent()) {
@@ -153,11 +131,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> oldWorld = Sponge.getServer().getWorld(BUILD_OLD);
         if (!oldWorld.isPresent()) {
-            oldWorld = instantiate(
+            oldWorld = service.loadWorld(
                     BUILD_OLD,
                     Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:barrier").get()
             );
-            registerWorld(BUILD_OLD);
+            service.registerWorld(BUILD_OLD);
         }
 
         if (oldWorld.isPresent()) {
@@ -175,11 +153,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = Sponge.getServer().getWorld(INSTANCE);
         if (!curWorld.isPresent()) {
-            curWorld = instantiate(
+            curWorld = service.loadWorld(
                     INSTANCE,
                     Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:void").get()
             );
-            registerWorld(INSTANCE);
+            service.registerWorld(INSTANCE);
         }
 
         if (curWorld.isPresent()) {
@@ -197,11 +175,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
         Optional<World> curWorld = Sponge.getServer().getWorld(WILDERNESS);
         if (!curWorld.isPresent()) {
-            curWorld = instantiate(
+            curWorld = service.loadWorld(
                     WILDERNESS,
                     Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness").get()
             );
-            registerWorld(WILDERNESS);
+            service.registerWorld(WILDERNESS);
         }
 
         if (curWorld.isPresent()) {
@@ -211,11 +189,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         // Wilderness Nether World
         curWorld = Sponge.getServer().getWorld(WILDERNESS_NETHER);
         if (!curWorld.isPresent()) {
-            curWorld = instantiate(
+            curWorld = service.loadWorld(
                     WILDERNESS_NETHER,
                     Sponge.getGame().getRegistry().getType(WorldArchetype.class, "skree:wilderness_nether").get()
             );
-            registerWorld(WILDERNESS_NETHER);
+            service.registerWorld(WILDERNESS_NETHER);
         }
 
         if (curWorld.isPresent()) {
@@ -242,20 +220,6 @@ public class WorldSystem implements ServiceProvider<WorldService> {
     private WorldArchetype.Builder obtainAutoloadingWorld() {
         WorldArchetype.Builder builder = WorldArchetype.builder();
         return builder.enabled(true).loadsOnStartup(true);
-    }
-
-    private Optional<World> instantiate(String name, WorldArchetype settings) {
-        try {
-            return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(name, settings));
-        } catch (Exception ex) {
-            return Optional.empty();
-        }
-    }
-
-    private void registerWorld(String worldName) {
-        if (Sponge.getPlatform().getType() == Platform.Type.SERVER) {
-            new ServerSideWorldRegistar().register(worldName);
-        }
     }
 
     @Override

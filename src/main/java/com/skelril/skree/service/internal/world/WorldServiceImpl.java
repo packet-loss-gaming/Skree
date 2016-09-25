@@ -9,16 +9,21 @@ package com.skelril.skree.service.internal.world;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.WorldService;
+import com.skelril.skree.system.world.ServerSideWorldRegistar;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldArchetype;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -58,6 +63,27 @@ public class WorldServiceImpl implements WorldService {
     @Override
     public Collection<WorldEffectWrapper> getEffectWrappers() {
         return new HashSet<>(worlds.values());
+    }
+
+    @Override
+    public Optional<World> loadWorld(String name, WorldArchetype archetype) {
+        try {
+            return Sponge.getServer().loadWorld(Sponge.getServer().createWorldProperties(name, archetype));
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<World> loadVanillaMapFromDisk(String name) {
+        return Sponge.getServer().loadWorld(name);
+    }
+
+    @Override
+    public void registerWorld(String name) {
+        if (Sponge.getPlatform().getType() == Platform.Type.SERVER) {
+            new ServerSideWorldRegistar().register(name);
+        }
     }
 
     private Map<UUID, Long> lastPlayerLogin = new HashMap<>();
