@@ -9,6 +9,7 @@ package com.skelril.skree.system.registry.block;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.registry.item.CookedItem;
+import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
@@ -17,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 
@@ -69,7 +71,7 @@ public class CustomBlockSystem {
         if (block instanceof Block && block instanceof ICustomBlock) {
             ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
 
-            GameRegistry.registerBlock((Block) block, ((ICustomBlock) block).__getID());
+            GameRegistry.register((Block) block, new ResourceLocation(((ICustomBlock) block).__getID()));
 
             // Add selective hooks
             if (block instanceof EventAwareContent) {

@@ -51,7 +51,7 @@ public class MagicMushroomPopulator implements Populator {
             BlockPos blockpos1 = position.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
             BlockPos blockpos2 = blockpos1.add(0, -1, 0);
 
-            if (worldIn.getBlockState(blockpos2).getBlock() == BlockTypes.STONE && worldIn.isAirBlock(blockpos1) && (!worldIn.provider.getHasNoSky() || blockpos1.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, blockpos1, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState()))  {
+            if (worldIn.getBlockState(blockpos2).getBlock() == BlockTypes.STONE && worldIn.isAirBlock(blockpos1) && (!worldIn.provider.hasNoSky() || blockpos1.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, blockpos1, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState()))  {
                 worldIn.setBlockState(blockpos2, CustomBlockTypes.MAGIC_STONE.getDefaultState(), 2);
                 worldIn.setBlockState(blockpos1, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState(), 2);
             }

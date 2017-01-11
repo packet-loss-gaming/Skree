@@ -61,7 +61,7 @@ public interface ICustomFood extends ICustomItem {
      * the Item before the action is complete.
      */
     default ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-        --stack.stackSize;
+        stack.setCount(stack.getCount() - 1);
 
         if (entityLiving instanceof EntityPlayer)
         {

@@ -112,7 +112,7 @@ public class SkyWarsListener {
 
                 ParticleEffect radiationEffect = ParticleEffect.builder().type(
                         ParticleTypes.FLAME
-                ).count(1).build();
+                ).quantity(1).build();
 
                 TargetBlock targetBlock = new TargetBlock(spongePlayer, 50, .2);
                 while (targetBlock.getNextBlock() != null) {

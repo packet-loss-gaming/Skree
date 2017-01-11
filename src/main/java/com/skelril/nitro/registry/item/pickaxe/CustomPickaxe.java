@@ -11,6 +11,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickaxe {
@@ -43,8 +45,8 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public int __superGetHarvestLevel(ItemStack stack, String toolClass) {
-        return super.getHarvestLevel(stack, toolClass);
+    public int __superGetHarvestLevel(ItemStack stack, String toolClass, @Nullable EntityPlayer player, @Nullable IBlockState blockState) {
+        return super.getHarvestLevel(stack, toolClass, player, blockState);
     }
 
     @Override
@@ -94,8 +96,8 @@ public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickax
     }
 
     @Override
-    public int getHarvestLevel(ItemStack stack, String toolClass) {
-        return ICustomPickaxe.super.getHarvestLevel(stack, toolClass);
+    public int getHarvestLevel(ItemStack stack, String toolClass, @Nullable EntityPlayer player, @Nullable IBlockState blockState) {
+        return ICustomPickaxe.super.getHarvestLevel(stack, toolClass, player, blockState);
     }
 
     @Override

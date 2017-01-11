@@ -10,20 +10,16 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntityLockable;
+import net.minecraft.tileentity.TileEntityLockableLoot;
+import net.minecraft.util.NonNullList;
 
-public class GraveStoneTileEntity extends TileEntityLockable implements IInventory {
+public class GraveStoneTileEntity extends TileEntityLockableLoot {
 
     private String customName;
-    private ItemStack[] graveContents = new ItemStack[getSizeInventory()];
-
-    static {
-        addMapping(GraveStoneTileEntity.class, "GraveStone");
-    }
+    private NonNullList<ItemStack> graveContents = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
 
     @Override
     public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
@@ -41,53 +37,14 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public ItemStack getStackInSlot(int index) {
-        return this.graveContents[index];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int index, int count) {
-        if (this.graveContents[index] != null) {
-            ItemStack itemstack;
-
-            if (this.graveContents[index].stackSize <= count) {
-                itemstack = this.graveContents[index];
-                this.graveContents[index] = null;
-                this.markDirty();
-                return itemstack;
+    public boolean isEmpty() {
+        for (ItemStack itemstack : this.graveContents) {
+            if (!itemstack.isEmpty()) {
+                return false;
             }
-
-            itemstack = this.graveContents[index].splitStack(count);
-
-            if (this.graveContents[index].stackSize == 0) {
-                this.graveContents[index] = null;
-            }
-
-            this.markDirty();
-            return itemstack;
-        }
-        return null;
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index) {
-        if (this.graveContents[index] != null) {
-            ItemStack itemstack = this.graveContents[index];
-            this.graveContents[index] = null;
-            return itemstack;
-        }
-        return null;
-    }
-
-    @Override
-    public void setInventorySlotContents(int index, ItemStack stack) {
-        this.graveContents[index] = stack;
-
-        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
-            stack.stackSize = this.getInventoryStackLimit();
         }
 
-        this.markDirty();
+        return true;
     }
 
     @Override
@@ -96,7 +53,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer playerIn) {
+    public boolean isUsableByPlayer(EntityPlayer player) {
         return false;
     }
 
@@ -131,10 +88,8 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
     }
 
     @Override
-    public void clear() {
-        for (int i = 0; i < getSizeInventory(); ++i) {
-            this.graveContents[i] = null;
-        }
+    protected NonNullList<ItemStack> getItems() {
+        return this.graveContents;
     }
 
     @Override
@@ -147,41 +102,27 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
         return this.customName != null && this.customName.length() > 0;
     }
 
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(NBTTagCompound compound)
+    {
         super.readFromNBT(compound);
-        NBTTagList nbttaglist = compound.getTagList("Items", 10);
-        this.graveContents = new ItemStack[this.getSizeInventory()];
+        this.graveContents = NonNullList.<ItemStack>withSize(this.getSizeInventory(), ItemStack.EMPTY);
 
-        if (compound.hasKey("CustomName", 8)) {
+        ItemStackHelper.loadAllItems(compound, this.graveContents);
+
+        if (compound.hasKey("CustomName", 8))
+        {
             this.customName = compound.getString("CustomName");
-        }
-
-        for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound1.getByte("Slot") & 255;
-
-            if (j >= 0 && j < this.graveContents.length) {
-                this.graveContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
-            }
         }
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    {
         super.writeToNBT(compound);
-        NBTTagList nbttaglist = new NBTTagList();
 
-        for (int i = 0; i < this.graveContents.length; ++i) {
-            if (this.graveContents[i] != null) {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.graveContents[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
-            }
-        }
+        ItemStackHelper.saveAllItems(compound, this.graveContents);
 
-        compound.setTag("Items", nbttaglist);
-
-        if (this.hasCustomName()) {
+        if (this.hasCustomName())
+        {
             compound.setString("CustomName", this.customName);
         }
 

@@ -14,6 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.content.registry.item.generic.*;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -58,7 +59,7 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
         if (optHeldItem.isPresent()) {
             ItemStack held = optHeldItem.get();
             if (held.getItem() == this) {
-                net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
+                NonNullList<net.minecraft.item.ItemStack> pInv = tf(player).inventory.mainInventory;
                 Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
                         CoalValueMap.inst(),
                         IronValueMap.inst(),
@@ -68,13 +69,13 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
                         DiamondValueMap.inst(),
                         EmeraldValueMap.inst(),
                         CofferValueMap.inst()
-                )).execute((ItemStack[]) (Object[]) pInv);
+                )).execute((ItemStack[]) pInv.toArray());
 
                 if (optCompacted.isPresent()) {
                     Task.builder().execute(() -> {
                         ItemStack[] nInv = optCompacted.get();
-                        for (int i = 0; i < pInv.length; ++i) {
-                            pInv[i] = tf(nInv[i]);
+                        for (int i = 0; i < pInv.size(); ++i) {
+                            pInv.set(i, tf(nInv[i]));
                         }
                         tf(player).inventoryContainer.detectAndSendChanges();
                         player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));

@@ -107,7 +107,7 @@ public class PrizeBox extends CustomItem {
 
         if (tag != null) {
             ItemStack returned = new ItemStack(Blocks.AIR);
-            returned.readFromNBT(tag);
+            returned.deserializeNBT(tag);
             return Optional.of(tf(returned));
         }
         return Optional.empty();

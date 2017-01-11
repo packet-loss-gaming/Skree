@@ -447,7 +447,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (entity instanceof Monster) {
             DropTable dropTable;
 
-            if (entity.getLocation().getExtent().getBiome(loc.getBlockX(), loc.getBlockZ()) == BiomeTypes.HELL || entity instanceof Wither) {
+            if (entity.getLocation().getExtent().getBiome(loc.getBlockPosition()) == BiomeTypes.HELL || entity instanceof Wither) {
                 dropTable = netherMobDropTable;
             } else {
                 dropTable = commonDropTable;
@@ -657,14 +657,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         World world = loc.getExtent();
                         for (int i = 0; i < 40; ++i) {
                             ParticleEffect effect = ParticleEffect.builder().type(
-                                    ParticleTypes.CRIT_MAGIC
-                            ).motion(
+                                    ParticleTypes.MAGIC_CRITICAL_HIT
+                            ).velocity(
                                     new Vector3d(
                                             Probability.getRangedRandom(-1, 1),
                                             Probability.getRangedRandom(-.7, .7),
                                             Probability.getRangedRandom(-1, 1)
                                     )
-                            ).count(1).build();
+                            ).quantity(1).build();
 
                             world.spawnParticles(effect, origin.add(.5, .5, .5));
                         }

@@ -23,6 +23,7 @@ import com.skelril.skree.service.PlayerStateService;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.*;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -591,7 +592,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         // They didn't pay, CHEATER!!!
         if (fee == null) return false;
 
-        net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+        NonNullList<net.minecraft.item.ItemStack> itemStacks = tf(player).inventory.mainInventory;
         BigDecimal goldValue = BigDecimal.ZERO;
         BigDecimal itemValue = BigDecimal.ZERO;
 
@@ -599,10 +600,10 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
         List<ItemStack> returned = new ArrayList<>();
 
-        for (int i = 0; i < itemStacks.length; ++i) {
-            net.minecraft.item.ItemStack is = itemStacks[i];
+        for (int i = 0; i < itemStacks.size(); ++i) {
+            net.minecraft.item.ItemStack is = itemStacks.get(i);
 
-            if (is == null || is.getItem() != CustomItemTypes.PRIZE_BOX) continue;
+            if (is == net.minecraft.item.ItemStack.EMPTY || is.getItem() != CustomItemTypes.PRIZE_BOX) continue;
 
             Optional<ItemStack> optOpened = PrizeBox.getPrizeStack(is);
             if (optService.isPresent() && optOpened.isPresent()) {
@@ -620,7 +621,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 }
             }
 
-            itemStacks[i] = null;
+            itemStacks.set(i, net.minecraft.item.ItemStack.EMPTY);
         }
 
         // Get the original grab amount (The Sum of Gold & Items)
@@ -783,9 +784,9 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         }
 
         for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+            NonNullList<net.minecraft.item.ItemStack> itemStacks = tf(player).inventory.mainInventory;
             for (net.minecraft.item.ItemStack is : itemStacks) {
-                if (is == null || is.getItem() != CustomItemTypes.PRIZE_BOX) {
+                if (is == net.minecraft.item.ItemStack.EMPTY || is.getItem() != CustomItemTypes.PRIZE_BOX) {
                     continue;
                 }
 

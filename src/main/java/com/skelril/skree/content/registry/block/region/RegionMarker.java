@@ -57,7 +57,7 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, net.minecraft.world.World worldIn, BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return null;
     }
 

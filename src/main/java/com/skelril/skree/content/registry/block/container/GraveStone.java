@@ -25,6 +25,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -83,8 +84,9 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     }
 
     @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return this.getDefaultState().withProperty(FACING_PROP, placer.getHorizontalFacing());
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, net.minecraft.item.ItemStack stack) {
+        state = state.withProperty(FACING_PROP, placer.getHorizontalFacing());
+        worldIn.setBlockState(pos, state);
     }
 
     @Override
@@ -146,9 +148,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
         List<ItemStack> excess = createGrave(items, pos);
         World world = (World) pos.getExtent();
         for (ItemStack stack : excess) {
-            world.spawnEntityInWorld(
-                    new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), tf(stack))
-            );
+            world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), tf(stack)));
         }
     }
 
@@ -156,13 +156,13 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
         Entity target = event.getTargetEntity();
         if (target instanceof Player) {
             EntityPlayer player = tf((Player) target);
-            net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
-            net.minecraft.item.ItemStack[] armInv = player.inventory.armorInventory;
+            NonNullList<net.minecraft.item.ItemStack> mainInv = player.inventory.mainInventory;
+            NonNullList<net.minecraft.item.ItemStack> armInv = player.inventory.armorInventory;
 
             List<ItemStack> items = new ArrayList<>();
 
-            Collections.addAll(items, (ItemStack[]) (Object[]) mainInv);
-            Collections.addAll(items, (ItemStack[]) (Object[]) armInv);
+            boolean b = Collections.addAll(items, (ItemStack[]) mainInv.toArray());
+            Collections.addAll(items, (ItemStack[]) armInv.toArray());
 
             items.removeAll(Collections.singleton(null));
 

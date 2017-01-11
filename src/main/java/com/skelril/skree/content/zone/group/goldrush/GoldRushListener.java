@@ -16,6 +16,7 @@ import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.LockCode;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -142,11 +143,11 @@ public class GoldRushListener {
             boolean unlocked = false;
 
             String text = texts.get(1).toPlain().toLowerCase();
-            net.minecraft.item.ItemStack[] itemStacks = tf(player).inventory.mainInventory;
-            for (int i = 0; i < itemStacks.length; ++i) {
-                ItemStack is = itemStacks[i];
+            NonNullList<ItemStack> itemStacks = tf(player).inventory.mainInventory;
+            for (int i = 0; i < itemStacks.size(); ++i) {
+                ItemStack is = itemStacks.get(i);
 
-                if (is == null || is.getItem() != CustomItemTypes.GOLD_RUSH_KEY) {
+                if (is == ItemStack.EMPTY || is.getItem() != CustomItemTypes.GOLD_RUSH_KEY) {
                     continue;
                 }
 
@@ -163,7 +164,7 @@ public class GoldRushListener {
                 }
 
                 unlocked = true;
-                itemStacks[i] = null;
+                itemStacks.set(i, ItemStack.EMPTY);
                 break;
             }
 

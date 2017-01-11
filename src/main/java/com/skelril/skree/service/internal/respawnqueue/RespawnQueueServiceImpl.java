@@ -9,6 +9,7 @@ package com.skelril.skree.service.internal.respawnqueue;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.RespawnQueueService;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
@@ -41,13 +42,13 @@ public class RespawnQueueServiceImpl implements RespawnQueueService {
     @Listener
     public void onRespawn(RespawnPlayerEvent event) {
         EntityPlayer player = tf(event.getTargetEntity());
-        net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
+        NonNullList<net.minecraft.item.ItemStack> mainInv = player.inventory.mainInventory;
         Task.builder().delayTicks(1).execute(() -> {
             Deque<ItemStack> queue = playerQueue.remove(player.getUniqueID());
             if (queue != null) {
-                for (int i = 0; !queue.isEmpty() && i < mainInv.length; ++i) {
-                    if (mainInv[i] == null) {
-                        mainInv[i] = tf(queue.poll());
+                for (int i = 0; !queue.isEmpty() && i < mainInv.size(); ++i) {
+                    if (mainInv.get(i) == net.minecraft.item.ItemStack.EMPTY) {
+                        mainInv.set(i, tf(queue.poll()));
                     }
                 }
                 if (!queue.isEmpty()) {

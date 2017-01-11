@@ -15,6 +15,7 @@ import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -78,7 +79,7 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
 
             redQ = (int) ((blockable - blocked) / k);
             updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
-            player.inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
+            player.inventory.mainInventory.set(featherDetail.getKey(), tf(featherDetail.getValue().getKey()));
         }
     }
 
@@ -94,14 +95,14 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     }
 
     public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(EntityPlayer player) {
-        net.minecraft.item.ItemStack[] itemStacks = player.inventory.mainInventory;
+        NonNullList<net.minecraft.item.ItemStack> itemStacks = player.inventory.mainInventory;
 
         int index = -1;
         ItemStack stack = null;
         Clause<Integer, Long> details = new Clause<>(0, 0L);
 
-        for (int i = 0; i < itemStacks.length; ++i) {
-            ItemStack curStack = tf(itemStacks[i]);
+        for (int i = 0; i < itemStacks.size(); ++i) {
+            ItemStack curStack = tf(itemStacks.get(i));
             Clause<Integer, Long> powerCooldown = getFeatherPower(curStack);
             if (powerCooldown.getValue() > System.currentTimeMillis()) {
                 return Optional.empty();

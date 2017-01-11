@@ -55,8 +55,8 @@ public class CofferItem extends CustomItem {
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
         DecimalFormat formatter = new DecimalFormat("#,###");
         tooltip.add(formatter.format(getCofferValue()) + " Coffers Each");
-        if (stack.stackSize > 1) {
-            tooltip.add(formatter.format(stack.stackSize * getCofferValue()) + " Coffers Total");
+        if (stack.getCount() > 1) {
+            tooltip.add(formatter.format(stack.getCount() * getCofferValue()) + " Coffers Total");
         }
     }
 }
