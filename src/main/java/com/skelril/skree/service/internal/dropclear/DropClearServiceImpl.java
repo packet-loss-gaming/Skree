@@ -103,13 +103,13 @@ public class DropClearServiceImpl implements DropClearService {
 
     @Listener(order = Order.POST)
     public void onItemSpawn(SpawnEntityEvent event) {
-        long spawnedCount = event.getEntities().stream().filter(DropClearServiceImpl.CHECK_PREDICATE).count();
-
-        World targetWorld = event.getTargetWorld();
-        long newCount = entityCount.merge(targetWorld, spawnedCount, (a, b) -> a + b);
-        if (newCount > autoAmt) {
-            checkedCleanup(targetWorld);
-        }
+        event.getEntities().stream().filter(DropClearServiceImpl.CHECK_PREDICATE).forEach(e -> {
+           long newCount = entityCount.merge(e.getWorld(), 1L, (a, b) -> a + b);
+            System.out.println("Hi!");
+            if (newCount > autoAmt) {
+                checkedCleanup(e.getWorld());
+            }
+        });
     }
 
     private EntityCleanupTask pickDropClear(World world) {
