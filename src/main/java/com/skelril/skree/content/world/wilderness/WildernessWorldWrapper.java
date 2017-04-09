@@ -222,7 +222,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
                 explosive.setVelocity(entity.getVelocity());
                 explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                
+
                 // TODO used to have a 1/4 chance of creating fire
                 entity.getLocation().getExtent().spawnEntity(
                         explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.DISPENSE).build()).build()
