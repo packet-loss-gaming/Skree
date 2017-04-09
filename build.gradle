@@ -55,7 +55,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jooq', name: 'jooq', version: '3.7.0'
+    compile group: 'org.jooq', name: 'jooq', version: '3.8.0'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '4.1.2'
     compile group: 'com.skelril', name: 'Open Boss', version: '2.0-SNAPSHOT'
     compile group: 'com.nearce', name: 'GameChatterServer-Sponge', version: '1.0-SNAPSHOT'
     compile group: 'com.sk89q.worldedit', name: 'worldedit-sponge-mc1.8.9', version: '7.0-SNAPSHOT'
@@ -70,7 +71,7 @@ version = '1.0'
 
 sourceSets {
     main {
-        resources.srcDirs = ["assets/Primary"]
+        resources.srcDirs = ["assets/Primary", "src/main/resources"]
     }
 }
 

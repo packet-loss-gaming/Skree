@@ -15,6 +15,7 @@ import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.DatabaseService;
 import com.skelril.skree.service.internal.database.DatabaseServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
+import org.flywaydb.core.Flyway;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 
@@ -33,6 +34,19 @@ public class DatabaseSystem implements ServiceProvider<DatabaseService> {
         ConfigManager service = Sponge.getGame().getConfigManager();
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         return path.resolve("database.json");
+    }
+
+    private void setupHandle(String database, String username, String password) {
+        SQLHandle.setDatabase(database);
+        SQLHandle.setUsername(username);
+        SQLHandle.setPassword(password);
+    }
+
+    private void runMigrations(String database, String username, String password) {
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(database, username, password);
+        flyway.setSchemas("mc_db");
+        flyway.migrate();
     }
 
     @NModuleTrigger(trigger = "PRE_INITIALIZATION")
@@ -56,9 +70,12 @@ public class DatabaseSystem implements ServiceProvider<DatabaseService> {
                         return;
                     }
 
-                    SQLHandle.setDatabase(config.getDatabase());
-                    SQLHandle.setUsername(config.getUsername());
-                    SQLHandle.setPassword(config.getPassword());
+                    String database = config.getDatabase();
+                    String username = config.getUsername();
+                    String password = config.getPassword();
+
+                    setupHandle(database, username, password);
+                    runMigrations(database, username, password);
                 }
             } else {
                 Files.createFile(targetFile);

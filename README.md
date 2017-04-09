@@ -31,4 +31,14 @@ The jOOQ Schema is generated via the gradle task ````codegen````. This task shou
 
 Database development which does not require schema modification can be performed by simply using the generated jOOQ files. These are updated as the server's active schema is changed.
 
-There is currently no system for creating the necessarily tables, they must currently be created manually. There is also a lack of documentation on the proper schema outside of the class files. This is an area which should be improved upon over time.
+### Setting up MariaDB
+
+First setup a MariaDB server on your development machine. Once that is completed,
+log in as root, and run the following SQL statements:
+
+```
+CREATE SCHEMA mc_db;
+CREATE USER 'mc_db_dev'@'localhost' IDENTIFIED BY 'mc_db_dev';
+GRANT ALL PRIVILEGES ON *.* TO 'mc_db_dev'@'localhost';
+FLUSH PRIVILEGES;
+```
