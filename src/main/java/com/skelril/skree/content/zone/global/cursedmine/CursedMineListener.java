@@ -211,12 +211,28 @@ public class CursedMineListener {
         }
     }
 
+    private boolean isRedstoneTransition(BlockType originalType, BlockType finalType) {
+        if (originalType == BlockTypes.REDSTONE_ORE && finalType == BlockTypes.LIT_REDSTONE_ORE) {
+            return true;
+        }
+
+        if (originalType == BlockTypes.LIT_REDSTONE_ORE && finalType == BlockTypes.REDSTONE_ORE) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Listener
     public void onBlockBurn(ChangeBlockEvent event) {
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             BlockType originalType = transaction.getOriginal().getState().getType();
             BlockType finalType = transaction.getFinal().getState().getType();
             if (originalType != BlockTypes.PLANKS && originalType != BlockTypes.OAK_STAIRS && finalType != BlockTypes.FIRE) {
+                continue;
+            }
+
+            if (isRedstoneTransition(originalType, finalType)) {
                 continue;
             }
 
