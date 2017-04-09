@@ -88,7 +88,7 @@ public class MarketLookupCommand implements CommandExecutor {
 
         Text itemDisplay = Text.of(
                 TextColors.BLUE,
-                TextActions.showItem(service.getItem(alias).get()), alias.toUpperCase()
+                TextActions.showItem(service.getItem(alias).get().createSnapshot()), alias.toUpperCase()
         );
 
         Text.Builder itemSteps = Text.builder();

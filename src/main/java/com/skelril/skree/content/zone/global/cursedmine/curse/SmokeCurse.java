@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 
 public class SmokeCurse implements Consumer<Player> {
     private static final ParticleEffect smokeEffect = ParticleEffect.builder().type(
-            ParticleTypes.SMOKE_LARGE
-    ).count(1).motion(new Vector3d(0, .4, 0)).build();
+            ParticleTypes.LARGE_SMOKE
+    ).quantity(1).velocity(new Vector3d(0, .4, 0)).build();
 
     @Override
     public void accept(Player player) {

@@ -77,11 +77,11 @@ public class MagicBlockStateHelper {
     }
 
     private static void ladderRecursion(Location<World> block) {
-        recursiveDiscovery(block.add(Direction.UP.toVector3d()));
-        platform(block.add(Direction.EAST.toVector3d()));
-        platform(block.add(Direction.WEST.toVector3d()));
-        platform(block.add(Direction.NORTH.toVector3d()));
-        platform(block.add(Direction.SOUTH.toVector3d()));
+        recursiveDiscovery(block.add(Direction.UP.asOffset()));
+        platform(block.add(Direction.EAST.asOffset()));
+        platform(block.add(Direction.WEST.asOffset()));
+        platform(block.add(Direction.NORTH.asOffset()));
+        platform(block.add(Direction.SOUTH.asOffset()));
     }
 
     private static void ladder(Location<World> block) {
@@ -96,11 +96,11 @@ public class MagicBlockStateHelper {
     }
 
     private static void platformRecursion(Location<World> block) {
-        ladder(block.add(Direction.UP.toVector3d()));
-        recursiveDiscovery(block.add(Direction.EAST.toVector3d()));
-        recursiveDiscovery(block.add(Direction.WEST.toVector3d()));
-        recursiveDiscovery(block.add(Direction.NORTH.toVector3d()));
-        recursiveDiscovery(block.add(Direction.SOUTH.toVector3d()));
+        ladder(block.add(Direction.UP.asOffset()));
+        recursiveDiscovery(block.add(Direction.EAST.asOffset()));
+        recursiveDiscovery(block.add(Direction.WEST.asOffset()));
+        recursiveDiscovery(block.add(Direction.NORTH.asOffset()));
+        recursiveDiscovery(block.add(Direction.SOUTH.asOffset()));
     }
 
     private static void platform(Location<World> block) {

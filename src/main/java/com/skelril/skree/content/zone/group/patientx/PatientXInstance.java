@@ -500,7 +500,7 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
             case RADIATION:
                 ParticleEffect radiationEffect = ParticleEffect.builder().type(
                         ParticleTypes.FLAME
-                ).count(1).build();
+                ).quantity(1).build();
 
                 Task.builder().execute(() -> {
                     for (int i = config.radiationTimes; i > 0; i--) {
