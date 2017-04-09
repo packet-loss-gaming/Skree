@@ -30,7 +30,7 @@ public abstract class CustomBow extends ItemBow implements ICustomBow {
 
         this.setMaxDamage(__getMaxUses());
 
-        this.addPropertyOverride(new ResourceLocation("skree:pull"), new IItemPropertyGetter() {
+        this.addPropertyOverride(new ResourceLocation("skree", "pull"), new IItemPropertyGetter() {
             @SideOnly(Side.CLIENT)
             public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
                 if (living == null) {
@@ -41,7 +41,7 @@ public abstract class CustomBow extends ItemBow implements ICustomBow {
                 }
             }
         });
-        this.addPropertyOverride(new ResourceLocation("skree:pulling"), new IItemPropertyGetter() {
+        this.addPropertyOverride(new ResourceLocation("skree", "pulling"), new IItemPropertyGetter() {
             @SideOnly(Side.CLIENT)
             public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
                 return living != null && living.isHandActive() && living.getActiveItemStack() == item ? 1.0F : 0.0F;
