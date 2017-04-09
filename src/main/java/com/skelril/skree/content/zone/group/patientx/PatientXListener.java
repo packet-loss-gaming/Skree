@@ -105,7 +105,7 @@ public class PatientXListener {
                                 .location(entity.getLocation())
                                 .shouldDamageEntities(true)
                                 .build(),
-                        Cause.source(entity).build()
+                        Cause.source(SkreePlugin.container()).build()
                 );
             }
         }
