@@ -73,8 +73,9 @@ public class CustomItemSystem {
     private void register(Object item) {
         if (item instanceof Item && item instanceof ICustomItem) {
             ((Item) item).setUnlocalizedName("skree_" + ((ICustomItem) item).__getID());
+            ((Item) item).setRegistryName("skree:" + ((ICustomItem) item).__getID());
 
-            GameRegistry.registerItem((Item) item, ((ICustomItem) item).__getID());
+            GameRegistry.register((Item) item);
 
             // Add selective hooks
             if (item instanceof EventAwareContent) {
