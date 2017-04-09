@@ -109,9 +109,7 @@ public class JungleRaidEffectProcessor {
                             random.nextDouble() * 2 * -1,
                             random.nextDouble() * 2.0 - 1
                     ));
-                    // TODO Use Sponge API after 1.9 release w/ Fuse Data merge
-                    // explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-                    tf(explosive).setFuse(20 * 4);
+                    explosive.offer(Keys.FUSE_DURATION, 20 * 4);
 
                     // TODO used to have a 1/4 chance of creating fire
                     inst.getRegion().getExtent().spawnEntity(
