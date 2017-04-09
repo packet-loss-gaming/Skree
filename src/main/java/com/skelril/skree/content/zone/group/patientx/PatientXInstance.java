@@ -488,9 +488,10 @@ public class PatientXInstance extends LegacyZoneBase implements Zone, Runnable {
                 break;
             case IM_JUST_BATTY:
                 for (Player player : contained) {
-                    // player.chat("I love Patient X!");
+                    Cause cause = Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build();
+                    player.simulateChat(Text.of("I love Patient X!"), cause);
                     Entity bat = getRegion().getExtent().createEntity(EntityTypes.BAT, player.getLocation().getPosition());
-                    getRegion().getExtent().spawnEntity(bat, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+                    getRegion().getExtent().spawnEntity(bat, cause);
                     bat.getPassengers().add(player);
                 }
                 attackDur = System.currentTimeMillis() + 20000;
