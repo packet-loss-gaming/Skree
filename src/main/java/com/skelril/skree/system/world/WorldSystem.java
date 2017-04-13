@@ -155,11 +155,11 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
     }
 
-    private void loadWorld(WorldConfig worldConfig) throws Throwable {
+    private World getOrCreateWorld(WorldConfig worldConfig) throws Throwable {
         String worldName = worldConfig.getName();
         Optional<World> optTargetWorld = Sponge.getServer().getWorld(worldName);
         if (optTargetWorld.isPresent()) {
-            return;
+            return optTargetWorld.get();
         }
 
         GameRegistry registry = Sponge.getRegistry();
@@ -168,16 +168,18 @@ public class WorldSystem implements ServiceProvider<WorldService> {
             return new RuntimeException("No world archetype: " + archetypeName);
         });
         optTargetWorld = service.loadWorld(worldName, archetype);
-        if (!optTargetWorld.isPresent()) {
-            return;
-        }
+        return optTargetWorld.get();
+    }
+
+    private void loadWorld(WorldConfig worldConfig) throws Throwable {
+        World world = getOrCreateWorld(worldConfig);
 
         String targetWrapper = worldConfig.getWrapper();
         if (targetWrapper == null || targetWrapper.isEmpty()) {
             return;
         }
 
-        wrappers.get(targetWrapper).addWorld(optTargetWorld.get());
+        wrappers.get(targetWrapper).addWorld(world);
     }
 
     private void initWorlds() {
