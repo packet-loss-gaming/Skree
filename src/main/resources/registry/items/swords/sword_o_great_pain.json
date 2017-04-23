@@ -1,8 +1,8 @@
 {
   "id": "sword_o_great_pain",
-  "maxUses": 14,
-  "repairItemStack": null,
+  "max_uses": 14,
+  "repair_item_stack": null,
   "enchantability": 15,
-  "hitPower": 100000000,
-  "attackSpeed": 1.6
+  "hit_power": 100000000,
+  "attack_speed": 1.6
 }

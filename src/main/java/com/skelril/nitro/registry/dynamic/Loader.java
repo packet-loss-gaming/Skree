@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.registry.dynamic;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,7 +17,10 @@ import java.nio.file.Path;
 
 public interface Loader<ConfigType> {
     default void load(Path config) throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
 
         try (BufferedReader reader = Files.newBufferedReader(config)) {
             load(gson.fromJson(reader, getConfigClass()));

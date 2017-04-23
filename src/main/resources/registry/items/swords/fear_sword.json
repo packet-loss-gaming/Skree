@@ -1,11 +1,11 @@
 {
   "id": "fear_sword",
-  "maxUses": 3122,
-  "repairItemStack": {
+  "max_uses": 3122,
+  "repair_item_stack": {
     "id": "skree:demonic_sword",
     "data": 0
   },
   "enchantability": 10,
-  "hitPower": 9,
-  "attackSpeed": 1.6
+  "hit_power": 9,
+  "attack_speed": 1.6
 }

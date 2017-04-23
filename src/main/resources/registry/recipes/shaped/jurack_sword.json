@@ -1,14 +1,14 @@
 {
-  "craftedItem": {
+  "crafted_item": {
     "id": "skree:jurack_sword",
     "data": 0
   },
-  "craftingRows": [
+  "crafting_rows": [
     " A ",
     " A ",
     " B "
   ],
-  "mappedItemStacks": {
+  "mapped_item_stacks": {
     "A": {
       "id": "skree:jurack",
       "data": 0

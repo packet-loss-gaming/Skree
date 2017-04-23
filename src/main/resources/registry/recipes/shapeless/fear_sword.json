@@ -1,9 +1,9 @@
 {
-  "craftedItem": {
+  "crafted_item": {
     "id": "skree:fear_sword",
     "data": 0
   },
-  "requiredItemStacks": [
+  "required_item_stacks": [
     {
       "id": "skree:demonic_sword",
       "data": 0
