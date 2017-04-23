@@ -7,6 +7,9 @@
 package com.skelril.skree.system.registry.item;
 
 import com.skelril.nitro.registry.Craftable;
+import com.skelril.nitro.registry.dynamic.LoaderRegistry;
+import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
+import com.skelril.nitro.registry.dynamic.item.sword.SwordLoader;
 import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
@@ -23,16 +26,62 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class CustomItemSystem {
 
+    private GameIntegrator gameIntegrator = new GameIntegrator("skree");
+
+    private FileSystem getFileSystem(URI uri) throws IOException {
+        try {
+            return FileSystems.getFileSystem(uri);
+        } catch (FileSystemNotFoundException e) {
+            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
+        }
+    }
+
+    private void loadFromResources(Consumer<Function<String, Path>> execute) {
+        String basePathName = "/registry/items/";
+        try {
+            URI uri = getClass().getResource(basePathName).toURI();
+            if (uri.getScheme().equals("jar")) {
+                try (FileSystem fileSystem = getFileSystem(uri)) {
+                    Function<String, Path> providerFunction = (resourceName) -> {
+                        return fileSystem.getPath(basePathName + resourceName);
+                    };
+                    execute.accept(providerFunction);
+                }
+            } else {
+                execute.accept(Paths::get);
+            }
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public CustomItemSystem() {
+        LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
+        loadFromResources(getResource -> {
+            dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator), getResource.apply("swords"));
+            dynamicItemRegistry.loadAll();
+        });
+    }
+
     public void preInit() {
         try {
+            gameIntegrator.registerItems();
             iterate(CustomItemSystem.class.getDeclaredMethod("register", Object.class));
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
@@ -49,6 +98,7 @@ public class CustomItemSystem {
 
     public void init() {
         try {
+            gameIntegrator.registerItemRenderings();
             iterate(CustomItemSystem.class.getDeclaredMethod("render", Object.class));
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
