@@ -6,45 +6,21 @@
 
 package com.skelril.skree.system.registry;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.Collections;
+import com.skelril.nitro.JarResourceLoader;
+
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AbstractCustomRegistrySystem {
-    private String baseResourcePathName;
+    private JarResourceLoader jarResourceLoader;
 
     public AbstractCustomRegistrySystem(String baseResourcePathName) {
-        this.baseResourcePathName = baseResourcePathName;
-    }
-
-    private FileSystem getFileSystem(URI uri) throws IOException {
-        try {
-            return FileSystems.getFileSystem(uri);
-        } catch (FileSystemNotFoundException e) {
-            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
-        }
+        this.jarResourceLoader = new JarResourceLoader(baseResourcePathName);
     }
 
     protected void loadFromResources(Consumer<Function<String, Path>> execute) {
-        try {
-            URI uri = getClass().getResource(baseResourcePathName).toURI();
-            if (uri.getScheme().equals("jar")) {
-                try (FileSystem fileSystem = getFileSystem(uri)) {
-                    Function<String, Path> providerFunction = (resourceName) -> {
-                        return fileSystem.getPath(baseResourcePathName + resourceName);
-                    };
-                    execute.accept(providerFunction);
-                }
-            } else {
-                execute.accept(Paths::get);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading: " + baseResourcePathName);
-            e.printStackTrace();
-        }
+        jarResourceLoader.loadFromResources(execute);
     }
 
     public void preInit() { }
