@@ -1,0 +1,11 @@
+{
+  "id": "demonic_sword",
+  "maxUses": 3122,
+  "repairItemStack": {
+    "id": "skree:demonic_ingot",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hitPower": 9,
+  "attackSpeed": 1.6
+}

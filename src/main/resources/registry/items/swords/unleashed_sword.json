@@ -1,0 +1,11 @@
+{
+  "id": "unleashed_sword",
+  "maxUses": 3122,
+  "repairItemStack": {
+    "id": "skree:holy_sword",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hitPower": 9,
+  "attackSpeed": 1.6
+}

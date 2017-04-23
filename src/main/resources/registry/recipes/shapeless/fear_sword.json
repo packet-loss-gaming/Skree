@@ -1,0 +1,16 @@
+{
+  "craftedItem": {
+    "id": "skree:fear_sword",
+    "data": 0
+  },
+  "requiredItemStacks": [
+    {
+      "id": "skree:demonic_sword",
+      "data": 0
+    },
+    {
+      "id": "skree:unstable_catalyst",
+      "data": 0
+    }
+  ]
+}

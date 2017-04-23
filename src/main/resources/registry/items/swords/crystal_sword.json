@@ -1,0 +1,11 @@
+{
+  "id": "crystal_sword",
+  "maxUses": 3122,
+  "repairItemStack": {
+    "id": "skree:sea_crystal",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hitPower": 9,
+  "attackSpeed": 1.6
+}

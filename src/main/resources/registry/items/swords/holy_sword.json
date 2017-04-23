@@ -1,0 +1,11 @@
+{
+  "id": "holy_sword",
+  "maxUses": 3122,
+  "repairItemStack": {
+    "id": "skree:holy_ingot",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hitPower": 9,
+  "attackSpeed": 1.6
+}

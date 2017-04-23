@@ -1,0 +1,16 @@
+{
+  "craftedItem": {
+    "id": "skree:holy_sword",
+    "data": 0
+  },
+  "requiredItemStacks": [
+    {
+      "id": "skree:holy_blade",
+      "data": 0
+    },
+    {
+      "id": "skree:holy_hilt",
+      "data": 0
+    }
+  ]
+}

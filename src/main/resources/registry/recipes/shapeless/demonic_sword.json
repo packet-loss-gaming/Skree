@@ -1,0 +1,16 @@
+{
+  "craftedItem": {
+    "id": "skree:demonic_sword",
+    "data": 0
+  },
+  "requiredItemStacks": [
+    {
+      "id": "skree:demonic_blade",
+      "data": 0
+    },
+    {
+      "id": "skree:demonic_hilt",
+      "data": 0
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "craftedItem": {
+    "id": "skree:unleashed_sword",
+    "data": 0
+  },
+  "requiredItemStacks": [
+    {
+      "id": "skree:holy_sword",
+      "data": 0
+    },
+    {
+      "id": "skree:unstable_catalyst",
+      "data": 0
+    }
+  ]
+}

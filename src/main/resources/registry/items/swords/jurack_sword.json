@@ -1,0 +1,11 @@
+{
+  "id": "jurack_sword",
+  "maxUses": 3122,
+  "repairItemStack": {
+    "id": "skree:jurack_gem",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hitPower": 8,
+  "attackSpeed": 1.6
+}
