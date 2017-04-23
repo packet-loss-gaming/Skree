@@ -14,7 +14,6 @@ import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.content.world.WorldEntryPermissionCheck;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -35,6 +34,8 @@ import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class FocusTeleporter extends CustomItem implements Craftable, EventAwareContent, Teleporter {
 
@@ -60,9 +61,9 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 "AAA",
                 "BCB",
                 "BBB",
-                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:red_shard").get()),
-                'B', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get()),
-                'C', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get())
+                'A', newItemStack("skree:red_shard"),
+                'B', newItemStack("skree:sea_crystal"),
+                'C', newItemStack("skree:ender_focus")
         );
     }
 
@@ -107,7 +108,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
             if (held.getItem() == this) {
                 Optional<Location<World>> optDestination = getDestination(held);
                 if (optDestination.isPresent()) {
-                    Inventory result = player.getInventory().query((ItemType) (Item) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
+                    Inventory result = player.getInventory().query((ItemType) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
                     if (result.size() > 0) {
                         Task.builder().execute(() -> {
                             result.poll(1);

@@ -14,7 +14,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -23,8 +22,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicPlatform extends Block implements ICustomBlock, Craftable {
     public MagicPlatform() {
@@ -75,7 +74,7 @@ public class MagicPlatform extends Block implements ICustomBlock, Craftable {
                 " B ",
                 "   ",
                 'A', new ItemStack(Items.STICK),
-                'B', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
+                'B', newItemStack("skree:fairy_dust")
         );
     }
 }

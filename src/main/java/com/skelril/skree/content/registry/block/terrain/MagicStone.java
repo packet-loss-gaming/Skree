@@ -18,10 +18,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
 
 import java.util.Random;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicStone extends Block implements ICustomBlock, Craftable {
 
@@ -50,7 +50,7 @@ public class MagicStone extends Block implements ICustomBlock, Craftable {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
                 new ItemStack(Blocks.STONE),
-                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
+                newItemStack("skree:fairy_dust")
         );
     }
 }

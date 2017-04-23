@@ -43,7 +43,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -55,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.*;
 
@@ -89,7 +89,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 "BBB",
                 "BAB",
                 "BBB",
-                'A', new ItemStack((net.minecraft.item.Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get()),
+                'A', newItemStack("skree:fairy_dust"),
                 'B', new ItemStack(Blocks.GLASS)
         );
         GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
@@ -131,7 +131,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 "Sky Wars",
                 new ItemStack(this),
                 new ItemStack(Items.FEATHER),
-                new ItemStack((net.minecraft.item.Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
+                (ItemStack) (Object) newItemStack("skree:fairy_dust")
         ));
     }
 

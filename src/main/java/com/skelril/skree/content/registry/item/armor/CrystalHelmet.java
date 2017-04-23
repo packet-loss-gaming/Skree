@@ -8,11 +8,10 @@ package com.skelril.skree.content.registry.item.armor;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomHelmet;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class CrystalHelmet extends CustomHelmet implements Craftable {
     @Override
@@ -27,7 +26,7 @@ public class CrystalHelmet extends CustomHelmet implements Craftable {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get());
+        return (ItemStack) (Object) newItemStack("skree:sea_crystal");
     }
 
     @Override
@@ -42,7 +41,7 @@ public class CrystalHelmet extends CustomHelmet implements Craftable {
                 "   ",
                 "AAA",
                 "A A",
-                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get())
+                'A', newItemStack("skree:sea_crystal")
         );
     }
 }

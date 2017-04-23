@@ -12,9 +12,7 @@ import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -22,13 +20,14 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicWand extends CustomItem implements EventAwareContent, Craftable {
 
@@ -93,7 +92,7 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
     public void registerRecipes() {
         GameRegistry.addShapelessRecipe(
                 new net.minecraft.item.ItemStack(this),
-                new net.minecraft.item.ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get()),
+                newItemStack("skree:fairy_dust"),
                 new net.minecraft.item.ItemStack(Items.STICK)
         );
     }

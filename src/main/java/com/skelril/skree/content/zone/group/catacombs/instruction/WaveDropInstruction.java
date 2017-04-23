@@ -20,10 +20,8 @@ import com.skelril.openboss.condition.UnbindCondition;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsBossDetail;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
@@ -62,7 +60,7 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:ancient_metal_fragment").get())
+                                                                newItemStack("skree:ancient_metal_fragment")
                                                         )
                                                 ), 700
                                         ),

@@ -9,11 +9,10 @@ package com.skelril.skree.content.registry.item.armor;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomLeggings;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class WraithLeggings extends CustomLeggings implements Craftable {
     @Override
@@ -41,7 +40,7 @@ public class WraithLeggings extends CustomLeggings implements Craftable {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
                 new ItemStack(CustomItemTypes.TORMENTOR_LEGGINGS),
-                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:unstable_catalyst").get())
+                newItemStack("skree:unstable_catalyst")
         );
     }
 }

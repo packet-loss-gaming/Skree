@@ -11,14 +11,13 @@ import com.skelril.nitro.registry.block.ICustomBlock;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.SoundType;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable {
 
@@ -40,7 +39,7 @@ public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable 
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
                 new ItemStack(Blocks.LADDER),
-                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
+                newItemStack("skree:fairy_dust")
         );
     }
 

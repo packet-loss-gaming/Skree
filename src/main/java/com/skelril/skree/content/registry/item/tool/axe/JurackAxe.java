@@ -12,11 +12,10 @@ import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.axe.CustomAxe;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class JurackAxe extends CustomAxe implements Craftable {
     @Override
@@ -26,7 +25,7 @@ public class JurackAxe extends CustomAxe implements Craftable {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get());
+        return (ItemStack) (Object) newItemStack("skree:jurack");
     }
 
     @Override
@@ -61,7 +60,7 @@ public class JurackAxe extends CustomAxe implements Craftable {
                 "AA ",
                 "AB ",
                 " B ",
-                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get()),
+                'A', newItemStack("skree:jurack"),
                 'B', new ItemStack(Items.STICK)
         );
     }

@@ -7,6 +7,7 @@
 package com.skelril.nitro.item;
 
 import com.skelril.nitro.registry.item.ICustomItem;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.item.ItemType;
@@ -66,6 +67,22 @@ public class ItemStackFactory {
         return ItemStack.builder().itemType(type).quantity(quantity).itemData(data).build();
     }
 
+    public static ItemStack newItemStack(String typeName) {
+        return newItemStack(typeName, 1);
+    }
+
+    public static ItemStack newItemStack(String typeName, DataManipulator<?, ?> data) {
+        return newItemStack(typeName, data, 1);
+    }
+
+    public static ItemStack newItemStack(String typeName, int quantity) {
+        return ItemStack.builder().itemType(typeFromString(typeName)).quantity(quantity).build();
+    }
+
+    public static ItemStack newItemStack(String typeName, DataManipulator<?, ?> data, int quantity) {
+        return ItemStack.builder().itemType(typeFromString(typeName)).quantity(quantity).itemData(data).build();
+    }
+
     public static ItemStack newItemStack(ItemStack itemStack) {
         return itemStack.copy();
     }
@@ -84,5 +101,9 @@ public class ItemStackFactory {
             itemStacks.add(newItemStack(itemStack, quantity));
         }
         return itemStacks;
+    }
+
+    private static ItemType typeFromString(String typeName) {
+        return Sponge.getRegistry().getType(ItemType.class, typeName).get();
     }
 }

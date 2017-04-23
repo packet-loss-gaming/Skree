@@ -777,7 +777,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
         if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
-            return Lists.newArrayList(newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:red_shard").get()));
+            return Lists.newArrayList(newItemStack("skree:red_shard"));
         }
         return DropRegistry.createDropsFor(blockType, hasSilkTouch);
     }

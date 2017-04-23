@@ -10,14 +10,13 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class IronTerragu extends CustomTerragu implements Craftable {
     @Override
@@ -77,7 +76,7 @@ public class IronTerragu extends CustomTerragu implements Craftable {
                 new ItemStack(Items.IRON_PICKAXE),
                 new ItemStack(Items.IRON_AXE),
                 new ItemStack(Items.IRON_SHOVEL),
-                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:unstable_catalyst").get())
+                newItemStack("skree:unstable_catalyst")
         );
     }
 }

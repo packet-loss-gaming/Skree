@@ -16,7 +16,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.property.block.HeldItemProperty;
 import org.spongepowered.api.data.type.DyeColors;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -59,7 +58,7 @@ public class DropRegistry {
             } else if (type.equals(BlockTypes.QUARTZ_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.QUARTZ));
             } else if (type.equals(CustomBlockTypes.JURACK_ORE))
-                return Lists.newArrayList(newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get()));
+                return Lists.newArrayList(newItemStack("skree:jurack"));
         }
         return null;
     }

@@ -12,7 +12,6 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
@@ -38,6 +37,8 @@ import org.spongepowered.api.util.Tristate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+
 public class PactScroll extends CustomItem implements Craftable, EventAwareContent {
 
     private Map<UUID, List<UUID>> pactMap = new WeakHashMap<>();
@@ -62,7 +63,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
         GameRegistry.addShapelessRecipe(
                 new net.minecraft.item.ItemStack(this),
                 new net.minecraft.item.ItemStack(Items.PAPER),
-                new net.minecraft.item.ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:red_shard").get())
+                newItemStack("skree:red_shard")
         );
     }
 

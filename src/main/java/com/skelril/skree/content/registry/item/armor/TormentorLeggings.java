@@ -8,11 +8,10 @@ package com.skelril.skree.content.registry.item.armor;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomLeggings;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
+
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class TormentorLeggings extends CustomLeggings implements Craftable {
     @Override
@@ -27,7 +26,7 @@ public class TormentorLeggings extends CustomLeggings implements Craftable {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:demonic_ingot").get());
+        return (ItemStack) (Object) newItemStack("skree:demonic_ingot");
     }
 
     @Override
@@ -42,7 +41,7 @@ public class TormentorLeggings extends CustomLeggings implements Craftable {
                 "AAA",
                 "A A",
                 "A A",
-                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:demonic_ingot").get())
+                'A', newItemStack("skree:demonic_ingot")
         );
     }
 }

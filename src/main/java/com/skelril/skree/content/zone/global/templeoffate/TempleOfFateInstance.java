@@ -17,9 +17,7 @@ import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -49,7 +47,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                     Lists.newArrayList(
-                                                            newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:ancient_metal_fragment").get())
+                                                            newItemStack("skree:ancient_metal_fragment")
                                                     )
                                                 ), 1
                                         )
@@ -61,7 +59,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_hallow").get())
+                                                                newItemStack("skree:emblem_of_hallow")
                                                         )
                                                 ), 30
                                         )
@@ -73,7 +71,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_the_forge").get())
+                                                                newItemStack("skree:emblem_of_the_forge")
                                                         )
                                                 ), 30
                                         )
