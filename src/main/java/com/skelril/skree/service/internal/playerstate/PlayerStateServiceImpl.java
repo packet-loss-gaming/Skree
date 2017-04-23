@@ -6,12 +6,14 @@
 
 package com.skelril.skree.service.internal.playerstate;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PlayerStateService;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.Player;
@@ -19,58 +21,96 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
 
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
+import static org.spongepowered.api.data.persistence.DataTranslators.CONFIGURATION_NODE;
 
 public class PlayerStateServiceImpl implements PlayerStateService {
 
     private static final String GENERAL_STORE_NAME = "general_store";
-    private static final String RELEASE_STATE_STRING = "_release_state";
 
     private Path getFile(Player player) throws IOException {
         ConfigManager service = Sponge.getGame().getConfigManager();
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         path = Files.createDirectories(path.resolve("profiles"));
-        return path.resolve(player.getUniqueId() + ".dat");
+        return path.resolve(player.getUniqueId() + ".json");
+    }
+
+    private static Optional<JsonElement> serializeItemStack(ItemStack item) {
+        try (StringWriter sink = new StringWriter()) {
+            try (BufferedWriter writer = new BufferedWriter(sink)) {
+                GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setSink(() -> writer).build();
+                ConfigurationNode node = CONFIGURATION_NODE.translate(item.toContainer());
+                loader.save(node);
+                return Optional.of(new JsonParser().parse(sink.toString()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<ItemStack> deserializeItemStack(JsonElement element) {
+        try (StringReader source = new StringReader(element.toString())) {
+            try (BufferedReader reader = new BufferedReader(source)) {
+                GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setSource(() -> reader).build();
+                ConfigurationNode node = loader.load();
+                return Optional.of(ItemStack.builder().fromContainer(CONFIGURATION_NODE.translate(node)).build());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    private Optional<SavedPlayerStateContainer> getContainer(Player player) throws IOException {
+        if (!getFile(player).toFile().exists()) {
+            return Optional.empty();
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(getFile(player))) {
+            Gson gson = new GsonBuilder().create();
+            return Optional.of(gson.fromJson(reader, SavedPlayerStateContainer.class));
+        }
+    }
+
+    private void writeContainer(Player player, SavedPlayerStateContainer container) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(getFile(player))) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            writer.write(gson.toJson(container));
+        }
     }
 
     @Override
     public boolean hasInventoryStored(Player player) {
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                return false;
-            }
+            SavedPlayerStateContainer stateContainer = getContainer(player).orElse(new SavedPlayerStateContainer());
+            Map<String, SavedPlayerState> states = stateContainer.getSavedPlayerStates();
 
-            NBTBase tag = compound.getTag(GENERAL_STORE_NAME);
-            if (tag instanceof NBTTagList) {
-                return true;
-            }
+            return states.get(GENERAL_STORE_NAME) != null;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public boolean hasReleasedInventoryStored(Player player) {
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                return false;
-            }
-
-            NBTBase tag = compound.getTag(GENERAL_STORE_NAME);
-            if (tag instanceof NBTTagList) {
-                return compound.getBoolean(GENERAL_STORE_NAME + RELEASE_STATE_STRING);
-            }
+            SavedPlayerStateContainer container = getContainer(player).orElse(new SavedPlayerStateContainer());
+            SavedPlayerState playerState = container.getSavedPlayerStates().get(container.getReleasedState());
+            return playerState != null;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -99,65 +139,75 @@ public class PlayerStateServiceImpl implements PlayerStateService {
         }
 
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                compound = new NBTTagCompound();
-            }
-            compound.setBoolean(GENERAL_STORE_NAME + RELEASE_STATE_STRING, true);
+            SavedPlayerStateContainer container = getContainer(player).orElse(new SavedPlayerStateContainer());
+            container.setReleasedState(GENERAL_STORE_NAME);
 
-            CompressedStreamTools.safeWrite(compound, getFile(player).toFile());
+            writeContainer(player, container);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
+    private SavedPlayerState createNewPlayerState(Player player) {
+        SavedPlayerState playerState = new SavedPlayerState();
+
+        player.getInventory().slots().forEach(slot -> {
+            ItemStack stackInSlot = slot.peek().orElse(newItemStack(ItemTypes.NONE));
+            JsonElement serializedStack = serializeItemStack(stackInSlot).get();
+            playerState.getInventoryContents().add(serializedStack);
+        });
+
+        return playerState;
+    }
+
     @Override
     public void save(Player player, String saveName) {
-        NBTTagList playerInv = new NBTTagList();
-        tf(player).inventory.writeToNBT(playerInv);
-
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                compound = new NBTTagCompound();
-            }
-            compound.setTag(saveName, playerInv);
+            SavedPlayerStateContainer stateContainer = getContainer(player).orElse(new SavedPlayerStateContainer());
+            Map<String, SavedPlayerState> states = stateContainer.getSavedPlayerStates();
+            states.put(saveName, createNewPlayerState(player));
 
-            CompressedStreamTools.safeWrite(compound, getFile(player).toFile());
+            writeContainer(player, stateContainer);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private List<JsonElement> getInventoryContents(Player player, String saveName) {
+        try {
+            SavedPlayerStateContainer stateContainer = getContainer(player).orElse(new SavedPlayerStateContainer());
+            SavedPlayerState state = stateContainer.getSavedPlayerStates().getOrDefault(saveName, new SavedPlayerState());
+            return state.getInventoryContents();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 
     @Override
     public void load(Player player, String saveName) {
-        try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                return;
+        Iterator<Inventory> slots = player.getInventory().slots().iterator();
+        List<JsonElement> persistedInventoryContents = getInventoryContents(player, saveName);
+        for (int i = 0; slots.hasNext(); ++i) {
+            if (i < persistedInventoryContents.size()) {
+                ItemStack stack = deserializeItemStack(persistedInventoryContents.get(i)).orElse(newItemStack(ItemTypes.NONE));
+                slots.next().set(stack);
+            } else {
+                slots.next().set(newItemStack(ItemTypes.NONE));
             }
-
-            NBTBase tag = compound.getTag(saveName);
-            if (tag instanceof NBTTagList) {
-                tf(player).inventory.readFromNBT((NBTTagList) tag);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     private void destroySave(Player player, String saveName) {
         try {
-            NBTTagCompound compound = CompressedStreamTools.read(getFile(player).toFile());
-            if (compound == null) {
-                compound = new NBTTagCompound();
-            }
-            compound.removeTag(saveName);
-            if (saveName.equals(GENERAL_STORE_NAME)) {
-                compound.setBoolean(saveName + RELEASE_STATE_STRING, false);
+            SavedPlayerStateContainer container = getContainer(player).orElse(new SavedPlayerStateContainer());
+            container.getSavedPlayerStates().remove(saveName);
+            if (Objects.equals(saveName, GENERAL_STORE_NAME)) {
+                container.setReleasedState(null);
             }
 
-            CompressedStreamTools.safeWrite(compound, getFile(player).toFile());
+            writeContainer(player, container);
         } catch (IOException e) {
             e.printStackTrace();
         }
