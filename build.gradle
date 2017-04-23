@@ -75,6 +75,16 @@ sourceSets {
     }
 }
 
+processResources {
+    rename '(.+_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'FMLSkree_at.cfg'
+    }
+}
+
 task codegen << {
     println 'Generating new schema classes...'
     def writer = new StringWriter()
