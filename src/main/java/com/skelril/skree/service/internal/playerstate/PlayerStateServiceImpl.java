@@ -57,7 +57,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
 
     private void writeContainer(Player player, SavedPlayerStateContainer container) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(getFile(player))) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
             writer.write(gson.toJson(container));
         }
     }
