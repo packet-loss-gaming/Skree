@@ -10,30 +10,34 @@ package com.skelril.skree.system.world;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.skelril.nitro.JarResourceLoader;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.world.*;
+import com.skelril.skree.content.world.LoadWorldCommand;
+import com.skelril.skree.content.world.SetSpawnCommand;
+import com.skelril.skree.content.world.WorldCommand;
+import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.WildernessMetaCommand;
 import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
-import com.skelril.skree.content.world.wilderness.WildernessWorldGeneratorModifier;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
-import com.skelril.skree.system.database.DatabaseConfig;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
-import org.spongepowered.api.world.*;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,15 +62,18 @@ public class WorldSystem implements ServiceProvider<WorldService> {
             Path targetFile = getWorldConfiguration();
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            if (Files.exists(targetFile)) {
-                try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                    config = gson.fromJson(reader, WorldSystemConfig.class);
-                }
-            } else {
-                Files.createFile(targetFile);
-                try (BufferedWriter writer = Files.newBufferedWriter(targetFile)) {
-                    writer.write(gson.toJson(new WorldSystemConfig()));
-                }
+            if (!Files.exists(targetFile)) {
+                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
+                    try {
+                        Files.copy(getResource.apply("worlds.json"), targetFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+                config = gson.fromJson(reader, WorldSystemConfig.class);
             }
         } catch (IOException e) {
             e.printStackTrace();

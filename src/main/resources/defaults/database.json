@@ -1,0 +1,5 @@
+{
+  "database": "jdbc:mariadb://localhost:3306",
+  "username": "mc_db_dev",
+  "password": "mc_db_dev"
+}

@@ -1,0 +1,79 @@
+{
+  "archetypes": [
+    {
+      "id": "skree:build",
+      "name": "build",
+      "dimension": "minecraft:overworld",
+      "generator": "default",
+      "usesMapFeatures": false,
+      "modifiers": [
+        "skree:no_ore"
+      ]
+    },
+    {
+      "id": "skree:barrier",
+      "name": "barrier",
+      "dimension": "minecraft:overworld",
+      "generator": "flat",
+      "usesMapFeatures": false,
+      "modifiers": [
+        "skree:barrier"
+      ]
+    },
+    {
+      "id": "skree:void",
+      "name": "void",
+      "dimension": "minecraft:overworld",
+      "generator": "flat",
+      "usesMapFeatures": false,
+      "modifiers": [
+        "skree:void"
+      ]
+    },
+    {
+      "id": "skree:wilderness",
+      "name": "wilderness",
+      "dimension": "minecraft:overworld",
+      "generator": "default",
+      "usesMapFeatures": true,
+      "modifiers": [
+        "skree:wilderness"
+      ]
+    },
+    {
+      "id": "skree:wilderness_nether",
+      "name": "wilderness_nether",
+      "dimension": "minecraft:nether",
+      "generator": "nether",
+      "usesMapFeatures": true,
+      "modifiers": []
+    }
+  ],
+  "worlds": [
+    {
+      "name": "Main",
+      "archetype": "skree:build",
+      "wrapper": "Main"
+    },
+    {
+      "name": "Kalazben",
+      "archetype": "skree:build",
+      "wrapper": "Build"
+    },
+    {
+      "name": "Instance",
+      "archetype": "skree:void",
+      "wrapper": "Instance"
+    },
+    {
+      "name": "Wilderness",
+      "archetype": "skree:wilderness",
+      "wrapper": "Wilderness"
+    },
+    {
+      "name": "Wilderness_nether",
+      "archetype": "skree:wilderness_nether",
+      "wrapper": "Wilderness"
+    }
+  ]
+}

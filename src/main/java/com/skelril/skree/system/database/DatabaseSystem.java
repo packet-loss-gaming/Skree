@@ -8,6 +8,7 @@ package com.skelril.skree.system.database;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.skelril.nitro.JarResourceLoader;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
@@ -20,7 +21,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,26 +62,29 @@ public class DatabaseSystem implements ServiceProvider<DatabaseService> {
             Path targetFile = getDatabaseFile();
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            if (Files.exists(targetFile)) {
-                try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                    DatabaseConfig config = gson.fromJson(reader, DatabaseConfig.class);
-
-                    if (config == null || config.getDatabase().isEmpty()) {
-                        return;
+            if (!Files.exists(targetFile)) {
+                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
+                    try {
+                        Files.copy(getResource.apply("database.json"), targetFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                });
+            }
 
-                    String database = config.getDatabase();
-                    String username = config.getUsername();
-                    String password = config.getPassword();
+            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+                DatabaseConfig config = gson.fromJson(reader, DatabaseConfig.class);
 
-                    setupHandle(database, username, password);
-                    runMigrations(database, username, password);
+                if (config == null || config.getDatabase().isEmpty()) {
+                    return;
                 }
-            } else {
-                Files.createFile(targetFile);
-                try (BufferedWriter writer = Files.newBufferedWriter(targetFile)) {
-                    writer.write(gson.toJson(new DatabaseConfig()));
-                }
+
+                String database = config.getDatabase();
+                String username = config.getUsername();
+                String password = config.getPassword();
+
+                setupHandle(database, username, password);
+                runMigrations(database, username, password);
             }
         } catch (IOException e) {
             e.printStackTrace();
