@@ -15,6 +15,7 @@ import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.system.registry.AbstractCustomRegistrySystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.ItemModelMesher;
@@ -26,52 +27,17 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
-public class CustomItemSystem {
-
+public class CustomItemSystem extends AbstractCustomRegistrySystem {
     private GameIntegrator gameIntegrator = new GameIntegrator("skree");
 
-    private FileSystem getFileSystem(URI uri) throws IOException {
-        try {
-            return FileSystems.getFileSystem(uri);
-        } catch (FileSystemNotFoundException e) {
-            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
-        }
-    }
-
-    private void loadFromResources(Consumer<Function<String, Path>> execute) {
-        String basePathName = "/registry/items/";
-        try {
-            URI uri = getClass().getResource(basePathName).toURI();
-            if (uri.getScheme().equals("jar")) {
-                try (FileSystem fileSystem = getFileSystem(uri)) {
-                    Function<String, Path> providerFunction = (resourceName) -> {
-                        return fileSystem.getPath(basePathName + resourceName);
-                    };
-                    execute.accept(providerFunction);
-                }
-            } else {
-                execute.accept(Paths::get);
-            }
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     public CustomItemSystem() {
+        super("/registry/items/");
         LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
         loadFromResources(getResource -> {
             dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator), getResource.apply("swords"));
@@ -79,6 +45,7 @@ public class CustomItemSystem {
         });
     }
 
+    @Override
     public void preInit() {
         try {
             gameIntegrator.registerItems();
@@ -88,6 +55,7 @@ public class CustomItemSystem {
         }
     }
 
+    @Override
     public void associate() {
         try {
             iterate(CustomItemSystem.class.getDeclaredMethod("registerAssociates", Object.class));
@@ -96,6 +64,7 @@ public class CustomItemSystem {
         }
     }
 
+    @Override
     public void init() {
         try {
             gameIntegrator.registerItemRenderings();

@@ -10,11 +10,13 @@ import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
+import com.skelril.skree.system.registry.recipe.CustomRecipeSystem;
 
 @NModule(name = "Custom Registry System")
 public class CustomRegisterySystem {
     private CustomItemSystem customItemSystem = new CustomItemSystem();
     private CustomBlockSystem customBlockSystem = new CustomBlockSystem();
+    private CustomRecipeSystem customRecipeSystem = new CustomRecipeSystem();
 
     @NModuleTrigger(trigger = "PRE_INITIALIZATION")
     public void preInit() {
@@ -26,6 +28,9 @@ public class CustomRegisterySystem {
 
         customItemSystem.associate();
         customBlockSystem.associate();
+
+        customRecipeSystem = new CustomRecipeSystem();
+        customRecipeSystem.associate();
     }
 
     @NModuleTrigger(trigger = "FMLInitializationEvent")
