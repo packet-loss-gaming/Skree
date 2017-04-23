@@ -15,7 +15,7 @@ public class ShapelessRecipeConfig extends CraftingRecipeConfig {
     List<ItemStackConfig> requiredItemStacks;
 
     public void registerRecipie() {
-        GameRegistry.addRecipe(
+        GameRegistry.addShapelessRecipe(
                 craftedItem.toNSMStack(),
                 requiredItemStacks.stream().map(ItemStackConfig::toNSMStack).toArray()
         );

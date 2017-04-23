@@ -8,14 +8,14 @@ package com.skelril.nitro.registry.dynamic.recipe;
 
 import com.skelril.nitro.registry.dynamic.Loader;
 
-public class ShapelessRecipeLoader implements Loader<ShapedRecipeConfig> {
+public class ShapelessRecipeLoader implements Loader<ShapelessRecipeConfig> {
     @Override
-    public void load(ShapedRecipeConfig config) {
+    public void load(ShapelessRecipeConfig config) {
         config.registerRecipie();
     }
 
     @Override
-    public Class<ShapedRecipeConfig> getConfigClass() {
-        return ShapedRecipeConfig.class;
+    public Class<ShapelessRecipeConfig> getConfigClass() {
+        return ShapelessRecipeConfig.class;
     }
 }
