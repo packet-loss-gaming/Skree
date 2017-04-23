@@ -6,19 +6,17 @@
 
 package com.skelril.nitro.registry.dynamic.item.sword;
 
-import com.skelril.nitro.registry.dynamic.Loader;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
 
-public class SwordLoader extends ItemLoader implements Loader<SwordConfig> {
+public class SwordLoader extends ItemLoader<LoadedSword, SwordConfig> {
     public SwordLoader(GameIntegrator integrator) {
         super(integrator);
     }
 
     @Override
-    public void load(SwordConfig config) {
-        LoadedSword sword = new LoadedSword(config);
-        registerWithGame(sword, config);
+    public LoadedSword constructFromConfig(SwordConfig config) {
+        return new LoadedSword(config);
     }
 
     @Override

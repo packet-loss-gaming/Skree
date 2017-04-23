@@ -6,13 +6,21 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
+import com.skelril.nitro.registry.dynamic.Loader;
 import net.minecraft.item.Item;
 
-public abstract class ItemLoader {
+public abstract class ItemLoader<ResultType extends Item, ConfigType extends ItemConfig> implements Loader<ConfigType> {
     private GameIntegrator integrator;
 
     public ItemLoader(GameIntegrator integrator) {
         this.integrator = integrator;
+    }
+
+    public abstract ResultType constructFromConfig(ConfigType config);
+
+    @Override
+    public void load(ConfigType config) {
+        registerWithGame(constructFromConfig(config), config);
     }
 
     protected void registerWithGame(Item item, ItemConfig config) {
