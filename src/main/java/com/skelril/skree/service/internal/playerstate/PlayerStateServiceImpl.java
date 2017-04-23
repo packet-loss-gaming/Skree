@@ -9,11 +9,8 @@ package com.skelril.skree.service.internal.playerstate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PlayerStateService;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,13 +22,16 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.skelril.nitro.item.ItemSerializer.deserializeItemStack;
+import static com.skelril.nitro.item.ItemSerializer.serializeItemStack;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static org.spongepowered.api.data.persistence.DataTranslators.CONFIGURATION_NODE;
 
 public class PlayerStateServiceImpl implements PlayerStateService {
 
@@ -42,33 +42,6 @@ public class PlayerStateServiceImpl implements PlayerStateService {
         Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
         path = Files.createDirectories(path.resolve("profiles"));
         return path.resolve(player.getUniqueId() + ".json");
-    }
-
-    private static Optional<JsonElement> serializeItemStack(ItemStack item) {
-        try (StringWriter sink = new StringWriter()) {
-            try (BufferedWriter writer = new BufferedWriter(sink)) {
-                GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setSink(() -> writer).build();
-                ConfigurationNode node = CONFIGURATION_NODE.translate(item.toContainer());
-                loader.save(node);
-                return Optional.of(new JsonParser().parse(sink.toString()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
-    }
-
-    private static Optional<ItemStack> deserializeItemStack(JsonElement element) {
-        try (StringReader source = new StringReader(element.toString())) {
-            try (BufferedReader reader = new BufferedReader(source)) {
-                GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setSource(() -> reader).build();
-                ConfigurationNode node = loader.load();
-                return Optional.of(ItemStack.builder().fromContainer(CONFIGURATION_NODE.translate(node)).build());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
     }
 
     private Optional<SavedPlayerStateContainer> getContainer(Player player) throws IOException {
