@@ -126,9 +126,13 @@ public class PlayerStateServiceImpl implements PlayerStateService {
         SavedPlayerState playerState = new SavedPlayerState();
 
         player.getInventory().slots().forEach(slot -> {
-            ItemStack stackInSlot = slot.peek().orElse(newItemStack(ItemTypes.NONE));
-            JsonElement serializedStack = serializeItemStack(stackInSlot).get();
-            playerState.getInventoryContents().add(serializedStack);
+            try {
+                ItemStack stackInSlot = slot.peek().orElse(newItemStack(ItemTypes.NONE));
+                JsonElement serializedStack = serializeItemStack(stackInSlot);
+                playerState.getInventoryContents().add(serializedStack);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         return playerState;
@@ -163,12 +167,18 @@ public class PlayerStateServiceImpl implements PlayerStateService {
         Iterator<Inventory> slots = player.getInventory().slots().iterator();
         List<JsonElement> persistedInventoryContents = getInventoryContents(player, saveName);
         for (int i = 0; slots.hasNext(); ++i) {
+            Inventory slot = slots.next();
             if (i < persistedInventoryContents.size()) {
-                ItemStack stack = deserializeItemStack(persistedInventoryContents.get(i)).orElse(newItemStack(ItemTypes.NONE));
-                slots.next().set(stack);
-            } else {
-                slots.next().set(newItemStack(ItemTypes.NONE));
+                try {
+                    ItemStack stack = deserializeItemStack(persistedInventoryContents.get(i));
+                    slot.set(stack);
+                    continue;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+            slot.set(newItemStack(ItemTypes.NONE));
         }
     }
 
