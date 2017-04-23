@@ -23,10 +23,12 @@ public class LoaderRegistry {
         loaders.forEach((loader, path) -> {
             try {
                 Files.walk(path).forEach(subPath -> {
-                    if (subPath.getFileName().toString().endsWith(".json")) {
+                    String filename = subPath.getFileName().toString();
+                    if (filename.endsWith(".json")) {
                         try {
                             loader.load(subPath);
-                        } catch (IOException e) {
+                        } catch (Exception e) {
+                            System.err.println("Error loading: " + filename);
                             e.printStackTrace();
                         }
                     }
