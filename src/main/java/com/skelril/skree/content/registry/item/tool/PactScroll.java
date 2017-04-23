@@ -10,9 +10,9 @@ import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
@@ -62,7 +62,7 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
         GameRegistry.addShapelessRecipe(
                 new net.minecraft.item.ItemStack(this),
                 new net.minecraft.item.ItemStack(Items.PAPER),
-                new net.minecraft.item.ItemStack(CustomItemTypes.RED_SHARD)
+                new net.minecraft.item.ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:red_shard").get())
         );
     }
 

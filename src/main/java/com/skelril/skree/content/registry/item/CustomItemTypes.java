@@ -6,15 +6,13 @@
 
 package com.skelril.skree.content.registry.item;
 
-import com.skelril.skree.content.registry.item.admin.EditWand;
-import com.skelril.skree.content.registry.item.admin.HackBook;
-import com.skelril.skree.content.registry.item.admin.NavigationWand;
 import com.skelril.skree.content.registry.item.armor.*;
 import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
-import com.skelril.skree.content.registry.item.generic.*;
+import com.skelril.skree.content.registry.item.generic.BrokenGlass;
+import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.registry.item.minigame.GoldRushKey;
 import com.skelril.skree.content.registry.item.minigame.SkyFeather;
 import com.skelril.skree.content.registry.item.tool.*;
@@ -37,11 +35,6 @@ import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
 
 public class CustomItemTypes {
-    /* ** Admin ** */
-    public static final EditWand EDIT_WAND = new EditWand();
-    public static final HackBook HACK_BOOK = new HackBook();
-    public static final NavigationWand NAVIGATION_WAND = new NavigationWand();
-
     /* ** Minigame ** */
     public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
     public static final PrizeBox PRIZE_BOX = new PrizeBox();
@@ -62,27 +55,6 @@ public class CustomItemTypes {
     public static final CondensedCofferItem REDISTRAL = new CondensedCofferItem("redistral", EQESTA);
     public static final CondensedCofferItem RETESRUM = new CondensedCofferItem("retesrum", REDISTRAL);
     public static final CondensedCofferItem MESARDITH = new CondensedCofferItem("mesardith", RETESRUM);
-
-    /* Gems */
-    public static final JurackGem JURACK_GEM = new JurackGem();
-    public static final BloodDiamond BLOOD_DIAMOND = new BloodDiamond();
-    public static final SeaCrystal SEA_CRYSTAL = new SeaCrystal();
-
-    /* Resources */
-    public static final AncientIngot ANCIENT_INGOT = new AncientIngot();
-    public static final AncientMetalFragment ANCIENT_METAL_FRAGMENT = new AncientMetalFragment();
-    public static final DemonicBlade DEMONIC_BLADE = new DemonicBlade();
-    public static final DemonicHilt DEMONIC_HILT = new DemonicHilt();
-    public static final DemonicIngot DEMONIC_INGOT = new DemonicIngot();
-    public static final EmblemOfHallow EMBLEM_OF_HALLOW = new EmblemOfHallow();
-    public static final EmblemOfTheForge EMBLEM_OF_THE_FORGE = new EmblemOfTheForge();
-    public static final EnderFocus ENDER_FOCUS = new EnderFocus();
-    public static final RedShard RED_SHARD = new RedShard();
-    public static final FairyDust FAIRY_DUST = new FairyDust();
-    public static final HolyBlade HOLY_BLADE = new HolyBlade();
-    public static final HolyHilt HOLY_HILT = new HolyHilt();
-    public static final HolyIngot HOLY_INGOT = new HolyIngot();
-    public static final UnstableCatalyst UNSTABLE_CATALYST = new UnstableCatalyst();
 
     /* Food */
     public static final RawGodFish RAW_GOD_FISH = new RawGodFish();

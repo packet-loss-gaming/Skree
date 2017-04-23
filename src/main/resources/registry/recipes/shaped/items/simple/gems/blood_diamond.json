@@ -1,0 +1,21 @@
+{
+  "crafted_item": {
+    "id": "skree:blood_diamond",
+    "data": 0
+  },
+  "crafting_rows": [
+    "BBB",
+    "BAB",
+    "BBB"
+  ],
+  "mapped_item_stacks": {
+    "A": {
+      "id": "minecraft:diamond",
+      "data": 0
+    },
+    "B": {
+      "id": "minecraft:redstone",
+      "data": 0
+    }
+  }
+}

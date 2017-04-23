@@ -1,0 +1,21 @@
+{
+  "crafted_item": {
+    "id": "skree:sea_crystal",
+    "data": 0
+  },
+  "crafting_rows": [
+    "ABA",
+    "BAB",
+    "ABA"
+  ],
+  "mapped_item_stacks": {
+    "A": {
+      "id": "minecraft:diamond",
+      "data": 0
+    },
+    "B": {
+      "id": "minecraft:prismarine_crystals",
+      "data": 0
+    }
+  }
+}

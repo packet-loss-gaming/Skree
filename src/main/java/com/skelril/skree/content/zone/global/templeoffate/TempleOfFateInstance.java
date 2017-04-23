@@ -17,13 +17,14 @@ import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class TempleOfFateInstance extends LegacyZoneBase {
@@ -48,7 +49,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                     Lists.newArrayList(
-                                                            newItemStack(ANCIENT_METAL_FRAGMENT)
+                                                            newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:ancient_metal_fragment").get())
                                                     )
                                                 ), 1
                                         )
@@ -60,7 +61,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(EMBLEM_OF_HALLOW)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_hallow").get())
                                                         )
                                                 ), 30
                                         )
@@ -72,7 +73,7 @@ public class TempleOfFateInstance extends LegacyZoneBase {
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(EMBLEM_OF_THE_FORGE)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_the_forge").get())
                                                         )
                                                 ), 30
                                         )

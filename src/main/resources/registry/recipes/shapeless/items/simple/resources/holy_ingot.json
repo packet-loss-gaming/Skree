@@ -1,0 +1,16 @@
+{
+  "crafted_item": {
+    "id": "skree:holy_ingot",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:ancient_ingot",
+      "data": 0
+    },
+    {
+      "id": "skree:emblem_of_the_forge",
+      "data": 0
+    }
+  ]
+}

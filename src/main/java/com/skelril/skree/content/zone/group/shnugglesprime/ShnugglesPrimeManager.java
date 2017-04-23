@@ -41,6 +41,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
@@ -55,7 +56,7 @@ import java.util.function.Consumer;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.*;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.SCROLL_OF_SUMMATION;
 
 public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstance> implements Runnable, LocationZone<ShnugglesPrimeInstance> {
     private static final DropTable dropTable;
@@ -77,7 +78,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(FAIRY_DUST)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
                                                         )
                                                 ), 25
                                         ),
@@ -91,14 +92,14 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(JURACK_GEM)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get())
                                                         )
                                                 ), 50
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(SEA_CRYSTAL)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get())
                                                         )
                                                 ), 100
                                         )
@@ -110,7 +111,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(EMBLEM_OF_THE_FORGE)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_the_forge").get())
                                                         )
                                                 ), 750
                                         )
@@ -122,7 +123,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(HOLY_HILT)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:holy_hilt").get())
                                                         )
                                                 ), 15000
                                         )
@@ -134,7 +135,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(HOLY_BLADE)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:holy_blade").get())
                                                         )
                                                 ), 15000
                                         )
@@ -146,7 +147,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(EMBLEM_OF_HALLOW)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:emblem_of_hallow").get())
                                                         )
                                                 ), 750
                                         )
@@ -158,7 +159,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(DEMONIC_HILT)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:demonic_hilt").get())
                                                         )
                                                 ), 15000
                                         )
@@ -170,7 +171,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(DEMONIC_BLADE)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:demonic_blade").get())
                                                         )
                                                 ), 15000
                                         )
@@ -189,21 +190,21 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(ANCIENT_METAL_FRAGMENT)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:ancient_metal_fragment").get())
                                                         )
                                                 ), 250
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(ANCIENT_INGOT)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:ancient_ingot").get())
                                                         )
                                                 ), 500
                                         ),
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack(UNSTABLE_CATALYST)
+                                                                newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:unstable_catalyst").get())
                                                         )
                                                 ), 25000
                                         )

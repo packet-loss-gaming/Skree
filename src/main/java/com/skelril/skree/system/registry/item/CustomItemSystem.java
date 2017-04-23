@@ -9,6 +9,7 @@ package com.skelril.skree.system.registry.item;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.dynamic.LoaderRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
+import com.skelril.nitro.registry.dynamic.item.simple.SimpleLoader;
 import com.skelril.nitro.registry.dynamic.item.sword.SwordLoader;
 import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.registry.item.ICustomItem;
@@ -40,6 +41,7 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
         super("/registry/items/");
         LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
         loadFromResources(getResource -> {
+            dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator), getResource.apply("simple"));
             dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator), getResource.apply("swords"));
             dynamicItemRegistry.loadAll();
         });

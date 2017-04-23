@@ -8,13 +8,13 @@ package com.skelril.skree.content.registry.block.trap;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -23,6 +23,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 
 public class Pitfall extends Block implements ICustomBlock, Craftable {
 
@@ -71,7 +73,7 @@ public class Pitfall extends Block implements ICustomBlock, Craftable {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this, 3),
                 new ItemStack(Blocks.CLAY),
-                new ItemStack(CustomItemTypes.FAIRY_DUST)
+                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:fairy_dust").get())
         );
     }
 }

@@ -10,15 +10,16 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.content.world.WorldEntryPermissionCheck;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -59,9 +60,9 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
                 "AAA",
                 "BCB",
                 "BBB",
-                'A', new ItemStack(CustomItemTypes.RED_SHARD),
-                'B', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'C', new ItemStack(CustomItemTypes.ENDER_FOCUS)
+                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:red_shard").get()),
+                'B', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get()),
+                'C', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get())
         );
     }
 
@@ -106,7 +107,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
             if (held.getItem() == this) {
                 Optional<Location<World>> optDestination = getDestination(held);
                 if (optDestination.isPresent()) {
-                    Inventory result = player.getInventory().query((ItemType) CustomItemTypes.ENDER_FOCUS);
+                    Inventory result = player.getInventory().query((ItemType) (Item) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
                     if (result.size() > 0) {
                         Task.builder().execute(() -> {
                             result.poll(1);

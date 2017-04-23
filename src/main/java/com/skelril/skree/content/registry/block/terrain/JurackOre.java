@@ -9,12 +9,13 @@ package com.skelril.skree.content.registry.block.terrain;
 import com.skelril.nitro.ReflectiveModifier;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.nitro.registry.block.OreHelper;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 
 import java.util.Random;
 
@@ -37,6 +38,6 @@ public class JurackOre extends BlockOre implements ICustomBlock {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return CustomItemTypes.JURACK_GEM;
+        return (Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get();
     }
 }

@@ -1,0 +1,17 @@
+{
+  "crafted_item": {
+    "id": "skree:ancient_ingot",
+    "data": 0
+  },
+  "crafting_rows": [
+    "AAA",
+    "AAA",
+    "AAA"
+  ],
+  "mapped_item_stacks": {
+    "A": {
+      "id": "skree:ancient_metal_fragment",
+      "data": 0
+    }
+  }
+}

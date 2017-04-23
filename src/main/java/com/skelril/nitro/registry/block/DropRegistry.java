@@ -9,7 +9,6 @@ package com.skelril.nitro.registry.block;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -59,9 +58,8 @@ public class DropRegistry {
                 return Lists.newArrayList(newItemStack(ItemTypes.EMERALD));
             } else if (type.equals(BlockTypes.QUARTZ_ORE)) {
                 return Lists.newArrayList(newItemStack(ItemTypes.QUARTZ));
-            } else if (type.equals(CustomBlockTypes.JURACK_ORE)) {
-                return Lists.newArrayList(newItemStack((ItemType) CustomItemTypes.JURACK_GEM));
-            }
+            } else if (type.equals(CustomBlockTypes.JURACK_ORE))
+                return Lists.newArrayList(newItemStack(Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get()));
         }
         return null;
     }

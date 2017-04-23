@@ -9,8 +9,11 @@ package com.skelril.skree.content.registry.item.armor;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomHelmet;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 
 public class WraithHelmet extends CustomHelmet implements Craftable {
     @Override
@@ -38,7 +41,7 @@ public class WraithHelmet extends CustomHelmet implements Craftable {
         GameRegistry.addShapelessRecipe(
                 new ItemStack(this),
                 new ItemStack(CustomItemTypes.TORMENTOR_HELMET),
-                new ItemStack(CustomItemTypes.UNSTABLE_CATALYST)
+                new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:unstable_catalyst").get())
         );
     }
 }

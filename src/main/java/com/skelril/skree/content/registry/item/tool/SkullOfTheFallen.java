@@ -10,17 +10,18 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -40,7 +41,7 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
                 "BBB",
                 "BAB",
                 "B B",
-                'A', new net.minecraft.item.ItemStack(CustomItemTypes.BLOOD_DIAMOND),
+                'A', new net.minecraft.item.ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:blood_diamond").get()),
                 'B', new net.minecraft.item.ItemStack(Items.BONE)
         );
     }

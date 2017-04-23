@@ -8,9 +8,11 @@ package com.skelril.skree.content.registry.item.armor;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.armor.CustomBoots;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 
 public class CrystalBoots extends CustomBoots implements Craftable {
     @Override
@@ -25,7 +27,7 @@ public class CrystalBoots extends CustomBoots implements Craftable {
 
     @Override
     public ItemStack __getRepairItemStack() {
-        return new ItemStack(CustomItemTypes.SEA_CRYSTAL);
+        return new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get());
     }
 
     @Override
@@ -40,7 +42,7 @@ public class CrystalBoots extends CustomBoots implements Craftable {
                 "   ",
                 "A A",
                 "A A",
-                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL)
+                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:sea_crystal").get())
         );
     }
 }

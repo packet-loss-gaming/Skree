@@ -10,10 +10,12 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.hoe.CustomHoe;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 
 public class JurackHoe extends CustomHoe implements Craftable {
     @Override
@@ -38,7 +40,7 @@ public class JurackHoe extends CustomHoe implements Craftable {
                 "AA ",
                 " B ",
                 " B ",
-                'A', new ItemStack(CustomItemTypes.JURACK_GEM),
+                'A', new ItemStack((Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get()),
                 'B', new ItemStack(Items.STICK)
         );
     }
