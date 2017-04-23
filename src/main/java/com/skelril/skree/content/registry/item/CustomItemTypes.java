@@ -9,7 +9,6 @@ package com.skelril.skree.content.registry.item;
 import com.skelril.skree.content.registry.item.admin.EditWand;
 import com.skelril.skree.content.registry.item.admin.HackBook;
 import com.skelril.skree.content.registry.item.admin.NavigationWand;
-import com.skelril.skree.content.registry.item.admin.SwordOGreatPain;
 import com.skelril.skree.content.registry.item.armor.*;
 import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
 import com.skelril.skree.content.registry.item.consumable.RawGodFish;
@@ -42,7 +41,6 @@ public class CustomItemTypes {
     public static final EditWand EDIT_WAND = new EditWand();
     public static final HackBook HACK_BOOK = new HackBook();
     public static final NavigationWand NAVIGATION_WAND = new NavigationWand();
-    public static final SwordOGreatPain SWORD_O_GREAT_PAIN = new SwordOGreatPain();
 
     /* ** Minigame ** */
     public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
