@@ -6,16 +6,13 @@
 
 package com.skelril.skree.content.registry.item.weapon.sword;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.sword.CustomSword;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CrystalSword extends CustomSword implements Craftable {
+public class CrystalSword extends CustomSword {
 
     @Override
     public String __getType() {
@@ -40,17 +37,5 @@ public class CrystalSword extends CustomSword implements Craftable {
     @Override
     public int __getEnchantability() {
         return ItemTiers.CRYSTAL.getEnchantability();
-    }
-
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                " A ",
-                " A ",
-                " B ",
-                'A', new ItemStack(CustomItemTypes.SEA_CRYSTAL),
-                'B', new ItemStack(Items.STICK)
-        );
     }
 }

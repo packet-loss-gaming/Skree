@@ -1,0 +1,21 @@
+{
+  "craftedItem": {
+    "id": "skree:crystal_sword",
+    "data": 0
+  },
+  "craftingRows": [
+    " A ",
+    " A ",
+    " B "
+  ],
+  "mappedItemStacks": {
+    "A": {
+      "id": "skree:sea_crystal",
+      "data": 0
+    },
+    "B": {
+      "id": "minecraft:stick",
+      "data": 0
+    }
+  }
+}
