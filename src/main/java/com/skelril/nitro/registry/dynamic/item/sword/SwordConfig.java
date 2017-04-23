@@ -6,7 +6,7 @@
 
 package com.skelril.nitro.registry.dynamic.item.sword;
 
-import com.skelril.nitro.registry.dynamic.item.ItemConfig;
+import com.skelril.nitro.registry.dynamic.item.ToolConfig;
 
-public class SwordConfig extends ItemConfig {
+public class SwordConfig extends ToolConfig {
 }

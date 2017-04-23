@@ -6,15 +6,15 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
-public class SimpleItemConfig extends ItemConfig {
-    private int maxStackSize;
-    private String tab;
+public class ToolConfig extends DamageableItemConfig {
+    private double hitPower;
+    private double attackSpeed;
 
-    public int getMaxStackSize() {
-        return maxStackSize;
+    public double getHitPower() {
+        return hitPower;
     }
 
-    public String getTab() {
-        return tab;
+    public double getAttackSpeed() {
+        return attackSpeed;
     }
 }
