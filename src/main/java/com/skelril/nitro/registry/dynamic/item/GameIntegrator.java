@@ -63,20 +63,17 @@ public class GameIntegrator {
 
         for (int i = 0; i < variants.size(); ++i) {
             ModelResourceLocation resourceLocation = new ModelResourceLocation(
-                    "skree:" + variants.get(i),
+                    modID + ":" + variants.get(i),
                     "inventory"
             );
 
             // if (!optMeshDefinition.isPresent()) {
-            mesher.register((Item) item, i, resourceLocation);
+            mesher.register(item, i, resourceLocation);
             // }
             modelResources.add(resourceLocation);
         }
 
-        ModelBakery.registerItemVariants(
-                (Item) item,
-                modelResources.toArray(new ResourceLocation[modelResources.size()])
-        );
+        ModelBakery.registerItemVariants(item, modelResources.toArray(new ResourceLocation[modelResources.size()]));
     }
 
     public void registerItemRenderings() {
