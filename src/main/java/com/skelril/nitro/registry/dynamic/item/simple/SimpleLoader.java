@@ -8,10 +8,11 @@ package com.skelril.nitro.registry.dynamic.item.simple;
 
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class SimpleLoader extends ItemLoader<LoadedSimpleItem, SimpleItemConfig> {
-    public SimpleLoader(GameIntegrator integrator) {
-        super(integrator);
+    public SimpleLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
+        super(integrator, abilityRegistry);
     }
 
     @Override

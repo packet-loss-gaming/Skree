@@ -1,0 +1,24 @@
+{
+  "id": "unleashed_sword",
+  "max_uses": 3122,
+  "repair_item_stack": {
+    "id": "skree:holy_sword",
+    "data": 0
+  },
+  "enchantability": 10,
+  "hit_power": 9,
+  "attack_speed": 1.6,
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "unleashed",
+        "seconds": 5.0
+      },
+      "melee_attacks": [
+        {
+          "id": "doom_blade"
+        }
+      ]
+    }
+  ]
+}

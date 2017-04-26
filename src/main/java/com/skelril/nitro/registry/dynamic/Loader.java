@@ -16,13 +16,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public interface Loader<ConfigType> {
-    default void load(Path config) throws IOException {
-        Gson gson = new GsonBuilder()
+    default GsonBuilder getGsonBuilder() {
+        return new GsonBuilder()
                 .setPrettyPrinting()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+    }
 
+    default void load(Path config) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(config)) {
+            Gson gson = getGsonBuilder().create();
             load(gson.fromJson(reader, getConfigClass()));
         }
     }

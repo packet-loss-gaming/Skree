@@ -6,6 +6,8 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownManager;
+import com.skelril.nitro.registry.dynamic.item.ability.grouptype.GroupListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.RenderItem;
@@ -22,6 +24,7 @@ import java.util.List;
 public class GameIntegrator {
     private String modID;
     private List<ItemDescriptor> constructedItems = new ArrayList<>();
+    private AbilityCooldownManager cooldownManager = new AbilityCooldownManager();
 
     public GameIntegrator(String modID) {
         this.modID = modID;
@@ -35,10 +38,19 @@ public class GameIntegrator {
         Item item = descriptor.item;
         ItemConfig config = descriptor.config;
 
-        item.setUnlocalizedName(modID + "_" + config.getID());
-        item.setRegistryName(modID + ":" + config.getID());
+        String unlocalizedName = modID + "_" + config.getID();
+        String id = modID + ":" + config.getID();
+
+        item.setUnlocalizedName(unlocalizedName);
+        item.setRegistryName(id);
 
         GameRegistry.register(item);
+
+        Object mod = Sponge.getPluginManager().getPlugin(modID).get().getInstance().get();
+        config.getAbilityGroups().forEach(abilityGroup -> {
+            GroupListener listener = abilityGroup.getListenerFor(id, cooldownManager);
+            Sponge.getEventManager().registerListeners(mod, listener);
+        });
     }
 
     public void registerItems() {

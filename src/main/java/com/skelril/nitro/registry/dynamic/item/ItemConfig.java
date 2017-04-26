@@ -7,16 +7,23 @@
 package com.skelril.nitro.registry.dynamic.item;
 
 import com.google.common.collect.Lists;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ItemConfig {
     private String id;
+    private List<AbilityGroup> abilityGroups = new ArrayList<>();
 
     private int enchantability;
 
     public String getID() {
         return id;
+    }
+
+    public List<AbilityGroup> getAbilityGroups() {
+        return abilityGroups;
     }
 
     public List<String> getMeshDefinitions() {

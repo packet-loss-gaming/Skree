@@ -16,6 +16,7 @@ import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
+import com.skelril.skree.content.registry.item.ability.SkreeAbilityRegistry;
 import com.skelril.skree.system.registry.AbstractCustomRegistrySystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
@@ -40,9 +41,10 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
     public CustomItemSystem() {
         super("/registry/items/");
         LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
+        SkreeAbilityRegistry abilityRegistry = new SkreeAbilityRegistry();
         loadFromResources(getResource -> {
-            dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator), getResource.apply("simple"));
-            dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator), getResource.apply("swords"));
+            dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
+            dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));
             dynamicItemRegistry.loadAll();
         });
     }
