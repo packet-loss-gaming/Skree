@@ -77,14 +77,12 @@ public class MeleeAttackGroupListener implements GroupListener {
             return;
         }
 
-        if (sourceEntity instanceof Player && !coolDownManager.canUseAbility((Player) sourceEntity, attackGroup.getCoolDown())) {
+        if (sourceEntity instanceof Player && coolDownManager.canUseAbility((Player) sourceEntity, attackGroup.getCoolDown())) {
+            coolDownManager.usedAbility((Player) sourceEntity, attackGroup.getCoolDown());
+        } else {
             return;
         }
 
         attackGroup.getNextAttackToRun().run(sourceEntity, (Living) targetEntity);
-
-        if (sourceEntity instanceof Player) {
-            coolDownManager.usedAbility((Player) sourceEntity, attackGroup.getCoolDown());
-        }
     }
 }
