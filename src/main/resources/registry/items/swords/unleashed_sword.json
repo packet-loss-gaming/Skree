@@ -12,11 +12,26 @@
     {
       "cool_down": {
         "pool": "unleashed",
-        "seconds": 5.0
+        "seconds": 3.8
       },
       "melee_attacks": [
         {
+          "id": "agility"
+        },
+        {
           "id": "doom_blade"
+        },
+        {
+          "id": "evil_focus"
+        },
+        {
+          "id": "healing_light"
+        },
+        {
+          "id": "life_leech"
+        },
+        {
+          "id": "regen"
         }
       ]
     }
