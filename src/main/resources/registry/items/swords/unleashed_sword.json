@@ -7,7 +7,7 @@
   },
   "enchantability": 10,
   "hit_power": 9,
-  "attack_speed": -2.4,
+  "attack_speed": %SWORD_SPEED%,
   "ability_groups": [
     {
       "cool_down": {

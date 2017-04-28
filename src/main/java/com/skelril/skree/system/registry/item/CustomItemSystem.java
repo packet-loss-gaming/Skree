@@ -41,6 +41,8 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
     public CustomItemSystem() {
         super("/registry/items/");
         LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
+        dynamicItemRegistry.registerConstant("SWORD_SPEED", "-2.4");
+
         SkreeAbilityRegistry abilityRegistry = new SkreeAbilityRegistry();
         loadFromResources(getResource -> {
             dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
