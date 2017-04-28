@@ -7,12 +7,12 @@
 package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
 
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityGroup;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityCluster;
 import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 
 import java.util.List;
 
-public abstract class SpecialAttackGroup extends AbilityGroup {
+public abstract class SpecialAttackCluster extends AbilityCluster {
     public abstract List<SpecialAttack> getSpecialAttacks();
 
     public SpecialAttack getNextAttackToRun() {

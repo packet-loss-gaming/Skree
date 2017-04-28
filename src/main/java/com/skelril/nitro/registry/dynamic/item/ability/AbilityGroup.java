@@ -6,14 +6,22 @@
 
 package com.skelril.nitro.registry.dynamic.item.ability;
 
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.GroupListener;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class AbilityGroup {
+public final class AbilityGroup {
     private AbilityCooldownProfile coolDown;
+    private transient List<AbilityCluster> clusters = new ArrayList<>();
+
+    public AbilityGroup(AbilityCooldownProfile coolDown) {
+        this.coolDown = coolDown;
+    }
 
     public AbilityCooldownProfile getCoolDown() {
         return coolDown;
     }
 
-    public abstract GroupListener getListenerFor(String itemID, AbilityCooldownManager coolDownManager);
+    public List<AbilityCluster> getClusters() {
+        return clusters;
+    }
 }

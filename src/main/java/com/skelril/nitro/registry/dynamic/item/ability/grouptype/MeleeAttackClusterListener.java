@@ -6,12 +6,11 @@
 
 package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
 
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownManager;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
@@ -21,15 +20,15 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
-public class MeleeAttackGroupListener implements GroupListener {
-    private MeleeAttackGroup attackGroup;
+public class MeleeAttackClusterListener implements ClusterListener {
+    private MeleeAttackCluster attackGroup;
     private String itemID;
-    private AbilityCooldownManager coolDownManager;
+    private AbilityCooldownHandler cooldownHandler;
 
-    public MeleeAttackGroupListener(MeleeAttackGroup attackGroup, String itemID, AbilityCooldownManager coolDownManager) {
+    public MeleeAttackClusterListener(MeleeAttackCluster attackGroup, String itemID, AbilityCooldownHandler cooldownHandler) {
         this.attackGroup = attackGroup;
         this.itemID = itemID;
-        this.coolDownManager = coolDownManager;
+        this.cooldownHandler = cooldownHandler;
     }
 
     public Optional<Living> getSource(Cause cause) {
@@ -77,8 +76,8 @@ public class MeleeAttackGroupListener implements GroupListener {
             return;
         }
 
-        if (sourceEntity instanceof Player && coolDownManager.canUseAbility((Player) sourceEntity, attackGroup.getCoolDown())) {
-            coolDownManager.usedAbility((Player) sourceEntity, attackGroup.getCoolDown());
+        if (cooldownHandler.canUseAbility(sourceEntity)) {
+            cooldownHandler.useAbility(sourceEntity);
         } else {
             return;
         }

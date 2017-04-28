@@ -6,12 +6,12 @@
 
 package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
 
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownManager;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
 import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 
 import java.util.List;
 
-public class MeleeAttackGroup extends SpecialAttackGroup {
+public class MeleeAttackCluster extends SpecialAttackCluster {
     private List<SpecialAttack> meleeAttacks;
 
     @Override
@@ -20,7 +20,7 @@ public class MeleeAttackGroup extends SpecialAttackGroup {
     }
 
     @Override
-    public GroupListener getListenerFor(String itemID, AbilityCooldownManager coolDownManager) {
-        return new MeleeAttackGroupListener(this, itemID, coolDownManager);
+    public ClusterListener getListenerFor(String itemID, AbilityCooldownHandler cooldownHandler) {
+        return new MeleeAttackClusterListener(this, itemID, cooldownHandler);
     }
 }

@@ -6,5 +6,5 @@
 
 package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
 
-public interface GroupListener {
+public interface ClusterListener {
 }

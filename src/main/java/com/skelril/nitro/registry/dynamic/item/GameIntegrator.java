@@ -6,8 +6,10 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownManager;
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.GroupListener;
+import com.skelril.nitro.registry.dynamic.item.ability.AbilityGroup;
+import com.skelril.nitro.registry.dynamic.item.ability.grouptype.ClusterListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.RenderItem;
@@ -34,6 +36,13 @@ public class GameIntegrator {
         constructedItems.add(new ItemDescriptor(item, config));
     }
 
+    private void processAbilityGroup(Object mod, String id, AbilityGroup abilityGroup) {
+        AbilityCooldownHandler cooldownHandler = new AbilityCooldownHandler(abilityGroup.getCoolDown(), cooldownManager);
+        abilityGroup.getClusters().forEach((cluster) -> {
+            ClusterListener listener = cluster.getListenerFor(id, cooldownHandler);
+            Sponge.getEventManager().registerListeners(mod, listener);
+        });
+    }
     private void registerItem(ItemDescriptor descriptor) {
         Item item = descriptor.item;
         ItemConfig config = descriptor.config;
@@ -47,10 +56,7 @@ public class GameIntegrator {
         GameRegistry.register(item);
 
         Object mod = Sponge.getPluginManager().getPlugin(modID).get().getInstance().get();
-        config.getAbilityGroups().forEach(abilityGroup -> {
-            GroupListener listener = abilityGroup.getListenerFor(id, cooldownManager);
-            Sponge.getEventManager().registerListeners(mod, listener);
-        });
+        config.getAbilityGroups().forEach(abilityGroup -> processAbilityGroup(mod, id, abilityGroup));
     }
 
     public void registerItems() {

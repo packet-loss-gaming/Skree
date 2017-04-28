@@ -7,18 +7,36 @@
 package com.skelril.nitro.registry.dynamic.item.ability;
 
 import com.google.gson.*;
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.MeleeAttackGroup;
+import com.skelril.nitro.registry.dynamic.item.ability.grouptype.MeleeAttackCluster;
+import com.skelril.nitro.registry.dynamic.item.ability.grouptype.PointOfContactCluster;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AbilityGroupDeserializer implements JsonDeserializer<AbilityGroup> {
+    private static final Map<String, Class<? extends AbilityCluster>> clusterMapping = new HashMap<>();
+
+    static {
+        clusterMapping.put("melee_attacks", MeleeAttackCluster.class);
+        clusterMapping.put("point_of_contact", PointOfContactCluster.class);
+    }
+
     @Override
     public AbilityGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject object = json.getAsJsonObject();
-        if (object.has("melee_attacks")) {
-            return context.deserialize(json, MeleeAttackGroup.class);
-        }
+        AbilityCooldownProfile profile = context.deserialize(object.get("cool_down"), AbilityCooldownProfile.class);
 
-        return null;
+        AbilityGroup group = new AbilityGroup(profile);
+
+        clusterMapping.forEach((key, clazz) -> {
+            if (!object.has(key)) {
+                return;
+            }
+
+            group.getClusters().add(context.deserialize(object, clazz));
+        });
+
+        return group;
     }
 }
