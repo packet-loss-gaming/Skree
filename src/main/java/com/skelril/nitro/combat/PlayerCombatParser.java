@@ -31,7 +31,7 @@ public interface PlayerCombatParser extends CombatParser {
         if (optDamageSource.isPresent()) {
             Entity srcEntity = null;
             Entity indirectSrcEntity = null;
-            if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+            if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
                 srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
                 indirectSrcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getSource();
             } else if (optDamageSource.get() instanceof EntityDamageSource) {
