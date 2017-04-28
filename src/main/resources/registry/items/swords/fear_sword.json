@@ -7,5 +7,33 @@
   },
   "enchantability": 10,
   "hit_power": 9,
-  "attack_speed": %SWORD_SPEED%
+  "attack_speed": %SWORD_SPEED%,
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "fear",
+        "seconds": 3.8
+      },
+      "melee_attacks": [
+        {
+          "id": "confuse"
+        },
+        {
+          "id": "curse"
+        },
+        {
+          "id": "decimate"
+        },
+        {
+          "id": "fear_blaze"
+        },
+        {
+          "id": "soul_smite"
+        },
+        {
+          "id": "weaken"
+        }
+      ]
+    }
+  ]
 }

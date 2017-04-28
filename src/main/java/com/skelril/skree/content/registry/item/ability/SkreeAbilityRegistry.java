@@ -18,11 +18,17 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
 
     public SkreeAbilityRegistry() {
         registerAbility("agility", Agility.class);
+        registerAbility("confuse", Confuse.class);
+        registerAbility("curse", Curse.class);
+        registerAbility("decimate", Decimate.class);
         registerAbility("doom_blade", DoomBlade.class);
         registerAbility("evil_focus", EvilFocus.class);
+        registerAbility("fear_blaze", FearBlaze.class);
         registerAbility("healing_light", HealingLight.class);
         registerAbility("life_leech", LifeLeech.class);
         registerAbility("regen", Regen.class);
+        registerAbility("soul_smite", SoulSmite.class);
+        registerAbility("weaken", Weaken.class);
     }
 
     @Override
