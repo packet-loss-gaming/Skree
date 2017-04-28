@@ -4,5 +4,5 @@
   "repair_item_stack": null,
   "enchantability": 15,
   "hit_power": 100000000,
-  "attack_speed": 1.6
+  "attack_speed": -2.4
 }
