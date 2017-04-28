@@ -10,10 +10,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public interface Loader<ConfigType> {
     default GsonBuilder getGsonBuilder() {
@@ -22,11 +19,9 @@ public interface Loader<ConfigType> {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
     }
 
-    default void load(Path config) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(config)) {
-            Gson gson = getGsonBuilder().create();
-            load(gson.fromJson(reader, getConfigClass()));
-        }
+    default void load(String configContent) throws IOException {
+        Gson gson = getGsonBuilder().create();
+        load(gson.fromJson(configContent, getConfigClass()));
     }
 
     void load(ConfigType configObject);

@@ -6,6 +6,8 @@
 
 package com.skelril.nitro.registry.dynamic;
 
+import com.google.common.base.Joiner;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +16,25 @@ import java.util.Map;
 
 public class LoaderRegistry {
     private Map<Loader, Path> loaders = new HashMap<>();
+    private Map<String, String> constants = new HashMap<>();
 
     public void registerLoader(Loader loader, Path path) {
         loaders.put(loader, path);
+    }
+
+    public void registerConstant(String constantName, String value) {
+        constants.putIfAbsent(constantName, value);
+    }
+
+    private String replaceConstants(String fileContent) {
+        for (Map.Entry<String, String> entry : constants.entrySet()) {
+            String constant = entry.getKey();
+            String value = entry.getValue();
+
+            fileContent = fileContent.replace("%" + constant +  "%", value);
+        }
+
+        return fileContent;
     }
 
     public void loadAll() {
@@ -26,7 +44,8 @@ public class LoaderRegistry {
                     String filename = subPath.getFileName().toString();
                     if (filename.endsWith(".json")) {
                         try {
-                            loader.load(subPath);
+                            String fileContent = Joiner.on('\n').join(Files.readAllLines(subPath));
+                            loader.load(replaceConstants(fileContent));
                         } catch (Exception e) {
                             System.err.println("Error loading: " + filename);
                             e.printStackTrace();
