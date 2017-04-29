@@ -25,9 +25,13 @@ public abstract class ItemLoader<ResultType extends Item, ConfigType extends Ite
     @Override
     public GsonBuilder getGsonBuilder() {
         GsonBuilder parentBuilder = Loader.super.getGsonBuilder();
+
+        AbilityDeserializer abilityDeserializer = new AbilityDeserializer(abilityRegistry);
+
         return parentBuilder
-                .registerTypeAdapter(Ability.class, new AbilityDeserializer(abilityRegistry))
-                .registerTypeAdapter(SpecialAttack.class, new AbilityDeserializer(abilityRegistry))
+                .registerTypeAdapter(Ability.class, abilityDeserializer)
+                .registerTypeAdapter(SpecialAttack.class, abilityDeserializer)
+                .registerTypeAdapter(PointOfContact.class, abilityDeserializer)
                 .registerTypeAdapter(AbilityGroup.class, new AbilityGroupDeserializer());
     }
 
