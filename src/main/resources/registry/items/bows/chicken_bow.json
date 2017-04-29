@@ -1,0 +1,19 @@
+{
+  "id": "chicken_bow",
+  "max_uses": 384,
+  "enchantability": 1,
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "animal_bow",
+        "seconds": 15
+      },
+      "point_of_contact": [
+        {
+          "id": "creature_impact",
+          "creature": "minecraft:chicken"
+        }
+      ]
+    }
+  ]
+}
