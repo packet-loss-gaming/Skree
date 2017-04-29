@@ -13,7 +13,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -21,28 +20,24 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.Optional;
 
 public class MeleeAttackClusterListener implements ClusterListener {
-    private MeleeAttackCluster attackGroup;
+    private MeleeAttackCluster attackCluster;
     private String itemID;
     private AbilityCooldownHandler cooldownHandler;
 
-    public MeleeAttackClusterListener(MeleeAttackCluster attackGroup, String itemID, AbilityCooldownHandler cooldownHandler) {
-        this.attackGroup = attackGroup;
+    public MeleeAttackClusterListener(MeleeAttackCluster attackCluster, String itemID, AbilityCooldownHandler cooldownHandler) {
+        this.attackCluster = attackCluster;
         this.itemID = itemID;
         this.cooldownHandler = cooldownHandler;
     }
 
     public Optional<Living> getSource(Cause cause) {
-        Optional<DamageSource> optDamageSource = cause.first(DamageSource.class);
-        if (!optDamageSource.isPresent()) {
+        Optional<EntityDamageSource> optEntityDamageSource = cause.first(EntityDamageSource.class);
+        if (!optEntityDamageSource.isPresent()) {
             return Optional.empty();
         }
 
-        DamageSource damageSource = optDamageSource.get();
-        if (!(damageSource instanceof EntityDamageSource)) {
-            return Optional.empty();
-        }
-
-        Entity source = ((EntityDamageSource) damageSource).getSource();
+        EntityDamageSource damageSource = optEntityDamageSource.get();
+        Entity source = damageSource.getSource();
         if (!(source instanceof Living)) {
             return Optional.empty();
         }
@@ -82,6 +77,6 @@ public class MeleeAttackClusterListener implements ClusterListener {
             return;
         }
 
-        attackGroup.getNextAttackToRun().run(sourceEntity, (Living) targetEntity);
+        attackCluster.getNextAttackToRun().run(sourceEntity, (Living) targetEntity);
     }
 }
