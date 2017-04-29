@@ -7,13 +7,9 @@
 package com.skelril.nitro.registry.dynamic.item.ability;
 
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public interface Ability {
-    default void notify(Living living, Text message) {
-        if (living instanceof Player) {
-            ((Player) living).sendMessage(message);
-        }
-    }
+public interface PointOfContact extends Ability {
+    void run(Living owner, Location<World> target);
 }
