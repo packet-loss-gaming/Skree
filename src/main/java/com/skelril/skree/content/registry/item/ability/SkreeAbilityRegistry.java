@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.ability;
 import com.skelril.nitro.registry.dynamic.item.ability.Ability;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 import com.skelril.skree.content.registry.item.ability.combat.*;
+import com.skelril.skree.content.registry.item.ability.misc.CreatureImpact;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
     public SkreeAbilityRegistry() {
         registerAbility("agility", Agility.class);
         registerAbility("confuse", Confuse.class);
+        registerAbility("creature_impact", CreatureImpact.class);
         registerAbility("curse", Curse.class);
         registerAbility("decimate", Decimate.class);
         registerAbility("doom_blade", DoomBlade.class);
