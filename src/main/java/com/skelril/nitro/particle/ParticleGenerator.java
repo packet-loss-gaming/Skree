@@ -25,4 +25,16 @@ public class ParticleGenerator {
             ));
         }
     }
+
+    private static final ParticleEffect SMOKE = ParticleEffect.builder().type(ParticleTypes.SMOKE).quantity(1).build();
+
+    public static void smoke(Location<World> location, int intensity) {
+        for (int i = 0; i < 20 * intensity; ++i ) {
+            location.getExtent().spawnParticles(SMOKE, location.getPosition().add(
+                    Probability.getRangedRandom(-.5, .5),
+                    Probability.getRangedRandom(0.0, 1.0),
+                    Probability.getRangedRandom(-.5, .5)
+            ));
+        }
+    }
 }
