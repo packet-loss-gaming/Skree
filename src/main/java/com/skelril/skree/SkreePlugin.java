@@ -22,6 +22,7 @@ import com.skelril.skree.system.modifier.ModifierSystem;
 import com.skelril.skree.system.playerstate.PlayerStateSystem;
 import com.skelril.skree.system.projectilewatcher.ProjectileWatcherSystem;
 import com.skelril.skree.system.pvp.PvPSystem;
+import com.skelril.skree.system.random.RandomSystem;
 import com.skelril.skree.system.region.RegionSystem;
 import com.skelril.skree.system.registry.CustomRegisterySystem;
 import com.skelril.skree.system.respawn.RespawnSystem;
@@ -88,6 +89,7 @@ public class SkreePlugin {
                 PlayerStateSystem.class,
                 ProjectileWatcherSystem.class,
                 PvPSystem.class,
+                RandomSystem.class,
                 RegionSystem.class,
                 RespawnSystem.class,
                 RespawnQueueSystem.class,
