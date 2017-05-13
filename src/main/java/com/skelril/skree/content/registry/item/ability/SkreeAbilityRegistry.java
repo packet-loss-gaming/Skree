@@ -19,6 +19,7 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
 
     public SkreeAbilityRegistry() {
         registerAbility("agility", Agility.class);
+        registerAbility("coin_toss", CoinToss.class);
         registerAbility("confuse", Confuse.class);
         registerAbility("creature_impact", CreatureImpact.class);
         registerAbility("curse", Curse.class);
