@@ -12,6 +12,7 @@ import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -54,7 +55,7 @@ public class MeleeAttackClusterListener implements ClusterListener {
         return optHeldItem.isPresent() && optHeldItem.get().getItem().getId().equals(itemID);
     }
 
-    @Listener
+    @Listener(order = Order.LATE)
     public void onPlayerCombat(DamageEntityEvent event) {
         Entity targetEntity = event.getTargetEntity();
         if (!(targetEntity instanceof Living)) {
@@ -77,6 +78,6 @@ public class MeleeAttackClusterListener implements ClusterListener {
             return;
         }
 
-        attackCluster.getNextAttackToRun().run(sourceEntity, (Living) targetEntity);
+        attackCluster.getNextAttackToRun().run(sourceEntity, (Living) targetEntity, event);
     }
 }

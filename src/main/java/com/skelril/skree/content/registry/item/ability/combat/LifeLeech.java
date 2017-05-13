@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.ability.combat;
 import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -17,7 +18,7 @@ import static com.skelril.nitro.entity.EntityHealthUtil.getMaxHealth;
 
 public class LifeLeech implements SpecialAttack {
     @Override
-    public void run(Living owner, Living target) {
+    public void run(Living owner, Living target, DamageEntityEvent event) {
         final double ownerMax = getMaxHealth(owner);
         final double targetMax = getMaxHealth(target);
 

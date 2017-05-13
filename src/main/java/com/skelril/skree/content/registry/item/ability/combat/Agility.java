@@ -12,6 +12,7 @@ import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 public class Agility implements SpecialAttack {
     @Override
-    public void run(Living owner, Living target) {
+    public void run(Living owner, Living target, DamageEntityEvent event) {
         int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 18);
 
         Optional<PotionEffectData> optOwnerPotionEffectData = owner.getOrCreate(PotionEffectData.class);

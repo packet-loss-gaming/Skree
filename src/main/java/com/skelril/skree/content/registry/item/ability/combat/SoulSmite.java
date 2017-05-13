@@ -10,6 +10,7 @@ import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -19,7 +20,7 @@ import static com.skelril.nitro.entity.EntityHealthUtil.getMaxHealth;
 
 public class SoulSmite implements SpecialAttack {
     @Override
-    public void run(Living owner, Living target) {
+    public void run(Living owner, Living target, DamageEntityEvent event) {
         final double targetMax = getMaxHealth(target);
         final double targetHP = getHealth(target) / targetMax;
 

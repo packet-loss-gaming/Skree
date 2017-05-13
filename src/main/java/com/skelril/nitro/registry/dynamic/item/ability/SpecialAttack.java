@@ -10,9 +10,10 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 public interface SpecialAttack extends Ability {
-    void run(Living owner, Living target);
+    void run(Living owner, Living target, DamageEntityEvent event);
 
     default DamageSource damageSource(Living owner) {
         return EntityDamageSource.builder().entity(owner).type(DamageTypes.ATTACK).build();

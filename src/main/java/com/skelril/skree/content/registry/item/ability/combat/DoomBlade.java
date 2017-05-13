@@ -13,6 +13,7 @@ import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -33,7 +34,7 @@ public class DoomBlade implements SpecialAttack {
     }
 
     @Override
-    public void run(Living owner, Living target) {
+    public void run(Living owner, Living target, DamageEntityEvent event) {
         notify(owner, Text.of(TextColors.YELLOW, "Your weapon releases a huge burst of energy."));
 
         double dmgTotal = 0;
