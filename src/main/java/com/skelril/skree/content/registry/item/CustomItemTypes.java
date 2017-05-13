@@ -27,7 +27,6 @@ import com.skelril.skree.content.registry.item.tool.shovel.JurackShovel;
 import com.skelril.skree.content.registry.item.tool.terragu.*;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
 import com.skelril.skree.content.registry.item.weapon.bow.NetherBow;
-import com.skelril.skree.content.registry.item.weapon.sword.TwoTailedSword;
 import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
@@ -87,8 +86,6 @@ public class CustomItemTypes {
 
     /* Weapons */
     public static final NetherBow NETHER_BOW = new NetherBow();
-
-    public static final TwoTailedSword TWO_TAILED_SWORD = new TwoTailedSword();
 
     /* Combat Items */
     public static final RedFeather RED_FEATHER = new RedFeather();

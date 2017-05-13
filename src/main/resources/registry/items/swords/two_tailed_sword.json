@@ -1,0 +1,18 @@
+{
+  "id": "two_tailed_sword",
+  "max_uses": 7,
+  "repair_item_stack": null,
+  "enchantability": 0,
+  "hit_power": 0,
+  "attack_speed": %SWORD_SPEED%,
+  "ability_groups": [
+    {
+      "cool_down": null,
+      "melee_attacks": [
+        {
+          "id": "coin_toss"
+        }
+      ]
+    }
+  ]
+}
