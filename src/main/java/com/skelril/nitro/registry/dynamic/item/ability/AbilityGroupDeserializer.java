@@ -26,10 +26,12 @@ public class AbilityGroupDeserializer implements JsonDeserializer<AbilityGroup> 
     public AbilityGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject object = json.getAsJsonObject();
 
-        AbilityCooldownProfile profile;
+        AbilityCooldownProfile profile = null;
         if (object.has("cool_down")) {
             profile = context.deserialize(object.get("cool_down"), AbilityCooldownProfile.class);
-        } else {
+        }
+
+        if (profile == null) {
             profile = new AbilityCooldownProfile();
         }
 
