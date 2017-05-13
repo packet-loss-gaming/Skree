@@ -1,0 +1,9 @@
+{
+  "id": "nether_bow",
+  "max_uses": 1536,
+  "repair_item_stack": {
+    "id": "minecraft:nether_star",
+    "data": 0
+  },
+  "enchantability": 1
+}

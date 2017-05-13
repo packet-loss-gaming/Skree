@@ -177,7 +177,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                         new DropTableEntryImpl(
                                                 new SimpleDropResolver(
                                                         Lists.newArrayList(
-                                                                newItemStack((ItemType) NETHER_BOW)
+                                                                newItemStack("skree:nether_bow")
                                                         )
                                                 ), 10000
                                         ),

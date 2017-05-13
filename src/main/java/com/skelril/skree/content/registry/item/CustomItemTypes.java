@@ -26,7 +26,6 @@ import com.skelril.skree.content.registry.item.tool.shovel.CrystalShovel;
 import com.skelril.skree.content.registry.item.tool.shovel.JurackShovel;
 import com.skelril.skree.content.registry.item.tool.terragu.*;
 import com.skelril.skree.content.registry.item.weapon.RedFeather;
-import com.skelril.skree.content.registry.item.weapon.bow.NetherBow;
 import com.skelril.skree.content.registry.item.zone.ZoneMasterOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
@@ -83,9 +82,6 @@ public class CustomItemTypes {
     public static final WraithChestplate WRAITH_CHESTPLATE = new WraithChestplate();
     public static final WraithLeggings WRAITH_LEGGINGS = new WraithLeggings();
     public static final WraithBoots WRAITH_BOOTS = new WraithBoots();
-
-    /* Weapons */
-    public static final NetherBow NETHER_BOW = new NetherBow();
 
     /* Combat Items */
     public static final RedFeather RED_FEATHER = new RedFeather();
