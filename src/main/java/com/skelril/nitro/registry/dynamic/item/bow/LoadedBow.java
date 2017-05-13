@@ -64,4 +64,12 @@ class LoadedBow extends ItemBow {
             }
         });
     }
+
+    // NMS Overrides
+
+    @Override
+    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+        ItemStack mat = config.getRepairItemStack();
+        return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
+    }
 }
