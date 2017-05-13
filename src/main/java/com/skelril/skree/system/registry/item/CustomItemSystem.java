@@ -10,6 +10,7 @@ import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.dynamic.LoaderRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.bow.BowLoader;
+import com.skelril.nitro.registry.dynamic.item.food.FoodLoader;
 import com.skelril.nitro.registry.dynamic.item.simple.SimpleLoader;
 import com.skelril.nitro.registry.dynamic.item.sword.SwordLoader;
 import com.skelril.nitro.registry.item.CookedItem;
@@ -49,6 +50,7 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
             dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
             dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));
             dynamicItemRegistry.registerLoader(new BowLoader(gameIntegrator, abilityRegistry), getResource.apply("bows"));
+            dynamicItemRegistry.registerLoader(new FoodLoader(gameIntegrator, abilityRegistry), getResource.apply("food"));
             dynamicItemRegistry.loadAll();
         });
     }

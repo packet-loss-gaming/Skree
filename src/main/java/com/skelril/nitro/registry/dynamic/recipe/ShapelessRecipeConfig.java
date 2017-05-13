@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.util.List;
 
 public class ShapelessRecipeConfig extends CraftingRecipeConfig {
-    List<ItemStackConfig> requiredItemStacks;
+    private List<ItemStackConfig> requiredItemStacks;
 
     public void registerRecipie() {
         GameRegistry.addShapelessRecipe(

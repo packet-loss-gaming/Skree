@@ -7,8 +7,6 @@
 package com.skelril.skree.content.registry.item;
 
 import com.skelril.skree.content.registry.item.armor.*;
-import com.skelril.skree.content.registry.item.consumable.CookedGodFish;
-import com.skelril.skree.content.registry.item.consumable.RawGodFish;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.BrokenGlass;
@@ -55,10 +53,6 @@ public class CustomItemTypes {
     public static final CondensedCofferItem REDISTRAL = new CondensedCofferItem("redistral", EQESTA);
     public static final CondensedCofferItem RETESRUM = new CondensedCofferItem("retesrum", REDISTRAL);
     public static final CondensedCofferItem MESARDITH = new CondensedCofferItem("mesardith", RETESRUM);
-
-    /* Food */
-    public static final RawGodFish RAW_GOD_FISH = new RawGodFish();
-    public static final CookedGodFish COOKED_GOD_FISH = new CookedGodFish();
 
     /* Armors */
     public static final JurackHelmet JURACK_HELMET = new JurackHelmet();

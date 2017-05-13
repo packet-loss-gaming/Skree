@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ShapedRecipeConfig extends CraftingRecipeConfig {
-    List<String> craftingRows;
-    Map<Character, ItemStackConfig> mappedItemStacks;
+    private List<String> craftingRows;
+    private Map<Character, ItemStackConfig> mappedItemStacks;
 
     public void registerRecipie() {
         List<Object> argList = new ArrayList<>();

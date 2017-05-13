@@ -30,7 +30,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.PHANTOM_CLOCK;
+import static com.skelril.skree.content.registry.item.CustomItemTypes.SCROLL_OF_SUMMATION;
 
 public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>> {
     private static final DropTable dropTable;
@@ -124,7 +125,7 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
                         new DropTableEntryImpl(
                                 new SimpleDropResolver(
                                         Lists.newArrayList(
-                                                newItemStack(COOKED_GOD_FISH)
+                                                newItemStack("skree:cooked_god_fish")
                                         )
                                 ), 500
                         )

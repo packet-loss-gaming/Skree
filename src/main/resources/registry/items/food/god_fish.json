@@ -1,0 +1,7 @@
+{
+  "id": "god_fish",
+  "max_stack_size": 16,
+  "hunger_restored": 5,
+  "saturation_modifier": 0.5,
+  "probability_of_food_poisoning": 0
+}

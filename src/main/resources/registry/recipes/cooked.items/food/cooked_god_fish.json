@@ -1,0 +1,11 @@
+{
+  "crafted_item": {
+    "id": "skree:cooked_god_fish",
+    "data": 0
+  },
+  "raw_item": {
+    "id": "skree:god_fish",
+    "data": 0
+  },
+  "xp": 0.45
+}

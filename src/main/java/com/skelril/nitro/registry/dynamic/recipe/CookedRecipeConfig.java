@@ -7,7 +7,13 @@
 package com.skelril.nitro.registry.dynamic.recipe;
 
 import com.skelril.nitro.registry.dynamic.ItemStackConfig;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CraftingRecipeConfig {
-    protected ItemStackConfig craftedItem;
+public class CookedRecipeConfig extends CraftingRecipeConfig {
+    private ItemStackConfig rawItem;
+    private float xp;
+
+    public void registerRecipie() {
+        GameRegistry.addSmelting(rawItem.toNSMStack(), craftedItem.toNSMStack(), xp);
+    }
 }

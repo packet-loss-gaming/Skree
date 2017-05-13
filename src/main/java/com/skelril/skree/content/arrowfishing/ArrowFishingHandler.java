@@ -26,7 +26,6 @@ import org.spongepowered.api.entity.projectile.arrow.Arrow;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -35,7 +34,6 @@ import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;
-import static com.skelril.skree.content.registry.item.CustomItemTypes.RAW_GOD_FISH;
 
 public class ArrowFishingHandler {
     private DropTable dropTable;
@@ -56,7 +54,7 @@ public class ArrowFishingHandler {
                         new DropTableEntryImpl(
                                 new SimpleDropResolver(
                                         Lists.newArrayList(
-                                                newItemStack((ItemType) RAW_GOD_FISH)
+                                                newItemStack("skree:god_fish")
                                         )
                                 ),
                                 500
