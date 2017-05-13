@@ -17,6 +17,10 @@ public class AbilityCooldownManager {
     private Map<UUID, Map<String, Long>> coolDownLookup = new HashMap<>();
 
     public void usedAbility(Player player, AbilityCooldownProfile abilityCooldown) {
+        if (!abilityCooldown.isEnforced()) {
+            return;
+        }
+
         coolDownLookup.putIfAbsent(player.getUniqueId(), new HashMap<>());
         long currentTime = System.currentTimeMillis();
         long delay = Math.round(TimeUnit.SECONDS.toMillis(1) * (abilityCooldown.getSeconds()));
@@ -25,6 +29,10 @@ public class AbilityCooldownManager {
     }
 
     public boolean canUseAbility(Player player, AbilityCooldownProfile abilityCooldownProfile) {
+        if (!abilityCooldownProfile.isEnforced()) {
+            return true;
+        }
+
         Map<String, Long> personalCoolDownMapping = coolDownLookup.getOrDefault(player.getUniqueId(), new HashMap<>());
         long coolDownExpireTime = personalCoolDownMapping.getOrDefault(abilityCooldownProfile.getPool(), 0L);
         return coolDownExpireTime < System.currentTimeMillis();

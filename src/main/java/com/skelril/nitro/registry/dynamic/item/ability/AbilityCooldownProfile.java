@@ -17,4 +17,8 @@ public class AbilityCooldownProfile {
     public double getSeconds() {
         return seconds;
     }
+
+    public boolean isEnforced() {
+        return seconds > 0;
+    }
 }
