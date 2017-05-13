@@ -35,7 +35,7 @@ class LoadedSword extends ItemSword {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        ItemStack mat = config.getRepairItemStack().toNSMStack();
+        ItemStack mat = config.getRepairItemStack();
         return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
     }
 
