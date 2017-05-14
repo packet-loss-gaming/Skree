@@ -249,6 +249,10 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         flagState[flag.index] = enabled;
     }
 
+    public boolean isSuddenDeath() {
+        return !isFlagEnabled(JungleRaidFlag.NO_TIME_LIMIT) && System.currentTimeMillis() - getStartTime() >= TimeUnit.MINUTES.toMillis(15);
+    }
+
     public boolean isFlagEnabled(JungleRaidFlag flag) {
         return flagState[flag.index];
     }

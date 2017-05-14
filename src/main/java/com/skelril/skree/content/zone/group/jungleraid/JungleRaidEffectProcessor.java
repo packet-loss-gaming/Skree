@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
@@ -51,9 +50,22 @@ public class JungleRaidEffectProcessor {
     private static final Random random = new Random();
 
     public static void run(JungleRaidInstance inst) {
+        globalPotionEffects(inst);
         titanMode(inst);
         distributor(inst);
         randomRockets(inst);
+    }
+
+    private static void globalPotionEffects(JungleRaidInstance inst) {
+        boolean isSuddenDeath = inst.isSuddenDeath();
+
+        for (Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
+            if (isSuddenDeath) {
+                List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
+                potionEffects.add(PotionEffect.of(PotionEffectTypes.GLOWING, 1, 20 * 20));
+                player.offer(Keys.POTION_EFFECTS, potionEffects);
+            }
+        }
     }
 
     private static void titanMode(JungleRaidInstance inst) {
@@ -81,7 +93,7 @@ public class JungleRaidEffectProcessor {
 
     private static void distributor(JungleRaidInstance inst) {
         FlagEffectData data = inst.getFlagData();
-        boolean isSuddenDeath = !inst.isFlagEnabled(JungleRaidFlag.NO_TIME_LIMIT) && System.currentTimeMillis() - inst.getStartTime() >= TimeUnit.MINUTES.toMillis(15);
+        boolean isSuddenDeath = inst.isSuddenDeath();
         if (isSuddenDeath) {
             data.amt = 100;
         }
