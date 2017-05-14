@@ -401,6 +401,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         List<ItemStack> gear = new ArrayList<>();
         switch (jrClass) {
             case MELEE:
+            {
                 ItemStack enchantedSword = newItemStack(ItemTypes.IRON_SWORD);
                 enchantedSword.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.FIRE_ASPECT, 2),
@@ -408,8 +409,13 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 ));
 
                 gear.add(enchantedSword);
+
+                ItemStack shield = newItemStack(ItemTypes.SHIELD);
+                gear.add(shield);
                 break;
+            }
             case LUMBERJACK:
+            {
                 ItemStack enchantedAxe = newItemStack(ItemTypes.DIAMOND_AXE);
                 enchantedAxe.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.SHARPNESS, 3),
@@ -418,7 +424,9 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
                 gear.add(enchantedAxe);
                 break;
+            }
             case ARCHER:
+            {
                 ItemStack dmgBow = newItemStack(ItemTypes.BOW);
                 dmgBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.PUNCH, 2)
@@ -433,7 +441,9 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
                 gear.add(fireBow);
                 break;
+            }
             case SNIPER:
+            {
                 ItemStack superBow = newItemStack(ItemTypes.BOW);
                 superBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
                         new ItemEnchantment(Enchantments.POWER, 5),
@@ -447,20 +457,28 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
                 ItemStack woodSword = newItemStack(ItemTypes.WOODEN_SWORD);
                 gear.add(woodSword);
                 break;
+            }
             case ENGINEER:
+            {
                 ItemStack ironSword = newItemStack(ItemTypes.IRON_SWORD);
                 gear.add(ironSword);
 
                 ItemStack diamondPickaxe = newItemStack(ItemTypes.DIAMOND_PICKAXE);
                 gear.add(diamondPickaxe);
+
+                ItemStack shield = newItemStack(ItemTypes.SHIELD);
+                gear.add(shield);
                 break;
+            }
             case BALANCED:
+            {
                 ItemStack standardSword = newItemStack(ItemTypes.IRON_SWORD);
                 gear.add(standardSword);
 
                 ItemStack standardBow = newItemStack(ItemTypes.BOW);
                 gear.add(standardBow);
                 break;
+            }
         }
 
         int tntAmt = jrClass.getTNTAmount();
