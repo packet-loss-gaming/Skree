@@ -415,7 +415,7 @@ public class ShnugglesPrimeInstance extends LegacyZoneBase implements Zone, Runn
                                 
                                 getRegion().getExtent().triggerExplosion(
                                         explosion,
-                                        Cause.source(boss).build()
+                                        Cause.source(SkreePlugin.container()).owner(boss).build()
                                 );
                             });
                             //Schedule Reset

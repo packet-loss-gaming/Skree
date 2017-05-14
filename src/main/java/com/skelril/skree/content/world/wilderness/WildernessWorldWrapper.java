@@ -539,7 +539,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                                 .shouldBreakBlocks(true)
                                 .radius(4F)
                                 .build(),
-                        Cause.source(SkreePlugin.inst()).build()
+                        Cause.source(SkreePlugin.container()).build()
                 );
             }
         }

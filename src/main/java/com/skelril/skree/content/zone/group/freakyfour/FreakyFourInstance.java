@@ -457,7 +457,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                                     .canCauseFire(false)
                                     .shouldDamageEntities(true)
                                     .build(),
-                            Cause.source(SkreePlugin.inst()).build()
+                            Cause.source(SkreePlugin.container()).build()
                     );
                 }
             }
