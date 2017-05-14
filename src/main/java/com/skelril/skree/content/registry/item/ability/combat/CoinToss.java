@@ -27,7 +27,9 @@ public class CoinToss implements SpecialAttack {
         attacker.offer(Keys.HEALTH, getHealth(attacker) - 1);
     }
 
-    public void processAttackOnPlayer(Living attacker, Player defender) {
+    public void processAttackOnPlayer(Living attacker, Player defender, DamageEntityEvent event) {
+        event.setBaseDamage(0);
+
         Living target = defender;
         if (Probability.getChance(2)) {
             target = attacker;
@@ -40,7 +42,7 @@ public class CoinToss implements SpecialAttack {
     @Override
     public void run(Living owner, Living target, DamageEntityEvent event) {
         if (target instanceof Player) {
-            processAttackOnPlayer(owner, (Player) target);
+            processAttackOnPlayer(owner, (Player) target, event);
         } else {
             processAttackOnEntity(owner, event);
         }
