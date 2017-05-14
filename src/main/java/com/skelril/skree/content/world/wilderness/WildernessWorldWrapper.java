@@ -96,9 +96,9 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.Extent;
 
@@ -474,7 +474,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (entity instanceof Monster) {
             DropTable dropTable;
 
-            if (entity.getLocation().getExtent().getBiome(loc.getBlockPosition()) == BiomeTypes.HELL || entity instanceof Wither) {
+            if (entity.getLocation().getExtent().getDimension() == DimensionTypes.NETHER || entity instanceof Wither) {
                 dropTable = netherMobDropTable;
             } else {
                 dropTable = commonDropTable;
