@@ -35,7 +35,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
-public class StormBringer implements WanderingBoss<Skeleton> {
+public class StormBringer extends SkeletonArcherWanderer {
     private final BossManager<Skeleton, WildernessBossDetail> bossManager = new BossManager<>();
 
     public StormBringer() {

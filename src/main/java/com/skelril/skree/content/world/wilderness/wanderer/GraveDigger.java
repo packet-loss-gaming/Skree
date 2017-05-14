@@ -38,7 +38,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
-public class GraveDigger implements WanderingBoss<Skeleton> {
+public class GraveDigger extends SkeletonArcherWanderer {
     private final BossManager<Skeleton, WildernessBossDetail> bossManager = new BossManager<>();
 
     public GraveDigger() {

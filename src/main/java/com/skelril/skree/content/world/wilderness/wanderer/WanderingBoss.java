@@ -9,9 +9,15 @@ package com.skelril.skree.content.world.wilderness.wanderer;
 import com.skelril.skree.content.world.wilderness.WildernessBossDetail;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 public interface WanderingBoss<T extends Entity> {
     EntityType getEntityType();
+
+    default Entity createEntity(Location<World> location) {
+        return location.getExtent().createEntity(getEntityType(), location.getPosition());
+    }
 
     default int getSpawnChance() {
         return 100;

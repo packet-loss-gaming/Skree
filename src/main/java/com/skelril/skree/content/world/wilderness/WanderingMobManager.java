@@ -63,7 +63,7 @@ public class WanderingMobManager {
             return false;
         }
 
-        Entity entity = location.getExtent().createEntity(wanderer.getEntityType(), location.getPosition());
+        Entity entity = wanderer.createEntity(location);
         boolean spawned = location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
         if (!spawned) {
             return false;
