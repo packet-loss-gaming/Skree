@@ -85,6 +85,7 @@ public class Fangz implements WanderingBoss<Spider> {
                     PotionEffectData potionEffects = optPotionEffects.get();
                     potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, 20 * 30));
                     potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 2, 20 * 30));
+                    aEntity.offer(potionEffects);
                 }
             }
             return Optional.empty();
@@ -111,6 +112,7 @@ public class Fangz implements WanderingBoss<Spider> {
                 PotionEffectData potionEffects = optPotionEffects.get();
                 potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 1, 20 * 15));
                 potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 1, 20 * 15));
+                toHit.offer(potionEffects);
             }
             return Optional.empty();
         });
