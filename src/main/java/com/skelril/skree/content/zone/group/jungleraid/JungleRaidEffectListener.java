@@ -243,7 +243,7 @@ public class JungleRaidEffectListener {
         if (stack != null && stack.getItem() == ItemTypes.COMPASS) {
             event.setUseBlockResult(Tristate.FALSE);
 
-            if (inst.getState() == JungleRaidState.IN_PROGRESS) {
+            if (inst.getState() == JungleRaidState.IN_PROGRESS && inst.isFlagEnabled(JungleRaidFlag.ENHANCED_COMPASS)) {
                 Set<Text> resultSet = new HashSet<>();
                 for (Player aPlayer : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
 

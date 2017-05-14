@@ -21,7 +21,8 @@ public enum JungleRaidFlag {
     NO_MINING(11),
     NO_BLOCK_BREAK(12),
     NO_TIME_LIMIT(13),
-    DEATH_ROCKETS(14, true);
+    ENHANCED_COMPASS(14, true),
+    DEATH_ROCKETS(15, true);
 
 
     public final int index;
