@@ -31,6 +31,9 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.droptable.CofferResolver;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
+import com.skelril.skree.content.world.wilderness.wanderer.Fangz;
+import com.skelril.skree.content.world.wilderness.wanderer.GraveDigger;
+import com.skelril.skree.content.world.wilderness.wanderer.StormBringer;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
@@ -55,10 +58,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.monster.Boss;
-import org.spongepowered.api.entity.living.monster.Creeper;
-import org.spongepowered.api.entity.living.monster.Monster;
-import org.spongepowered.api.entity.living.monster.Wither;
+import org.spongepowered.api.entity.living.monster.*;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Egg;
@@ -202,6 +202,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         tf(world).setAllowedSpawnTypes(true, true);
     }
 
+    private Fangz fangz = new Fangz();
+    private GraveDigger graveDigger = new GraveDigger();
+    private StormBringer stormBringer = new StormBringer();
+
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
@@ -246,6 +250,19 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                         healthData.set(Keys.HEALTH, newMax);
 
                         entity.offer(healthData);
+                    }
+
+                    // Wandering Bosses
+                    if (entity instanceof Spider) {
+                        if (Probability.getChance(100)) {
+                            fangz.bind((Spider) entity, new WildernessBossDetail(level));
+                        }
+                    } else if (entity instanceof Skeleton) {
+                        if (Probability.getChance(100)) {
+                            stormBringer.bind((Skeleton) entity, new WildernessBossDetail(level));
+                        } else if (Probability.getChance(100)) {
+                            graveDigger.bind((Skeleton) entity, new WildernessBossDetail(level));
+                        }
                     }
                 }
             }
