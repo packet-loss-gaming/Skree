@@ -34,6 +34,7 @@ import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.content.world.wilderness.wanderer.Fangz;
 import com.skelril.skree.content.world.wilderness.wanderer.GraveDigger;
 import com.skelril.skree.content.world.wilderness.wanderer.StormBringer;
+import com.skelril.skree.content.world.wilderness.wanderer.WanderingBoss;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
@@ -58,7 +59,10 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.monster.*;
+import org.spongepowered.api.entity.living.monster.Boss;
+import org.spongepowered.api.entity.living.monster.Creeper;
+import org.spongepowered.api.entity.living.monster.Monster;
+import org.spongepowered.api.entity.living.monster.Wither;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Egg;
@@ -116,6 +120,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private DropTable netherMobDropTable;
 
     private Map<UUID, WildernessPlayerMeta> playerMetaMap = new HashMap<>();
+
+    private WanderingMobManager wanderingMobManager;
 
     public WildernessWorldWrapper() {
         this(new ArrayList<>());
@@ -194,6 +200,21 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         );
 
         Task.builder().execute(this).interval(1, SECONDS).submit(SkreePlugin.inst());
+
+        setupWanderers();
+    }
+
+    private void setupWanderers() {
+        Map<String, WanderingBoss<? extends Entity>> wanderers = new HashMap<>();
+        wanderers.put("fangz", new Fangz());
+        wanderers.put("grave_digger", new GraveDigger());
+        wanderers.put("storm_bringer", new StormBringer());
+
+        wanderingMobManager = new WanderingMobManager(wanderers);
+    }
+
+    public WanderingMobManager getWanderingMobManager() {
+        return wanderingMobManager;
     }
 
     @Override
@@ -201,10 +222,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         super.addWorld(world);
         tf(world).setAllowedSpawnTypes(true, true);
     }
-
-    private Fangz fangz = new Fangz();
-    private GraveDigger graveDigger = new GraveDigger();
-    private StormBringer stormBringer = new StormBringer();
 
     @Listener
     public void onEntitySpawn(SpawnEntityEvent event) {
@@ -253,15 +270,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                     }
 
                     // Wandering Bosses
-                    if (entity instanceof Spider) {
-                        if (Probability.getChance(100)) {
-                            fangz.bind((Spider) entity, new WildernessBossDetail(level));
-                        }
-                    } else if (entity instanceof Skeleton) {
-                        if (Probability.getChance(100)) {
-                            stormBringer.bind((Skeleton) entity, new WildernessBossDetail(level));
-                        } else if (Probability.getChance(100)) {
-                            graveDigger.bind((Skeleton) entity, new WildernessBossDetail(level));
+                    Collection<String> wanderers = wanderingMobManager.getSupportedWanderersOfType(entity.getType());
+                    for (String wanderer: wanderers) {
+                        if (wanderingMobManager.chanceBind(wanderer, level, entity)) {
+                            break;
                         }
                     }
                 }
@@ -471,7 +483,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
             if (optDamageSource.isPresent()) {
                 Entity srcEntity;
-                if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
                     srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
                 } else {
                     srcEntity = optDamageSource.get().getSource();

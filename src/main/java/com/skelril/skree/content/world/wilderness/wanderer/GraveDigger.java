@@ -20,6 +20,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Skeleton;
@@ -37,13 +38,19 @@ import java.util.Optional;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
-public class GraveDigger {
+public class GraveDigger implements WanderingBoss<Skeleton> {
     private final BossManager<Skeleton, WildernessBossDetail> bossManager = new BossManager<>();
 
     public GraveDigger() {
         setupGraveDigger();
     }
 
+    @Override
+    public EntityType getEntityType() {
+        return EntityTypes.SKELETON;
+    }
+
+    @Override
     public void bind(Skeleton entity, WildernessBossDetail detail) {
         bossManager.bind(new Boss<>(entity, detail));
     }

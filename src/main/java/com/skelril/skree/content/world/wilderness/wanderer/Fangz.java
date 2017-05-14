@@ -23,6 +23,8 @@ import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Spider;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -33,13 +35,19 @@ import java.util.Optional;
 
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
-public class Fangz {
+public class Fangz implements WanderingBoss<Spider> {
     private final BossManager<Spider, WildernessBossDetail> bossManager = new BossManager<>();
 
     public Fangz() {
         setupFangz();
     }
 
+    @Override
+    public EntityType getEntityType() {
+        return EntityTypes.SPIDER;
+    }
+
+    @Override
     public void bind(Spider entity, WildernessBossDetail detail) {
         bossManager.bind(new Boss<>(entity, detail));
     }
