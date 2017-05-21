@@ -202,14 +202,6 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                     return;
                 }
 
-                Optional<List<Text>> optTexts = optTileEnt.get().get(Keys.SIGN_LINES);
-                if (optTexts.isPresent()) {
-                    List<Text> text = optTexts.get();
-                    text.set(2, Text.of("- Locked -"));
-                    text.set(3, Text.of("Unlocked"));
-                    optTileEnt.get().offer(Keys.SIGN_LINES, text);
-                }
-
                 locks.add(new Location<>(getRegion().getExtent(), pt));
             }
         });
@@ -275,6 +267,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
                 Optional<List<Text>> optTexts = optTileEnt.get().get(Keys.SIGN_LINES);
                 if (optTexts.isPresent()) {
                     List<Text> text = optTexts.get();
+                    text.set(1, Text.of(locks.indexOf(lock) % 2 == 0 ? "Red" : "Blue"));
                     text.set(2, Text.of("- Locked -"));
                     text.set(3, Text.of("Unlocked"));
                     optTileEnt.get().offer(Keys.SIGN_LINES, text);
