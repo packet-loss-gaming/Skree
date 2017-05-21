@@ -52,9 +52,11 @@ public class MarketLookupCommand implements CommandExecutor {
         double percentageSale = 1;
 
         if (optAlias.isPresent()) {
-            optPrice = service.getPrice(optAlias.get());
             optAlias = service.getAlias(optAlias.get());
-            optStock = service.getStock(optAlias.get());
+            if (optAlias.isPresent()) {
+                optPrice = service.getPrice(optAlias.get());
+                optStock = service.getStock(optAlias.get());
+            }
         } else {
             Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
             if (held.isPresent()) {
