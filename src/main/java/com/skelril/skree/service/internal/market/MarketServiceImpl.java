@@ -295,8 +295,10 @@ public class MarketServiceImpl implements MarketService {
             Clause<String, String> idVariant = getIDVariant(stack);
 
             DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA).set(ITEM_DATA.VALUE, price).where(
-                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+            int changed = create.update(ITEM_DATA)
+                    .set(ITEM_DATA.VALUE, price)
+                    .set(ITEM_DATA.CURRENT_VALUE, price)
+                    .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
             ).execute();
             return changed > 0;
         } catch (SQLException e) {
