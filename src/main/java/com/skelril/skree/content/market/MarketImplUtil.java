@@ -20,6 +20,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
@@ -31,6 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
@@ -162,20 +164,30 @@ public class MarketImplUtil {
 
     public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
-        List<ItemStackSnapshot> droppedItems = new ArrayList<>();
+        List<ItemStackSnapshot> itemBuffer = new ArrayList<>();
+        itemBuffer.addAll(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()));
 
-        PlayerInventory inventory = player.getInventory().query(PlayerInventory.class);
+        PlayerInventory playerInventory = player.getInventory().query(PlayerInventory.class);
+        List<Inventory> inventories = new ArrayList<>();
+        inventories.add(playerInventory.getHotbar());
+        inventories.add(playerInventory.getMain());
 
         // Loop through replacing empty space with the requested items
-        for (ItemStack stack : stacks) {
-            InventoryTransactionResult result = inventory.offer(stack);
-            droppedItems.addAll(result.getRejectedItems());
+        for (Inventory inventory : inventories) {
+            List<ItemStackSnapshot> newBuffer = new ArrayList<>();
+            for (ItemStackSnapshot snapshot : itemBuffer) {
+                ItemStack stack = snapshot.createStack();
 
-            transactions.add(new Clause<>(stack, stack.getQuantity()));
+                InventoryTransactionResult result = inventory.offer(stack);
+                newBuffer.addAll(result.getRejectedItems());
+
+                transactions.add(new Clause<>(stack, stack.getQuantity()));
+            }
+            itemBuffer = newBuffer;
         }
 
         // Drop remaining items
-        new ItemDropper(player.getLocation()).dropStackSnapshots(droppedItems, SpawnTypes.PLUGIN);
+        new ItemDropper(player.getLocation()).dropStackSnapshots(itemBuffer, SpawnTypes.PLUGIN);
 
         return new Clause<>(true, transactions);
     }
