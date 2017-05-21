@@ -21,10 +21,7 @@ import com.skelril.skree.content.world.WorldListCommand;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
-import com.skelril.skree.content.world.wilderness.SummonWandererCommand;
-import com.skelril.skree.content.world.wilderness.WildernessMetaCommand;
-import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
-import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
+import com.skelril.skree.content.world.wilderness.*;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
@@ -79,6 +76,37 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Path getWildernessConfiguration() throws IOException {
+        ConfigManager service = Sponge.getGame().getConfigManager();
+        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+        return path.resolve("wilderness.json");
+    }
+
+    private WildernessConfig loadWildernessConfiguration() {
+        // Insert ugly configuration code
+        try {
+            Path targetFile = getWildernessConfiguration();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            if (!Files.exists(targetFile)) {
+                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
+                    try {
+                        Files.copy(getResource.apply("wilderness.json"), targetFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+                return gson.fromJson(reader, WildernessConfig.class);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @NModuleTrigger(trigger = "SERVER_STARTED")
@@ -154,7 +182,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
                 new MainWorldWrapper(),
                 new BuildWorldWrapper(),
                 new InstanceWorldWrapper(),
-                new WildernessWorldWrapper()
+                new WildernessWorldWrapper(loadWildernessConfiguration())
         );
 
         for (WorldEffectWrapper wrapper : wrappers) {

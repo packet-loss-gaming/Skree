@@ -1,0 +1,85 @@
+{
+  "multipliedBlocks": {
+    "minecraft:redstone_ore": {
+      "normal": {
+        "id": "skree:red_shard"
+      },
+      "silkTouch": {
+        "id": "minecraft:redstone_ore"
+      }
+    },
+    "minecraft:lit_redstone_ore": {
+      "normal": {
+        "id": "skree:red_shard"
+      },
+      "silkTouch": {
+        "id": "minecraft:redstone_ore"
+      }
+    },
+    "minecraft:iron_ore": {
+      "allowsFortuneMultiplication": false,
+      "normal": {
+        "id": "minecraft:iron_ore"
+      }
+    },
+    "minecraft:gold_ore": {
+      "allowsFortuneMultiplication": false,
+      "normal": {
+        "id": "minecraft:gold_ore"
+      }
+    },
+    "minecraft:coal_ore": {
+      "normal": {
+        "id": "minecraft:coal"
+      },
+      "silkTouch": {
+        "id": "minecraft:coal_ore"
+      }
+    },
+    "minecraft:lapis_ore": {
+      "normal": {
+        "id": "minecraft:dye",
+        "data": 4,
+        "quantity": {
+          "min": 4,
+          "max": 8
+        }
+      },
+      "silkTouch": {
+        "id": "minecraft:lapis_ore"
+      }
+    },
+    "minecraft:diamond_ore": {
+      "normal": {
+        "id": "minecraft:diamond"
+      },
+      "silkTouch": {
+        "id": "minecraft:diamond_ore"
+      }
+    },
+    "minecraft:emerald_ore": {
+      "normal": {
+        "id": "minecraft:emerald"
+      },
+      "silkTouch": {
+        "id": "minecraft:emerald_ore"
+      }
+    },
+    "minecraft:quartz_ore": {
+      "normal": {
+        "id": "minecraft:quartz"
+      },
+      "silkTouch": {
+        "id": "minecraft:quartz_ore"
+      }
+    },
+    "skree:jurack_ore": {
+      "normal": {
+        "id": "skree:jurack"
+      },
+      "silkTouch": {
+        "id": "skree:jurack_ore"
+      }
+    }
+  }
+}

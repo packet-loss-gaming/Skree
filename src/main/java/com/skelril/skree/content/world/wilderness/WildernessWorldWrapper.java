@@ -21,8 +21,6 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.block.DropRegistry;
-import com.skelril.nitro.registry.block.MultiTypeRegistry;
 import com.skelril.nitro.text.CombinedText;
 import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.nitro.time.IntegratedRunnable;
@@ -115,6 +113,7 @@ import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
+    private WildernessConfig config;
 
     private DropTable commonDropTable;
     private DropTable netherMobDropTable;
@@ -123,12 +122,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
     private WanderingMobManager wanderingMobManager;
 
-    public WildernessWorldWrapper() {
-        this(new ArrayList<>());
+    public WildernessWorldWrapper(WildernessConfig config) {
+        this(config, new ArrayList<>());
     }
 
-    public WildernessWorldWrapper(Collection<World> worlds) {
+    public WildernessWorldWrapper(WildernessConfig config, Collection<World> worlds) {
         super("Wilderness", worlds);
+        this.config = config;
 
         SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
         commonDropTable = new MasterDropTable(
@@ -575,7 +575,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             BlockState state = original.getState();
             BlockType type = state.getType();
-            if (ore().contains(type)) {
+            System.out.println("Key: " + type.getId());
+            config.getMultipliedBlocks().keySet().forEach((key) -> {
+                System.out.println("Valid key: " + key);
+            });
+            if (config.getMultipliedBlocks().containsKey(type.getId())) {
+                System.out.println("Entering block");
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
@@ -805,10 +810,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
-        if (!hasSilkTouch && MultiTypeRegistry.isRedstoneOre(blockType)) {
-            return Lists.newArrayList(newItemStack("skree:red_shard"));
-        }
-        return DropRegistry.createDropsFor(blockType, hasSilkTouch);
+        return Lists.newArrayList(config.getMultipliedBlocks().get(blockType.getId()).getApplicableResult(hasSilkTouch));
     }
 
     private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
@@ -818,7 +820,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         int level = optLevel.get();
 
         Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
-        if (DropRegistry.dropsSelf(blockType)) {
+        if (!config.getMultipliedBlocks().get(blockType.getId()).allowsFortuneMultiplication()) {
             fortune = 0;
         }
 

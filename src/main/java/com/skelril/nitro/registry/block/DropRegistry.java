@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
+@Deprecated
 public class DropRegistry {
     public static boolean dropsSelf(BlockType type) {
         return type.equals(BlockTypes.IRON_ORE) || type.equals(BlockTypes.GOLD_ORE);
