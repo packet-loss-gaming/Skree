@@ -375,7 +375,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     private void moveToRoom(Player player, ZoneBoundingBox room) {
         Vector3d target = room.getCenter();
-        target = new Vector3d(target.getX(), 1, target.getZ());
+        target = new Vector3d(target.getX(), 2, target.getZ());
         player.setLocation(new Location<>(getRegion().getExtent(), target));
     }
 
