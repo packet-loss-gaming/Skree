@@ -121,6 +121,15 @@ public class MarketLookupCommand implements CommandExecutor {
                 Text.of(TextColors.YELLOW, "Quick buy: ", itemSteps.build())
         );
 
+        if (src.hasPermission("skree.market.admin")) {
+            String basePrice = df.format(service.getBasePrice(alias).get());
+            Collections.addAll(
+                    information,
+                    Text.of(TextColors.YELLOW, "Base Price:"),
+                    Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, basePrice, TextColors.YELLOW, " each.")
+            );
+        }
+
         if (percentageSale != 1) {
             information.add(
                     Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellNewPrice, TextColors.YELLOW, " each when new.")
