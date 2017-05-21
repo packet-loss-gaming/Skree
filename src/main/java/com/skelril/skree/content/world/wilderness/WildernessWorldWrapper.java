@@ -575,12 +575,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             BlockState state = original.getState();
             BlockType type = state.getType();
-            System.out.println("Key: " + type.getId());
-            config.getMultipliedBlocks().keySet().forEach((key) -> {
-                System.out.println("Valid key: " + key);
-            });
             if (config.getMultipliedBlocks().containsKey(type.getId())) {
-                System.out.println("Entering block");
                 int fortuneMod = 0;
                 boolean silkTouch = false;
 
