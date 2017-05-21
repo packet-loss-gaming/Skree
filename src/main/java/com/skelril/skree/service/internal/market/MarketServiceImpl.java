@@ -276,8 +276,10 @@ public class MarketServiceImpl implements MarketService {
 
         try (Connection con = SQLHandle.getConnection()) {
             DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA).set(ITEM_DATA.VALUE, price).where(
-                    ITEM_DATA.ID.equal(
+            int changed = create.update(ITEM_DATA)
+                    .set(ITEM_DATA.VALUE, price)
+                    .set(ITEM_DATA.CURRENT_VALUE, price)
+                    .where(ITEM_DATA.ID.equal(
                             create.select(ITEM_ALIASES.ITEM_ID)
                                     .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
                     )
