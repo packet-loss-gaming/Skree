@@ -18,7 +18,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
@@ -155,16 +154,14 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     public void createGraveFromDeath(DestructEntityEvent.Death event) {
         Entity target = event.getTargetEntity();
         if (target instanceof Player) {
-            EntityPlayer player = tf((Player) target);
-            net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
-            net.minecraft.item.ItemStack[] armInv = player.inventory.armorInventory;
+            Player player = (Player) target;
 
             List<ItemStack> items = new ArrayList<>();
 
-            Collections.addAll(items, (ItemStack[]) (Object[]) mainInv);
-            Collections.addAll(items, (ItemStack[]) (Object[]) armInv);
-
-            items.removeAll(Collections.singleton(null));
+            Optional<ItemStack> optStack;
+            do {
+                optStack = player.getInventory().poll();
+            } while (optStack.isPresent() && items.add(optStack.get()));
 
             Iterator<ItemStack> it = items.iterator();
             Optional<RespawnQueueService> optService = Sponge.getServiceManager().provide(RespawnQueueService.class);
@@ -174,14 +171,12 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
                     if (it.next().getItem() == CustomItemTypes.NETHER_BOWL) {
                         it.remove();
                         ItemStack stack = tf(new net.minecraft.item.ItemStack(CustomItemTypes.NETHER_BOWL));
-                        CustomItemTypes.NETHER_BOWL.setDestination(stack, tf(player).getLocation());
-                        service.enque(tf(player), stack);
+                        CustomItemTypes.NETHER_BOWL.setDestination(stack, player.getLocation());
+                        service.enque(player, stack);
                         break;
                     }
                 }
             }
-
-            player.inventory.clear();
 
             Task.builder().execute(() -> {
                 createGraveDropExcess(items, target.getLocation());
