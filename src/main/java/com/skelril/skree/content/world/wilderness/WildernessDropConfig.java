@@ -7,15 +7,19 @@
 package com.skelril.skree.content.world.wilderness;
 
 import com.skelril.nitro.registry.dynamic.QuantityBoundedItemStackConfig;
+import org.spongepowered.api.block.BlockState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WildernessDropConfig {
     private List<String> multipliedBlockTypes = new ArrayList<>();
     private Map<String, QuantityBoundedItemStackConfig> itemReplacementMapping = new HashMap<>();
 
-    public Collection<String> getMultipliedBlockTypes() {
-        return multipliedBlockTypes;
+    public boolean amplifies(BlockState state) {
+        return multipliedBlockTypes.contains(state.getId());
     }
 
     public Map<String, QuantityBoundedItemStackConfig> getItemReplacementMapping() {

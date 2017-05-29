@@ -581,7 +581,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             // Prevent item dupe glitch by removing the position before subsequent breaks
             markedOrePoints.remove(loc);
-            if (config.getDropAmplificationConfig().getMultipliedBlockTypes().contains(type.getId())) {
+            if (config.getDropAmplificationConfig().amplifies(state)) {
                 markedOrePoints.add(loc);
             }
 
@@ -637,8 +637,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 }
 
                 Location<World> loc = optLoc.get();
-                BlockType finalType = block.getFinal().getState().getType();
-                if (config.getDropAmplificationConfig().getMultipliedBlockTypes().contains(finalType.getId())) {
+                BlockState finalState = block.getFinal().getState();
+                if (config.getDropAmplificationConfig().amplifies(finalState)) {
                     // Allow creative mode players to still place blocks
                     if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
                         continue;
