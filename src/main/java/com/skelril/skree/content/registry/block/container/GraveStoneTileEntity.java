@@ -37,7 +37,7 @@ public class GraveStoneTileEntity extends TileEntityLockable implements IInvento
 
     @Override
     public int getSizeInventory() {
-        return 40;
+        return 80;
     }
 
     @Override
