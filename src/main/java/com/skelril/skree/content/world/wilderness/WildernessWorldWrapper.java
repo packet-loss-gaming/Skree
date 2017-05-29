@@ -18,9 +18,10 @@ import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.nitro.entity.EntityHealthPrinter;
 import com.skelril.nitro.item.ItemDropper;
-import com.skelril.nitro.item.ItemFountain;
 import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.registry.dynamic.ItemStackConfig;
+import com.skelril.nitro.registry.dynamic.QuantityBoundedItemStackConfig;
 import com.skelril.nitro.text.CombinedText;
 import com.skelril.nitro.text.PlaceHolderText;
 import com.skelril.nitro.time.IntegratedRunnable;
@@ -37,8 +38,6 @@ import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.Item;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -53,7 +52,6 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
@@ -82,9 +80,11 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -104,6 +104,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
@@ -575,47 +576,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             BlockState state = original.getState();
             BlockType type = state.getType();
-            if (config.getMultipliedBlocks().containsKey(type.getId())) {
-                int fortuneMod = 0;
-                boolean silkTouch = false;
-
-                if (srcEnt instanceof ArmorEquipable) {
-                    Optional<ItemStack> held = ((ArmorEquipable) srcEnt).getItemInHand(HandTypes.MAIN_HAND);
-                    if (held.isPresent()) {
-                        ItemStack stack = held.get();
-
-                        // TODO Currently abusing NMS to determine "breakability"
-                        ItemType itemType = stack.getItem();
-                        if (itemType instanceof Item && state instanceof IBlockState) {
-                            if (!((Item) stack.getItem()).canHarvestBlock((IBlockState) state)) {
-                                continue;
-                            }
-                        }
-
-                        // Handle fortune
-                        Optional<ItemEnchantment> optFortune = EnchantmentUtil.getHighestEnchantment(
-                                stack,
-                                Enchantments.FORTUNE
-                        );
-                        if (optFortune.isPresent()) {
-                            fortuneMod = optFortune.get().getLevel();
-                        }
-
-                        // Handle silk touch
-                        Optional<ItemEnchantment> optSilkTouch = EnchantmentUtil.getHighestEnchantment(
-                                stack,
-                                Enchantments.SILK_TOUCH
-                        );
-                        if (optSilkTouch.isPresent()) {
-                            silkTouch = true;
-                        }
-                    } else if (srcEnt instanceof Player) {
-                        continue;
-                    }
-                }
-
-                addPool(loc, type, fortuneMod, silkTouch);
-            } else if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
+            if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
@@ -711,6 +672,54 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
     }
 
+    private ItemStackSnapshot getPoolItemDrop(ItemStackSnapshot snapshot) {
+        Map<String, QuantityBoundedItemStackConfig> replacementMapping = config.getDropAmplificationConfig().getItemReplacementMapping();
+        ItemStackConfig replacementItem = replacementMapping.get(snapshot.getType().getId());
+        if (replacementItem != null) {
+            return ((ItemStack) (Object) replacementItem.toNSMStack()).createSnapshot();
+        }
+
+        return snapshot;
+    }
+
+    @Listener
+    public void onItemDrop(DropItemEvent.Destruct event) {
+        Optional<BlockSpawnCause> optSpawnCause = event.getCause().get(NamedCause.SOURCE, BlockSpawnCause.class);
+        if (!optSpawnCause.isPresent()) {
+            return;
+        }
+
+        BlockSpawnCause spawnCause = optSpawnCause.get();
+        BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
+
+        BlockType blockType = blockSnapshot.getState().getType();
+        if (!config.getDropAmplificationConfig().getMultipliedBlockTypes().contains(blockType.getId())) {
+            return;
+        }
+
+        Optional<Location<World>> optLocation = blockSnapshot.getLocation();
+        if (!optLocation.isPresent()) {
+            return;
+        }
+
+        Location<World> loc = optLocation.get();
+
+        Optional<Integer> optLevel = getLevel(loc);
+        if (optLevel.orElse(0) < 1) {
+            return;
+        }
+
+        List<ItemStackSnapshot> itemStacks = new ArrayList<>();
+        event.getEntities().forEach((entity -> {
+            if (entity instanceof Item) {
+                ItemStackSnapshot snapshot = ((Item) entity).item().get();
+                itemStacks.add(getPoolItemDrop(snapshot));
+            }
+        }));
+
+        addPool(loc, () -> itemStacks);
+    }
+
     public Set<Map.Entry<Player, WildernessPlayerMeta>> getMetaInformation() {
         Set<Map.Entry<Player, WildernessPlayerMeta>> resultSets = new HashSet<>();
         for (Map.Entry<UUID, WildernessPlayerMeta> entry : playerMetaMap.entrySet()) {
@@ -804,50 +813,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         return modifier;
     }
 
-    public Collection<ItemStack> createDropsFor(BlockType blockType, boolean hasSilkTouch) {
-        return Lists.newArrayList(config.getMultipliedBlocks().get(blockType.getId()).getApplicableResult(hasSilkTouch));
-    }
-
-    private void addPool(Location<World> block, BlockType blockType, int fortune, boolean hasSilkTouch) {
-
+    private void addPool(Location<World> block, Supplier<Collection<ItemStackSnapshot>> itemStackSupplier) {
         Optional<Integer> optLevel = getLevel(block);
         Validate.isTrue(optLevel.isPresent());
         int level = optLevel.get();
 
-        Collection<ItemStack> generalDrop = createDropsFor(blockType, hasSilkTouch);
-        if (!config.getMultipliedBlocks().get(blockType.getId()).allowsFortuneMultiplication()) {
-            fortune = 0;
-        }
+        int times = Probability.getRandom(getOreMod(getDropTier(level))) + 30;
+        WildernessDropPool dropPool = new WildernessDropPool(block, itemStackSupplier, times);
 
-        final int times = Probability.getRandom(getOreMod(getDropTier(level)));
-        final int finalFortune = fortune;
-        ItemFountain fountain = new ItemFountain(
-                new Location<>(block.getExtent(), block.getPosition().add(.5, 0, .5)),
-                (a) -> finalFortune,
-                generalDrop,
-                SpawnTypes.DROPPED_ITEM
-        ) {
-            @Override
-            public boolean run(int timesL) {
-                getExtent().playSound(
-                        SoundTypes.ENTITY_BLAZE_BURN,
-                        getPos(),
-                        Math.min(
-                                1,
-                                (((float) timesL / times) * .6F) + ((float) 1 / times)
-                        ),
-                        1
-                );
-                return super.run(timesL);
-            }
-
-            @Override
-            public void end() {
-                getExtent().playSound(SoundTypes.ENTITY_BLAZE_DEATH, getPos(), .2F, 0);
-            }
-        };
-
-        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(fountain, times);
+        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(dropPool, times);
         Task task = Task.builder().execute(runnable).delay(1, SECONDS).interval(
                 1,
                 SECONDS

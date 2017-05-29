@@ -6,13 +6,10 @@
 
 package com.skelril.skree.content.world.wilderness;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class WildernessConfig {
-    private Map<String, WildernessMultipliedResult> multipliedBlocks = new HashMap<>();
+    private WildernessDropConfig dropAmplification;
 
-    public Map<String, WildernessMultipliedResult> getMultipliedBlocks() {
-        return multipliedBlocks;
+    public WildernessDropConfig getDropAmplificationConfig() {
+        return dropAmplification;
     }
 }
