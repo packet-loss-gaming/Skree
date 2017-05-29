@@ -12,10 +12,12 @@ import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneSpaceAllocator;
 import com.skelril.skree.service.internal.zone.global.GlobalZoneManager;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
-public class TempleOfFateManager extends GlobalZoneManager<TempleOfFateInstance> implements LocationZone<TempleOfFateInstance> {
+public class TempleOfFateManager extends GlobalZoneManager<TempleOfFateInstance> implements Runnable, LocationZone<TempleOfFateInstance> {
 
     public TempleOfFateManager() {
         Sponge.getEventManager().registerListeners(
@@ -38,6 +40,8 @@ public class TempleOfFateManager extends GlobalZoneManager<TempleOfFateInstance>
                 SkreePlugin.inst(),
                 new ZoneTransitionalOrbListener<>(this::getApplicableZone)
         );
+
+        Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
     }
 
     @Override
@@ -55,5 +59,16 @@ public class TempleOfFateManager extends GlobalZoneManager<TempleOfFateInstance>
     @Override
     public String getName() {
         return "Temple of Fate";
+    }
+
+    @Override
+    public void run() {
+        Optional<TempleOfFateInstance> optInstance = getActiveZone();
+        if (!optInstance.isPresent()) {
+            return;
+        }
+
+        TempleOfFateInstance inst = optInstance.get();
+        inst.run();
     }
 }

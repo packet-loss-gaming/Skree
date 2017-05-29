@@ -15,20 +15,32 @@ import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
+import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
-public class TempleOfFateInstance extends LegacyZoneBase {
+public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
 
     private Location<World> startingPoint;
     private DropTable dropTable;
+
+    private List<Player> participants = new ArrayList<>();
 
     public TempleOfFateInstance(ZoneRegion region) {
         super(region);
@@ -82,10 +94,30 @@ public class TempleOfFateInstance extends LegacyZoneBase {
     }
 
     public void rewardPlayer(Player player) {
+        boolean participated = participants.contains(player);
+
+        remove(player);
+        if (!participated) {
+            return;
+        }
+
         for (ItemStack stack : dropTable.getDrops(1)) {
             player.getInventory().offer(stack);
         }
-        remove(player);
+    }
+
+    public void tryInventoryRestore(Player player) {
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optService.isPresent()) {
+            PlayerStateService service = optService.get();
+            if (service.hasInventoryStored(player)) {
+                try {
+                    service.loadInventory(player);
+                } catch (InventoryStorageStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -93,6 +125,29 @@ public class TempleOfFateInstance extends LegacyZoneBase {
         remove();
         setUp();
         return true;
+    }
+
+    private void outOfBoundsCheck() {
+        for (Player player : getPlayers(PARTICIPANT)) {
+            if (contains(player)) {
+                continue;
+            }
+
+            remove(player);
+        }
+    }
+
+    private void feedPlayers() {
+        for (Player player : getPlayers(PARTICIPANT)) {
+            player.offer(Keys.FOOD_LEVEL, 20);
+            player.offer(Keys.SATURATION, 5D);
+        }
+    }
+
+    @Override
+    public void run() {
+        outOfBoundsCheck();
+        feedPlayers();
     }
 
     @Override
@@ -103,6 +158,40 @@ public class TempleOfFateInstance extends LegacyZoneBase {
     @Override
     public Clause<Player, ZoneStatus> add(Player player) {
         player.setLocation(startingPoint);
+        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+        if (optService.isPresent()) {
+            PlayerStateService service = optService.get();
+            try {
+                service.storeInventory(player);
+                service.releaseInventory(player);
+
+                player.offer(Keys.POTION_EFFECTS, new ArrayList<>());
+                player.getInventory().clear();
+            } catch (InventoryStorageStateException e) {
+                e.printStackTrace();
+                return new Clause<>(player, ZoneStatus.ERROR);
+            }
+        }
+
+        participants.add(player);
+
         return new Clause<>(player, ZoneStatus.ADDED);
+    }
+
+    @Override
+    public Clause<Player, ZoneStatus> remove(Player player) {
+        player.getInventory().clear();
+        tryInventoryRestore(player);
+        participants.remove(player);
+
+        return super.remove(player);
+    }
+
+    @Override
+    public Collection<Player> getPlayers(PlayerClassifier classifier) {
+        if (classifier == PARTICIPANT) {
+            return participants;
+        }
+        return super.getPlayers(classifier);
     }
 }
