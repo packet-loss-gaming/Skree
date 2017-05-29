@@ -712,7 +712,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         }
 
         Optional<Integer> optLevel = getLevel(loc);
-        if (optLevel.orElse(0) < 1) {
+        if (!optLevel.isPresent()) {
             return;
         }
 
@@ -825,7 +825,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         Validate.isTrue(optLevel.isPresent());
         int level = optLevel.get();
 
-        int times = Probability.getRandom(getOreMod(getDropTier(level))) + 30;
+        int times = Probability.getRandom(getOreMod(getDropTier(level)));
         WildernessDropPool dropPool = new WildernessDropPool(block, itemStackSupplier, times);
 
         TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(dropPool, times);
