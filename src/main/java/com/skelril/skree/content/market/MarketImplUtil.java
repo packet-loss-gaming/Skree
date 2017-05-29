@@ -131,7 +131,20 @@ public class MarketImplUtil {
         net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
         List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
         for (int i : ints) {
-            transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
+            Clause<ItemStack, Integer> existingTransaction = null;
+            for (Clause<ItemStack, Integer> transaction : transactions) {
+                if (ItemComparisonUtil.isSimilar(transaction.getKey(), tf(mainInv[i]))) {
+                    existingTransaction = transaction;
+                    break;
+                }
+            }
+
+            if (existingTransaction != null) {
+                existingTransaction.setValue(existingTransaction.getValue() + -(mainInv[i].stackSize));
+            } else {
+                transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
+            }
+
             mainInv[i] = null;
         }
         return transactions;
