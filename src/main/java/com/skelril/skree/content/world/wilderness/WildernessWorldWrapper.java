@@ -547,6 +547,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         GRAVE_STONE.createGraveFromDeath(event);
     }
 
+    private Set<Location<World>> markedOrePoints = new HashSet<>();
+
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event) {
         Optional<Entity> optSrcEnt = event.getCause().get(NamedCause.SOURCE, Entity.class);
@@ -576,6 +578,13 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
             BlockState state = original.getState();
             BlockType type = state.getType();
+
+            // Prevent item dupe glitch by removing the position before subsequent breaks
+            markedOrePoints.remove(loc);
+            if (config.getDropAmplificationConfig().getMultipliedBlockTypes().contains(type.getId())) {
+                markedOrePoints.add(loc);
+            }
+
             if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
@@ -692,17 +701,15 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         BlockSpawnCause spawnCause = optSpawnCause.get();
         BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
 
-        BlockType blockType = blockSnapshot.getState().getType();
-        if (!config.getDropAmplificationConfig().getMultipliedBlockTypes().contains(blockType.getId())) {
-            return;
-        }
-
         Optional<Location<World>> optLocation = blockSnapshot.getLocation();
         if (!optLocation.isPresent()) {
             return;
         }
 
         Location<World> loc = optLocation.get();
+        if (!markedOrePoints.remove(loc)) {
+            return;
+        }
 
         Optional<Integer> optLevel = getLevel(loc);
         if (optLevel.orElse(0) < 1) {
