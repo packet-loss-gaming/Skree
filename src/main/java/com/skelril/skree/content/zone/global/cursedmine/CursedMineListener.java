@@ -8,12 +8,10 @@ package com.skelril.skree.content.zone.global.cursedmine;
 
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.block.DropRegistry;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
 import com.skelril.skree.content.zone.global.cursedmine.restoration.BlockRecord;
 import com.skelril.skree.service.ModifierService;
-import net.minecraft.item.ItemPickaxe;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
@@ -35,16 +33,18 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.*;
-
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class CursedMineListener {
     
@@ -139,64 +139,16 @@ public class CursedMineListener {
         for (Transaction<BlockSnapshot> block : event.getTransactions()) {
             BlockType originalType = block.getOriginal().getState().getType();
             if (cursedOres.contains(originalType)) {
-                ItemStack held = optHeldItem.get();
-
-                if (!(held.getItem() instanceof ItemPickaxe)) {
-                    event.setCancelled(true);
-                    break;
-                }
-
                 // Check to see if the block has already been broken
                 // we were having some multi-firing problems
                 if (inst.recordBlockBreak(player, new BlockRecord(block.getOriginal()))) {
-                    if (Probability.getChance(4)) {
-                        Collection<ItemStack> drops = new ArrayList<>();
-
-                        Optional<ItemEnchantment> optFortune = EnchantmentUtil.getHighestEnchantment(
-                                held,
-                                Enchantments.FORTUNE
-                        );
-
-                        int times = 1;
-
-                        if (optFortune.isPresent() && !DropRegistry.dropsSelf(originalType)) {
-                            times += optFortune.get().getLevel();
-                        }
-                        for (int i = times; i > 0; --i) {
-                            Collection<ItemStack> items = DropRegistry.createDropsFor(originalType, hasSilkTouch(held));
-                            if (items != null) {
-                                drops.addAll(items);
-                            }
-                        }
-
-                        for (ItemStack stack : drops) {
-                            stack.setQuantity(Math.min(
-                                    stack.getQuantity() * Probability.getRangedRandom(4, 8),
-                                    stack.getMaxStackQuantity()
-                            ));
-                            player.getInventory().offer(stack);
-                        }
-
-                        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-                        if (optService.isPresent()) {
-                            ModifierService service = optService.get();
-                            if (service.isActive(Modifiers.DOUBLE_CURSED_ORES)) {
-                                for (ItemStack stack : drops) {
-                                    player.getInventory().offer(stack.copy());
-                                }
-                            }
-                        }
-
-                        tf(player).inventoryContainer.detectAndSendChanges();
-                    }
-
                     /*if (Probability.getChance(3000)) {
                         ChatUtil.send(player, "You feel as though a spirit is trying to tell you something...");
                         player.getInventory().addItem(BookUtil.Lore.Areas.theGreatMine());
                     }*/
 
                     ExperienceOrb xpOrb = (ExperienceOrb) player.getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, block.getOriginal().getLocation().get().getPosition());
-                    xpOrb.offer(Keys.HELD_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
+                    xpOrb.offer(Keys.CONTAINED_EXPERIENCE, (70 - player.getLocation().getBlockY()) / 2);
 
                     inst.eatFood(player);
                     inst.poison(player, 6);
@@ -205,8 +157,82 @@ public class CursedMineListener {
             } else if (stealableFluids.contains(originalType)) {
                 inst.recordBlockBreak(player, new BlockRecord(block.getOriginal()));
             } else {
-                event.setCancelled(true);
-                break;
+                block.setCustom(block.getOriginal());
+            }
+        }
+    }
+
+    @Listener
+    public void onItemDrop(DropItemEvent.Destruct event) {
+        if (!Probability.getChance(4)) {
+            return;
+        }
+
+        Optional<BlockSpawnCause> optSpawnCause = event.getCause().get(NamedCause.SOURCE, BlockSpawnCause.class);
+        if (!optSpawnCause.isPresent()) {
+            return;
+        }
+
+        BlockSpawnCause spawnCause = optSpawnCause.get();
+
+        BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
+
+        Optional<Location<World>> optLocation = blockSnapshot.getLocation();
+        if (!optLocation.isPresent()) {
+            return;
+        }
+
+        Optional<Player> optPlayer = event.getCause().get(NamedCause.NOTIFIER, Player.class);
+
+        if (!optPlayer.isPresent()) {
+            return;
+        }
+
+        Player player = optPlayer.get();
+
+        Location<World> loc = optLocation.get();
+        Optional<CursedMineInstance> optInst = manager.getApplicableZone(loc);
+
+        if (!optInst.isPresent()) {
+            return;
+        }
+
+        CursedMineInstance inst = optInst.get();
+        if (!inst.hasrecordForPlayerAt(player, loc)) {
+            return;
+        }
+
+        List<ItemStackSnapshot> itemStacks = new ArrayList<>();
+        Iterator<Entity> entityIterator = event.getEntities().iterator();
+        while (entityIterator.hasNext()) {
+            Entity entity = entityIterator.next();
+            if (entity instanceof Item) {
+                ItemStackSnapshot snapshot = ((Item) entity).item().get();
+                itemStacks.add(snapshot);
+                entityIterator.remove();
+            }
+        }
+
+        int times = 1;
+
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+        if (optService.isPresent()) {
+            ModifierService service = optService.get();
+            if (service.isActive(Modifiers.DOUBLE_CURSED_ORES)) {
+                times *= 2;
+            }
+        }
+
+        for (ItemStackSnapshot stackSnapshot : itemStacks) {
+            int quantity = Math.min(
+                    stackSnapshot.getCount() * Probability.getRangedRandom(4, 8),
+                    stackSnapshot.getType().getMaxStackQuantity()
+            );
+
+            for (int i = 0; i < times; ++i) {
+                ItemStack stack = stackSnapshot.createStack();
+                stack.setQuantity(quantity);
+                player.getInventory().offer(stack);
             }
         }
     }

@@ -6,7 +6,8 @@
 
 package com.skelril.skree.content.zone.global.cursedmine.restoration;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,15 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerMappedBlockRecordIndex implements BlockRecordIndex {
 
-    private Map<UUID, Map<Vector3i, BlockRecord>> recordMap = new ConcurrentHashMap<>();
+    private Map<UUID, Map<Location<World>, BlockRecord>> recordMap = new ConcurrentHashMap<>();
 
     public boolean addItem(UUID player, BlockRecord record) {
 
         if (!recordMap.containsKey(player)) {
             recordMap.put(player, new HashMap<>());
         }
-        Map<Vector3i, BlockRecord> playerRecord = recordMap.get(player);
-        Vector3i blockPos = record.getLocation().getBlockPosition();
+        Map<Location<World>, BlockRecord> playerRecord = recordMap.get(player);
+        Location<World> blockPos = record.getLocation();
         if (playerRecord.containsKey(blockPos)) {
             return false;
         }
@@ -32,15 +33,19 @@ public class PlayerMappedBlockRecordIndex implements BlockRecordIndex {
         return true;
     }
 
+    public boolean hasRecordForPlayerAt(UUID player, Location<World> location) {
+        return recordMap.getOrDefault(player, new HashMap<>()).containsKey(location);
+    }
+
     @Override
     public void revertByTime(long time) {
 
-        Iterator<Map<Vector3i, BlockRecord>> primeIt = recordMap.values().iterator();
-        Map<Vector3i, BlockRecord> activeRecordList;
+        Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
+        Map<Location<World>, BlockRecord> activeRecordList;
         while (primeIt.hasNext()) {
             activeRecordList = primeIt.next();
 
-            Iterator<Map.Entry<Vector3i, BlockRecord>> it = activeRecordList.entrySet().iterator();
+            Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
             BlockRecord activeRecord;
             while (it.hasNext()) {
                 activeRecord = it.next().getValue();
@@ -65,14 +70,14 @@ public class PlayerMappedBlockRecordIndex implements BlockRecordIndex {
 
         if (!hasRecordForPlayer(player)) return;
 
-        Map<Vector3i, BlockRecord> activeRecordList = recordMap.get(player);
+        Map<Location<World>, BlockRecord> activeRecordList = recordMap.get(player);
 
         if (activeRecordList.isEmpty()) {
             recordMap.remove(player);
             return;
         }
 
-        Iterator<Map.Entry<Vector3i, BlockRecord>> it = activeRecordList.entrySet().iterator();
+        Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
         BlockRecord activeRecord;
         while (it.hasNext()) {
             activeRecord = it.next().getValue();
@@ -86,12 +91,12 @@ public class PlayerMappedBlockRecordIndex implements BlockRecordIndex {
     @Override
     public void revertAll() {
 
-        Iterator<Map<Vector3i, BlockRecord>> primeIt = recordMap.values().iterator();
-        Map<Vector3i, BlockRecord> activeRecordList;
+        Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
+        Map<Location<World>, BlockRecord> activeRecordList;
         while (primeIt.hasNext()) {
             activeRecordList = primeIt.next();
 
-            Iterator<Map.Entry<Vector3i, BlockRecord>> it = activeRecordList.entrySet().iterator();
+            Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
             BlockRecord activeRecord;
             while (it.hasNext()) {
                 activeRecord = it.next().getValue();

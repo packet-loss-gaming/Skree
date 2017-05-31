@@ -144,6 +144,10 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
         return recordSystem.hasRecordForPlayer(player.getUniqueId());
     }
 
+    public boolean hasrecordForPlayerAt(Player player, Location<World> location) {
+        return recordSystem.hasRecordForPlayerAt(player.getUniqueId(), location);
+    }
+
     public HitList getHitList() {
         return hitList;
     }
