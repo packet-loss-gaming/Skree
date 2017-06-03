@@ -25,6 +25,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
@@ -93,6 +94,10 @@ public class GraveDigger extends SkeletonArcherWanderer {
             Optional<DamageSource> optDamageSource = condition.getDamageSource();
             if (optDamageSource.isPresent()) {
                 DamageSource damageSource = optDamageSource.get();
+                if (damageSource.getType() == DamageTypes.EXPLOSIVE) {
+                    condition.getEvent().setCancelled(true);
+                }
+
                 if (!(damageSource instanceof IndirectEntityDamageSource)) {
                     return Optional.empty();
                 }
