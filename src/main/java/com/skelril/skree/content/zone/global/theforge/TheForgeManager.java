@@ -18,6 +18,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> implements Runnable, LocationZone<TheForgeInstance> {
@@ -40,7 +41,7 @@ public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> impleme
                 new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
         );
 
-        Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
+        Task.builder().interval(4, TimeUnit.SECONDS).execute(this).submit(SkreePlugin.inst());
     }
 
     @Override
