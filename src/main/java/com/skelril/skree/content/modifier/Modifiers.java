@@ -12,4 +12,6 @@ public class Modifiers {
     public static final String DOUBLE_WILD_DROPS = "DOUBLE_WILD_DROPS";
     public static final String QUAD_GOLD_RUSH = "QUADRUPLE_GOLD_RUSH";
     public static final String UBER_ARROW_FISHING = "UBER_ARROW_FISHING";
+    public static final String HEXA_FACTORY_SPEED = "HEXA_FACTORY_SPEED";
+    public static final String TRIPLE_FACTORY_PRODUCTION = "TRIPLE_FACTORY_PRODUCTION";
 }

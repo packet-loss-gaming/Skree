@@ -14,9 +14,11 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -43,6 +45,8 @@ import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+import static com.skelril.skree.content.modifier.Modifiers.HEXA_FACTORY_SPEED;
+import static com.skelril.skree.content.modifier.Modifiers.TRIPLE_FACTORY_PRODUCTION;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class TheForgeInstance extends LegacyZoneBase implements Runnable {
@@ -86,9 +90,16 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
     private int getQuantityToSupply(ItemStackSnapshot snapshot) {
         int total = 0;
+
         for (int i = 0; i < snapshot.getCount(); ++i) {
             total += Probability.getRandom(8);
         }
+
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+        if (optService.isPresent() && optService.get().isActive(TRIPLE_FACTORY_PRODUCTION)) {
+            total *= 3;
+        }
+
         return total;
     }
 
@@ -129,6 +140,12 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
     private int getQuantityToProduce() {
         int max = getPlayers(PARTICIPANT).size() * 9;
+
+        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+        if (optService.isPresent() && optService.get().isActive(HEXA_FACTORY_SPEED)) {
+            max *= 6;
+        }
+
         return Probability.getRangedRandom(max / 3, max);
     }
 
