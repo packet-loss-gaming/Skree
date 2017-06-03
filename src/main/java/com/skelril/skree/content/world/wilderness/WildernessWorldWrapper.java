@@ -585,7 +585,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 markedOrePoints.add(loc);
             }
 
-            if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 100 - level))) {
+            if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 250 - level))) {
                 Vector3d max = loc.getPosition().add(1, 1, 1);
                 Vector3d min = loc.getPosition().sub(1, 1, 1);
 
