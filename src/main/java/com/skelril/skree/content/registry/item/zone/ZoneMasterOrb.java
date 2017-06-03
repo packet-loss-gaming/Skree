@@ -133,6 +133,11 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
                 new ItemStack(Items.FEATHER),
                 (ItemStack) (Object) newItemStack("skree:fairy_dust")
         ));
+        GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+                "The Forge",
+                new ItemStack(this),
+                new ItemStack(Blocks.IRON_BLOCK)
+        ));
     }
 
     @Override
