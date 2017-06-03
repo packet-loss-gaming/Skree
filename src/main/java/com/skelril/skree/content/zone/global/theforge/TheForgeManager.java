@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.global.theforge;
 
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LocationZone;
+import com.skelril.skree.content.zone.ZoneGlobalHealthPrinter;
 import com.skelril.skree.content.zone.ZoneImmutableBlockListener;
 import com.skelril.skree.content.zone.ZoneTransitionalOrbListener;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -33,6 +34,10 @@ public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> impleme
         Sponge.getEventManager().registerListeners(
                 SkreePlugin.inst(),
                 new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+        );
+        Sponge.getEventManager().registerListeners(
+                SkreePlugin.inst(),
+                new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
         );
 
         Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
