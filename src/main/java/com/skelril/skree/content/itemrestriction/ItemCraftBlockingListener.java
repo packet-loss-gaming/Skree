@@ -24,6 +24,10 @@ public class ItemCraftBlockingListener {
 
     @Listener
     public void onItemCraft(ChangeInventoryEvent event) {
+        if (event instanceof ChangeInventoryEvent.Held) {
+            return;
+        }
+
         event.getTransactions().forEach((t) -> {
             if (blockedItems.contains(t.getFinal().getType().getId())) {
                 Optional<Player> optPlayer = event.getCause().first(Player.class);
