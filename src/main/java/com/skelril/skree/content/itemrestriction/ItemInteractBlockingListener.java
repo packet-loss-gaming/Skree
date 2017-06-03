@@ -33,5 +33,4 @@ public class ItemInteractBlockingListener {
             event.setCancelled(true);
         }
     }
-
 }

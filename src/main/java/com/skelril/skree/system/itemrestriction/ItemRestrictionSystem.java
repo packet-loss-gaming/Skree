@@ -12,6 +12,7 @@ import com.skelril.nitro.JarResourceLoader;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.itemrestriction.ItemCraftBlockingListener;
 import com.skelril.skree.content.itemrestriction.ItemInteractBlockingListener;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigManager;
@@ -59,6 +60,7 @@ public class ItemRestrictionSystem {
     public void init() {
         ItemRestrictionConfig itemRestrictionConfig = loadConfiguration();
         Set<String> blockedItems = itemRestrictionConfig.getBlockedItems();
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemCraftBlockingListener(blockedItems));
         Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemInteractBlockingListener(blockedItems));
     }
 }
