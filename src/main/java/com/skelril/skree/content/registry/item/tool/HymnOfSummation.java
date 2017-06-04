@@ -50,7 +50,7 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
     public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
+        if (!optHeldItem.isPresent()) {
             return;
         }
 
