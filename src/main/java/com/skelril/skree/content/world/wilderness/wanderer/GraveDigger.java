@@ -94,7 +94,9 @@ public class GraveDigger extends SkeletonArcherWanderer {
       Optional<DamageSource> optDamageSource = condition.getDamageSource();
       if (optDamageSource.isPresent()) {
         DamageSource damageSource = optDamageSource.get();
-        if (damageSource.getType() == DamageTypes.EXPLOSIVE) {
+
+        // Explosions are show up as custom instead of Explosion
+        if (damageSource.getType() == DamageTypes.CUSTOM) {
           condition.getEvent().setCancelled(true);
         }
 
