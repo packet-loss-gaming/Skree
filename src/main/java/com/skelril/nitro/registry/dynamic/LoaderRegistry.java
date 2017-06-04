@@ -7,8 +7,14 @@
 package com.skelril.nitro.registry.dynamic;
 
 import com.google.common.base.Joiner;
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.error.PebbleException;
+import com.mitchellbosecke.pebble.loader.StringLoader;
+import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -26,15 +32,25 @@ public class LoaderRegistry {
         constants.putIfAbsent(constantName, value);
     }
 
-    private String replaceConstants(String fileContent) {
+    private final PebbleEngine TEMPLATE_ENGINE = new PebbleEngine.Builder().loader(new StringLoader()).build();
+
+    private String renderTemplate(String templateContent) throws PebbleException, IOException {
+        PebbleTemplate compiledTemplate = TEMPLATE_ENGINE.getTemplate(templateContent);
+
+        Map<String, Object> context = new HashMap<>();
+
         for (Map.Entry<String, String> entry : constants.entrySet()) {
             String constant = entry.getKey();
             String value = entry.getValue();
 
-            fileContent = fileContent.replace("%" + constant +  "%", value);
+            context.put(constant, value);
         }
 
-        return fileContent;
+        try (Writer writer = new StringWriter()) {
+            compiledTemplate.evaluate(writer, context);
+
+            return writer.toString();
+        }
     }
 
     public void loadAll() {
@@ -45,7 +61,7 @@ public class LoaderRegistry {
                     if (filename.endsWith(".json")) {
                         try {
                             String fileContent = Joiner.on('\n').join(Files.readAllLines(subPath));
-                            loader.load(replaceConstants(fileContent));
+                            loader.load(renderTemplate(fileContent));
                         } catch (Exception e) {
                             System.err.println("Error loading: " + filename);
                             e.printStackTrace();

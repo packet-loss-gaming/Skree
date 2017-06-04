@@ -7,5 +7,5 @@
   },
   "enchantability": 10,
   "hit_power": 8,
-  "attack_speed": %SWORD_SPEED%
+  "attack_speed": {{ SWORD_SPEED }}
 }

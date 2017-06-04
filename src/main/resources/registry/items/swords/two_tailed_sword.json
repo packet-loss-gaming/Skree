@@ -4,7 +4,7 @@
   "repair_item_stack": null,
   "enchantability": 0,
   "hit_power": 1,
-  "attack_speed": %SWORD_SPEED%,
+  "attack_speed": {{ SWORD_SPEED }},
   "ability_groups": [
     {
       "cool_down": null,
