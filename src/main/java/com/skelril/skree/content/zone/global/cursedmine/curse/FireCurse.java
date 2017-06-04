@@ -14,11 +14,11 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.function.Consumer;
 
 public class FireCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        if (player.get(Keys.FIRE_TICKS).orElse(0) < 20) {
-            player.sendMessage(Text.of(TextColors.RED, "BURN!!!"));
-            player.offer(Keys.FIRE_TICKS, 20 * 60);
-        }
+  @Override
+  public void accept(Player player) {
+    if (player.get(Keys.FIRE_TICKS).orElse(0) < 20) {
+      player.sendMessage(Text.of(TextColors.RED, "BURN!!!"));
+      player.offer(Keys.FIRE_TICKS, 20 * 60);
     }
+  }
 }

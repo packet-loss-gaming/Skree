@@ -18,36 +18,36 @@ import static com.skelril.skree.db.schema.tables.Modifiers.MODIFIERS;
 
 public class LazyMySQLModifierService extends ModifierServiceImpl {
 
-    @Override
-    protected void repopulateData() {
-        try {
-            try (Connection con = SQLHandle.getConnection()) {
-                Result<?> results = DSL.using(con)
-                        .select(MODIFIERS.NAME, MODIFIERS.EXPIREY)
-                        .from(MODIFIERS)
-                        .fetch();
-                results.forEach(a -> setExpiry(a.getValue(MODIFIERS.NAME), a.getValue(MODIFIERS.EXPIREY).getTime()));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+  @Override
+  protected void repopulateData() {
+    try {
+      try (Connection con = SQLHandle.getConnection()) {
+        Result<?> results = DSL.using(con)
+            .select(MODIFIERS.NAME, MODIFIERS.EXPIREY)
+            .from(MODIFIERS)
+            .fetch();
+        results.forEach(a -> setExpiry(a.getValue(MODIFIERS.NAME), a.getValue(MODIFIERS.EXPIREY).getTime()));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 
-    @Override
-    protected void updateModifier(String modifier, long time) {
-        try {
-            try (Connection con = SQLHandle.getConnection()) {
-                Timestamp newExpirey = new Timestamp(time);
-                DSL.using(con)
-                        .insertInto(MODIFIERS)
-                        .columns(MODIFIERS.NAME, MODIFIERS.EXPIREY)
-                        .values(modifier, newExpirey)
-                        .onDuplicateKeyUpdate()
-                        .set(MODIFIERS.EXPIREY, newExpirey)
-                        .execute();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+  @Override
+  protected void updateModifier(String modifier, long time) {
+    try {
+      try (Connection con = SQLHandle.getConnection()) {
+        Timestamp newExpirey = new Timestamp(time);
+        DSL.using(con)
+            .insertInto(MODIFIERS)
+            .columns(MODIFIERS.NAME, MODIFIERS.EXPIREY)
+            .values(modifier, newExpirey)
+            .onDuplicateKeyUpdate()
+            .set(MODIFIERS.EXPIREY, newExpirey)
+            .execute();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 }

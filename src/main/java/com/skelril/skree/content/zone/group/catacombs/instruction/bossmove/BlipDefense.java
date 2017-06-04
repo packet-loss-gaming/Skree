@@ -18,36 +18,36 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import java.util.Optional;
 
 public class BlipDefense implements Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>> {
-    public double getMultiplier() {
-        return 4;
+  public double getMultiplier() {
+    return 4;
+  }
+
+  public double getYFloor() {
+    return .175;
+  }
+
+  public double getYCiel() {
+    return .8;
+  }
+
+  public boolean activate(CatacombsBossDetail detail) {
+    return Probability.getChance(5);
+  }
+
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
+
+    if (activate(detail)) {
+      Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+      Vector3d vel = EntityDirectionUtil.getFacingVector(boss);
+      vel = vel.mul(getMultiplier());
+      vel = new Vector3d(vel.getX(), Math.min(getYCiel(), Math.max(getYFloor(), vel.getY())), vel.getZ());
+      boss.setVelocity(vel);
     }
 
-    public double getYFloor() {
-        return .175;
-    }
-
-    public double getYCiel() {
-        return .8;
-    }
-
-    public boolean activate(CatacombsBossDetail detail) {
-        return Probability.getChance(5);
-    }
-
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
-
-        if (activate(detail)) {
-            Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
-            Vector3d vel = EntityDirectionUtil.getFacingVector(boss);
-            vel = vel.mul(getMultiplier());
-            vel = new Vector3d(vel.getX(), Math.min(getYCiel(), Math.max(getYFloor(), vel.getY())), vel.getZ());
-            boss.setVelocity(vel);
-        }
-
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

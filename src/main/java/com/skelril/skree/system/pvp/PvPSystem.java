@@ -18,20 +18,20 @@ import org.spongepowered.api.Sponge;
 @NModule(name = "PvP System")
 public class PvPSystem implements ServiceProvider<PvPService> {
 
-    private PvPService service;
+  private PvPService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new PvPServiceImpl();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new PvPServiceImpl();
 
-        // Register the service & command
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PvPService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), PvPCommand.aquireSpec(), "pvp");
-    }
+    // Register the service & command
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), PvPService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), PvPCommand.aquireSpec(), "pvp");
+  }
 
-    @Override
-    public PvPService getService() {
-        return service;
-    }
+  @Override
+  public PvPService getService() {
+    return service;
+  }
 }

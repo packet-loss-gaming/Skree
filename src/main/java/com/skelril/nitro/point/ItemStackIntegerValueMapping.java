@@ -11,7 +11,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.List;
 
 public class ItemStackIntegerValueMapping extends ItemStackValueMapping<Integer> {
-    public ItemStackIntegerValueMapping(List<PointValue<ItemStack, Integer>> values) {
-        super(values, 0, 1, (a) -> a, (a) -> a, (a, b) -> a - b, (a, b) -> a * b, (a, b) -> a / b, (a, b) -> a % b);
-    }
+  public ItemStackIntegerValueMapping(List<PointValue<ItemStack, Integer>> values) {
+    super(values, 0, 1, (a) -> a, (a) -> a, (a, b) -> a - b, (a, b) -> a * b, (a, b) -> a / b, (a, b) -> a % b);
+  }
 }

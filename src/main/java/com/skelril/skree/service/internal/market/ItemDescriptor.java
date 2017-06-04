@@ -9,25 +9,25 @@ package com.skelril.skree.service.internal.market;
 import java.math.BigDecimal;
 
 public class ItemDescriptor {
-    private final String name;
-    private final BigDecimal currentValue;
-    private final int stock;
+  private final String name;
+  private final BigDecimal currentValue;
+  private final int stock;
 
-    public ItemDescriptor(String name, BigDecimal currentValue, int stock) {
-        this.name = name;
-        this.currentValue = currentValue;
-        this.stock = stock;
-    }
+  public ItemDescriptor(String name, BigDecimal currentValue, int stock) {
+    this.name = name;
+    this.currentValue = currentValue;
+    this.stock = stock;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public BigDecimal getCurrentValue() {
-        return currentValue;
-    }
+  public BigDecimal getCurrentValue() {
+    return currentValue;
+  }
 
-    public int getStock() {
-        return stock;
-    }
+  public int getStock() {
+    return stock;
+  }
 }

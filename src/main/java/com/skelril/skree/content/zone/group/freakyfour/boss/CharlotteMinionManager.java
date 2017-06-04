@@ -22,21 +22,21 @@ import java.util.Optional;
 
 public class CharlotteMinionManager extends BossManager<CaveSpider, ZoneBossDetail<FreakyFourInstance>> {
 
-    public CharlotteMinionManager() {
-        handleDamage();
-    }
+  public CharlotteMinionManager() {
+    handleDamage();
+  }
 
-    private void handleDamage() {
-        List<Instruction<DamageCondition, Boss<CaveSpider, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            FreakyFourInstance inst = boss.getDetail().getZone();
+  private void handleDamage() {
+    List<Instruction<DamageCondition, Boss<CaveSpider, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      FreakyFourInstance inst = boss.getDetail().getZone();
 
-            Optional<Living> optBossEnt = inst.getBoss(FreakyFourBoss.CHARLOTTE);
-            if (optBossEnt.isPresent()) {
-                EntityHealthUtil.heal(optBossEnt.get(), condition.getEvent().getBaseDamage());
-            }
+      Optional<Living> optBossEnt = inst.getBoss(FreakyFourBoss.CHARLOTTE);
+      if (optBossEnt.isPresent()) {
+        EntityHealthUtil.heal(optBossEnt.get(), condition.getEvent().getBaseDamage());
+      }
 
-            return Optional.empty();
-        });
-    }
+      return Optional.empty();
+    });
+  }
 }

@@ -25,39 +25,39 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class SoulReaper implements Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>> {
-    private final int baseActivation;
+  private final int baseActivation;
 
-    public SoulReaper() {
-        this(15);
-    }
+  public SoulReaper() {
+    this(15);
+  }
 
-    public SoulReaper(int baseActivation) {
-        this.baseActivation = baseActivation;
-    }
+  public SoulReaper(int baseActivation) {
+    this.baseActivation = baseActivation;
+  }
 
-    public boolean activate(CatacombsBossDetail detail) {
-        return Probability.getChance(baseActivation - detail.getWave());
-    }
+  public boolean activate(CatacombsBossDetail detail) {
+    return Probability.getChance(baseActivation - detail.getWave());
+  }
 
-    @Override
-    public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
-        Entity attacked = damageCondition.getAttacked();
-        if (attacked instanceof Player && activate(detail)) {
-            Task.builder().execute(() -> {
-                Optional<Zombie> optZombie = zombieCatacombsBossDetailBoss.getTargetEntity();
-                if (optZombie.isPresent()) {
-                    Zombie boss = optZombie.get();
-                    double stolen = EntityHealthUtil.getHealth((Living) attacked) - 1;
+  @Override
+  public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
+    Entity attacked = damageCondition.getAttacked();
+    if (attacked instanceof Player && activate(detail)) {
+      Task.builder().execute(() -> {
+        Optional<Zombie> optZombie = zombieCatacombsBossDetailBoss.getTargetEntity();
+        if (optZombie.isPresent()) {
+          Zombie boss = optZombie.get();
+          double stolen = EntityHealthUtil.getHealth((Living) attacked) - 1;
 
-                    attacked.offer(Keys.HEALTH, 1D);
-                    EntityHealthUtil.heal(boss, stolen);
-                    ((Player) attacked).sendMessage(Text.of(TextColors.RED, "The necromancer reaps your soul."));
-                }
-            }).delayTicks(1).submit(SkreePlugin.inst());
+          attacked.offer(Keys.HEALTH, 1D);
+          EntityHealthUtil.heal(boss, stolen);
+          ((Player) attacked).sendMessage(Text.of(TextColors.RED, "The necromancer reaps your soul."));
         }
-        return Optional.empty();
+      }).delayTicks(1).submit(SkreePlugin.inst());
     }
+    return Optional.empty();
+  }
 }

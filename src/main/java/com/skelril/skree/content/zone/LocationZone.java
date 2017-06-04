@@ -15,22 +15,22 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface LocationZone<T extends LegacyZoneBase> {
-    default Optional<T> getApplicableZone(BlockSnapshot block) {
-        return getApplicableZone(block.getLocation().get());
-    }
+  default Optional<T> getApplicableZone(BlockSnapshot block) {
+    return getApplicableZone(block.getLocation().get());
+  }
 
-    default Optional<T> getApplicableZone(Entity entity) {
-        return getApplicableZone(entity.getLocation());
-    }
+  default Optional<T> getApplicableZone(Entity entity) {
+    return getApplicableZone(entity.getLocation());
+  }
 
-    default Optional<T> getApplicableZone(Location<World> loc) {
-        for (T inst : getActiveZones()) {
-            if (inst.contains(loc)) {
-                return Optional.of(inst);
-            }
-        }
-        return Optional.empty();
+  default Optional<T> getApplicableZone(Location<World> loc) {
+    for (T inst : getActiveZones()) {
+      if (inst.contains(loc)) {
+        return Optional.of(inst);
+      }
     }
+    return Optional.empty();
+  }
 
-    Collection<T> getActiveZones();
+  Collection<T> getActiveZones();
 }

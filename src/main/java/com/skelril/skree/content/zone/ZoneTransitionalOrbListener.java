@@ -28,32 +28,32 @@ import java.util.function.Function;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class ZoneTransitionalOrbListener<T extends Zone> extends ZoneApplicableListener<T> {
-    public ZoneTransitionalOrbListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
+  public ZoneTransitionalOrbListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
+
+  @Listener
+  public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+    if (!optItemStack.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (!optItemStack.isPresent()) {
-            return;
-        }
-
-        ItemStack itemStack = tf(optItemStack.get());
-        if (itemStack.getItem() != CustomItemTypes.ZONE_TRANSITIONAL_ORB) {
-            return;
-        }
-
-        Optional<T> optInst = getApplicable(player);
-        if (optInst.isPresent()) {
-            Clause<Player, ZoneStatus> status = optInst.get().remove(player);
-            if (status.getValue() == ZoneStatus.REMOVED) {
-                Task.builder().execute(() -> {
-                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                    tf(player).inventoryContainer.detectAndSendChanges();
-                }).delayTicks(1).submit(SkreePlugin.inst());
-            }
-            event.setUseBlockResult(Tristate.FALSE);
-        }
+    ItemStack itemStack = tf(optItemStack.get());
+    if (itemStack.getItem() != CustomItemTypes.ZONE_TRANSITIONAL_ORB) {
+      return;
     }
+
+    Optional<T> optInst = getApplicable(player);
+    if (optInst.isPresent()) {
+      Clause<Player, ZoneStatus> status = optInst.get().remove(player);
+      if (status.getValue() == ZoneStatus.REMOVED) {
+        Task.builder().execute(() -> {
+          tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+          tf(player).inventoryContainer.detectAndSendChanges();
+        }).delayTicks(1).submit(SkreePlugin.inst());
+      }
+      event.setUseBlockResult(Tristate.FALSE);
+    }
+  }
 }

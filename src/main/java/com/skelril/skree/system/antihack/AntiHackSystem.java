@@ -15,9 +15,9 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Anti-Hack System")
 public class AntiHackSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiJumpListener());
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiRailDupeListener());
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiJumpListener());
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiRailDupeListener());
+  }
 }

@@ -34,52 +34,52 @@ import java.util.Optional;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class SnipeeBossManager extends BossManager<Living, ZoneBossDetail<FreakyFourInstance>> {
-    private FreakyFourConfig config;
+  private FreakyFourConfig config;
 
-    public SnipeeBossManager(FreakyFourConfig config) {
-        this.config = config;
-        handleBinds();
-        handleUnbinds();
-        handleDamage();
-        handleDamaged();
-    }
+  public SnipeeBossManager(FreakyFourConfig config) {
+    this.config = config;
+    handleBinds();
+    handleUnbinds();
+    handleDamage();
+    handleDamaged();
+  }
 
-    private void handleBinds() {
-        List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
-        bindProcessor.add(new NamedBindInstruction<>("Snipee"));
-        bindProcessor.add(new HealthBindInstruction<>(config.snipeeHP));
-        bindProcessor.add((condition, boss) -> {
-            Living entity = boss.getTargetEntity().get();
-            if (entity instanceof ArmorEquipable) {
-                ((ArmorEquipable) entity).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
-            }
-            return Optional.empty();
-        });
-    }
+  private void handleBinds() {
+    List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
+    bindProcessor.add(new NamedBindInstruction<>("Snipee"));
+    bindProcessor.add(new HealthBindInstruction<>(config.snipeeHP));
+    bindProcessor.add((condition, boss) -> {
+      Living entity = boss.getTargetEntity().get();
+      if (entity instanceof ArmorEquipable) {
+        ((ArmorEquipable) entity).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
+      }
+      return Optional.empty();
+    });
+  }
 
-    private void handleUnbinds() {
-        List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
-        unbindProcessor.add(new FreakyFourBossDeath());
-    }
+  private void handleUnbinds() {
+    List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
+    unbindProcessor.add(new FreakyFourBossDeath());
+  }
 
-    private void handleDamage() {
-        List<Instruction<DamageCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            Entity attacked = condition.getAttacked();
-            if (attacked instanceof Living) {
-                EntityHealthUtil.forceDamage(
-                        (Living) attacked,
-                        EntityHealthUtil.getMaxHealth((Living) attacked) * config.snipeeDamage
-                );
-                condition.getEvent().setBaseDamage(0);
-            }
-            return Optional.empty();
-        });
-    }
+  private void handleDamage() {
+    List<Instruction<DamageCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      Entity attacked = condition.getAttacked();
+      if (attacked instanceof Living) {
+        EntityHealthUtil.forceDamage(
+            (Living) attacked,
+            EntityHealthUtil.getMaxHealth((Living) attacked) * config.snipeeDamage
+        );
+        condition.getEvent().setBaseDamage(0);
+      }
+      return Optional.empty();
+    });
+  }
 
-    private void handleDamaged() {
-        List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
-        damagedProcessor.add(new BackTeleportInstruction(config));
-        damagedProcessor.add(new HealableInstruction());
-    }
+  private void handleDamaged() {
+    List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
+    damagedProcessor.add(new BackTeleportInstruction(config));
+    damagedProcessor.add(new HealableInstruction());
+  }
 }

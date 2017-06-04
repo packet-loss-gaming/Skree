@@ -15,9 +15,9 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Random System")
 public class RandomSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
-    public void init() {
-        // Register the service & command
-        Sponge.getCommandManager().register(SkreePlugin.inst(), HeartsCommand.aquireSpec(), "hearts");
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
+  public void init() {
+    // Register the service & command
+    Sponge.getCommandManager().register(SkreePlugin.inst(), HeartsCommand.aquireSpec(), "hearts");
+  }
 }

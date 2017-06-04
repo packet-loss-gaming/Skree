@@ -55,434 +55,436 @@ import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPA
 
 public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
 
-    private static Map<Color, String> colorNameMapping = new LinkedHashMap<>();
+  private static final Map<Color, String> COLOR_NAME_MAPPING = new LinkedHashMap<>();
 
-    static {
-        colorNameMapping.put(Color.WHITE, "white");
-        colorNameMapping.put(Color.BLUE, "blue");
-        colorNameMapping.put(Color.RED, "red");
-        colorNameMapping.put(Color.GREEN, "green");
-        colorNameMapping.put(Color.GRAY, "gray");
-        colorNameMapping.put(Color.YELLOW, "yellow");
-        colorNameMapping.put(Color.BLACK, "black");
+  static {
+    COLOR_NAME_MAPPING.put(Color.WHITE, "white");
+    COLOR_NAME_MAPPING.put(Color.BLUE, "blue");
+    COLOR_NAME_MAPPING.put(Color.RED, "red");
+    COLOR_NAME_MAPPING.put(Color.GREEN, "green");
+    COLOR_NAME_MAPPING.put(Color.GRAY, "gray");
+    COLOR_NAME_MAPPING.put(Color.YELLOW, "yellow");
+    COLOR_NAME_MAPPING.put(Color.BLACK, "black");
+  }
+
+  private Location<World> startingLocation;
+
+  private SkyWarsState state = SkyWarsState.LOBBY;
+
+  private Map<Player, SkyWarsPlayerData> playerDataMapping = new HashMap<>();
+  private Map<Color, Set<Player>> teams = new HashMap<>();
+
+  public SkyWarsInstance(ZoneRegion region) {
+    super(region);
+  }
+
+  @Override
+  public boolean init() {
+    remove();
+    setup();
+    return true;
+  }
+
+  private Map<Color, Set<Player>> createTeamsMapping() {
+    Map<Color, Set<Player>> teams = new HashMap<>();
+    for (Color color : COLOR_NAME_MAPPING.keySet()) {
+      teams.put(color, new HashSet<>());
+    }
+    return teams;
+  }
+
+  private void setup() {
+    teams = createTeamsMapping();
+
+    Vector3d centerPoint = getRegion().getCenter();
+    startingLocation = new Location<>(getRegion().getExtent(), centerPoint.getX(), 14, centerPoint.getZ());
+
+    showStartingPlatform(true);
+  }
+
+  @Override
+  public void remove() {
+    remove(Chicken.class, Item.class);
+  }
+
+  @Override
+  public void forceEnd() {
+    remove(getPlayers(PARTICIPANT));
+    remove();
+  }
+
+  private void giveTeamHoods(Player player) {
+    player.getInventory().clear();
+    for (Color teamColor : COLOR_NAME_MAPPING.keySet()) {
+      ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
+      teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
+      teamHood.offer(Keys.COLOR, teamColor);
+      player.getInventory().offer(teamHood);
+    }
+  }
+
+  private void giveTeamEquipment(Player player, Color teamColor) {
+    player.getInventory().clear();
+
+    ItemStack infinityFeather = newItemStack(CustomItemTypes.SKY_FEATHER);
+    SkyFeather.setFeatherProperties(infinityFeather, -1, 3, 2, 2);
+    player.getInventory().offer(infinityFeather);
+
+    ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
+    teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
+    teamHood.offer(Keys.COLOR, teamColor);
+    player.setHelmet(teamHood);
+
+    ItemStack teamChestplate = newItemStack(ItemTypes.LEATHER_CHESTPLATE);
+    teamChestplate.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Chestplate"));
+    teamChestplate.offer(Keys.COLOR, teamColor);
+    player.setChestplate(teamChestplate);
+
+    ItemStack teamLeggings = newItemStack(ItemTypes.LEATHER_LEGGINGS);
+    teamLeggings.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Leggings"));
+    teamLeggings.offer(Keys.COLOR, teamColor);
+    player.setLeggings(teamLeggings);
+
+    ItemStack teamBoots = newItemStack(ItemTypes.LEATHER_BOOTS);
+    teamBoots.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Boots"));
+    teamBoots.offer(Keys.COLOR, teamColor);
+    player.setBoots(teamBoots);
+  }
+
+  private void showStartingPlatform(boolean present) {
+    Location<World> platformLocation = startingLocation.add(0, -1, 0);
+
+    EditSession editor = WorldEdit.getInstance().getEditSessionFactory().getEditSession(
+        new WorldResolver(getRegion().getExtent()).getWorldEditWorld(),
+        -1
+    );
+    com.sk89q.worldedit.Vector origin = new com.sk89q.worldedit.Vector(
+        platformLocation.getX(), platformLocation.getY(), platformLocation.getZ()
+    );
+
+    BaseBlock targetBlock;
+
+    if (present) {
+      targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.STAINED_GLASS, 15);
+    } else {
+      targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.AIR);
     }
 
-    private Location<World> startingLocation;
+    try {
+      editor.makeCylinder(origin, new SingleBlockPattern(targetBlock), 12, 1, true);
+    } catch (MaxChangedBlocksException e) {
+      e.printStackTrace();
+    }
+  }
 
-    private SkyWarsState state = SkyWarsState.LOBBY;
-
-    private Map<Player, SkyWarsPlayerData> playerDataMapping = new HashMap<>();
-    private Map<Color, Set<Player>> teams = new HashMap<>();
-
-    public SkyWarsInstance(ZoneRegion region) {
-        super(region);
+  @Override
+  public Clause<Player, ZoneStatus> add(Player player) {
+    if (state != SkyWarsState.LOBBY) {
+      return new Clause<>(player, ZoneStatus.NO_REJOIN);
     }
 
-    @Override
-    public boolean init() {
-        remove();
-        setup();
-        return true;
+    player.setLocation(startingLocation);
+    Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+    if (optService.isPresent()) {
+      PlayerStateService service = optService.get();
+      try {
+        service.storeInventory(player);
+        service.releaseInventory(player);
+
+        giveTeamHoods(player);
+      } catch (InventoryStorageStateException e) {
+        e.printStackTrace();
+        return new Clause<>(player, ZoneStatus.ERROR);
+      }
     }
 
-    private Map<Color, Set<Player>> createTeamsMapping() {
-        Map<Color, Set<Player>> teams = new HashMap<>();
-        for (Color color : colorNameMapping.keySet()) {
-            teams.put(color, new HashSet<>());
-        }
-        return teams;
+    playerDataMapping.put(player, new SkyWarsPlayerData());
+
+    return new Clause<>(player, ZoneStatus.ADDED);
+  }
+
+  @Override
+  public Clause<Player, ZoneStatus> remove(Player player) {
+    player.offer(Keys.FALL_DISTANCE, 0F);
+    playerLost(player);
+
+    Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+    if (optService.isPresent()) {
+      PlayerStateService service = optService.get();
+      service.loadInventoryIfStored(player);
     }
 
-    private void setup() {
-        teams = createTeamsMapping();
+    return super.remove(player);
+  }
 
-        Vector3d centerPoint = getRegion().getCenter();
-        startingLocation = new Location<>(getRegion().getExtent(), centerPoint.getX(), 14, centerPoint.getZ());
+  public void playerLost(Player player) {
+    SkyWarsPlayerData playerData = playerDataMapping.remove(player);
+    if (playerData != null) {
+      Set<Player> team = playerData.getTeam();
+      if (team != null) {
+        team.remove(player);
+      }
 
-        showStartingPlatform(true);
+      player.getInventory().clear();
+    }
+  }
+
+  @Override
+  public Collection<Player> getPlayers(PlayerClassifier classifier) {
+    if (classifier == PARTICIPANT) {
+      return playerDataMapping.keySet();
+    }
+    return super.getPlayers(classifier);
+  }
+
+  @Override
+  public void run() {
+    if (isEmpty() && state != SkyWarsState.IN_PROGRESS) {
+      expire();
+      return;
     }
 
-    @Override
-    public void remove() {
-        remove(Chicken.class, Item.class);
+    if (state == SkyWarsState.LOBBY) {
+      smartStart();
+      return;
     }
 
-    @Override
-    public void forceEnd() {
-        remove(getPlayers(PARTICIPANT));
-        remove();
+    outOfBoundsCheck();
+
+    Optional<Clause<String, WinType>> optWinner = getWinner();
+    if (optWinner.isPresent()) {
+      processWin(optWinner.get());
+      expire();
+      return;
     }
 
-    private void giveTeamHoods(Player player) {
-        player.getInventory().clear();
-        for (Color teamColor : colorNameMapping.keySet()) {
-            ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
-            teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
-            teamHood.offer(Keys.COLOR, teamColor);
-            player.getInventory().offer(teamHood);
-        }
+    feedPlayers();
+    damagePlayers();
+    spawnChickens();
+  }
+
+  public SkyWarsState getState() {
+    return state;
+  }
+
+  public void awardPowerup(Player player, ItemStack held) {
+
+    ItemStack powerup;
+
+    Optional<String> optSuffix = SkyFeather.getSuffix(held);
+    if (optSuffix.isPresent() && optSuffix.get().equals("Doom")) {
+      return;
     }
 
-    private void giveTeamEquipment(Player player, Color teamColor) {
-        player.getInventory().clear();
+    int uses = 5;
+    double radius = 3;
+    double flight = 2;
+    double pushBack = 4;
 
-        ItemStack infinityFeather = newItemStack(CustomItemTypes.SKY_FEATHER);
-        SkyFeather.setFeatherProperties(infinityFeather, -1, 3, 2, 2);
-        player.getInventory().offer(infinityFeather);
-
-        ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
-        teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Hood"));
-        teamHood.offer(Keys.COLOR, teamColor);
-        player.setHelmet(teamHood);
-
-        ItemStack teamChestplate = newItemStack(ItemTypes.LEATHER_CHESTPLATE);
-        teamChestplate.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Chestplate"));
-        teamChestplate.offer(Keys.COLOR, teamColor);
-        player.setChestplate(teamChestplate);
-
-        ItemStack teamLeggings = newItemStack(ItemTypes.LEATHER_LEGGINGS);
-        teamLeggings.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Leggings"));
-        teamLeggings.offer(Keys.COLOR, teamColor);
-        player.setLeggings(teamLeggings);
-
-        ItemStack teamBoots = newItemStack(ItemTypes.LEATHER_BOOTS);
-        teamBoots.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Sky Boots"));
-        teamBoots.offer(Keys.COLOR, teamColor);
-        player.setBoots(teamBoots);
+    if (Probability.getChance(2)) {
+      radius = 5;
+      pushBack = 6;
+    } else {
+      flight = 6;
     }
 
-    private void showStartingPlatform(boolean present) {
-        Location<World> platformLocation = startingLocation.add(0, -1, 0);
+    if (Probability.getChance(50)) {
+      uses = -1;
+      radius = 7;
+      flight = 6;
+      pushBack = 6;
+      MutableMessageChannel targets = getPlayerMessageChannel(PlayerClassifier.SPECTATOR).asMutable();
+      targets.removeMember(player);
+      targets.send(Text.of(TextColors.RED, player.getName(), " has been given a Doom feather!"));
 
-        EditSession editor = WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                new WorldResolver(getRegion().getExtent()).getWorldEditWorld(),
-                -1
-        );
-        com.sk89q.worldedit.Vector origin = new com.sk89q.worldedit.Vector(
-                platformLocation.getX(), platformLocation.getY(), platformLocation.getZ()
-        );
+      player.getInventory().clear();
+    }
 
-        BaseBlock targetBlock;
+    powerup = newItemStack(CustomItemTypes.SKY_FEATHER);
+    SkyFeather.setFeatherProperties(powerup, uses, radius, flight, pushBack);
 
-        if (present) {
-            targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.STAINED_GLASS, 15);
+    player.getInventory().offer(powerup);
+    tf(player).inventoryContainer.detectAndSendChanges();
+
+    // Display name doesn't need checked as all power ups have one assigned
+    player.sendMessage(Text.of(TextColors.YELLOW, "You obtain a power-up!"));
+  }
+
+  public boolean isFriendlyFire(Player attacker, Player defender) {
+    SkyWarsPlayerData attackerData = playerDataMapping.get(attacker);
+    SkyWarsPlayerData defenderData = playerDataMapping.get(defender);
+
+    if (attackerData == null || defenderData == null) {
+      return false;
+    }
+
+    Set<Player> attackerTeam = attackerData.getTeam();
+    Set<Player> defenderTeam = defenderData.getTeam();
+
+    /* We want identity comparison to prevent expensive list comparisons */
+    return attackerTeam == defenderTeam && attackerTeam != teams.get(Color.WHITE) && attackerTeam != null;
+  }
+
+  public Optional<SkyWarsPlayerData> getPlayerData(Player player) {
+    return Optional.ofNullable(playerDataMapping.get(player));
+  }
+
+  private void launchPlayer(Player player, double mod) {
+    player.setVelocity(new Vector3d(0, 3.5, 0).mul(mod));
+  }
+
+  private void smartStart() {
+    HashMap<Player, Color> colorMapping = new HashMap<>();
+    for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
+      Optional<ItemStack> optHelmet = player.getHelmet();
+      if (!optHelmet.isPresent()) {
+        return;
+      }
+
+      ItemStack helmet = optHelmet.get();
+      Optional<Color> optColor = helmet.get(Keys.COLOR);
+      if (!optColor.isPresent()) {
+        return;
+      }
+
+      colorMapping.put(player, optColor.get());
+    }
+
+    teams = createTeamsMapping(); // Reset the team mapping as it may have been corrupted by a bad run
+
+    for (Map.Entry<Player, Color> entry : colorMapping.entrySet()) {
+      Color color = entry.getValue();
+      Set<Player> team = teams.get(color);
+      if (team == null) {
+        return;
+      }
+
+      Player player = entry.getKey();
+
+      // Update team mapping
+      team.add(player);
+      SkyWarsPlayerData playerData = playerDataMapping.get(player);
+      playerData.setTeam(team);
+
+      // Give player team equipment
+      giveTeamEquipment(player, color);
+
+      // Throw player
+      launchPlayer(player, 1);
+      playerData.stopPushBack();
+    }
+
+    if (getWinner().isPresent()) {
+      return;
+    }
+
+    getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.RED, "Fight!"));
+    state = SkyWarsState.IN_PROGRESS;
+
+    showStartingPlatform(false);
+  }
+
+  private void outOfBoundsCheck() {
+    for (Player player : getPlayers(PARTICIPANT)) {
+      if (contains(player)) {
+        continue;
+      }
+
+      remove(player);
+    }
+  }
+
+  public Optional<Clause<String, WinType>> getWinner() {
+    return getWinner(teams);
+  }
+
+  private Optional<Clause<String, WinType>> getWinner(Map<Color, Set<Player>> teams) {
+    List<Clause<String, WinType>> winners = new ArrayList<>();
+    for (Map.Entry<Color, Set<Player>> entry : teams.entrySet()) {
+      String colorName = COLOR_NAME_MAPPING.get(entry.getKey());
+      if (colorName.equals("white")) {
+        entry.getValue().stream().forEach(p -> winners.add(new Clause<>(p.getName(), WinType.SOLO)));
+      } else if (!entry.getValue().isEmpty()) {
+        winners.add(new Clause<>(colorName, WinType.TEAM));
+      }
+    }
+
+    if (winners.isEmpty()) {
+      return Optional.of(new Clause<>(null, WinType.DRAW));
+    }
+
+    return winners.size() == 1 ? Optional.of(winners.get(0)) : Optional.empty();
+  }
+
+  private void processWin(Clause<String, WinType> winClause) {
+    state = SkyWarsState.DONE;
+
+    String rawWinMessage;
+    switch (winClause.getValue()) {
+      case SOLO:
+        rawWinMessage = winClause.getKey() + " is the sky wars victor!";
+        break;
+      case TEAM:
+        rawWinMessage = winClause.getKey() + " team is the sky wars victor!";
+        break;
+      case DRAW:
+        rawWinMessage = "Sky wars ended with a draw!";
+        break;
+      default:
+        return;
+    }
+
+    MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawWinMessage));
+    GameChatterPlugin.inst().sendSystemMessage(rawWinMessage);
+  }
+
+  private void feedPlayers() {
+    for (Player player : getPlayers(PARTICIPANT)) {
+      player.offer(Keys.FOOD_LEVEL, 20);
+      player.offer(Keys.SATURATION, 5D);
+    }
+  }
+
+  private void damagePlayers() {
+    for (Player player : getPlayers(PARTICIPANT)) {
+      BlockType blockType = player.getLocation().getBlockType();
+      if (blockType == BlockTypes.WATER || blockType == BlockTypes.FLOWING_WATER) {
+        // If the game is in progress, damage, otherwise return to the spawn point
+        if (state == SkyWarsState.IN_PROGRESS) {
+          player.damage(Probability.getRandom(3), DamageSource.builder().type(DamageTypes.DROWN).build());
         } else {
-            targetBlock = WorldEdit.getInstance().getBaseBlockFactory().getBaseBlock(BlockID.AIR);
+          player.setLocation(startingLocation);
         }
-
-        try {
-            editor.makeCylinder(origin, new SingleBlockPattern(targetBlock), 12, 1, true);
-        } catch (MaxChangedBlocksException e) {
-            e.printStackTrace();
-        }
+      }
     }
+  }
 
-    @Override
-    public Clause<Player, ZoneStatus> add(Player player) {
-        if (state != SkyWarsState.LOBBY) {
-            return new Clause<>(player, ZoneStatus.NO_REJOIN);
-        }
+  private void spawnChickens() {
+    Vector3i bvMax = getRegion().getMaximumPoint();
+    Vector3i bvMin = getRegion().getMinimumPoint();
 
-        player.setLocation(startingLocation);
-        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
-        if (optService.isPresent()) {
-            PlayerStateService service = optService.get();
-            try {
-                service.storeInventory(player);
-                service.releaseInventory(player);
+    for (int i = 0; i < getPlayers(PARTICIPANT).size(); ++i) {
+      Location<World> testLoc = new Location<>(
+          getRegion().getExtent(),
+          Probability.getRangedRandom(bvMin.getX(), bvMax.getX()),
+          bvMax.getY() - 10,
+          Probability.getRangedRandom(bvMin.getZ(), bvMax.getZ())
+      );
 
-                giveTeamHoods(player);
-            } catch (InventoryStorageStateException e) {
-                e.printStackTrace();
-                return new Clause<>(player, ZoneStatus.ERROR);
-            }
-        }
+      Vector2d testPos = new Vector2d(testLoc.getX(), testLoc.getZ());
+      Vector2d originPos = new Vector2d(startingLocation.getX(), startingLocation.getZ());
 
-        playerDataMapping.put(player, new SkyWarsPlayerData());
+      if (testPos.distanceSquared(originPos) >= 70 * 70) {
+        --i;
+        continue;
+      }
 
-        return new Clause<>(player, ZoneStatus.ADDED);
+      Chicken chicken = (Chicken) testLoc.getExtent().createEntity(EntityTypes.CHICKEN, testLoc.getPosition());
+      chicken.offer(Keys.PERSISTS, false);
+      testLoc.getExtent().spawnEntity(
+          chicken,
+          Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+      );
     }
-
-    @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        player.offer(Keys.FALL_DISTANCE, 0F);
-        playerLost(player);
-
-        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
-        if (optService.isPresent()) {
-            PlayerStateService service = optService.get();
-            service.loadInventoryIfStored(player);
-        }
-
-        return super.remove(player);
-    }
-
-    public void playerLost(Player player) {
-        SkyWarsPlayerData playerData = playerDataMapping.remove(player);
-        if (playerData != null) {
-            Set<Player> team = playerData.getTeam();
-            if (team != null) {
-                team.remove(player);
-            }
-
-            player.getInventory().clear();
-        }
-    }
-
-    @Override
-    public Collection<Player> getPlayers(PlayerClassifier classifier) {
-        if (classifier == PARTICIPANT) {
-            return playerDataMapping.keySet();
-        }
-        return super.getPlayers(classifier);
-    }
-
-    @Override
-    public void run() {
-        if (isEmpty() && state != SkyWarsState.IN_PROGRESS) {
-            expire();
-            return;
-        }
-
-        if (state == SkyWarsState.LOBBY) {
-            smartStart();
-            return;
-        }
-
-        outOfBoundsCheck();
-
-        Optional<Clause<String, WinType>> optWinner = getWinner();
-        if (optWinner.isPresent()) {
-            processWin(optWinner.get());
-            expire();
-            return;
-        }
-
-        feedPlayers();
-        damagePlayers();
-        spawnChickens();
-    }
-
-    public SkyWarsState getState() {
-        return state;
-    }
-
-    public void awardPowerup(Player player, ItemStack held) {
-
-        ItemStack powerup;
-
-        Optional<String> optSuffix = SkyFeather.getSuffix(held);
-        if (optSuffix.isPresent() && optSuffix.get().equals("Doom")) return;
-
-        int uses = 5;
-        double radius = 3;
-        double flight = 2;
-        double pushBack = 4;
-
-        if (Probability.getChance(2)) {
-            radius = 5;
-            pushBack = 6;
-        } else {
-            flight = 6;
-        }
-
-        if (Probability.getChance(50)) {
-            uses = -1;
-            radius = 7;
-            flight = 6;
-            pushBack = 6;
-            MutableMessageChannel targets = getPlayerMessageChannel(PlayerClassifier.SPECTATOR).asMutable();
-            targets.removeMember(player);
-            targets.send(Text.of(TextColors.RED, player.getName(), " has been given a Doom feather!"));
-
-            player.getInventory().clear();
-        }
-
-        powerup = newItemStack(CustomItemTypes.SKY_FEATHER);
-        SkyFeather.setFeatherProperties(powerup, uses, radius, flight, pushBack);
-
-        player.getInventory().offer(powerup);
-        tf(player).inventoryContainer.detectAndSendChanges();
-
-        // Display name doesn't need checked as all power ups have one assigned
-        player.sendMessage(Text.of(TextColors.YELLOW, "You obtain a power-up!"));
-    }
-
-    public boolean isFriendlyFire(Player attacker, Player defender) {
-        SkyWarsPlayerData attackerData = playerDataMapping.get(attacker);
-        SkyWarsPlayerData defenderData = playerDataMapping.get(defender);
-
-        if (attackerData == null || defenderData == null) {
-            return false;
-        }
-
-        Set<Player> attackerTeam = attackerData.getTeam();
-        Set<Player> defenderTeam = defenderData.getTeam();
-
-        /* We want identity comparison to prevent expensive list comparisons */
-        return attackerTeam == defenderTeam && attackerTeam != teams.get(Color.WHITE) && attackerTeam != null;
-    }
-
-    public Optional<SkyWarsPlayerData> getPlayerData(Player player) {
-        return Optional.ofNullable(playerDataMapping.get(player));
-    }
-
-    private void launchPlayer(Player player, double mod) {
-        player.setVelocity(new Vector3d(0, 3.5, 0).mul(mod));
-    }
-
-    private void smartStart() {
-        HashMap<Player, Color> colorMapping = new HashMap<>();
-        for (Player player : getPlayers(PlayerClassifier.PARTICIPANT)) {
-            Optional<ItemStack> optHelmet = player.getHelmet();
-            if (!optHelmet.isPresent()) {
-                return;
-            }
-
-            ItemStack helmet = optHelmet.get();
-            Optional<Color> optColor = helmet.get(Keys.COLOR);
-            if (!optColor.isPresent()) {
-                return;
-            }
-
-            colorMapping.put(player, optColor.get());
-        }
-
-        teams = createTeamsMapping(); // Reset the team mapping as it may have been corrupted by a bad run
-
-        for (Map.Entry<Player, Color> entry : colorMapping.entrySet()) {
-            Color color = entry.getValue();
-            Set<Player> team = teams.get(color);
-            if (team == null) {
-                return;
-            }
-
-            Player player = entry.getKey();
-
-            // Update team mapping
-            team.add(player);
-            SkyWarsPlayerData playerData = playerDataMapping.get(player);
-            playerData.setTeam(team);
-
-            // Give player team equipment
-            giveTeamEquipment(player, color);
-
-            // Throw player
-            launchPlayer(player, 1);
-            playerData.stopPushBack();
-        }
-
-        if (getWinner().isPresent()) {
-            return;
-        }
-
-        getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.RED, "Fight!"));
-        state = SkyWarsState.IN_PROGRESS;
-
-        showStartingPlatform(false);
-    }
-
-    private void outOfBoundsCheck() {
-        for (Player player : getPlayers(PARTICIPANT)) {
-            if (contains(player)) {
-                continue;
-            }
-
-            remove(player);
-        }
-    }
-
-    public Optional<Clause<String, WinType>> getWinner() {
-        return getWinner(teams);
-    }
-
-    private Optional<Clause<String, WinType>> getWinner(Map<Color, Set<Player>> teams) {
-        List<Clause<String, WinType>> winners = new ArrayList<>();
-        for (Map.Entry<Color, Set<Player>> entry : teams.entrySet()) {
-            String colorName = colorNameMapping.get(entry.getKey());
-            if (colorName.equals("white")) {
-                entry.getValue().stream().forEach(p -> winners.add(new Clause<>(p.getName(), WinType.SOLO)));
-            } else if (!entry.getValue().isEmpty()) {
-                winners.add(new Clause<>(colorName, WinType.TEAM));
-            }
-        }
-
-        if (winners.isEmpty()) {
-            return Optional.of(new Clause<>(null, WinType.DRAW));
-        }
-
-        return winners.size() == 1 ? Optional.of(winners.get(0)) : Optional.empty();
-    }
-
-    private void processWin(Clause<String, WinType> winClause) {
-        state = SkyWarsState.DONE;
-
-        String rawWinMessage;
-        switch (winClause.getValue()) {
-            case SOLO:
-                rawWinMessage = winClause.getKey() + " is the sky wars victor!";
-                break;
-            case TEAM:
-                rawWinMessage = winClause.getKey() + " team is the sky wars victor!";
-                break;
-            case DRAW:
-                rawWinMessage = "Sky wars ended with a draw!";
-                break;
-            default:
-                return;
-        }
-
-        MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawWinMessage));
-        GameChatterPlugin.inst().sendSystemMessage(rawWinMessage);
-    }
-
-    private void feedPlayers() {
-        for (Player player : getPlayers(PARTICIPANT)) {
-            player.offer(Keys.FOOD_LEVEL, 20);
-            player.offer(Keys.SATURATION, 5D);
-        }
-    }
-
-    private void damagePlayers() {
-        for (Player player : getPlayers(PARTICIPANT)) {
-            BlockType blockType = player.getLocation().getBlockType();
-            if (blockType == BlockTypes.WATER || blockType == BlockTypes.FLOWING_WATER) {
-                // If the game is in progress, damage, otherwise return to the spawn point
-                if (state == SkyWarsState.IN_PROGRESS) {
-                    player.damage(Probability.getRandom(3), DamageSource.builder().type(DamageTypes.DROWN).build());
-                } else {
-                    player.setLocation(startingLocation);
-                }
-            }
-        }
-    }
-
-    private void spawnChickens() {
-        Vector3i bvMax = getRegion().getMaximumPoint();
-        Vector3i bvMin = getRegion().getMinimumPoint();
-
-        for (int i = 0; i < getPlayers(PARTICIPANT).size(); ++i) {
-            Location<World> testLoc = new Location<>(
-                    getRegion().getExtent(),
-                    Probability.getRangedRandom(bvMin.getX(), bvMax.getX()),
-                    bvMax.getY() - 10,
-                    Probability.getRangedRandom(bvMin.getZ(), bvMax.getZ())
-            );
-
-            Vector2d testPos = new Vector2d(testLoc.getX(), testLoc.getZ());
-            Vector2d originPos = new Vector2d(startingLocation.getX(), startingLocation.getZ());
-
-            if (testPos.distanceSquared(originPos) >= 70 * 70) {
-                --i;
-                continue;
-            }
-
-            Chicken chicken = (Chicken) testLoc.getExtent().createEntity(EntityTypes.CHICKEN, testLoc.getPosition());
-            chicken.offer(Keys.PERSISTS, false);
-            testLoc.getExtent().spawnEntity(
-                    chicken,
-                    Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-            );
-        }
-    }
+  }
 }

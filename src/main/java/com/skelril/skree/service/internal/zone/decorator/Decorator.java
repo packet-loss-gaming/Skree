@@ -14,5 +14,5 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface Decorator {
-    <T> ZoneWorldBoundingBox pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<ZoneWorldBoundingBox, T> initMapper, Consumer<T> callback);
+  <T> ZoneWorldBoundingBox pasteAt(WorldResolver world, Vector3i origin, String resourceName, Function<ZoneWorldBoundingBox, T> initMapper, Consumer<T> callback);
 }

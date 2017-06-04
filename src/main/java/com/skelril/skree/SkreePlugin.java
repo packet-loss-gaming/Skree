@@ -46,70 +46,70 @@ import java.util.logging.Logger;
 @Plugin(id = "skree", name = "Skree", description = "The Skelril super-mod", version = "1.0")
 public class SkreePlugin {
 
-    @Inject
-    private Logger logger;
+  @Inject
+  private Logger logger;
 
-    protected NitroModuleManager manager = new NitroModuleManager();
+  protected NitroModuleManager manager = new NitroModuleManager();
 
-    private static SkreePlugin inst;
+  private static SkreePlugin inst;
 
-    @Inject
-    private PluginContainer container;
+  @Inject
+  private PluginContainer container;
 
-    public static PluginContainer container() {
-        return inst.container;
+  public static PluginContainer container() {
+    return inst.container;
+  }
+
+  public static SkreePlugin inst() {
+    return inst;
+  }
+
+  public SkreePlugin() {
+    inst = this;
+    registerModules();
+    manager.discover();
+  }
+
+  @Listener
+  public void onGameStateChange(GameStateEvent event) {
+    manager.trigger(event.getState().toString());
+  }
+
+  private void registerModules() {
+    ImmutableList<Class> initialized = ImmutableList.of(
+        AidSystem.class,
+        AntiHackSystem.class,
+        ArrowFishingSystem.class,
+        CustomRegisterySystem.class,
+        DatabaseSystem.class,
+        DropClearSystem.class,
+        ItemRestrictionSystem.class,
+        MaintenanceSystem.class,
+        MarketSystem.class,
+        MobDensitySystem.class,
+        ModifierSystem.class,
+        PlayerStateSystem.class,
+        ProjectileWatcherSystem.class,
+        PvPSystem.class,
+        RandomSystem.class,
+        RegionSystem.class,
+        RespawnSystem.class,
+        RespawnQueueSystem.class,
+        ShutdownSystem.class,
+        TeleportSystem.class,
+        TweakerSystem.class,
+        WeatherCommandSystem.class,
+        WorldGeneratorSystem.class,
+        WorldSystem.class,
+        ZoneSystem.class
+    );
+
+    for (Class<?> entry : initialized) {
+      try {
+        manager.registerModule(entry.newInstance());
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
     }
-
-    public static SkreePlugin inst() {
-        return inst;
-    }
-
-    public SkreePlugin() {
-        inst = this;
-        registerModules();
-        manager.discover();
-    }
-
-    @Listener
-    public void onGameStateChange(GameStateEvent event) {
-        manager.trigger(event.getState().toString());
-    }
-
-    private void registerModules() {
-        ImmutableList<Class> initialized = ImmutableList.of(
-                AidSystem.class,
-                AntiHackSystem.class,
-                ArrowFishingSystem.class,
-                CustomRegisterySystem.class,
-                DatabaseSystem.class,
-                DropClearSystem.class,
-                ItemRestrictionSystem.class,
-                MaintenanceSystem.class,
-                MarketSystem.class,
-                MobDensitySystem.class,
-                ModifierSystem.class,
-                PlayerStateSystem.class,
-                ProjectileWatcherSystem.class,
-                PvPSystem.class,
-                RandomSystem.class,
-                RegionSystem.class,
-                RespawnSystem.class,
-                RespawnQueueSystem.class,
-                ShutdownSystem.class,
-                TeleportSystem.class,
-                TweakerSystem.class,
-                WeatherCommandSystem.class,
-                WorldGeneratorSystem.class,
-                WorldSystem.class,
-                ZoneSystem.class
-        );
-
-        for (Class<?> entry : initialized) {
-            try {
-                manager.registerModule(entry.newInstance());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+  }
 }

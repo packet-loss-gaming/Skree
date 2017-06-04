@@ -21,116 +21,116 @@ import java.util.*;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class DesmireDungeonInstance extends LegacyZoneBase implements Runnable {
-    private DesmireDungeonRoom[][] roomGrid = new DesmireDungeonRoom[5][5];
-    private List<DesmireDungeonRoom> rooms = new ArrayList<>();
-    private DesmireDungeonRoom activeRoom;
+  private DesmireDungeonRoom[][] roomGrid = new DesmireDungeonRoom[5][5];
+  private List<DesmireDungeonRoom> rooms = new ArrayList<>();
+  private DesmireDungeonRoom activeRoom;
 
-    public DesmireDungeonInstance(ZoneRegion region) {
-        super(region);
-    }
+  public DesmireDungeonInstance(ZoneRegion region) {
+    super(region);
+  }
 
-    private boolean isCenterRoom(int x, int z) {
-        return x == (roomGrid.length / 2) && z == (roomGrid[x].length / 2);
-    }
+  private boolean isCenterRoom(int x, int z) {
+    return x == (roomGrid.length / 2) && z == (roomGrid[x].length / 2);
+  }
 
-    private void configureRooms() {
-        for (int x = 0; x < roomGrid.length; ++x) {
-            for (int z = 0; z < roomGrid[x].length; ++z) {
-                if (isCenterRoom(x, z)) {
-                    continue;
-                }
-
-                Vector3i roomSize = new Vector3i(18, 8, 18);
-                Vector3i roomOrigin = getRegion().getMinimumPoint().add(x * 17, 0, z * 17);
-                ZoneBoundingBox roomBoundingBox = new ZoneBoundingBox(roomOrigin, roomSize);
-
-                DesmireDungeonRoom room = new DesmireDungeonRoom(this, roomBoundingBox);
-
-                room.lockDoors();
-
-                rooms.add(roomGrid[x][z] = room);
-            }
-        }
-    }
-
-    private DesmireDungeonRoom getRandomRoom() {
-        return Probability.pickOneOf(rooms);
-    }
-
-    private void setStartingRoom() {
-        activeRoom = getRandomRoom();
-        activeRoom.unlockDoors();
-    }
-
-    private void setUp() {
-        configureRooms();
-        setStartingRoom();
-    }
-
-    @Override
-    public boolean init() {
-        setUp();
-        remove();
-        return true;
-    }
-
-    @Override
-    public void forceEnd() {
-        remove(getPlayers(PARTICIPANT));
-        remove();
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> add(Player player) {
-        player.setLocation(activeRoom.getSpawnPoint());
-        return new Clause<>(player, ZoneStatus.ADDED);
-    }
-
-    public Optional<DesmireDungeonRoom> getCurrentlyOccupiedRoom() {
-        Set<DesmireDungeonRoom> usedRooms = new HashSet<>();
-
-        for (Player player : getPlayers(PARTICIPANT)) {
-            for (DesmireDungeonRoom room : rooms) {
-                if (room.contains(player)) {
-                    usedRooms.add(room);
-                }
-            }
+  private void configureRooms() {
+    for (int x = 0; x < roomGrid.length; ++x) {
+      for (int z = 0; z < roomGrid[x].length; ++z) {
+        if (isCenterRoom(x, z)) {
+          continue;
         }
 
-        if (usedRooms.size() != 1) {
-            return Optional.empty();
-        }
+        Vector3i roomSize = new Vector3i(18, 8, 18);
+        Vector3i roomOrigin = getRegion().getMinimumPoint().add(x * 17, 0, z * 17);
+        ZoneBoundingBox roomBoundingBox = new ZoneBoundingBox(roomOrigin, roomSize);
 
-        return Optional.of(usedRooms.iterator().next());
+        DesmireDungeonRoom room = new DesmireDungeonRoom(this, roomBoundingBox);
+
+        room.lockDoors();
+
+        rooms.add(roomGrid[x][z] = room);
+      }
+    }
+  }
+
+  private DesmireDungeonRoom getRandomRoom() {
+    return Probability.pickOneOf(rooms);
+  }
+
+  private void setStartingRoom() {
+    activeRoom = getRandomRoom();
+    activeRoom.unlockDoors();
+  }
+
+  private void setUp() {
+    configureRooms();
+    setStartingRoom();
+  }
+
+  @Override
+  public boolean init() {
+    setUp();
+    remove();
+    return true;
+  }
+
+  @Override
+  public void forceEnd() {
+    remove(getPlayers(PARTICIPANT));
+    remove();
+  }
+
+  @Override
+  public Clause<Player, ZoneStatus> add(Player player) {
+    player.setLocation(activeRoom.getSpawnPoint());
+    return new Clause<>(player, ZoneStatus.ADDED);
+  }
+
+  public Optional<DesmireDungeonRoom> getCurrentlyOccupiedRoom() {
+    Set<DesmireDungeonRoom> usedRooms = new HashSet<>();
+
+    for (Player player : getPlayers(PARTICIPANT)) {
+      for (DesmireDungeonRoom room : rooms) {
+        if (room.contains(player)) {
+          usedRooms.add(room);
+        }
+      }
     }
 
-    public void checkDungeonProgression() {
-        Optional<DesmireDungeonRoom> optRoom = getCurrentlyOccupiedRoom();
-        if (!optRoom.isPresent()) {
-            return;
-        }
-
-        DesmireDungeonRoom room = optRoom.get();
-        if (room != activeRoom) {
-            activeRoom.lockDoors();
-            activeRoom = room;
-            activeRoom.summonCreatures();
-            return;
-        }
-
-        int containedCount = getContained(room.getBoundingBox(), Monster.class).size();
-        if (containedCount < 1) {
-            activeRoom.unlockDoors();
-        }
+    if (usedRooms.size() != 1) {
+      return Optional.empty();
     }
 
-    @Override
-    public void run() {
-        if (isEmpty()) {
-            expire();
-            return;
-        }
+    return Optional.of(usedRooms.iterator().next());
+  }
 
-        checkDungeonProgression();
+  public void checkDungeonProgression() {
+    Optional<DesmireDungeonRoom> optRoom = getCurrentlyOccupiedRoom();
+    if (!optRoom.isPresent()) {
+      return;
     }
+
+    DesmireDungeonRoom room = optRoom.get();
+    if (room != activeRoom) {
+      activeRoom.lockDoors();
+      activeRoom = room;
+      activeRoom.summonCreatures();
+      return;
+    }
+
+    int containedCount = getContained(room.getBoundingBox(), Monster.class).size();
+    if (containedCount < 1) {
+      activeRoom.unlockDoors();
+    }
+  }
+
+  @Override
+  public void run() {
+    if (isEmpty()) {
+      expire();
+      return;
+    }
+
+    checkDungeonProgression();
+  }
 }

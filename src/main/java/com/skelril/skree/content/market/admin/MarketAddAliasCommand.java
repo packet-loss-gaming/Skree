@@ -26,46 +26,46 @@ import static org.spongepowered.api.command.args.GenericArguments.remainingJoine
 
 public class MarketAddAliasCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
-        if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
-            return CommandResult.empty();
-        }
-
-        ItemStack item = held.get();
-        String alias = args.<String>getOne("alias").get();
-
-        if (service.addAlias(alias, item)) {
-            src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
-            return CommandResult.empty();
-        }
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Add an alias for an item"))
-                .arguments(remainingJoinedStrings(Text.of("alias")))
-                .executor(new MarketAddAliasCommand())
-                .build();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
+
+    MarketService service = optService.get();
+
+    Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
+    if (!held.isPresent()) {
+      src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
+      return CommandResult.empty();
+    }
+
+    ItemStack item = held.get();
+    String alias = args.<String>getOne("alias").get();
+
+    if (service.addAlias(alias, item)) {
+      src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
+      return CommandResult.empty();
+    }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Add an alias for an item"))
+        .arguments(remainingJoinedStrings(Text.of("alias")))
+        .executor(new MarketAddAliasCommand())
+        .build();
+  }
 }

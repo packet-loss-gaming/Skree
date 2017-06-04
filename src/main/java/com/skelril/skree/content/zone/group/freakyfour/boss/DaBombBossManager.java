@@ -26,29 +26,29 @@ import java.util.List;
 
 public class DaBombBossManager extends BossManager<Living, ZoneBossDetail<FreakyFourInstance>> {
 
-    private FreakyFourConfig config;
+  private FreakyFourConfig config;
 
-    public DaBombBossManager(FreakyFourConfig config) {
-        this.config = config;
-        handleBinds();
-        handleUnbinds();
-        handleDamaged();
-    }
+  public DaBombBossManager(FreakyFourConfig config) {
+    this.config = config;
+    handleBinds();
+    handleUnbinds();
+    handleDamaged();
+  }
 
-    private void handleBinds() {
-        List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
-        bindProcessor.add(new NamedBindInstruction<>("Da Bomb"));
-        bindProcessor.add(new HealthBindInstruction<>(config.daBombHP));
-    }
+  private void handleBinds() {
+    List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
+    bindProcessor.add(new NamedBindInstruction<>("Da Bomb"));
+    bindProcessor.add(new HealthBindInstruction<>(config.daBombHP));
+  }
 
-    private void handleUnbinds() {
-        List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
-        unbindProcessor.add(new FreakyFourBossDeath());
-    }
+  private void handleUnbinds() {
+    List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
+    unbindProcessor.add(new FreakyFourBossDeath());
+  }
 
-    private void handleDamaged() {
-        List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
-        damagedProcessor.add(new BackTeleportInstruction(config));
-        damagedProcessor.add(new HealableInstruction());
-    }
+  private void handleDamaged() {
+    List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
+    damagedProcessor.add(new BackTeleportInstruction(config));
+    damagedProcessor.add(new HealableInstruction());
+  }
 }

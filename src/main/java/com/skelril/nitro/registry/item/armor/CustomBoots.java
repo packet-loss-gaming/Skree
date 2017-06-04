@@ -9,23 +9,23 @@ package com.skelril.nitro.registry.item.armor;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 public abstract class CustomBoots extends CustomArmor {
-    public CustomBoots() {
-        super(EntityEquipmentSlot.FEET);
-    }
+  public CustomBoots() {
+    super(EntityEquipmentSlot.FEET);
+  }
 
-    @Override
-    public int __getDamageReductionAmount() {
-        return 3;
-    }
+  @Override
+  public int __getDamageReductionAmount() {
+    return 3;
+  }
 
-    @Override
-    public int __getToughness() {
-        return 2;
-    }
+  @Override
+  public int __getToughness() {
+    return 2;
+  }
 
-    @Override
-    public String __getArmorCategory() {
-        return "boots";
-    }
+  @Override
+  public String __getArmorCategory() {
+    return "boots";
+  }
 }
 

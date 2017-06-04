@@ -25,32 +25,34 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ModifierNotifier {
-    @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event) {
-        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-        if (!optService.isPresent()) {
-            return;
-        }
-
-        ModifierService service = optService.get();
-
-        List<String> messages = new ArrayList<>();
-        for (Map.Entry<String, Long> entry : service.getActiveModifiers().entrySet()) {
-            String friendlyName = StringUtils.capitalize(entry.getKey().replace("_", " ").toLowerCase());
-            String friendlyTime = PrettyText.date(entry.getValue());
-            messages.add(" - " + friendlyName + " till " + friendlyTime);
-        }
-        if (messages.isEmpty()) return;
-
-        messages.sort(String.CASE_INSENSITIVE_ORDER);
-        messages.add(0, "\n\nThe following donation perks are enabled:");
-
-        Player player = event.getTargetEntity();
-
-        Task.builder().execute(() -> {
-            for (String message : messages) {
-                player.sendMessage(Text.of(TextColors.GOLD, message));
-            }
-        }).delay(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+  @Listener
+  public void onPlayerJoin(ClientConnectionEvent.Join event) {
+    Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+    if (!optService.isPresent()) {
+      return;
     }
+
+    ModifierService service = optService.get();
+
+    List<String> messages = new ArrayList<>();
+    for (Map.Entry<String, Long> entry : service.getActiveModifiers().entrySet()) {
+      String friendlyName = StringUtils.capitalize(entry.getKey().replace("_", " ").toLowerCase());
+      String friendlyTime = PrettyText.date(entry.getValue());
+      messages.add(" - " + friendlyName + " till " + friendlyTime);
+    }
+    if (messages.isEmpty()) {
+      return;
+    }
+
+    messages.sort(String.CASE_INSENSITIVE_ORDER);
+    messages.add(0, "\n\nThe following donation perks are enabled:");
+
+    Player player = event.getTargetEntity();
+
+    Task.builder().execute(() -> {
+      for (String message : messages) {
+        player.sendMessage(Text.of(TextColors.GOLD, message));
+      }
+    }).delay(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+  }
 }

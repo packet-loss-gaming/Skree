@@ -19,25 +19,25 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class RedstoneValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> REDSTONE_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.REDSTONE)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.REDSTONE_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> REDSTONE_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.REDSTONE)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.REDSTONE_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final RedstoneValueMap map = new RedstoneValueMap();
+  private static final RedstoneValueMap MAP = new RedstoneValueMap();
 
-    protected RedstoneValueMap() {
-        super(REDSTONE_VALUE_MAP);
-    }
+  protected RedstoneValueMap() {
+    super(REDSTONE_VALUE_MAP);
+  }
 
-    public static RedstoneValueMap inst() {
-        return map;
-    }
+  public static RedstoneValueMap inst() {
+    return MAP;
+  }
 }

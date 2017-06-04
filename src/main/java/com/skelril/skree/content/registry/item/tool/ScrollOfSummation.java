@@ -31,58 +31,58 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class ScrollOfSummation extends CustomItem implements EventAwareContent {
 
-    @Override
-    public String __getID() {
-        return "scroll_of_summation";
+  @Override
+  public String __getId() {
+    return "scroll_of_summation";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 64;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.TOOLS;
+  }
+
+  @Listener
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+
+    if (!optHeldItem.isPresent()) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 64;
+    ItemStack held = optHeldItem.get();
+    if (held.getItem() != this) {
+      return;
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.TOOLS;
-    }
+    net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
+    Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
+        CoalValueMap.inst(),
+        IronValueMap.inst(),
+        GoldValueMap.inst(),
+        RedstoneValueMap.inst(),
+        LapisValueMap.inst(),
+        DiamondValueMap.inst(),
+        EmeraldValueMap.inst(),
+        CofferValueMap.inst()
+    )).execute((ItemStack[]) (Object[]) pInv);
 
-    @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-
-        if (!optHeldItem.isPresent()) {
-            return;
+    if (optCompacted.isPresent()) {
+      Task.builder().execute(() -> {
+        ItemStack[] nInv = optCompacted.get();
+        for (int i = 0; i < pInv.length; ++i) {
+          pInv[i] = tf(nInv[i]);
         }
+        tf(player).inventoryContainer.detectAndSendChanges();
+        tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+        player.sendMessage(Text.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
+      }).delayTicks(1).submit(SkreePlugin.inst());
 
-        ItemStack held = optHeldItem.get();
-        if (held.getItem() != this) {
-            return;
-        }
-
-        net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
-        Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
-                CoalValueMap.inst(),
-                IronValueMap.inst(),
-                GoldValueMap.inst(),
-                RedstoneValueMap.inst(),
-                LapisValueMap.inst(),
-                DiamondValueMap.inst(),
-                EmeraldValueMap.inst(),
-                CofferValueMap.inst()
-        )).execute((ItemStack[]) (Object[]) pInv);
-
-        if (optCompacted.isPresent()) {
-            Task.builder().execute(() -> {
-                ItemStack[] nInv = optCompacted.get();
-                for (int i = 0; i < pInv.length; ++i) {
-                    pInv[i] = tf(nInv[i]);
-                }
-                tf(player).inventoryContainer.detectAndSendChanges();
-                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                player.sendMessage(Text.of(TextColors.GOLD, "The scroll glows brightly before turning to dust..."));
-            }).delayTicks(1).submit(SkreePlugin.inst());
-
-            event.setUseBlockResult(Tristate.FALSE);
-        }
+      event.setUseBlockResult(Tristate.FALSE);
     }
+  }
 }

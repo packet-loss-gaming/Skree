@@ -16,28 +16,28 @@ import java.util.function.Predicate;
 
 public class WorldStatisticsEntityCollection implements StatisticEntityCollection {
 
-    private Map<Vector3i, ChunkStatisticEntityCollection> chunkMapping = new HashMap<>();
+  private Map<Vector3i, ChunkStatisticEntityCollection> chunkMapping = new HashMap<>();
 
-    public WorldStatisticsEntityCollection(List<ChunkStatisticEntityCollection> entityCollections) {
-        for (ChunkStatisticEntityCollection entityCollection : entityCollections) {
-            chunkMapping.put(entityCollection.getPosition(), entityCollection);
-        }
+  public WorldStatisticsEntityCollection(List<ChunkStatisticEntityCollection> entityCollections) {
+    for (ChunkStatisticEntityCollection entityCollection : entityCollections) {
+      chunkMapping.put(entityCollection.getPosition(), entityCollection);
     }
+  }
 
-    public static WorldStatisticsEntityCollection createFor(World world, Predicate<Entity> predicate) {
-        List<ChunkStatisticEntityCollection> entityCollections = new ArrayList<>();
-        for (Chunk chunk : world.getLoadedChunks()) {
-            entityCollections.add(ChunkStatisticEntityCollection.createFor(chunk, predicate));
-        }
-        return new WorldStatisticsEntityCollection(entityCollections);
+  public static WorldStatisticsEntityCollection createFor(World world, Predicate<Entity> predicate) {
+    List<ChunkStatisticEntityCollection> entityCollections = new ArrayList<>();
+    for (Chunk chunk : world.getLoadedChunks()) {
+      entityCollections.add(ChunkStatisticEntityCollection.createFor(chunk, predicate));
     }
+    return new WorldStatisticsEntityCollection(entityCollections);
+  }
 
-    @Override
-    public Collection<Entity> getEntities() {
-        List<Entity> entities = new ArrayList<>();
-        for (ChunkStatisticEntityCollection entityCollection : chunkMapping.values()) {
-            entities.addAll(entityCollection.getEntities());
-        }
-        return entities;
+  @Override
+  public Collection<Entity> getEntities() {
+    List<Entity> entities = new ArrayList<>();
+    for (ChunkStatisticEntityCollection entityCollection : chunkMapping.values()) {
+      entities.addAll(entityCollection.getEntities());
     }
+    return entities;
+  }
 }

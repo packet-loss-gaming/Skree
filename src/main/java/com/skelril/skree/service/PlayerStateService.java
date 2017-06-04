@@ -10,24 +10,31 @@ import com.skelril.skree.service.internal.playerstate.InventoryStorageStateExcep
 import org.spongepowered.api.entity.living.player.Player;
 
 public interface PlayerStateService {
-    boolean hasInventoryStored(Player player);
-    boolean hasReleasedInventoryStored(Player player);
-    void storeInventory(Player player) throws InventoryStorageStateException;
-    void loadInventory(Player player) throws InventoryStorageStateException;
-    void releaseInventory(Player player) throws InventoryStorageStateException;
+  boolean hasInventoryStored(Player player);
 
-    default void loadInventoryIfStored(Player player) {
-        if (hasInventoryStored(player)) {
-            try {
-                loadInventory(player);
-            } catch (InventoryStorageStateException e) {
-                e.printStackTrace();
-            }
-        }
+  boolean hasReleasedInventoryStored(Player player);
+
+  void storeInventory(Player player) throws InventoryStorageStateException;
+
+  void loadInventory(Player player) throws InventoryStorageStateException;
+
+  void releaseInventory(Player player) throws InventoryStorageStateException;
+
+  default void loadInventoryIfStored(Player player) {
+    if (hasInventoryStored(player)) {
+      try {
+        loadInventory(player);
+      } catch (InventoryStorageStateException e) {
+        e.printStackTrace();
+      }
     }
+  }
 
-    @Deprecated // Temporary function
-    void save(Player player, String saveName);
-    @Deprecated // Temporary function
-    void load(Player player, String saveName);
+  @Deprecated
+  // Temporary function
+  void save(Player player, String saveName);
+
+  @Deprecated
+  // Temporary function
+  void load(Player player, String saveName);
 }

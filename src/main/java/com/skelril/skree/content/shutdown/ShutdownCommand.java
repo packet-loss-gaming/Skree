@@ -24,49 +24,49 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ShutdownCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<ShutdownService> optService = Sponge.getServiceManager().provide(ShutdownService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The shutdown service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        ShutdownService service = optService.get();
-
-        Integer seconds = args.<Integer>getOne("seconds").get();
-        Optional<String> message = args.getOne("message");
-
-        seconds = Math.min(Math.max(seconds, 10), 120);
-
-        if (args.<Boolean>getOne("f").isPresent()) {
-            if (message.isPresent()) {
-                service.forceShutdown(Text.of(message.get()));
-            } else {
-                service.forceShutdown();
-            }
-        } else {
-            if (message.isPresent()) {
-                service.shutdown(seconds, Text.of(message.get()));
-            } else {
-                service.shutdown(seconds);
-            }
-        }
-
-        return CommandResult.success();
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Optional<ShutdownService> optService = Sponge.getServiceManager().provide(ShutdownService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The shutdown service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Shut the server off"))
-                .permission("skree.shutdown")
-                .arguments(
-                        flags().flag("f").buildWith(
-                                seq(
-                                        onlyOne(optionalWeak(integer(Text.of("seconds")), 60)),
-                                        optional(remainingJoinedStrings(Text.of("message")))
-                                )
-                        )
-                ).executor(new ShutdownCommand()).build();
+    ShutdownService service = optService.get();
+
+    Integer seconds = args.<Integer>getOne("seconds").get();
+    Optional<String> message = args.getOne("message");
+
+    seconds = Math.min(Math.max(seconds, 10), 120);
+
+    if (args.<Boolean>getOne("f").isPresent()) {
+      if (message.isPresent()) {
+        service.forceShutdown(Text.of(message.get()));
+      } else {
+        service.forceShutdown();
+      }
+    } else {
+      if (message.isPresent()) {
+        service.shutdown(seconds, Text.of(message.get()));
+      } else {
+        service.shutdown(seconds);
+      }
     }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Shut the server off"))
+        .permission("skree.shutdown")
+        .arguments(
+            flags().flag("f").buildWith(
+                seq(
+                    onlyOne(optionalWeak(integer(Text.of("seconds")), 60)),
+                    optional(remainingJoinedStrings(Text.of("message")))
+                )
+            )
+        ).executor(new ShutdownCommand()).build();
+  }
 }

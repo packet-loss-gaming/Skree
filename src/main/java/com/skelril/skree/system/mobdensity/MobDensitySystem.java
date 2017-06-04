@@ -14,8 +14,8 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Mob Density System")
 public class MobDensitySystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new MobDensityListener());
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new MobDensityListener());
+  }
 }

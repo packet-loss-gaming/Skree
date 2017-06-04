@@ -11,19 +11,19 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
 public class MarketAdminCommand {
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Administrative commands for the market"))
-                .permission("skree.market.admin")
-                .child(MarketQuickAddCommand.aquireSpec(), "quickadd", "add")
-                .child(MarketAddAliasCommand.aquireSpec(), "addalias")
-                .child(MarketRemoveAliasCommand.aquireSpec(), "remalias")
-                .child(MarketSetPriceCommand.aquireSpec(), "setprice")
-                .child(MarketSetPrimaryAliasCommand.aquireSpec(), "setprimaryalias", "setpalias")
-                .child(MarketTrackItemCommand.aquireSpec(), "track")
-                .child(MarketUntrackItemComand.aquireSpec(), "untrack", "remove")
-                .child(MarketVerifyCommand.aquireSpec(), "verify")
-                .child(MarketSimulateCommand.aquireSpec(), "simulate")
-                .build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Administrative commands for the market"))
+        .permission("skree.market.admin")
+        .child(MarketQuickAddCommand.aquireSpec(), "quickadd", "add")
+        .child(MarketAddAliasCommand.aquireSpec(), "addalias")
+        .child(MarketRemoveAliasCommand.aquireSpec(), "remalias")
+        .child(MarketSetPriceCommand.aquireSpec(), "setprice")
+        .child(MarketSetPrimaryAliasCommand.aquireSpec(), "setprimaryalias", "setpalias")
+        .child(MarketTrackItemCommand.aquireSpec(), "track")
+        .child(MarketUntrackItemComand.aquireSpec(), "untrack", "remove")
+        .child(MarketVerifyCommand.aquireSpec(), "verify")
+        .child(MarketSimulateCommand.aquireSpec(), "simulate")
+        .build();
+  }
 }

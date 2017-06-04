@@ -9,5 +9,5 @@ package com.skelril.nitro.droptable.resolver.point;
 import com.skelril.nitro.droptable.resolver.DropResolver;
 
 public interface PointDropResolver extends DropResolver {
-    int getMaxPoints(double modifier);
+  int getMaxPoints(double modifier);
 }

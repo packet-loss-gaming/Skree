@@ -9,13 +9,13 @@ package com.skelril.skree.content.world.wilderness;
 import com.skelril.openboss.EntityDetail;
 
 public class WildernessBossDetail implements EntityDetail {
-    private int level;
+  private int level;
 
-    public WildernessBossDetail(int level) {
-        this.level = level;
-    }
+  public WildernessBossDetail(int level) {
+    this.level = level;
+  }
 
-    public int getLevel() {
-        return level;
-    }
+  public int getLevel() {
+    return level;
+  }
 }

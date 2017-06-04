@@ -45,94 +45,96 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
-    public BuildWorldWrapper() {
-        this(new ArrayList<>());
+  public BuildWorldWrapper() {
+    this(new ArrayList<>());
+  }
+
+  public BuildWorldWrapper(Collection<World> worlds) {
+    super("Build", worlds);
+  }
+
+  @Override
+  public void addWorld(World world) {
+    super.addWorld(world);
+    tf(world).setAllowedSpawnTypes(false, true);
+  }
+
+  @Listener
+  public void onEntityConstruction(ConstructEntityEvent.Pre event) {
+    if (!isApplicable(event.getTransform().getExtent())) {
+      return;
     }
 
-    public BuildWorldWrapper(Collection<World> worlds) {
-        super("Build", worlds);
+    if (Monster.class.isAssignableFrom(event.getTargetType().getEntityClass())) {
+      event.setCancelled(true);
     }
+  }
 
-    @Override
-    public void addWorld(World world) {
-        super.addWorld(world);
-        tf(world).setAllowedSpawnTypes(false, true);
+  @Listener
+  public void onEntitySpawn(SpawnEntityEvent event) {
+    List<Entity> entities = event.getEntities();
+
+    Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
+    for (Entity entity : entities) {
+      if (!isApplicable(entity)) {
+        continue;
+      }
+
+      if (entity instanceof Lightning) {
+        ((Lightning) entity).setEffect(true);
+        continue;
+      }
+
+      if (entity instanceof Egg && optBlockCause.isPresent()) {
+        new ItemDropper(entity.getLocation()).dropStacks(
+            Lists.newArrayList(newItemStack(ItemTypes.EGG)), SpawnTypes.DISPENSE
+        );
+        event.setCancelled(true);
+        return;
+      }
+
+      if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
+        event.setCancelled(true);
+        return;
+      }
     }
+  }
 
-    @Listener
-    public void onEntityConstruction(ConstructEntityEvent.Pre event) {
-        if (!isApplicable(event.getTransform().getExtent())) {
+
+  private PlayerCombatParser createFor(Cancellable event) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPvP(Player attacker, Player defender) {
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+        if (optService.isPresent()) {
+          PvPService service = optService.get();
+          if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
             return;
+          }
         }
 
-        if (Monster.class.isAssignableFrom(event.getTargetType().getEntityClass())) {
-            event.setCancelled(true);
-        }
+        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
+
+        event.setCancelled(true);
+      }
+    };
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    if (!isApplicable(event.getTargetEntity())) {
+      return;
     }
 
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        List<Entity> entities = event.getEntities();
+    createFor(event).parse(event);
+  }
 
-        Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
-        for (Entity entity : entities) {
-            if (!isApplicable(entity)) continue;
-
-            if (entity instanceof Lightning) {
-                ((Lightning) entity).setEffect(true);
-                continue;
-            }
-
-            if (entity instanceof Egg && optBlockCause.isPresent()) {
-                new ItemDropper(entity.getLocation()).dropStacks(
-                        Lists.newArrayList(newItemStack(ItemTypes.EGG)), SpawnTypes.DISPENSE
-                );
-                event.setCancelled(true);
-                return;
-            }
-
-            if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    if (!isApplicable(projectile)) {
+      return;
     }
 
-
-    private PlayerCombatParser createFor(Cancellable event) {
-        return new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender) {
-                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-                if (optService.isPresent()) {
-                    PvPService service = optService.get();
-                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
-                        return;
-                    }
-                }
-
-                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in build worlds!"));
-
-                event.setCancelled(true);
-            }
-        };
-    }
-
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity())) {
-            return;
-        }
-
-        createFor(event).parse(event);
-    }
-
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        if (!isApplicable(projectile)) {
-            return;
-        }
-
-        createFor(event).parse(event);
-    }
+    createFor(event).parse(event);
+  }
 }

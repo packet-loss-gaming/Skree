@@ -30,49 +30,49 @@ import java.util.Optional;
 
 public class BackTeleportInstruction implements Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>> {
 
-    private FreakyFourConfig config;
+  private FreakyFourConfig config;
 
-    public BackTeleportInstruction(FreakyFourConfig config) {
-        this.config = config;
-    }
+  public BackTeleportInstruction(FreakyFourConfig config) {
+    this.config = config;
+  }
 
-    private void throwBack(Living entity) {
-        Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
-        vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
-        vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
-        entity.setVelocity(vel);
-    }
+  private void throwBack(Living entity) {
+    Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
+    vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
+    vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
+    entity.setVelocity(vel);
+  }
 
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
-            DamagedCondition damagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> livingZoneBossDetailBoss
-    ) {
-        DamageEntityEvent event = damagedCondition.getEvent();
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
+      DamagedCondition damagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> livingZoneBossDetailBoss
+  ) {
+    DamageEntityEvent event = damagedCondition.getEvent();
 
-        new PlayerCombatParser() {
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) {
-                boolean backTeleport = Probability.getChance(config.backTeleport);
-                if (backTeleport || damagedCondition.getDamageSource().get() instanceof IndirectEntityDamageSource) {
-                    double distSQ = 2;
-                    double maxDist = 1;
+    new PlayerCombatParser() {
+      @Override
+      public void processPlayerAttack(Player attacker, Living defender) {
+        boolean backTeleport = Probability.getChance(config.backTeleport);
+        if (backTeleport || damagedCondition.getDamageSource().get() instanceof IndirectEntityDamageSource) {
+          double distSQ = 2;
+          double maxDist = 1;
 
-                    if (defender instanceof Skeleton) {
-                        distSQ = defender.getLocation().getPosition().distanceSquared(attacker.getLocation().getPosition());
-                        maxDist = config.snipeeTeleportDist;
-                    }
+          if (defender instanceof Skeleton) {
+            distSQ = defender.getLocation().getPosition().distanceSquared(attacker.getLocation().getPosition());
+            maxDist = config.snipeeTeleportDist;
+          }
 
-                    if (backTeleport || distSQ > Math.pow(maxDist, 2)) {
-                        final Entity finalDamager = attacker;
-                        Task.builder().execute(() -> {
-                            defender.setLocation(finalDamager.getLocation());
-                            throwBack(defender);
-                        }).delayTicks(1).submit(SkreePlugin.inst());
-                    }
-                }
-            }
-        }.parse(event);
+          if (backTeleport || distSQ > Math.pow(maxDist, 2)) {
+            final Entity finalDamager = attacker;
+            Task.builder().execute(() -> {
+              defender.setLocation(finalDamager.getLocation());
+              throwBack(defender);
+            }).delayTicks(1).submit(SkreePlugin.inst());
+          }
+        }
+      }
+    }.parse(event);
 
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

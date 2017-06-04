@@ -17,14 +17,14 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneImmutableBlockListener<T> extends ZoneApplicableListener<T> {
-    public ZoneImmutableBlockListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
-    }
+  public ZoneImmutableBlockListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
 
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
-        if (isApplicable(player)) {
-            event.setCancelled(true);
-        }
+  @Listener
+  public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+    if (isApplicable(player)) {
+      event.setCancelled(true);
     }
+  }
 }

@@ -13,14 +13,14 @@ import static net.minecraft.item.ItemStack.areItemStackTagsEqual;
 import static net.minecraft.item.ItemStack.areItemsEqual;
 
 public class ItemComparisonUtil {
-    public static boolean isSimilar(ItemStack a, ItemStack b) {
-        net.minecraft.item.ItemStack stackA = tf(a);
-        net.minecraft.item.ItemStack stackB = tf(b);
+  public static boolean isSimilar(ItemStack a, ItemStack b) {
+    net.minecraft.item.ItemStack stackA = tf(a);
+    net.minecraft.item.ItemStack stackB = tf(b);
 
-        if (stackA.isItemStackDamageable()) {
-            return a.getItem() == b.getItem() && areItemStackTagsEqual(stackA, stackB);
-        }
-
-        return areItemsEqual(stackA, stackB) && areItemStackTagsEqual(stackA, stackB);
+    if (stackA.isItemStackDamageable()) {
+      return a.getItem() == b.getItem() && areItemStackTagsEqual(stackA, stackB);
     }
+
+    return areItemsEqual(stackA, stackB) && areItemStackTagsEqual(stackA, stackB);
+  }
 }

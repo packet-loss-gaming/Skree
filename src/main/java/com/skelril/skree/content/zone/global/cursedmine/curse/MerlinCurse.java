@@ -11,12 +11,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.function.Consumer;
 
 public class MerlinCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        new FireCurse().accept(player);
-        new BlindnessCurse().accept(player);
-        new SmokeCurse().accept(player);
-        new MushroomCurse().accept(player);
-        new ButterFingersCurse().accept(player);
-    }
+  @Override
+  public void accept(Player player) {
+    new FireCurse().accept(player);
+    new BlindnessCurse().accept(player);
+    new SmokeCurse().accept(player);
+    new MushroomCurse().accept(player);
+    new ButterFingersCurse().accept(player);
+  }
 }

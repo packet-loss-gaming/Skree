@@ -11,14 +11,14 @@ import org.spongepowered.api.world.World;
 
 public class ZoneWorldBoundingBox extends ZoneBoundingBox {
 
-    private final World world;
+  private final World world;
 
-    public ZoneWorldBoundingBox(World world, Vector3i origin, Vector3i boundingBox) {
-        super(origin, boundingBox);
-        this.world = world;
-    }
+  public ZoneWorldBoundingBox(World world, Vector3i origin, Vector3i boundingBox) {
+    super(origin, boundingBox);
+    this.world = world;
+  }
 
-    public World getExtent() {
-        return world;
-    }
+  public World getExtent() {
+    return world;
+  }
 }

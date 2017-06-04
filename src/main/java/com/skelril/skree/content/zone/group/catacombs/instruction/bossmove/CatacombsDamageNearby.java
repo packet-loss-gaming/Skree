@@ -17,21 +17,21 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public class CatacombsDamageNearby extends DamageNearby<Boss<Zombie, CatacombsBossDetail>> {
-    @Override
-    public boolean checkTarget(Boss<Zombie, CatacombsBossDetail> boss, Living entity) {
-        return entity instanceof Player && boss.getDetail().getZone().contains(entity);
-    }
+  @Override
+  public boolean checkTarget(Boss<Zombie, CatacombsBossDetail> boss, Living entity) {
+    return entity instanceof Player && boss.getDetail().getZone().contains(entity);
+  }
 
-    @Override
-    public double getDamage(EntityDetail detail) {
-        return Probability.getRandom(20);
-    }
+  @Override
+  public double getDamage(EntityDetail detail) {
+    return Probability.getRandom(20);
+  }
 
-    @Override
-    public void damage(Boss<Zombie, CatacombsBossDetail> boss, Living entity) {
-        super.damage(boss, entity);
-        if (entity instanceof Player) {
-            ((Player) entity).sendMessage(Text.of(TextColors.RED, "The boss sends some of the damage back to you"));
-        }
+  @Override
+  public void damage(Boss<Zombie, CatacombsBossDetail> boss, Living entity) {
+    super.damage(boss, entity);
+    if (entity instanceof Player) {
+      ((Player) entity).sendMessage(Text.of(TextColors.RED, "The boss sends some of the damage back to you"));
     }
+  }
 }

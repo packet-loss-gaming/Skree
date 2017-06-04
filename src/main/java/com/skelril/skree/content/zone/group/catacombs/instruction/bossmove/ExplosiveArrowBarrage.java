@@ -31,58 +31,58 @@ import java.util.concurrent.TimeUnit;
 
 public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>> {
 
-    public boolean activate(EntityDetail detail) {
-        return true;
-    }
+  public boolean activate(EntityDetail detail) {
+    return true;
+  }
 
-    public float explosionStrength(CatacombsBossDetail detail) {
-        return 4F;
-    }
+  public float explosionStrength(CatacombsBossDetail detail) {
+    return 4F;
+  }
 
-    public boolean allowFire(CatacombsBossDetail detail) {
-        return false;
-    }
+  public boolean allowFire(CatacombsBossDetail detail) {
+    return false;
+  }
 
-    public boolean allowBlockBreak(CatacombsBossDetail detail) {
-        return false;
-    }
+  public boolean allowBlockBreak(CatacombsBossDetail detail) {
+    return false;
+  }
 
-    public long getDelay(CatacombsBossDetail detail) {
-        return 7;
-    }
+  public long getDelay(CatacombsBossDetail detail) {
+    return 7;
+  }
 
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
-        CatacombsInstance inst = detail.getZone();
-        Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
+    CatacombsInstance inst = detail.getZone();
+    Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
 
-        if (activate(detail)) {
-            List<Entity> arrows = VelocityEntitySpawner.sendRadial(
-                    EntityTypes.TIPPED_ARROW,
-                    boss,
-                    Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
-            );
+    if (activate(detail)) {
+      List<Entity> arrows = VelocityEntitySpawner.sendRadial(
+          EntityTypes.TIPPED_ARROW,
+          boss,
+          Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
+      );
 
-            Task.builder().execute(() -> {
-                for (Entity arrow : arrows) {
-                    Location<World> target = arrow.getLocation();
-                    target.getExtent().triggerExplosion(
-                            Explosion.builder()
-                                    .location(target)
-                                    .radius(explosionStrength(detail))
-                                    .canCauseFire(allowFire(detail))
-                                    .shouldBreakBlocks(allowBlockBreak(detail))
-                                    .shouldDamageEntities(true)
-                                    .build(),
-                            Cause.source(SkreePlugin.container()).owner(boss).build()
-                    );
-                }
-            }).delay(getDelay(detail), TimeUnit.SECONDS).submit(SkreePlugin.inst());
+      Task.builder().execute(() -> {
+        for (Entity arrow : arrows) {
+          Location<World> target = arrow.getLocation();
+          target.getExtent().triggerExplosion(
+              Explosion.builder()
+                  .location(target)
+                  .radius(explosionStrength(detail))
+                  .canCauseFire(allowFire(detail))
+                  .shouldBreakBlocks(allowBlockBreak(detail))
+                  .shouldDamageEntities(true)
+                  .build(),
+              Cause.source(SkreePlugin.container()).owner(boss).build()
+          );
         }
-
-        return Optional.empty();
+      }).delay(getDelay(detail), TimeUnit.SECONDS).submit(SkreePlugin.inst());
     }
+
+    return Optional.empty();
+  }
 }

@@ -13,15 +13,17 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface ZoneManager<T extends Zone> {
-    void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback);
-    Collection<T> getActiveZones();
+  void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback);
 
-    default Optional<Integer> getMaxGroupSize() {
-        return Optional.empty();
-    }
+  Collection<T> getActiveZones();
 
-    String getName();
-    default String getSystemName() {
-        return ZoneService.mangleManagerName(getName());
-    }
+  default Optional<Integer> getMaxGroupSize() {
+    return Optional.empty();
+  }
+
+  String getName();
+
+  default String getSystemName() {
+    return ZoneService.mangleManagerName(getName());
+  }
 }

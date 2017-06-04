@@ -8,13 +8,13 @@ package com.skelril.nitro.registry.item;
 
 public class ItemToolType {
 
-    private int baseDamage;
+  private int baseDamage;
 
-    public ItemToolType(int baseDamage) {
-        this.baseDamage = baseDamage;
-    }
+  public ItemToolType(int baseDamage) {
+    this.baseDamage = baseDamage;
+  }
 
-    public int getBaseDamage() {
-        return baseDamage;
-    }
+  public int getBaseDamage() {
+    return baseDamage;
+  }
 }

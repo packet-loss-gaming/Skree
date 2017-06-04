@@ -9,5 +9,5 @@ package com.skelril.nitro.registry.dynamic.recipe;
 import com.skelril.nitro.registry.dynamic.ItemStackConfig;
 
 public class CraftingRecipeConfig {
-    protected ItemStackConfig craftedItem;
+  protected ItemStackConfig craftedItem;
 }

@@ -19,20 +19,20 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class Regen implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        Optional<PotionEffectData> optPotionEffectData = owner.getOrCreate(PotionEffectData.class);
-        if (!optPotionEffectData.isPresent()) {
-            return;
-        }
-
-        PotionEffectData potionEffectData = optPotionEffectData.get();
-
-        int duration = (int) (EntityHealthUtil.getHealth(target) * 10);
-        potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.REGENERATION, 2, duration));
-
-        owner.offer(potionEffectData);
-
-        notify(owner, Text.of(TextColors.YELLOW, "You gain a healing aura."));
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    Optional<PotionEffectData> optPotionEffectData = owner.getOrCreate(PotionEffectData.class);
+    if (!optPotionEffectData.isPresent()) {
+      return;
     }
+
+    PotionEffectData potionEffectData = optPotionEffectData.get();
+
+    int duration = (int) (EntityHealthUtil.getHealth(target) * 10);
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.REGENERATION, 2, duration));
+
+    owner.offer(potionEffectData);
+
+    notify(owner, Text.of(TextColors.YELLOW, "You gain a healing aura."));
+  }
 }

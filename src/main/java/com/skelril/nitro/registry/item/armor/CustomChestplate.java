@@ -9,23 +9,23 @@ package com.skelril.nitro.registry.item.armor;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 public abstract class CustomChestplate extends CustomArmor {
-    public CustomChestplate() {
-        super(EntityEquipmentSlot.CHEST);
-    }
+  public CustomChestplate() {
+    super(EntityEquipmentSlot.CHEST);
+  }
 
-    @Override
-    public int __getDamageReductionAmount() {
-        return 8;
-    }
+  @Override
+  public int __getDamageReductionAmount() {
+    return 8;
+  }
 
-    @Override
-    public int __getToughness() {
-        return 2;
-    }
+  @Override
+  public int __getToughness() {
+    return 2;
+  }
 
-    @Override
-    public String __getArmorCategory() {
-        return "chestplate";
-    }
+  @Override
+  public String __getArmorCategory() {
+    return "chestplate";
+  }
 }
 

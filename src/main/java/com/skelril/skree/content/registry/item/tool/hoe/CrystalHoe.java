@@ -17,30 +17,30 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class CrystalHoe extends CustomHoe implements Craftable {
-    @Override
-    public String __getType() {
-        return "crystal";
-    }
+  @Override
+  public String __getType() {
+    return "crystal";
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.CRYSTAL.getDurability();
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.CRYSTAL.getDurability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.CRYSTAL;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.CRYSTAL;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AA ",
-                " B ",
-                " B ",
-                'A', newItemStack("skree:sea_crystal"),
-                'B', new ItemStack(Items.STICK)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AA ",
+        " B ",
+        " B ",
+        'A', newItemStack("skree:sea_crystal"),
+        'B', new ItemStack(Items.STICK)
+    );
+  }
 }

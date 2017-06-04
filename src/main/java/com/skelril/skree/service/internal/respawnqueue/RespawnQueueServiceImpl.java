@@ -21,39 +21,39 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class RespawnQueueServiceImpl implements RespawnQueueService {
 
-    private HashMap<UUID, Deque<ItemStack>> playerQueue = new HashMap<>();
+  private HashMap<UUID, Deque<ItemStack>> playerQueue = new HashMap<>();
 
-    @Override
-    public void enque(Player player, Collection<ItemStack> stacks) {
-        if (stacks.isEmpty()) {
-            return;
+  @Override
+  public void enque(Player player, Collection<ItemStack> stacks) {
+    if (stacks.isEmpty()) {
+      return;
+    }
+
+    Deque<ItemStack> queue = new ArrayDeque<>();
+    queue.addAll(stacks);
+
+    playerQueue.merge(player.getUniqueId(), queue, (a, b) -> {
+      a.addAll(b);
+      return a;
+    });
+  }
+
+  @Listener
+  public void onRespawn(RespawnPlayerEvent event) {
+    EntityPlayer player = tf(event.getTargetEntity());
+    net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
+    Task.builder().delayTicks(1).execute(() -> {
+      Deque<ItemStack> queue = playerQueue.remove(player.getUniqueID());
+      if (queue != null) {
+        for (int i = 0; !queue.isEmpty() && i < mainInv.length; ++i) {
+          if (mainInv[i] == null) {
+            mainInv[i] = tf(queue.poll());
+          }
         }
-
-        Deque<ItemStack> queue = new ArrayDeque<>();
-        queue.addAll(stacks);
-
-        playerQueue.merge(player.getUniqueId(), queue, (a, b) -> {
-            a.addAll(b);
-            return a;
-        });
-    }
-
-    @Listener
-    public void onRespawn(RespawnPlayerEvent event) {
-        EntityPlayer player = tf(event.getTargetEntity());
-        net.minecraft.item.ItemStack[] mainInv = player.inventory.mainInventory;
-        Task.builder().delayTicks(1).execute(() -> {
-            Deque<ItemStack> queue = playerQueue.remove(player.getUniqueID());
-            if (queue != null) {
-                for (int i = 0; !queue.isEmpty() && i < mainInv.length; ++i) {
-                    if (mainInv[i] == null) {
-                        mainInv[i] = tf(queue.poll());
-                    }
-                }
-                if (!queue.isEmpty()) {
-                    enque(tf(player), queue);
-                }
-            }
-        }).submit(SkreePlugin.inst());
-    }
+        if (!queue.isEmpty()) {
+          enque(tf(player), queue);
+        }
+      }
+    }).submit(SkreePlugin.inst());
+  }
 }

@@ -19,64 +19,64 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class GoldTerragu extends CustomTerragu implements Craftable {
-    @Override
-    public String __getType() {
-        return "golden";
-    }
+  @Override
+  public String __getType() {
+    return "golden";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return null;
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return null;
+  }
 
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.GOLD.getDamage();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.GOLD.getDamage();
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.GOLD.getEnchantability();
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.GOLD.getEnchantability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.GOLD;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.GOLD;
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.GOLD.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.GOLD.getEfficienyOnProperMaterial();
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.GOLD.getDurability() * 10;
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.GOLD.getDurability() * 10;
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Primary.MainHand event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Primary.MainHand event) {
+    super.process(event);
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Secondary.MainHand event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Secondary.MainHand event) {
+    super.process(event);
+  }
 
-    @Listener
-    public void process(ChangeBlockEvent.Break event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(ChangeBlockEvent.Break event) {
+    super.process(event);
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(Items.GOLDEN_PICKAXE),
-                new ItemStack(Items.GOLDEN_AXE),
-                new ItemStack(Items.GOLDEN_SHOVEL),
-                newItemStack("skree:unstable_catalyst")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(Items.GOLDEN_PICKAXE),
+        new ItemStack(Items.GOLDEN_AXE),
+        new ItemStack(Items.GOLDEN_SHOVEL),
+        newItemStack("skree:unstable_catalyst")
+    );
+  }
 }

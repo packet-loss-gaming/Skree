@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class BlindnessCurse implements Consumer<Player> {
-    private static final PotionEffect effect = PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 20);
+  private static final PotionEffect EFFECT = PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 20);
 
-    @Override
-    public void accept(Player player) {
-        List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
-        potionEffects.add(effect);
-        player.offer(Keys.POTION_EFFECTS, potionEffects);
-    }
+  @Override
+  public void accept(Player player) {
+    List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
+    potionEffects.add(EFFECT);
+    player.offer(Keys.POTION_EFFECTS, potionEffects);
+  }
 }

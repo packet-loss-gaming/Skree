@@ -14,20 +14,20 @@ import java.util.List;
 import java.util.Map;
 
 public class ShapedRecipeConfig extends CraftingRecipeConfig {
-    private List<String> craftingRows;
-    private Map<Character, ItemStackConfig> mappedItemStacks;
+  private List<String> craftingRows;
+  private Map<Character, ItemStackConfig> mappedItemStacks;
 
-    public void registerRecipie() {
-        List<Object> argList = new ArrayList<>();
-        argList.addAll(craftingRows);
-        mappedItemStacks.forEach((character, config) -> {
-            argList.add(character);
-            argList.add(config.toNSMStack());
-        });
+  public void registerRecipie() {
+    List<Object> argList = new ArrayList<>();
+    argList.addAll(craftingRows);
+    mappedItemStacks.forEach((character, config) -> {
+      argList.add(character);
+      argList.add(config.toNSMStack());
+    });
 
-        GameRegistry.addRecipe(
-                craftedItem.toNSMStack(),
-                argList.toArray(new Object[argList.size()])
-        );
-    }
+    GameRegistry.addRecipe(
+        craftedItem.toNSMStack(),
+        argList.toArray(new Object[argList.size()])
+    );
+  }
 }

@@ -44,141 +44,147 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class PatientXListener {
 
-    private final PatientXManager manager;
+  private final PatientXManager manager;
 
-    public PatientXListener(PatientXManager manager) {
-        this.manager = manager;
+  public PatientXListener(PatientXManager manager) {
+    this.manager = manager;
+  }
+
+  @Listener
+  public void onBlockChange(ChangeBlockEvent event) {
+    // Depends on SpongeForge#550
+    if (event instanceof ExplosionEvent.Detonate) {
+      return;
     }
 
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        // Depends on SpongeForge#550
-        if (event instanceof ExplosionEvent.Detonate) {
-            return;
-        }
-
-        Optional<PluginContainer> optPluginContainer = event.getCause().first(PluginContainer.class);
-        if (optPluginContainer.isPresent()) {
-            return;
-        }
-
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
-                event.setCancelled(true);
-                break;
-            }
-        }
+    Optional<PluginContainer> optPluginContainer = event.getCause().first(PluginContainer.class);
+    if (optPluginContainer.isPresent()) {
+      return;
     }
 
-    @Listener(order = Order.LAST)
-    public void onEntityDamageEvent(DamageEntityEvent event) {
-        Entity defender = event.getTargetEntity();
+    for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+      if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
+        event.setCancelled(true);
+        break;
+      }
+    }
+  }
 
-        Optional<PatientXInstance> optInst = manager.getApplicableZone(defender);
-        if (!optInst.isPresent()) return;
+  @Listener(order = Order.LAST)
+  public void onEntityDamageEvent(DamageEntityEvent event) {
+    Entity defender = event.getTargetEntity();
 
-        PatientXInstance inst = optInst.get();
-
-        DamageSource dmgSource = event.getCause().first(DamageSource.class).get();
-
-        if (defender instanceof Player && manager.getBlockedDamage().contains(dmgSource.getType())) {
-            // Explosive damage formula: (1 × 1 + 1) × 8 × power + 1
-            // Use 49, snowball power is 3
-            double ratio = event.getBaseDamage() / 49;
-
-            // Nullify all modifiers
-            for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-                event.setDamage(modifier.getFirst(), (a) -> 0D);
-            }
-
-            event.setBaseDamage(ratio * inst.getDifficulty());
-        }
+    Optional<PatientXInstance> optInst = manager.getApplicableZone(defender);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onProjectileHit(CollideEvent.Impact event, @First Entity entity) {
-        Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
-        if (!optInst.isPresent()) return;
+    PatientXInstance inst = optInst.get();
 
-        if (entity instanceof Snowball) {
-            if (!event.getCause().containsType(Player.class)) {
-                entity.getLocation().getExtent().triggerExplosion(
-                        Explosion.builder()
-                                .radius(3)
-                                .location(entity.getLocation())
-                                .shouldDamageEntities(true)
-                                .build(),
-                        Cause.source(SkreePlugin.container()).build()
-                );
-            }
-        }
+    DamageSource dmgSource = event.getCause().first(DamageSource.class).get();
+
+    if (defender instanceof Player && manager.getBlockedDamage().contains(dmgSource.getType())) {
+      // Explosive damage formula: (1 × 1 + 1) × 8 × power + 1
+      // Use 49, snowball power is 3
+      double ratio = event.getBaseDamage() / 49;
+
+      // Nullify all modifiers
+      for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
+        event.setDamage(modifier.getFirst(), (a) -> 0D);
+      }
+
+      event.setBaseDamage(ratio * inst.getDifficulty());
+    }
+  }
+
+  @Listener
+  public void onProjectileHit(CollideEvent.Impact event, @First Entity entity) {
+    Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Zombie zombie) {
-        Optional<PatientXInstance> optInst = manager.getApplicableZone(zombie);
-        if (!optInst.isPresent()) return;
+    if (entity instanceof Snowball) {
+      if (!event.getCause().containsType(Player.class)) {
+        entity.getLocation().getExtent().triggerExplosion(
+            Explosion.builder()
+                .radius(3)
+                .location(entity.getLocation())
+                .shouldDamageEntities(true)
+                .build(),
+            Cause.source(SkreePlugin.container()).build()
+        );
+      }
+    }
+  }
 
-        if ( ((EntityZombie) zombie).isChild()) {
-            if (Probability.getChance(10)) {
-                Task.builder().execute(() -> {
-                    new ItemDropper(zombie.getLocation()).dropStacks(
-                            Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
-                            SpawnTypes.DROPPED_ITEM
-                    );
-                }).delayTicks(1).submit(SkreePlugin.inst());
-            }
-        }
+  @Listener
+  public void onEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Zombie zombie) {
+    Optional<PatientXInstance> optInst = manager.getApplicableZone(zombie);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
-        Optional<PatientXInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            PatientXInstance inst = optInst.get();
-            inst.healBoss(.25F);
-            inst.resetDifficulty();
-
-            inst.sendAttackBroadcast(
-                    "Haha, bow down " + player.getName() + ", show's over for you.",
-                    PatientXInstance.AttackSeverity.INFO
-            );
-
-            Optional<PatientXAttack> optAttack = inst.getLastAttack();
-            String deathMessage = " froze";
-            if (optAttack.isPresent()) {
-                switch (optAttack.get()) {
-                    case MUSICAL_CHAIRS:
-                        deathMessage = " tripped over a chair";
-                        break;
-                    case SMASHING_HIT:
-                        deathMessage = " got smashed";
-                        break;
-                    case BOMB_PERFORMANCE:
-                        deathMessage = " bombed a performance evaluation";
-                        break;
-                    case WITHER_AWAY:
-                        deathMessage = " became a fellow candle";
-                        break;
-                    case SPLASH_TO_IT:
-                        deathMessage = " loves toxic fluids";
-                        break;
-                    case COLD_FEET:
-                        deathMessage = " lost a foot or two";
-                        break;
-                    case IM_JUST_BATTY:
-                        deathMessage = " went batty";
-                        break;
-                    case RADIATION:
-                        deathMessage = " was irradiated";
-                        break;
-                    case SNOWBALL_FIGHT:
-                        deathMessage = " took a snowball to the face";
-                        break;
-                }
-            }
-
-            event.setMessage(Text.of(player.getName(), deathMessage));
-        }
+    if (((EntityZombie) zombie).isChild()) {
+      if (Probability.getChance(10)) {
+        Task.builder().execute(() -> {
+          new ItemDropper(zombie.getLocation()).dropStacks(
+              Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
+              SpawnTypes.DROPPED_ITEM
+          );
+        }).delayTicks(1).submit(SkreePlugin.inst());
+      }
     }
+  }
+
+  @Listener
+  public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
+    Optional<PatientXInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      PatientXInstance inst = optInst.get();
+      inst.healBoss(.25F);
+      inst.resetDifficulty();
+
+      inst.sendAttackBroadcast(
+          "Haha, bow down " + player.getName() + ", show's over for you.",
+          PatientXInstance.AttackSeverity.INFO
+      );
+
+      Optional<PatientXAttack> optAttack = inst.getLastAttack();
+      String deathMessage = " froze";
+      if (optAttack.isPresent()) {
+        switch (optAttack.get()) {
+          case MUSICAL_CHAIRS:
+            deathMessage = " tripped over a chair";
+            break;
+          case SMASHING_HIT:
+            deathMessage = " got smashed";
+            break;
+          case BOMB_PERFORMANCE:
+            deathMessage = " bombed a performance evaluation";
+            break;
+          case WITHER_AWAY:
+            deathMessage = " became a fellow candle";
+            break;
+          case SPLASH_TO_IT:
+            deathMessage = " loves toxic fluids";
+            break;
+          case COLD_FEET:
+            deathMessage = " lost a foot or two";
+            break;
+          case IM_JUST_BATTY:
+            deathMessage = " went batty";
+            break;
+          case RADIATION:
+            deathMessage = " was irradiated";
+            break;
+          case SNOWBALL_FIGHT:
+            deathMessage = " took a snowball to the face";
+            break;
+        }
+      }
+
+      event.setMessage(Text.of(player.getName(), deathMessage));
+    }
+  }
 }

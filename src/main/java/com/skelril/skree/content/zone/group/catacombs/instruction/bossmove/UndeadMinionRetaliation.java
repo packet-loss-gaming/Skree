@@ -17,34 +17,34 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import java.util.Optional;
 
 public class UndeadMinionRetaliation implements Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>> {
-    private final int baseActivation;
+  private final int baseActivation;
 
-    public UndeadMinionRetaliation() {
-        this(25);
-    }
+  public UndeadMinionRetaliation() {
+    this(25);
+  }
 
-    public UndeadMinionRetaliation(int baseActivation) {
-        this.baseActivation = baseActivation;
-    }
+  public UndeadMinionRetaliation(int baseActivation) {
+    this.baseActivation = baseActivation;
+  }
 
-    public boolean activate(CatacombsBossDetail detail) {
-        return Probability.getChance(baseActivation - detail.getWave());
-    }
+  public boolean activate(CatacombsBossDetail detail) {
+    return Probability.getChance(baseActivation - detail.getWave());
+  }
 
-    public int quantity(CatacombsBossDetail detail) {
-        return activate(detail) ? Probability.getRangedRandom(3, 17) : 0;
-    }
+  public int quantity(CatacombsBossDetail detail) {
+    return activate(detail) ? Probability.getRangedRandom(3, 17) : 0;
+  }
 
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
-        CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
-        CatacombsInstance inst = detail.getZone();
-        for (int i = quantity(detail); i > 0; --i){
-            inst.spawnWaveMob(boss.getLocation());
-        }
-        return Optional.empty();
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    Zombie boss = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+    CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
+    CatacombsInstance inst = detail.getZone();
+    for (int i = quantity(detail); i > 0; --i) {
+      inst.spawnWaveMob(boss.getLocation());
     }
+    return Optional.empty();
+  }
 }

@@ -9,26 +9,26 @@ package com.skelril.nitro.point;
 import java.util.Collection;
 
 public class SimplePointValue<KeyType, PointType extends Comparable<PointType>> implements PointValue<KeyType, PointType> {
-    private final Collection<KeyType> itemStacks;
-    private final PointType points;
+  private final Collection<KeyType> itemStacks;
+  private final PointType points;
 
-    public SimplePointValue(Collection<KeyType> itemStacks, PointType points) {
-        this.itemStacks = itemStacks;
-        this.points = points;
-    }
+  public SimplePointValue(Collection<KeyType> itemStacks, PointType points) {
+    this.itemStacks = itemStacks;
+    this.points = points;
+  }
 
-    @Override
-    public Collection<KeyType> getSatisfiers() {
-        return itemStacks;
-    }
+  @Override
+  public Collection<KeyType> getSatisfiers() {
+    return itemStacks;
+  }
 
-    @Override
-    public PointType getPoints() {
-        return points;
-    }
+  @Override
+  public PointType getPoints() {
+    return points;
+  }
 
-    @Override
-    public int compareTo(PointValue<KeyType, PointType> pointValue) {
-        return this.points.compareTo(pointValue.getPoints());
-    }
+  @Override
+  public int compareTo(PointValue<KeyType, PointType> pointValue) {
+    return this.points.compareTo(pointValue.getPoints());
+  }
 }

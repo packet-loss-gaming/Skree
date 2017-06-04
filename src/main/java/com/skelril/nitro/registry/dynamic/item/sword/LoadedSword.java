@@ -16,38 +16,38 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 
 class LoadedSword extends ItemSword {
-    private SwordConfig config;
+  private SwordConfig config;
 
-    protected LoadedSword(SwordConfig config) {
-        super(Item.ToolMaterial.DIAMOND);
-        this.config = config;
+  protected LoadedSword(SwordConfig config) {
+    super(Item.ToolMaterial.DIAMOND);
+    this.config = config;
 
-        setMaxDamage();
+    setMaxDamage();
+  }
+
+  // Config Loading
+
+  private void setMaxDamage() {
+    this.setMaxDamage(config.getMaxUses());
+  }
+
+  // NMS Overrides
+
+  @Override
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    ItemStack mat = config.getRepairItemStack();
+    return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
+  }
+
+  @Override
+  public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    Multimap<String, AttributeModifier> multimap = HashMultimap.create();
+
+    if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
+      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", config.getHitPower() - 1, 0));
+      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", config.getAttackSpeed(), 0));
     }
 
-    // Config Loading
-
-    private void setMaxDamage() {
-        this.setMaxDamage(config.getMaxUses());
-    }
-
-    // NMS Overrides
-
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        ItemStack mat = config.getRepairItemStack();
-        return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
-    }
-
-    @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = HashMultimap.create();
-
-        if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", config.getHitPower() - 1, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", config.getAttackSpeed(), 0));
-        }
-
-        return multimap;
-    }
+    return multimap;
+  }
 }

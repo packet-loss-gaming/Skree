@@ -18,12 +18,12 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 @NModule(name = "World Generator System")
 public class WorldGeneratorSystem {
-    @NModuleTrigger(trigger = "PRE_INITIALIZATION")
-    public void init() {
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new VoidWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new SolidWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new BarrierWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new NoOreWorldGeneratorModifier());
-        Sponge.getRegistry().register(WorldGeneratorModifier.class, new WildernessWorldGeneratorModifier());
-    }
+  @NModuleTrigger(trigger = "PRE_INITIALIZATION")
+  public void init() {
+    Sponge.getRegistry().register(WorldGeneratorModifier.class, new VoidWorldGeneratorModifier());
+    Sponge.getRegistry().register(WorldGeneratorModifier.class, new SolidWorldGeneratorModifier());
+    Sponge.getRegistry().register(WorldGeneratorModifier.class, new BarrierWorldGeneratorModifier());
+    Sponge.getRegistry().register(WorldGeneratorModifier.class, new NoOreWorldGeneratorModifier());
+    Sponge.getRegistry().register(WorldGeneratorModifier.class, new WildernessWorldGeneratorModifier());
+  }
 }

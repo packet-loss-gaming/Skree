@@ -12,35 +12,35 @@ import com.skelril.nitro.numeric.MathExt;
 import com.skelril.nitro.probability.Probability;
 
 public class PositionRandomizer {
-    private int noiseX;
-    private int noiseY;
-    private int noiseZ;
+  private int noiseX;
+  private int noiseY;
+  private int noiseZ;
 
-    public PositionRandomizer(int noise) {
-        this(noise, noise, noise);
-    }
+  public PositionRandomizer(int noise) {
+    this(noise, noise, noise);
+  }
 
-    public PositionRandomizer(int noiseX, int noiseY, int noiseZ) {
-        this.noiseX = noiseX;
-        this.noiseY = noiseY;
-        this.noiseZ = noiseZ;
-    }
+  public PositionRandomizer(int noiseX, int noiseY, int noiseZ) {
+    this.noiseX = noiseX;
+    this.noiseY = noiseY;
+    this.noiseZ = noiseZ;
+  }
 
-    public Vector3i createPosition3i(Vector3i src) {
-        Vector3i res = src.add(
-                Probability.getRangedRandom(-noiseX, noiseX * 2),
-                Probability.getRangedRandom(-noiseY, noiseY * 2),
-                Probability.getRangedRandom(-noiseZ, noiseZ * 2)
-        );
+  public Vector3i createPosition3i(Vector3i src) {
+    Vector3i res = src.add(
+        Probability.getRangedRandom(-noiseX, noiseX * 2),
+        Probability.getRangedRandom(-noiseY, noiseY * 2),
+        Probability.getRangedRandom(-noiseZ, noiseZ * 2)
+    );
 
-        return new Vector3i(
-                MathExt.bound(res.getX(), -30000000, 30000000),
-                MathExt.bound(res.getY(), 0, 255),
-                MathExt.bound(res.getZ(), -30000000, 30000000)
-        );
-    }
+    return new Vector3i(
+        MathExt.bound(res.getX(), -30000000, 30000000),
+        MathExt.bound(res.getY(), 0, 255),
+        MathExt.bound(res.getZ(), -30000000, 30000000)
+    );
+  }
 
-    public Vector3i createPosition3i(Vector3d src) {
-        return createPosition3i(src.toInt());
-    }
+  public Vector3i createPosition3i(Vector3d src) {
+    return createPosition3i(src.toInt());
+  }
 }

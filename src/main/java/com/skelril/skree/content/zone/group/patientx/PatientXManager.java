@@ -57,200 +57,200 @@ import java.util.function.Function;
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
 public class PatientXManager extends GroupZoneManager<PatientXInstance> implements Runnable, LocationZone<PatientXInstance> {
-    private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager = new BossManager<>();
-    private final PatientXConfig config = new PatientXConfig();
+  private final BossManager<Zombie, ZoneBossDetail<PatientXInstance>> bossManager = new BossManager<>();
+  private final PatientXConfig config = new PatientXConfig();
 
-    public PatientXManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new PatientXListener(this)
+  public PatientXManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new PatientXListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZonePvPListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneInventoryProtector<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneCreatureDropBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
+
+    setupBossManager();
+    Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+  }
+
+  private static Set<DamageType> blockedDamage = new HashSet<>();
+
+  static {
+    blockedDamage.add(DamageTypes.EXPLOSIVE);
+  }
+
+  public Set<DamageType> getBlockedDamage() {
+    return Collections.unmodifiableSet(blockedDamage);
+  }
+
+  private void setupBossManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(bossManager, Zombie.class)
+    );
+
+    List<Instruction<BindCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> bindProcessor = bossManager.getBindProcessor();
+    bindProcessor.add((condition, boss) -> {
+      Optional<Zombie> optBossEnt = boss.getTargetEntity();
+      if (optBossEnt.isPresent()) {
+        Zombie bossEnt = optBossEnt.get();
+        bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Patient X"));
+        setMaxHealth(bossEnt, config.bossHealth, true);
+      }
+      return Optional.empty();
+    });
+    bindProcessor.add((condition, boss) -> {
+      Optional<Zombie> optBoss = boss.getTargetEntity();
+      if (optBoss.isPresent()) {
+        optBoss.get().offer(Keys.PERSISTS, true);
+      }
+      return Optional.empty();
+    });
+    bindProcessor.add((condition, boss) -> {
+      boss.getDetail().getZone().getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.GOLD, "Ice to meet you again!"));
+      return Optional.empty();
+    });
+
+    List<Instruction<UnbindCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> unbindProcessor = bossManager.getUnbindProcessor();
+    unbindProcessor.add((condition, boss) -> {
+      PatientXInstance inst = boss.getDetail().getZone();
+
+      Location<World> target = inst.getCenter();
+      for (Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
+        player.setLocation(target);
+
+        boolean useX = Probability.getChance(2);
+        int accel = Probability.getChance(2) ? 1 : -1;
+
+        Vector3d v = new Vector3d(
+            useX ? accel : 0,
+            0,
+            !useX ? accel : 0
         );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZonePvPListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneInventoryProtector<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneCreatureDropBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+        player.setVelocity(v);
+      }
 
-        setupBossManager();
-        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
-    }
+      inst.freezeBlocks(100, false);
+      // Reset respawn mechanics
+      inst.bossDied();
 
-    private static Set<DamageType> blockedDamage = new HashSet<>();
+      return Optional.empty();
+    });
 
-    static {
-        blockedDamage.add(DamageTypes.EXPLOSIVE);
-    }
+    List<Instruction<DamageCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> damageProcessor = bossManager.getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      PatientXInstance inst = boss.getDetail().getZone();
+      DamageEntityEvent event = condition.getEvent();
 
-    public Set<DamageType> getBlockedDamage() {
-        return Collections.unmodifiableSet(blockedDamage);
-    }
+      // Nullify all modifiers
+      for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
+        event.setDamage(modifier.getFirst(), (a) -> a);
+      }
 
-    private void setupBossManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(bossManager, Zombie.class)
-        );
+      event.setBaseDamage(inst.getDifficulty() * config.baseBossHit);
+      return Optional.empty();
+    });
 
-        List<Instruction<BindCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> bindProcessor = bossManager.getBindProcessor();
-        bindProcessor.add((condition, boss) -> {
-            Optional<Zombie> optBossEnt = boss.getTargetEntity();
-            if (optBossEnt.isPresent()) {
-                Zombie bossEnt = optBossEnt.get();
-                bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Patient X"));
-                setMaxHealth(bossEnt, config.bossHealth, true);
+
+    List<Instruction<DamagedCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> damagedProcessor = bossManager.getDamagedProcessor();
+    damagedProcessor.add((condition, boss) -> {
+      DamageEntityEvent event = condition.getEvent();
+      Optional<DamageSource> optDamageSource = condition.getDamageSource();
+      if (optDamageSource.isPresent() && blockedDamage.contains(optDamageSource.get().getType())) {
+        event.setCancelled(true);
+        return Optional.empty();
+      }
+
+      return Optional.of((damagedCondition, zombieZoneBossDetailBoss) -> {
+        PatientXInstance inst = boss.getDetail().getZone();
+        if (optDamageSource.isPresent() && optDamageSource.get() instanceof EntityDamageSource) {
+          if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
+            Task.builder().execute(() -> {
+              VelocityEntitySpawner.sendRadial(
+                  EntityTypes.SNOWBALL,
+                  inst.getBoss().get(),
+                  Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
+              );
+            }).delayTicks(1).submit(SkreePlugin.inst());
+          } else {
+            Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
+
+            if (srcEntity instanceof Player) {
+              Optional<ItemStack> optHeld = ((Player) srcEntity).getItemInHand(HandTypes.MAIN_HAND);
+              if (optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.BLAZE_ROD) {
+                inst.modifyDifficulty(2);
+              }
             }
-            return Optional.empty();
-        });
-        bindProcessor.add((condition, boss) -> {
-            Optional<Zombie> optBoss = boss.getTargetEntity();
-            if (optBoss.isPresent()) {
-                optBoss.get().offer(Keys.PERSISTS, true);
-            }
-            return Optional.empty();
-        });
-        bindProcessor.add((condition, boss) -> {
-            boss.getDetail().getZone().getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(Text.of(TextColors.GOLD, "Ice to meet you again!"));
-            return Optional.empty();
-        });
-
-        List<Instruction<UnbindCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> unbindProcessor = bossManager.getUnbindProcessor();
-        unbindProcessor.add((condition, boss) -> {
-            PatientXInstance inst = boss.getDetail().getZone();
-
-            Location<World> target = inst.getCenter();
-            for (Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
-                player.setLocation(target);
-
-                boolean useX = Probability.getChance(2);
-                int accel = Probability.getChance(2) ? 1 : -1;
-
-                Vector3d v = new Vector3d(
-                        useX ? accel : 0,
-                        0,
-                        !useX ? accel : 0
-                );
-                player.setVelocity(v);
-            }
-
-            inst.freezeBlocks(100, false);
-            // Reset respawn mechanics
-            inst.bossDied();
-
-            return Optional.empty();
-        });
-
-        List<Instruction<DamageCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> damageProcessor = bossManager.getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            PatientXInstance inst = boss.getDetail().getZone();
-            DamageEntityEvent event = condition.getEvent();
-
-            // Nullify all modifiers
-            for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-                event.setDamage(modifier.getFirst(), (a) -> a);
-            }
-
-            event.setBaseDamage(inst.getDifficulty() * config.baseBossHit);
-            return Optional.empty();
-        });
-
-
-        List<Instruction<DamagedCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>> damagedProcessor = bossManager.getDamagedProcessor();
-        damagedProcessor.add((condition, boss) -> {
-            DamageEntityEvent event = condition.getEvent();
-            Optional<DamageSource> optDamageSource = condition.getDamageSource();
-            if (optDamageSource.isPresent() && blockedDamage.contains(optDamageSource.get().getType())) {
-                event.setCancelled(true);
-                return Optional.empty();
-            }
-
-            return Optional.of((damagedCondition, zombieZoneBossDetailBoss) -> {
-                PatientXInstance inst = boss.getDetail().getZone();
-                if (optDamageSource.isPresent() && optDamageSource.get() instanceof EntityDamageSource) {
-                    if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
-                        Task.builder().execute(() -> {
-                            VelocityEntitySpawner.sendRadial(
-                                    EntityTypes.SNOWBALL,
-                                    inst.getBoss().get(),
-                                    Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
-                            );
-                        }).delayTicks(1).submit(SkreePlugin.inst());
-                    } else {
-                        Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
-
-                        if (srcEntity instanceof Player) {
-                            Optional<ItemStack> optHeld = ((Player) srcEntity).getItemInHand(HandTypes.MAIN_HAND);
-                            if (optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.BLAZE_ROD) {
-                                inst.modifyDifficulty(2);
-                            }
-                        }
-                    }
-                }
-
-                inst.modifyDifficulty(.5);
-                inst.teleportRandom(true);
-
-                return Optional.empty();
-            });
-        });
-    }
-
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<PatientXInstance>> callback) {
-        Function<Clause<ZoneRegion, ZoneRegion.State>, PatientXInstance> initFunc = clause -> {
-            ZoneRegion region = clause.getKey();
-
-            PatientXInstance instance = new PatientXInstance(region, config, bossManager);
-            zones.add(instance);
-
-            return instance;
-        };
-
-        Consumer<PatientXInstance> postInitFunc = instance -> {
-            instance.init();
-
-            callback.accept(Optional.of(instance));
-        };
-
-        allocator.regionFor(getSystemName(), initFunc, postInitFunc);
-    }
-
-    @Override
-    public String getName() {
-        return "Patient X";
-    }
-
-    @Override
-    public void run() {
-        Iterator<PatientXInstance> it = zones.iterator();
-        while (it.hasNext()) {
-            PatientXInstance next = it.next();
-            if (next.isActive()) {
-                next.run();
-                continue;
-            }
-            next.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), next.getRegion());
-            }
-
-            it.remove();
+          }
         }
+
+        inst.modifyDifficulty(.5);
+        inst.teleportRandom(true);
+
+        return Optional.empty();
+      });
+    });
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<PatientXInstance>> callback) {
+    Function<Clause<ZoneRegion, ZoneRegion.State>, PatientXInstance> initFunc = clause -> {
+      ZoneRegion region = clause.getKey();
+
+      PatientXInstance instance = new PatientXInstance(region, config, bossManager);
+      zones.add(instance);
+
+      return instance;
+    };
+
+    Consumer<PatientXInstance> postInitFunc = instance -> {
+      instance.init();
+
+      callback.accept(Optional.of(instance));
+    };
+
+    allocator.regionFor(getSystemName(), initFunc, postInitFunc);
+  }
+
+  @Override
+  public String getName() {
+    return "Patient X";
+  }
+
+  @Override
+  public void run() {
+    Iterator<PatientXInstance> it = zones.iterator();
+    while (it.hasNext()) {
+      PatientXInstance next = it.next();
+      if (next.isActive()) {
+        next.run();
+        continue;
+      }
+      next.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), next.getRegion());
+      }
+
+      it.remove();
     }
+  }
 }

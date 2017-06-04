@@ -15,24 +15,24 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.function.Consumer;
 
 public class SmokeCurse implements Consumer<Player> {
-    private static final ParticleEffect smokeEffect = ParticleEffect.builder().type(
-            ParticleTypes.LARGE_SMOKE
-    ).quantity(1).velocity(new Vector3d(0, .4, 0)).build();
+  private static final ParticleEffect SMOKE_EFFECT = ParticleEffect.builder().type(
+      ParticleTypes.LARGE_SMOKE
+  ).quantity(1).velocity(new Vector3d(0, .4, 0)).build();
 
-    @Override
-    public void accept(Player player) {
-        for (int x = -1; x <= 1; ++x) {
-            for (int z = -1; z <= 1; ++z) {
-                for (int y = 0; y <=1; ++y) {
-                    for (int i = 0; i < 10; ++i) {
-                        player.getWorld().spawnParticles(smokeEffect, player.getLocation().getPosition().add(
-                                x + Probability.getRangedRandom(0, 1.0),
-                                y + Probability.getRangedRandom(0, 1.0),
-                                z + Probability.getRangedRandom(0, 1.0)
-                        ));
-                    }
-                }
-            }
+  @Override
+  public void accept(Player player) {
+    for (int x = -1; x <= 1; ++x) {
+      for (int z = -1; z <= 1; ++z) {
+        for (int y = 0; y <= 1; ++y) {
+          for (int i = 0; i < 10; ++i) {
+            player.getWorld().spawnParticles(SMOKE_EFFECT, player.getLocation().getPosition().add(
+                x + Probability.getRangedRandom(0, 1.0),
+                y + Probability.getRangedRandom(0, 1.0),
+                z + Probability.getRangedRandom(0, 1.0)
+            ));
+          }
         }
+      }
     }
+  }
 }

@@ -11,10 +11,10 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 
 public class OreHelper {
-    public static final Material CUSTOM_ORE_MATERIAL = new Material(MapColor.GRAY);
+  public static final Material CUSTOM_ORE_MATERIAL = new Material(MapColor.GRAY);
 
-    static {
-        // Refers to requiresNoTool
-        ReflectiveModifier.modifyFieldValue(Material.class, CUSTOM_ORE_MATERIAL, "field_76241_J", false);
-    }
+  static {
+    // Refers to requiresNoTool
+    ReflectiveModifier.modifyFieldValue(Material.class, CUSTOM_ORE_MATERIAL, "field_76241_J", false);
+  }
 }

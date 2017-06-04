@@ -7,13 +7,13 @@
 package com.skelril.skree.content.zone.group.patientx;
 
 public enum PatientXAttack {
-    MUSICAL_CHAIRS,
-    SMASHING_HIT,
-    BOMB_PERFORMANCE,
-    WITHER_AWAY,
-    SPLASH_TO_IT,
-    COLD_FEET,
-    IM_JUST_BATTY,
-    RADIATION,
-    SNOWBALL_FIGHT
+  MUSICAL_CHAIRS,
+  SMASHING_HIT,
+  BOMB_PERFORMANCE,
+  WITHER_AWAY,
+  SPLASH_TO_IT,
+  COLD_FEET,
+  IM_JUST_BATTY,
+  RADIATION,
+  SNOWBALL_FIGHT
 }

@@ -12,8 +12,8 @@ import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
 public class VoidTerrainGenerator implements GenerationPopulator {
-    @Override
-    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeVolume biomes) {
+  @Override
+  public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeVolume biomes) {
 
-    }
+  }
 }

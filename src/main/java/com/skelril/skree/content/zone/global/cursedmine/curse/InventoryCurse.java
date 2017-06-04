@@ -23,24 +23,24 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class InventoryCurse implements Consumer<Player> {
 
-    private ItemType targetType;
-    private int targetAmt;
+  private ItemType targetType;
+  private int targetAmt;
 
-    public InventoryCurse(ItemType targetType, int targetAmt) {
-        this.targetType = targetType;
-        this.targetAmt = targetAmt;
-    }
+  public InventoryCurse(ItemType targetType, int targetAmt) {
+    this.targetType = targetType;
+    this.targetAmt = targetAmt;
+  }
 
-    @Override
-    public void accept(Player player) {
-        ItemStack stack = newItemStack(targetType, Probability.getRandom(targetAmt));
-        Optional<ItemStack> optHeld = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (optHeld.isPresent() && !isSimilar(optHeld.get(), stack)) {
-            new ItemDropper(player.getLocation()).dropStacks(
-                    Lists.newArrayList(optHeld.get()),
-                    SpawnTypes.DROPPED_ITEM
-            );
-        }
-        player.setItemInHand(HandTypes.MAIN_HAND, stack);
+  @Override
+  public void accept(Player player) {
+    ItemStack stack = newItemStack(targetType, Probability.getRandom(targetAmt));
+    Optional<ItemStack> optHeld = player.getItemInHand(HandTypes.MAIN_HAND);
+    if (optHeld.isPresent() && !isSimilar(optHeld.get(), stack)) {
+      new ItemDropper(player.getLocation()).dropStacks(
+          Lists.newArrayList(optHeld.get()),
+          SpawnTypes.DROPPED_ITEM
+      );
     }
+    player.setItemInHand(HandTypes.MAIN_HAND, stack);
+  }
 }

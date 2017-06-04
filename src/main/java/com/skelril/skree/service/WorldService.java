@@ -14,13 +14,17 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface WorldService {
-    void registerEffectWrapper(WorldEffectWrapper wrapper);
-    <T extends WorldEffectWrapper> Optional<T> getEffectWrapper(Class<T> wrapperClass);
-    Optional<WorldEffectWrapper> getEffectWrapperFor(World world);
-    Collection<WorldEffectWrapper> getEffectWrappers();
+  void registerEffectWrapper(WorldEffectWrapper wrapper);
 
-    Optional<World> loadWorld(String name, WorldArchetype archetype);
-    Optional<World> loadVanillaMapFromDisk(String name);
+  <T extends WorldEffectWrapper> Optional<T> getEffectWrapper(Class<T> wrapperClass);
 
-    void registerWorld(String name);
+  Optional<WorldEffectWrapper> getEffectWrapperFor(World world);
+
+  Collection<WorldEffectWrapper> getEffectWrappers();
+
+  Optional<World> loadWorld(String name, WorldArchetype archetype);
+
+  Optional<World> loadVanillaMapFromDisk(String name);
+
+  void registerWorld(String name);
 }

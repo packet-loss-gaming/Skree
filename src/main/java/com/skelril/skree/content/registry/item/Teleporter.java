@@ -18,62 +18,62 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public interface Teleporter {
 
-    default void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
-        setDestination(tf(stack), target);
+  default void setDestination(org.spongepowered.api.item.inventory.ItemStack stack, Location<World> target) {
+    setDestination(tf(stack), target);
+  }
+
+  default void setDestination(ItemStack stack, Location<World> target) {
+    if (stack.getTagCompound() == null) {
+      stack.setTagCompound(new NBTTagCompound());
     }
 
-    default void setDestination(ItemStack stack, Location<World> target) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
-        }
-
-        if (!stack.getTagCompound().hasKey("skree_dest_data")) {
-            stack.getTagCompound().setTag("skree_dest_data", new NBTTagCompound());
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        tag.setString("world", target.getExtent().getName());
-        tag.setDouble("x", target.getX());
-        tag.setDouble("y", target.getY());
-        tag.setDouble("z", target.getZ());
+    if (!stack.getTagCompound().hasKey("skree_dest_data")) {
+      stack.getTagCompound().setTag("skree_dest_data", new NBTTagCompound());
     }
 
-    default Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getDestination(tf(stack));
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
+    tag.setString("world", target.getExtent().getName());
+    tag.setDouble("x", target.getX());
+    tag.setDouble("y", target.getY());
+    tag.setDouble("z", target.getZ());
+  }
+
+  default Optional<Location<World>> getDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
+    return getDestination(tf(stack));
+  }
+
+  default Optional<Location<World>> getDestination(ItemStack stack) {
+    if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
+      return Optional.empty();
     }
 
-    default Optional<Location<World>> getDestination(ItemStack stack) {
-        if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
-            return Optional.empty();
-        }
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
+    String worldName = tag.getString("world");
+    double x = tag.getDouble("x");
+    double y = tag.getDouble("y");
+    double z = tag.getDouble("z");
+    Optional<World> optWorld = Sponge.getServer().getWorld(worldName);
+    if (optWorld.isPresent()) {
+      return Optional.of(new Location<>(optWorld.get(), x, y, z));
+    }
+    return Optional.empty();
+  }
 
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        String worldName = tag.getString("world");
-        double x = tag.getDouble("x");
-        double y = tag.getDouble("y");
-        double z = tag.getDouble("z");
-        Optional<World> optWorld = Sponge.getServer().getWorld(worldName);
-        if (optWorld.isPresent()) {
-            return Optional.of(new Location<>(optWorld.get(), x, y, z));
-        }
-        return Optional.empty();
+  default Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
+    return getClientDestination(tf(stack));
+  }
+
+  default Optional<String> getClientDestination(ItemStack stack) {
+    if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
+      return Optional.empty();
     }
 
-    default Optional<String> getClientDestination(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return getClientDestination(tf(stack));
-    }
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
+    String worldName = tag.getString("world");
+    double x = tag.getDouble("x");
+    double y = tag.getDouble("y");
+    double z = tag.getDouble("z");
 
-    default Optional<String> getClientDestination(ItemStack stack) {
-        if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("skree_dest_data")) {
-            return Optional.empty();
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_dest_data");
-        String worldName = tag.getString("world");
-        double x = tag.getDouble("x");
-        double y = tag.getDouble("y");
-        double z = tag.getDouble("z");
-
-        return Optional.of(worldName + " at " + (int) x + ", " + (int) y + ", " + (int) z);
-    }
+    return Optional.of(worldName + " at " + (int) x + ", " + (int) y + ", " + (int) z);
+  }
 }

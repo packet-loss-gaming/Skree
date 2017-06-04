@@ -35,116 +35,116 @@ import static org.spongepowered.api.command.args.GenericArguments.remainingJoine
 
 public class MarketLookupCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        Optional<String> optAlias = args.getOne("alias");
-        Optional<BigDecimal> optPrice = Optional.empty();
-        Optional<Integer> optStock = Optional.empty();
-        double percentageSale = 1;
-
-        if (optAlias.isPresent()) {
-            optAlias = service.getAlias(optAlias.get());
-            if (optAlias.isPresent()) {
-                optPrice = service.getPrice(optAlias.get());
-                optStock = service.getStock(optAlias.get());
-            }
-        } else {
-            Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
-            if (held.isPresent()) {
-                optPrice = service.getPrice(held.get());
-                optAlias = service.getAlias(held.get());
-                optStock = service.getStock(held.get());
-                net.minecraft.item.ItemStack stack = tf(held.get());
-                if (stack.isItemStackDamageable()) {
-                    percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
-                }
-            }
-        }
-
-        if (!optPrice.isPresent()) {
-            src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
-            return CommandResult.empty();
-        }
-
-        BigDecimal price = optPrice.get();
-        Integer stockCount = optStock.orElse(0);
-        BigDecimal sellPrice = price.multiply(service.getSellFactor(price));
-
-        DecimalFormat df = new DecimalFormat("#,###.##");
-
-        String buyPrice = df.format(price);
-        String stock = df.format(stockCount);
-        String sellUsedPrice = df.format(sellPrice.multiply(new BigDecimal(percentageSale)));
-        String sellNewPrice = df.format(sellPrice);
-
-        String alias = optAlias.get();
-
-        Text itemDisplay = Text.of(
-                TextColors.BLUE,
-                TextActions.showItem(service.getItem(alias).get().createSnapshot()), alias.toUpperCase()
-        );
-
-        Text.Builder itemSteps = Text.builder();
-        for (int i : new int[]{1, 16, 32, 64, 128, 256}) {
-            if (i != 1) {
-                itemSteps.append(Text.of(TextColors.YELLOW, ", "));
-            }
-
-            BigDecimal intervalPrice = price.multiply(new BigDecimal(i));
-
-            itemSteps.append(Text.of(
-                    TextColors.BLUE,
-                    TextActions.runCommand("/market buy -a " + i + " " + alias),
-                    TextActions.showText(Text.of("Buy ", i, " for ", df.format(intervalPrice))),
-                    i
-            ));
-        }
-
-        List<Text> information = new ArrayList<>(6);
-        Collections.addAll(
-                information,
-                Text.of(TextColors.GOLD, "Price information for: ", itemDisplay),
-                Text.of(TextColors.YELLOW, "There are currently ", TextColors.GRAY, stock, TextColors.YELLOW, " in stock."),
-                Text.of(TextColors.YELLOW, "When you buy it you pay:"),
-                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
-                Text.of(TextColors.YELLOW, "When you sell it you get:"),
-                Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each."),
-                Text.of(TextColors.YELLOW, "Quick buy: ", itemSteps.build())
-        );
-
-        if (src.hasPermission("skree.market.admin")) {
-            String basePrice = df.format(service.getBasePrice(alias).get());
-            Collections.addAll(
-                    information,
-                    Text.of(TextColors.YELLOW, "Base Price:"),
-                    Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, basePrice, TextColors.YELLOW, " each.")
-            );
-        }
-
-        if (percentageSale != 1) {
-            information.add(
-                    Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellNewPrice, TextColors.YELLOW, " each when new.")
-            );
-        }
-
-        src.sendMessages(information);
-        return CommandResult.success();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Lookup the price information for an item"))
-                .arguments(optional(remainingJoinedStrings(Text.of("alias"))))
-                .executor(new MarketLookupCommand())
-                .build();
+    MarketService service = optService.get();
+
+    Optional<String> optAlias = args.getOne("alias");
+    Optional<BigDecimal> optPrice = Optional.empty();
+    Optional<Integer> optStock = Optional.empty();
+    double percentageSale = 1;
+
+    if (optAlias.isPresent()) {
+      optAlias = service.getAlias(optAlias.get());
+      if (optAlias.isPresent()) {
+        optPrice = service.getPrice(optAlias.get());
+        optStock = service.getStock(optAlias.get());
+      }
+    } else {
+      Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
+      if (held.isPresent()) {
+        optPrice = service.getPrice(held.get());
+        optAlias = service.getAlias(held.get());
+        optStock = service.getStock(held.get());
+        net.minecraft.item.ItemStack stack = tf(held.get());
+        if (stack.isItemStackDamageable()) {
+          percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
+        }
+      }
     }
+
+    if (!optPrice.isPresent()) {
+      src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
+      return CommandResult.empty();
+    }
+
+    BigDecimal price = optPrice.get();
+    Integer stockCount = optStock.orElse(0);
+    BigDecimal sellPrice = price.multiply(service.getSellFactor(price));
+
+    DecimalFormat df = new DecimalFormat("#,###.##");
+
+    String buyPrice = df.format(price);
+    String stock = df.format(stockCount);
+    String sellUsedPrice = df.format(sellPrice.multiply(new BigDecimal(percentageSale)));
+    String sellNewPrice = df.format(sellPrice);
+
+    String alias = optAlias.get();
+
+    Text itemDisplay = Text.of(
+        TextColors.BLUE,
+        TextActions.showItem(service.getItem(alias).get().createSnapshot()), alias.toUpperCase()
+    );
+
+    Text.Builder itemSteps = Text.builder();
+    for (int i : new int[] {1, 16, 32, 64, 128, 256}) {
+      if (i != 1) {
+        itemSteps.append(Text.of(TextColors.YELLOW, ", "));
+      }
+
+      BigDecimal intervalPrice = price.multiply(new BigDecimal(i));
+
+      itemSteps.append(Text.of(
+          TextColors.BLUE,
+          TextActions.runCommand("/market buy -a " + i + " " + alias),
+          TextActions.showText(Text.of("Buy ", i, " for ", df.format(intervalPrice))),
+          i
+      ));
+    }
+
+    List<Text> information = new ArrayList<>(6);
+    Collections.addAll(
+        information,
+        Text.of(TextColors.GOLD, "Price information for: ", itemDisplay),
+        Text.of(TextColors.YELLOW, "There are currently ", TextColors.GRAY, stock, TextColors.YELLOW, " in stock."),
+        Text.of(TextColors.YELLOW, "When you buy it you pay:"),
+        Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, buyPrice, TextColors.YELLOW, " each."),
+        Text.of(TextColors.YELLOW, "When you sell it you get:"),
+        Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellUsedPrice, TextColors.YELLOW, " each."),
+        Text.of(TextColors.YELLOW, "Quick buy: ", itemSteps.build())
+    );
+
+    if (src.hasPermission("skree.market.admin")) {
+      String basePrice = df.format(service.getBasePrice(alias).get());
+      Collections.addAll(
+          information,
+          Text.of(TextColors.YELLOW, "Base Price:"),
+          Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, basePrice, TextColors.YELLOW, " each.")
+      );
+    }
+
+    if (percentageSale != 1) {
+      information.add(
+          Text.of(TextColors.YELLOW, " - ", TextColors.WHITE, sellNewPrice, TextColors.YELLOW, " each when new.")
+      );
+    }
+
+    src.sendMessages(information);
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Lookup the price information for an item"))
+        .arguments(optional(remainingJoinedStrings(Text.of("alias"))))
+        .executor(new MarketLookupCommand())
+        .build();
+  }
 }

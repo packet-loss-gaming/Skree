@@ -32,66 +32,66 @@ import java.util.Optional;
 
 public class Luminositor extends CustomItem implements EventAwareContent, Craftable {
 
-    @Override
-    public String __getID() {
-        return "luminositor";
-    }
+  @Override
+  public String __getId() {
+    return "luminositor";
+  }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
-    }
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.TOOLS;
-    }
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.TOOLS;
+  }
 
-    @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+  @Listener
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
-            if (this.equals(optHeldItem.get().getItem())) {
-                Direction dir = event.getTargetSide();
-                Optional<Location<World>> optTargetBlockLoc = event.getTargetBlock().getLocation();
+    if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {
+      if (this.equals(optHeldItem.get().getItem())) {
+        Direction dir = event.getTargetSide();
+        Optional<Location<World>> optTargetBlockLoc = event.getTargetBlock().getLocation();
 
-                if (!optTargetBlockLoc.isPresent()) {
-                    return;
-                }
-
-                Location<World> targetBlockLoc = optTargetBlockLoc.get();
-                Vector3i targPos = targetBlockLoc.getBlockPosition().add(dir.toVector3d().toInt());
-                Location<World> trueTargBlock = new Location<>(targetBlockLoc.getExtent(), targPos);
-
-                int lightLevel = LightLevelUtil.getMaxLightLevel(trueTargBlock).get();
-
-                TextColor color;
-                if (lightLevel >= 12) {
-                    color = TextColors.GREEN;
-                } else if (lightLevel >= 8) {
-                    color = TextColors.RED;
-                } else {
-                    color = TextColors.DARK_RED;
-                }
-
-                // TODO system message.color(color)
-                player.sendMessage(Text.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
-                event.setUseBlockResult(Tristate.FALSE);
-            }
+        if (!optTargetBlockLoc.isPresent()) {
+          return;
         }
-    }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new net.minecraft.item.ItemStack(this),
-                "ABA",
-                " C ",
-                " C ",
-                'A', new net.minecraft.item.ItemStack(Items.GLOWSTONE_DUST),
-                'B', new net.minecraft.item.ItemStack(Items.REDSTONE),
-                'C', new net.minecraft.item.ItemStack(Items.IRON_INGOT)
-        );
+        Location<World> targetBlockLoc = optTargetBlockLoc.get();
+        Vector3i targPos = targetBlockLoc.getBlockPosition().add(dir.toVector3d().toInt());
+        Location<World> trueTargBlock = new Location<>(targetBlockLoc.getExtent(), targPos);
+
+        int lightLevel = LightLevelUtil.getMaxLightLevel(trueTargBlock).get();
+
+        TextColor color;
+        if (lightLevel >= 12) {
+          color = TextColors.GREEN;
+        } else if (lightLevel >= 8) {
+          color = TextColors.RED;
+        } else {
+          color = TextColors.DARK_RED;
+        }
+
+        // TODO system message.color(color)
+        player.sendMessage(Text.of(TextColors.YELLOW, "Light level: ", color, lightLevel));
+        event.setUseBlockResult(Tristate.FALSE);
+      }
     }
+  }
+
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new net.minecraft.item.ItemStack(this),
+        "ABA",
+        " C ",
+        " C ",
+        'A', new net.minecraft.item.ItemStack(Items.GLOWSTONE_DUST),
+        'B', new net.minecraft.item.ItemStack(Items.REDSTONE),
+        'C', new net.minecraft.item.ItemStack(Items.IRON_INGOT)
+    );
+  }
 }

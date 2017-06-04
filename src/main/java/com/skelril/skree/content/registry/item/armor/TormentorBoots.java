@@ -14,34 +14,34 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class TormentorBoots extends CustomBoots implements Craftable {
-    @Override
-    public int __getMaxUsesBaseModifier() {
-        return 60;
-    }
+  @Override
+  public int __getMaxUsesBaseModifier() {
+    return 60;
+  }
 
-    @Override
-    public String __getType() {
-        return "tormentor";
-    }
+  @Override
+  public String __getType() {
+    return "tormentor";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return (ItemStack) (Object) newItemStack("skree:demonic_ingot");
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return (ItemStack) (Object) newItemStack("skree:demonic_ingot");
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return 10;
-    }
+  @Override
+  public int __getEnchantability() {
+    return 10;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "   ",
-                "A A",
-                "A A",
-                'A', newItemStack("skree:demonic_ingot")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "   ",
+        "A A",
+        "A A",
+        'A', newItemStack("skree:demonic_ingot")
+    );
+  }
 }

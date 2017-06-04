@@ -13,24 +13,24 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 public class ZoneRegion extends ZoneWorldBoundingBox {
-    private final WeakReference<ZoneSpaceAllocator> weakAllocator;
+  private final WeakReference<ZoneSpaceAllocator> weakAllocator;
 
-    public ZoneRegion(ZoneSpaceAllocator allocator, ZoneWorldBoundingBox boundingBox) {
-        this(allocator, boundingBox.getExtent(), boundingBox.getOrigin(), boundingBox.getBoundingBox());
-    }
+  public ZoneRegion(ZoneSpaceAllocator allocator, ZoneWorldBoundingBox boundingBox) {
+    this(allocator, boundingBox.getExtent(), boundingBox.getOrigin(), boundingBox.getBoundingBox());
+  }
 
-    public ZoneRegion(ZoneSpaceAllocator allocator, World world, Vector3i origin, Vector3i boundingBox) {
-        super(world, origin, boundingBox);
-        this.weakAllocator = new WeakReference<>(allocator);
-    }
+  public ZoneRegion(ZoneSpaceAllocator allocator, World world, Vector3i origin, Vector3i boundingBox) {
+    super(world, origin, boundingBox);
+    this.weakAllocator = new WeakReference<>(allocator);
+  }
 
-    public Optional<ZoneSpaceAllocator> getAllocator() {
-        return Optional.ofNullable(weakAllocator.get());
-    }
+  public Optional<ZoneSpaceAllocator> getAllocator() {
+    return Optional.ofNullable(weakAllocator.get());
+  }
 
-    public enum State {
-        NEW,
-        NEW_LOADING,
-        RELOADED
-    }
+  public enum State {
+    NEW,
+    NEW_LOADING,
+    RELOADED
+  }
 }

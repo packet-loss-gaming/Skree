@@ -10,36 +10,36 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class PrettyText {
-    public static String date(long time) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time);
+  public static String date(long time) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(time);
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US));
-        builder.append(" ");
-        builder.append(calendar.get(Calendar.DAY_OF_MONTH));
-        builder.append(" ");
-        builder.append(calendar.get(Calendar.YEAR));
-        builder.append(" at ");
-        builder.append(calendar.get(Calendar.HOUR));
-        builder.append(":");
-        int minute = calendar.get(Calendar.MINUTE);
-        if (minute < 10) {
-            builder.append("0").append(minute);
-        } else {
-            builder.append(minute);
-        }
-        builder.append(calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM");
-        return builder.toString();
+    StringBuilder builder = new StringBuilder();
+    builder.append(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US));
+    builder.append(" ");
+    builder.append(calendar.get(Calendar.DAY_OF_MONTH));
+    builder.append(" ");
+    builder.append(calendar.get(Calendar.YEAR));
+    builder.append(" at ");
+    builder.append(calendar.get(Calendar.HOUR));
+    builder.append(":");
+    int minute = calendar.get(Calendar.MINUTE);
+    if (minute < 10) {
+      builder.append("0").append(minute);
+    } else {
+      builder.append(minute);
     }
+    builder.append(calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM");
+    return builder.toString();
+  }
 
-    public static String dateFromCur(long time) {
-        Calendar curTime = Calendar.getInstance();
-        Calendar newTime = Calendar.getInstance();
-        newTime.setTimeInMillis(System.currentTimeMillis() + time);
+  public static String dateFromCur(long time) {
+    Calendar curTime = Calendar.getInstance();
+    Calendar newTime = Calendar.getInstance();
+    newTime.setTimeInMillis(System.currentTimeMillis() + time);
 
-        // TODO make this actually work
+    // TODO make this actually work
 
-        return "30 seconds";
-    }
+    return "30 seconds";
+  }
 }

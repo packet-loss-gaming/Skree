@@ -36,66 +36,66 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.modifier.Modifiers.UBER_ARROW_FISHING;
 
 public class ArrowFishingHandler {
-    private DropTable dropTable;
+  private DropTable dropTable;
 
-    public ArrowFishingHandler() {
-        SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
-        dropTable = new DropTableImpl(
-                slipRoller,
-                Lists.newArrayList(
-                        new DropTableEntryImpl(
-                                new SimpleDropResolver(
-                                        Lists.newArrayList(
-                                                newItemStack(ItemTypes.FISH)
-                                        )
-                                ),
-                                100
-                        ),
-                        new DropTableEntryImpl(
-                                new SimpleDropResolver(
-                                        Lists.newArrayList(
-                                                newItemStack("skree:god_fish")
-                                        )
-                                ),
-                                500
-                        )
-                )
-        );
+  public ArrowFishingHandler() {
+    SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
+    dropTable = new DropTableImpl(
+        slipRoller,
+        Lists.newArrayList(
+            new DropTableEntryImpl(
+                new SimpleDropResolver(
+                    Lists.newArrayList(
+                        newItemStack(ItemTypes.FISH)
+                    )
+                ),
+                100
+            ),
+            new DropTableEntryImpl(
+                new SimpleDropResolver(
+                    Lists.newArrayList(
+                        newItemStack("skree:god_fish")
+                    )
+                ),
+                500
+            )
+        )
+    );
+  }
+
+  private boolean checkVelocity(Vector3d velocity) {
+    return Math.abs(velocity.getX()) + Math.abs(velocity.getY()) > 2;
+  }
+
+  @Listener
+  public void onProjectileTickEvent(ProjectileTickEvent event) {
+    Projectile projectile = event.getTargetEntity();
+
+    if (!(projectile instanceof Arrow) || Probability.getChance(3)) {
+      return;
     }
 
-    private boolean checkVelocity(Vector3d velocity) {
-        return Math.abs(velocity.getX()) + Math.abs(velocity.getY()) > 2;
-    }
+    Location<World> loc = projectile.getLocation();
 
-    @Listener
-    public void onProjectileTickEvent(ProjectileTickEvent event) {
-        Projectile projectile = event.getTargetEntity();
+    if (MultiTypeRegistry.isWater(loc.getBlockType()) && checkVelocity(projectile.getVelocity())) {
+      ProjectileSource source = projectile.getShooter();
+      double modifier = 1;
 
-        if (!(projectile instanceof Arrow) || Probability.getChance(3)) {
-            return;
+      if (source instanceof Living) {
+        modifier = 50;
+      }
+
+      Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+      int rolls = 1;
+      if (optService.isPresent() && optService.get().isActive(UBER_ARROW_FISHING)) {
+        if (source instanceof Living) {
+          rolls = 15;
+        } else {
+          rolls = 5;
         }
+      }
 
-        Location<World> loc = projectile.getLocation();
-
-        if (MultiTypeRegistry.isWater(loc.getBlockType()) && checkVelocity(projectile.getVelocity())) {
-            ProjectileSource source = projectile.getShooter();
-            double modifier = 1;
-
-            if (source instanceof Living) {
-                modifier = 50;
-            }
-
-            Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-            int rolls = 1;
-            if (optService.isPresent() && optService.get().isActive(UBER_ARROW_FISHING)) {
-                if (source instanceof Living) {
-                    rolls = 15;
-                } else {
-                    rolls = 5;
-                }
-            }
-
-            new ItemDropper(loc).dropStacks(dropTable.getDrops(rolls, modifier), SpawnTypes.DROPPED_ITEM);
-        }
+      new ItemDropper(loc).dropStacks(dropTable.getDrops(rolls, modifier), SpawnTypes.DROPPED_ITEM);
     }
+  }
 }

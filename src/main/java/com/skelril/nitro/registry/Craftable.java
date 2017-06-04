@@ -7,5 +7,5 @@
 package com.skelril.nitro.registry;
 
 public interface Craftable {
-    void registerRecipes();
+  void registerRecipes();
 }

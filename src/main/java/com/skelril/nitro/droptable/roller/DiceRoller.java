@@ -12,5 +12,5 @@ import com.skelril.nitro.droptable.DropTableEntry;
 import java.util.Collection;
 
 public interface DiceRoller {
-    <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, double modifier);
+  <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, double modifier);
 }

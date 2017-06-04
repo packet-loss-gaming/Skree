@@ -24,46 +24,46 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class DeathMark implements Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>> {
-    private final int baseActivation;
+  private final int baseActivation;
 
-    public DeathMark() {
-        this(30);
-    }
+  public DeathMark() {
+    this(30);
+  }
 
-    public DeathMark(int baseActivation) {
-        this.baseActivation = baseActivation;
-    }
+  public DeathMark(int baseActivation) {
+    this.baseActivation = baseActivation;
+  }
 
-    public boolean activate(CatacombsBossDetail detail) {
-        return Probability.getChance(baseActivation - detail.getWave());
-    }
+  public boolean activate(CatacombsBossDetail detail) {
+    return Probability.getChance(baseActivation - detail.getWave());
+  }
 
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        new PlayerCombatParser() {
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) {
-                CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
-                CatacombsInstance inst = detail.getZone();
-                if (detail.getMarked().isPresent()) {
-                    if (attacker.equals(detail.getMarked().get())) {
-                        inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-                                Text.of(TextColors.YELLOW, attacker.getName() + " has been freed!")
-                        );
-                    } else {
-                        detail.getMarked().get().offer(Keys.HEALTH, 0D);
-                    }
-                    detail.setMarked(null);
-                } else if (activate(detail)) {
-                    detail.setMarked(attacker);
-                    inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-                            Text.of(TextColors.DARK_RED, attacker.getName() + " has been marked!")
-                    );
-                }
-            }
-        }.parse(damagedCondition.getEvent());
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamagedCondition damagedCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    new PlayerCombatParser() {
+      @Override
+      public void processPlayerAttack(Player attacker, Living defender) {
+        CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
+        CatacombsInstance inst = detail.getZone();
+        if (detail.getMarked().isPresent()) {
+          if (attacker.equals(detail.getMarked().get())) {
+            inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                Text.of(TextColors.YELLOW, attacker.getName() + " has been freed!")
+            );
+          } else {
+            detail.getMarked().get().offer(Keys.HEALTH, 0D);
+          }
+          detail.setMarked(null);
+        } else if (activate(detail)) {
+          detail.setMarked(attacker);
+          inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+              Text.of(TextColors.DARK_RED, attacker.getName() + " has been marked!")
+          );
+        }
+      }
+    }.parse(damagedCondition.getEvent());
+    return Optional.empty();
+  }
 }

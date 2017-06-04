@@ -14,11 +14,11 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.function.Consumer;
 
 public class StarvationCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        if (player.get(Keys.FOOD_LEVEL).orElse(0) > 0) {
-            player.sendMessage(Text.of(TextColors.RED, "Tasty..."));
-            player.offer(Keys.FOOD_LEVEL, player.get(Keys.FOOD_LEVEL).get() - 1);
-        }
+  @Override
+  public void accept(Player player) {
+    if (player.get(Keys.FOOD_LEVEL).orElse(0) > 0) {
+      player.sendMessage(Text.of(TextColors.RED, "Tasty..."));
+      player.offer(Keys.FOOD_LEVEL, player.get(Keys.FOOD_LEVEL).get() - 1);
     }
+  }
 }

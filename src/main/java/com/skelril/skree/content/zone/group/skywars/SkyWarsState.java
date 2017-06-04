@@ -7,7 +7,7 @@
 package com.skelril.skree.content.zone.group.skywars;
 
 public enum SkyWarsState {
-    LOBBY,
-    IN_PROGRESS,
-    DONE
+  LOBBY,
+  IN_PROGRESS,
+  DONE
 }

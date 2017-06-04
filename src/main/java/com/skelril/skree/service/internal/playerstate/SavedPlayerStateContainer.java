@@ -10,19 +10,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 class SavedPlayerStateContainer {
-    private String releasedState;
+  private String releasedState;
 
-    private Map<String, SavedPlayerState> savedPlayerStates = new HashMap<>();
+  private Map<String, SavedPlayerState> savedPlayerStates = new HashMap<>();
 
-    public String getReleasedState() {
-        return releasedState;
-    }
+  public String getReleasedState() {
+    return releasedState;
+  }
 
-    public void setReleasedState(String releasedState) {
-        this.releasedState = releasedState;
-    }
+  public void setReleasedState(String releasedState) {
+    this.releasedState = releasedState;
+  }
 
-    public Map<String, SavedPlayerState> getSavedPlayerStates() {
-        return savedPlayerStates;
-    }
+  public Map<String, SavedPlayerState> getSavedPlayerStates() {
+    return savedPlayerStates;
+  }
 }

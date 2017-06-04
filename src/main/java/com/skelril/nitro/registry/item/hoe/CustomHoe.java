@@ -23,40 +23,40 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class CustomHoe extends ItemHoe implements ICustomHoe {
-    protected CustomHoe() {
-        super(ToolMaterial.DIAMOND);
-        this.maxStackSize = __getMaxStackSize();
-        this.setCreativeTab(__getCreativeTab());
+  protected CustomHoe() {
+    super(ToolMaterial.DIAMOND);
+    this.maxStackSize = __getMaxStackSize();
+    this.setCreativeTab(__getCreativeTab());
 
-        this.setMaxDamage(__getMaxUses());
-    }
+    this.setMaxDamage(__getMaxUses());
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return HashMultimap.create(); // Use functionality defined in Item
-    }
+  @Override
+  public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return HashMultimap.create(); // Use functionality defined in Item
+  }
 
-    @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return ICustomHoe.super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
-    }
+  @Override
+  public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    return ICustomHoe.super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+  }
 
-    @Override
-    public void setBlock(ItemStack stack, EntityPlayer player, World worldIn, BlockPos pos, IBlockState state) {
-        ICustomHoe.super.setBlock(stack, player, worldIn, pos, state);
-    }
+  @Override
+  public void setBlock(ItemStack stack, EntityPlayer player, World worldIn, BlockPos pos, IBlockState state) {
+    ICustomHoe.super.setBlock(stack, player, worldIn, pos, state);
+  }
 
-    /**
-     * Returns True is the item is renderer in full 3D when hold.
-     */
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean isFull3D() {
-        return ICustomHoe.super.isFull3D();
-    }
+  /**
+   * Returns True is the item is renderer in full 3D when hold.
+   */
+  @SideOnly(Side.CLIENT)
+  @Override
+  public boolean isFull3D() {
+    return ICustomHoe.super.isFull3D();
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return ICustomHoe.super.getItemAttributeModifiers(equipmentSlot);
-    }
+  @Override
+  public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return ICustomHoe.super.getItemAttributeModifiers(equipmentSlot);
+  }
 }

@@ -20,31 +20,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigLoader {
-    private static Path getFile(String configName) throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return path.resolve(configName);
+  private static Path getFile(String configName) throws IOException {
+    ConfigManager service = Sponge.getGame().getConfigManager();
+    Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+    return path.resolve(configName);
+  }
+
+  public static <T> T loadConfig(String configName, Class<T> configClass) throws IOException {
+    Path targetFile = getFile(configName);
+    Gson gson = new GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .setPrettyPrinting()
+        .create();
+
+    if (!Files.exists(targetFile)) {
+      new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
+        try {
+          Files.copy(getResource.apply(configName), targetFile);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      });
     }
 
-    public static <T> T loadConfig(String configName, Class<T> configClass) throws IOException {
-        Path targetFile = getFile(configName);
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .setPrettyPrinting()
-                .create();
-
-        if (!Files.exists(targetFile)) {
-            new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
-                try {
-                    Files.copy(getResource.apply(configName), targetFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
-
-        try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-            return gson.fromJson(reader, configClass);
-        }
+    try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+      return gson.fromJson(reader, configClass);
     }
+  }
 }

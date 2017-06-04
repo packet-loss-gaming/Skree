@@ -17,20 +17,20 @@ import java.util.Optional;
 
 public class CatacombsHealthInstruction implements Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>> {
 
-    private final int baseHP;
+  private final int baseHP;
 
-    public CatacombsHealthInstruction(int baseHP) {
-        this.baseHP = baseHP;
-    }
+  public CatacombsHealthInstruction(int baseHP) {
+    this.baseHP = baseHP;
+  }
 
-    @Override
-    public Optional<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            BindCondition bindCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        Zombie targetEntity = zombieCatacombsBossDetailBoss.getTargetEntity().get();
-        int wave = zombieCatacombsBossDetailBoss.getDetail().getWave();
+  @Override
+  public Optional<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      BindCondition bindCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    Zombie targetEntity = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+    int wave = zombieCatacombsBossDetailBoss.getDetail().getWave();
 
-        EntityHealthUtil.setMaxHealth(targetEntity, wave * baseHP, true);
-        return Optional.empty();
-    }
+    EntityHealthUtil.setMaxHealth(targetEntity, wave * baseHP, true);
+    return Optional.empty();
+  }
 }

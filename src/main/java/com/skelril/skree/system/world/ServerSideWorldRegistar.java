@@ -17,18 +17,18 @@ import java.sql.Timestamp;
 import static com.skelril.skree.db.schema.Tables.WORLDS;
 
 public class ServerSideWorldRegistar {
-    public void register(String name) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
+  public void register(String name) {
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
 
-            Timestamp createdTime = new Timestamp(System.currentTimeMillis());
+      Timestamp createdTime = new Timestamp(System.currentTimeMillis());
 
-            create.insertInto(WORLDS).columns(WORLDS.NAME, WORLDS.CREATED_AT)
-                    .values(name, createdTime)
-                    .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, createdTime)
-                    .execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+      create.insertInto(WORLDS).columns(WORLDS.NAME, WORLDS.CREATED_AT)
+          .values(name, createdTime)
+          .onDuplicateKeyUpdate().set(WORLDS.CREATED_AT, createdTime)
+          .execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 }

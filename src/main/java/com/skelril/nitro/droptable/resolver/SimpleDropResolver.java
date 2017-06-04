@@ -12,26 +12,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class SimpleDropResolver implements DropResolver {
-    private Collection<ItemStack> queue = getBaseCollection();
-    private Collection<ItemStack> itemStacks;
+  private Collection<ItemStack> queue = getBaseCollection();
+  private Collection<ItemStack> itemStacks;
 
-    public SimpleDropResolver(Collection<ItemStack> itemStacks) {
-        this.itemStacks = itemStacks;
-    }
+  public SimpleDropResolver(Collection<ItemStack> itemStacks) {
+    this.itemStacks = itemStacks;
+  }
 
-    public Collection<ItemStack> getBaseCollection() {
-        return new ArrayList<>();
-    }
+  public Collection<ItemStack> getBaseCollection() {
+    return new ArrayList<>();
+  }
 
-    @Override
-    public void enqueue(double modifier) {
-        queue.addAll(itemStacks);
-    }
+  @Override
+  public void enqueue(double modifier) {
+    queue.addAll(itemStacks);
+  }
 
-    @Override
-    public Collection<ItemStack> flush() {
-        Collection<ItemStack> itemStacks = queue;
-        queue = getBaseCollection();
-        return itemStacks;
-    }
+  @Override
+  public Collection<ItemStack> flush() {
+    Collection<ItemStack> itemStacks = queue;
+    queue = getBaseCollection();
+    return itemStacks;
+  }
 }

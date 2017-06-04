@@ -24,32 +24,32 @@ import static org.spongepowered.api.command.args.GenericArguments.remainingJoine
 
 public class MarketSetPrimaryAliasCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        String alias = args.<String>getOne("alias").get();
-        if (service.setPrimaryAlias(alias)) {
-            src.sendMessage(Text.of(TextColors.YELLOW, alias + " set as a primary alias."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias."));
-        }
-
-        return CommandResult.success();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Set the primary alias (name) of an item"))
-                .arguments(onlyOne(remainingJoinedStrings(Text.of("alias"))))
-                .executor(new MarketSetPrimaryAliasCommand())
-                .build();
+    MarketService service = optService.get();
+
+    String alias = args.<String>getOne("alias").get();
+    if (service.setPrimaryAlias(alias)) {
+      src.sendMessage(Text.of(TextColors.YELLOW, alias + " set as a primary alias."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias."));
     }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Set the primary alias (name) of an item"))
+        .arguments(onlyOne(remainingJoinedStrings(Text.of("alias"))))
+        .executor(new MarketSetPrimaryAliasCommand())
+        .build();
+  }
 }

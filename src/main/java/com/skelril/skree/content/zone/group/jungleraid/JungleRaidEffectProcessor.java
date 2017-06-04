@@ -47,138 +47,144 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class JungleRaidEffectProcessor {
-    private static final Random random = new Random();
+  private static final Random RANDOM = new Random();
 
-    public static void run(JungleRaidInstance inst) {
-        globalPotionEffects(inst);
-        titanMode(inst);
-        distributor(inst);
-        randomRockets(inst);
+  public static void run(JungleRaidInstance inst) {
+    globalPotionEffects(inst);
+    titanMode(inst);
+    distributor(inst);
+    randomRockets(inst);
+  }
+
+  private static void globalPotionEffects(JungleRaidInstance inst) {
+    boolean isSuddenDeath = inst.isSuddenDeath();
+
+    for (Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
+      if (isSuddenDeath) {
+        List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
+        potionEffects.add(PotionEffect.of(PotionEffectTypes.GLOWING, 1, 20 * 20));
+        player.offer(Keys.POTION_EFFECTS, potionEffects);
+      }
+    }
+  }
+
+  private static void titanMode(JungleRaidInstance inst) {
+    FlagEffectData data = inst.getFlagData();
+    Collection<Player> players = inst.getPlayers(PlayerClassifier.PARTICIPANT);
+
+    if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && data.titan == null) {
+      Player player = Probability.pickOneOf(players);
+      data.titan = player.getUniqueId();
+      ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
+      teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
+      teamHood.offer(Keys.COLOR, Color.BLACK);
+      // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
+      tf(player).inventory.armorInventory[3] = tf(teamHood);
     }
 
-    private static void globalPotionEffects(JungleRaidInstance inst) {
-        boolean isSuddenDeath = inst.isSuddenDeath();
+    for (Player player : players) {
+      if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && player.getUniqueId().equals(data.titan)) {
+        List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
+        potionEffects.add(PotionEffect.of(PotionEffectTypes.NIGHT_VISION, 1, 20 * 20));
+        player.offer(Keys.POTION_EFFECTS, potionEffects);
+      }
+    }
+  }
 
-        for (Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
-            if (isSuddenDeath) {
-                List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
-                potionEffects.add(PotionEffect.of(PotionEffectTypes.GLOWING, 1, 20 * 20));
-                player.offer(Keys.POTION_EFFECTS, potionEffects);
-            }
-        }
+  private static void distributor(JungleRaidInstance inst) {
+    FlagEffectData data = inst.getFlagData();
+    boolean isSuddenDeath = inst.isSuddenDeath();
+    if (isSuddenDeath) {
+      data.amt = 100;
     }
 
-    private static void titanMode(JungleRaidInstance inst) {
-        FlagEffectData data = inst.getFlagData();
-        Collection<Player> players = inst.getPlayers(PlayerClassifier.PARTICIPANT);
+    if (inst.isFlagEnabled(JungleRaidFlag.END_OF_DAYS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES) || inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET) || isSuddenDeath) {
 
-        if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && data.titan == null) {
-            Player player = Probability.pickOneOf(players);
-            data.titan = player.getUniqueId();
-            ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
-            teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
-            teamHood.offer(Keys.COLOR, Color.BLACK);
-            // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-            tf(player).inventory.armorInventory[3] = tf(teamHood);
+      Vector3i bvMax = inst.getRegion().getMaximumPoint();
+      Vector3i bvMin = inst.getRegion().getMinimumPoint();
+
+      for (int i = 0; i < Probability.getRangedRandom(data.amt / 3, data.amt); i++) {
+
+        Location<World> testLoc = new Location<>(
+            inst.getRegion().getExtent(),
+            Probability.getRangedRandom(bvMin.getX(), bvMax.getX()),
+            bvMax.getY(),
+            Probability.getRangedRandom(bvMin.getZ(), bvMax.getZ())
+        );
+
+        if (testLoc.getBlockType() != BlockTypes.AIR) {
+          continue;
         }
 
-        for (Player player : players) {
-            if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && player.getUniqueId().equals(data.titan)) {
-                List<PotionEffect> potionEffects = player.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
-                potionEffects.add(PotionEffect.of(PotionEffectTypes.NIGHT_VISION, 1, 20 * 20));
-                player.offer(Keys.POTION_EFFECTS, potionEffects);
-            }
+        if (inst.isFlagEnabled(JungleRaidFlag.END_OF_DAYS) || isSuddenDeath) {
+          PrimedTNT explosive = (PrimedTNT) inst.getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, testLoc.getPosition());
+          explosive.setVelocity(new Vector3d(
+              RANDOM.nextDouble() * 2.0 - 1,
+              RANDOM.nextDouble() * 2 * -1,
+              RANDOM.nextDouble() * 2.0 - 1
+          ));
+          explosive.offer(Keys.FUSE_DURATION, 20 * 4);
+
+          // TODO used to have a 1/4 chance of creating fire
+          inst.getRegion().getExtent().spawnEntity(
+              explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+          );
         }
+        if (inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET)) {
+          PotionEffectType type = Probability.pickOneOf(Sponge.getRegistry().getAllOf(PotionEffectType.class));
+          for (int ii = Probability.getRandom(5); ii > 0; --ii) {
+            ThrownPotion potion = (ThrownPotion) inst.getRegion().getExtent().createEntity(EntityTypes.SPLASH_POTION, testLoc.getPosition());
+            potion.setVelocity(new Vector3d(
+                RANDOM.nextDouble() * 2.0 - 1,
+                0,
+                RANDOM.nextDouble() * 2.0 - 1
+            ));
+            potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
+                PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
+            ));
+            inst.getRegion().getExtent().spawnEntity(
+                potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+            );
+          }
+        }
+        if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
+          new ItemDropper(testLoc).dropStacks(
+              Lists.newArrayList(newItemStack(ItemTypes.SNOWBALL, Probability.getRandom(3))),
+              SpawnTypes.PLUGIN
+          );
+        }
+      }
+      if (data.amt < 150 && Probability.getChance(inst.isFlagEnabled(JungleRaidFlag.SUPER) ? 9 : 25)) {
+        ++data.amt;
+      }
     }
+  }
 
-    private static void distributor(JungleRaidInstance inst) {
-        FlagEffectData data = inst.getFlagData();
-        boolean isSuddenDeath = inst.isSuddenDeath();
-        if (isSuddenDeath) {
-            data.amt = 100;
+  private static void randomRockets(JungleRaidInstance inst) {
+    if (inst.isFlagEnabled(JungleRaidFlag.RANDOM_ROCKETS)) {
+      for (final Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
+        if (!Probability.getChance(30)) {
+          continue;
         }
-
-        if (inst.isFlagEnabled(JungleRaidFlag.END_OF_DAYS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES) || inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET) || isSuddenDeath) {
-
-            Vector3i bvMax = inst.getRegion().getMaximumPoint();
-            Vector3i bvMin = inst.getRegion().getMinimumPoint();
-
-            for (int i = 0; i < Probability.getRangedRandom(data.amt / 3, data.amt); i++) {
-
-                Location<World> testLoc = new Location<>(
-                        inst.getRegion().getExtent(),
-                        Probability.getRangedRandom(bvMin.getX(), bvMax.getX()),
-                        bvMax.getY(),
-                        Probability.getRangedRandom(bvMin.getZ(), bvMax.getZ())
-                );
-
-                if (testLoc.getBlockType() != BlockTypes.AIR) continue;
-
-                if (inst.isFlagEnabled(JungleRaidFlag.END_OF_DAYS) || isSuddenDeath) {
-                    PrimedTNT explosive = (PrimedTNT) inst.getRegion().getExtent().createEntity(EntityTypes.PRIMED_TNT, testLoc.getPosition());
-                    explosive.setVelocity(new Vector3d(
-                            random.nextDouble() * 2.0 - 1,
-                            random.nextDouble() * 2 * -1,
-                            random.nextDouble() * 2.0 - 1
-                    ));
-                    explosive.offer(Keys.FUSE_DURATION, 20 * 4);
-
-                    // TODO used to have a 1/4 chance of creating fire
-                    inst.getRegion().getExtent().spawnEntity(
-                            explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                    );
-                }
-                if (inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET)) {
-                    PotionEffectType type = Probability.pickOneOf(Sponge.getRegistry().getAllOf(PotionEffectType.class));
-                    for (int ii = Probability.getRandom(5); ii > 0; --ii) {
-                        ThrownPotion potion = (ThrownPotion) inst.getRegion().getExtent().createEntity(EntityTypes.SPLASH_POTION, testLoc.getPosition());
-                        potion.setVelocity(new Vector3d(
-                                random.nextDouble() * 2.0 - 1,
-                                0,
-                                random.nextDouble() * 2.0 - 1
-                        ));
-                        potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
-                                PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
-                        ));
-                        inst.getRegion().getExtent().spawnEntity(
-                                potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                        );
-                    }
-                }
-                if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
-                    new ItemDropper(testLoc).dropStacks(
-                            Lists.newArrayList(newItemStack(ItemTypes.SNOWBALL, Probability.getRandom(3))),
-                            SpawnTypes.PLUGIN
-                    );
-                }
-            }
-            if (data.amt < 150 && Probability.getChance(inst.isFlagEnabled(JungleRaidFlag.SUPER) ? 9 : 25)) ++data.amt;
+        for (int i = 0; i < 5; i++) {
+          Task.builder().delayTicks(i * 4).execute(() -> {
+            Location targetLocation = player.getLocation();
+            Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, targetLocation.getPosition());
+            FireworkEffect fireworkEffect = FireworkEffect.builder()
+                .flicker(Probability.getChance(2))
+                .trail(Probability.getChance(2))
+                .color(Color.RED)
+                .fade(Color.YELLOW)
+                .shape(FireworkShapes.BURST)
+                .build();
+            firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+            firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
+            inst.getRegion().getExtent().spawnEntity(
+                firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+            );
+          }).submit(SkreePlugin.inst());
         }
+      }
     }
-
-    private static void randomRockets(JungleRaidInstance inst) {
-        if (inst.isFlagEnabled(JungleRaidFlag.RANDOM_ROCKETS)) {
-            for (final Player player : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
-                if (!Probability.getChance(30)) continue;
-                for (int i = 0; i < 5; i++) {
-                    Task.builder().delayTicks(i * 4).execute(() -> {
-                        Location targetLocation = player.getLocation();
-                        Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, targetLocation.getPosition());
-                        FireworkEffect fireworkEffect = FireworkEffect.builder()
-                                .flicker(Probability.getChance(2))
-                                .trail(Probability.getChance(2))
-                                .color(Color.RED)
-                                .fade(Color.YELLOW)
-                                .shape(FireworkShapes.BURST)
-                                .build();
-                        firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
-                        firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-                        inst.getRegion().getExtent().spawnEntity(
-                                firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                        );
-                    }).submit(SkreePlugin.inst());
-                }
-            }
-        }
-    }
+  }
 }

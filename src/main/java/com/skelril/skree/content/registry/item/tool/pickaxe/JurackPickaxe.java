@@ -18,50 +18,50 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class JurackPickaxe extends CustomPickaxe implements Craftable {
-    @Override
-    public String __getType() {
-        return "jurack";
-    }
+  @Override
+  public String __getType() {
+    return "jurack";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return (ItemStack) (Object) newItemStack("skree:jurack");
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return (ItemStack) (Object) newItemStack("skree:jurack");
+  }
 
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.JURACK.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.JURACK.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.JURACK.getEnchantability();
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.JURACK.getEnchantability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.JURACK;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.JURACK;
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.JURACK.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.JURACK.getEfficienyOnProperMaterial();
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.JURACK.getDurability();
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.JURACK.getDurability();
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                " B ",
-                " B ",
-                'A', newItemStack("skree:jurack"),
-                'B', new ItemStack(Items.STICK)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        " B ",
+        " B ",
+        'A', newItemStack("skree:jurack"),
+        'B', new ItemStack(Items.STICK)
+    );
+  }
 }

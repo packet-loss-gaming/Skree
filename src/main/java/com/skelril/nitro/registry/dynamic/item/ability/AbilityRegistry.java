@@ -7,6 +7,7 @@
 package com.skelril.nitro.registry.dynamic.item.ability;
 
 public interface AbilityRegistry {
-    Class<? extends Ability> lookupByID(String id);
-    void registerAbility(String id, Class<? extends Ability> abilityClass);
+  Class<? extends Ability> lookupByID(String id);
+
+  void registerAbility(String id, Class<? extends Ability> abilityClass);
 }

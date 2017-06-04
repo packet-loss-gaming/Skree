@@ -8,13 +8,13 @@ package com.skelril.nitro.text;
 
 public class PlaceHolderText {
 
-    private String key;
+  private String key;
 
-    public PlaceHolderText(String key) {
-        this.key = key;
-    }
+  public PlaceHolderText(String key) {
+    this.key = key;
+  }
 
-    public String getKey() {
-        return key;
-    }
+  public String getKey() {
+    return key;
+  }
 }

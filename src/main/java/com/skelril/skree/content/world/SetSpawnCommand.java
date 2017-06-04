@@ -18,26 +18,26 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class SetSpawnCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        Player player = (Player) src;
-        player.getWorld().getProperties().setSpawnPosition(player.getLocation().getPosition().toInt());
-
-        player.sendMessage(Text.of(TextColors.YELLOW, "Set the spawn for this world to your current location."));
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Set the spawn for the current world"))
-                .permission("skree.world.setspawn")
-                .executor(new SetSpawnCommand()).build();
-    }
+    Player player = (Player) src;
+    player.getWorld().getProperties().setSpawnPosition(player.getLocation().getPosition().toInt());
+
+    player.sendMessage(Text.of(TextColors.YELLOW, "Set the spawn for this world to your current location."));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Set the spawn for the current world"))
+        .permission("skree.world.setspawn")
+        .executor(new SetSpawnCommand()).build();
+  }
 }

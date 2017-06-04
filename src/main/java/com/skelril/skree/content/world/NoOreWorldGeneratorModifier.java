@@ -18,22 +18,22 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.util.List;
 
 public class NoOreWorldGeneratorModifier implements WorldGeneratorModifier {
-    @Override
-    public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
-        for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
-            BiomeGenerationSettings biomeData = worldGenerator.getBiomeSettings(biomeType);
-            List<Ore> populators = biomeData.getPopulators(Ore.class);
-            biomeData.getPopulators().removeAll(populators);
-        }
+  @Override
+  public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
+    for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
+      BiomeGenerationSettings biomeData = worldGenerator.getBiomeSettings(biomeType);
+      List<Ore> populators = biomeData.getPopulators(Ore.class);
+      biomeData.getPopulators().removeAll(populators);
     }
+  }
 
-    @Override
-    public String getId() {
-        return "skree:no_ore";
-    }
+  @Override
+  public String getId() {
+    return "skree:no_ore";
+  }
 
-    @Override
-    public String getName() {
-        return "Ore Remover";
-    }
+  @Override
+  public String getName() {
+    return "Ore Remover";
+  }
 }

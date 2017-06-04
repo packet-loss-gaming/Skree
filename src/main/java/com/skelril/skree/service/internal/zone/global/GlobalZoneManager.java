@@ -14,37 +14,37 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class GlobalZoneManager<T extends Zone> implements ZoneManager<T> {
-    protected T zone;
-    protected Queue<Consumer<Optional<T>>> pendingCallbacks = new ArrayDeque<>();
+  protected T zone;
+  protected Queue<Consumer<Optional<T>>> pendingCallbacks = new ArrayDeque<>();
 
-    public abstract void init(ZoneSpaceAllocator allocator, Consumer<T> callback);
+  public abstract void init(ZoneSpaceAllocator allocator, Consumer<T> callback);
 
-    public boolean isActive() {
-        return zone != null && zone.isActive();
+  public boolean isActive() {
+    return zone != null && zone.isActive();
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback) {
+    if (!isActive()) {
+      pendingCallbacks.add(callback);
+      if (pendingCallbacks.size() == 1) {
+        init(allocator, returnedZone -> {
+          while (!pendingCallbacks.isEmpty()) {
+            pendingCallbacks.poll().accept(Optional.of(zone = returnedZone));
+          }
+        });
+      }
+    } else {
+      callback.accept(Optional.of(zone));
     }
+  }
 
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<T>> callback) {
-        if (!isActive()) {
-            pendingCallbacks.add(callback);
-            if (pendingCallbacks.size() == 1) {
-                init(allocator, returnedZone -> {
-                    while (!pendingCallbacks.isEmpty()) {
-                        pendingCallbacks.poll().accept(Optional.of(zone = returnedZone));
-                    }
-                });
-            }
-        } else {
-            callback.accept(Optional.of(zone));
-        }
-    }
+  public Optional<T> getActiveZone() {
+    return Optional.ofNullable(zone);
+  }
 
-    public Optional<T> getActiveZone() {
-        return Optional.ofNullable(zone);
-    }
-
-    @Override
-    public Collection<T> getActiveZones() {
-        return isActive() ? Collections.singletonList(zone) : Collections.emptyList();
-    }
+  @Override
+  public Collection<T> getActiveZones() {
+    return isActive() ? Collections.singletonList(zone) : Collections.emptyList();
+  }
 }

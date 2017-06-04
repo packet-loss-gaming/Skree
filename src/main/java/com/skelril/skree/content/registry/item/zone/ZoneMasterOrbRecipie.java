@@ -19,32 +19,32 @@ import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.setMaste
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.setMasterToZoneBasic;
 
 public class ZoneMasterOrbRecipie extends ShapelessRecipes {
-    private final String zone;
+  private final String zone;
 
-    public ZoneMasterOrbRecipie(String zone, ItemStack... inputList) {
-        super(setMasterToZoneBasic(new ItemStack(CustomItemTypes.ZONE_MASTER_ORB), zone), Arrays.asList(inputList));
-        this.zone = zone;
-    }
+  public ZoneMasterOrbRecipie(String zone, ItemStack... inputList) {
+    super(setMasterToZoneBasic(new ItemStack(CustomItemTypes.ZONE_MASTER_ORB), zone), Arrays.asList(inputList));
+    this.zone = zone;
+  }
 
-    private ItemStack getFull() {
-        ItemStack stack = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
-        setMasterToZone(stack, zone);
-        return stack;
-    }
+  private ItemStack getFull() {
+    ItemStack stack = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
+    setMasterToZone(stack, zone);
+    return stack;
+  }
 
-    @Override
-    public ItemStack getRecipeOutput() {
-        if (Sponge.getPlatform().getType() == Platform.Type.CLIENT) {
-            return super.getRecipeOutput();
-        }
-        return getFull();
+  @Override
+  public ItemStack getRecipeOutput() {
+    if (Sponge.getPlatform().getType() == Platform.Type.CLIENT) {
+      return super.getRecipeOutput();
     }
+    return getFull();
+  }
 
-    @Override
-    public ItemStack getCraftingResult(InventoryCrafting inv) {
-        if (Sponge.getPlatform().getType() == Platform.Type.CLIENT) {
-            return super.getCraftingResult(inv);
-        }
-        return getFull();
+  @Override
+  public ItemStack getCraftingResult(InventoryCrafting inv) {
+    if (Sponge.getPlatform().getType() == Platform.Type.CLIENT) {
+      return super.getCraftingResult(inv);
     }
+    return getFull();
+  }
 }

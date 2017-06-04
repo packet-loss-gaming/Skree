@@ -38,122 +38,122 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public class RegionMarker extends Block implements ICustomBlock, EventAwareContent {
-    public RegionMarker() {
-        super(new Material(MapColor.STONE));
-        this.setCreativeTab(CreativeTabs.DECORATIONS);
+  public RegionMarker() {
+    super(new Material(MapColor.STONE));
+    this.setCreativeTab(CreativeTabs.DECORATIONS);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(1.5F);
-        this.setResistance(6000000.0F);
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(1.5F);
+    this.setResistance(6000000.0F);
+  }
+
+  @Override
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    return new AxisAlignedBB(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
+  }
+
+  @Override
+  public String __getID() {
+    return "region_marker";
+  }
+
+  @Override
+  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, net.minecraft.world.World worldIn, BlockPos pos) {
+    return null;
+  }
+
+  @Override
+  public boolean isOpaqueCube(IBlockState state) {
+    return false;
+  }
+
+  @Override
+  public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+    return true;
+  }
+
+  @Override
+  public boolean isFullCube(IBlockState state) {
+    return false;
+  }
+
+  @SideOnly(Side.CLIENT)
+  public BlockRenderLayer getBlockLayer() {
+    return BlockRenderLayer.CUTOUT_MIPPED;
+  }
+
+  @Listener
+  public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      return;
     }
 
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return new AxisAlignedBB(0.125F, 0.125F, 0.125F, 0.875F, 0.875F, 0.875F);
-    }
+    RegionService service = optService.get();
 
-    @Override
-    public String __getID() {
-        return "region_marker";
-    }
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      if (!block.isValid()) {
+        continue;
+      }
 
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, net.minecraft.world.World worldIn, BlockPos pos) {
-        return null;
-    }
+      if (block.getFinal().getState().getType() != this) {
+        continue;
+      }
 
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-        return true;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT_MIPPED;
-    }
-
-    @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            return;
-        }
-
-        RegionService service = optService.get();
-
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            if (!block.isValid()) {
+      Optional<Location<World>> optLoc = block.getFinal().getLocation();
+      if (optLoc.isPresent()) {
+        Optional<Region> optRef = service.getSelectedRegion(player);
+        if (optRef.isPresent()) {
+          Location<World> loc = optLoc.get();
+          Region ref = optRef.get();
+          if (ref.getWorldName().equals(loc.getExtent().getName())) {
+            if (ref.isMember(player)) {
+              RegionErrorStatus status = ref.addPoint(new RegionPoint(loc.getPosition()));
+              if (status == RegionErrorStatus.NONE) {
+                player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
                 continue;
+              } else if (status == RegionErrorStatus.INTERSECT) {
+                player.sendMessage(Text.of(TextColors.RED, "No two regions can occupy the same space!"));
+              } else if (status == RegionErrorStatus.REGION_TOO_LARGE) {
+                player.sendMessage(Text.of(TextColors.RED, "You do not have enough power to expand your region!"));
+              }
             }
-
-            if (block.getFinal().getState().getType() != this) {
-                continue;
-            }
-
-            Optional<Location<World>> optLoc = block.getFinal().getLocation();
-            if (optLoc.isPresent()) {
-                Optional<Region> optRef = service.getSelectedRegion(player);
-                if (optRef.isPresent()) {
-                    Location<World> loc = optLoc.get();
-                    Region ref = optRef.get();
-                    if (ref.getWorldName().equals(loc.getExtent().getName())) {
-                        if (ref.isMember(player)) {
-                            RegionErrorStatus status = ref.addPoint(new RegionPoint(loc.getPosition()));
-                            if (status == RegionErrorStatus.NONE) {
-                                player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
-                                continue;
-                            } else if (status == RegionErrorStatus.INTERSECT) {
-                                player.sendMessage(Text.of(TextColors.RED, "No two regions can occupy the same space!"));
-                            } else if (status == RegionErrorStatus.REGION_TOO_LARGE) {
-                                player.sendMessage(Text.of(TextColors.RED, "You do not have enough power to expand your region!"));
-                            }
-                        }
-                    }
-                }
-            }
-            block.setValid(false);
+          }
         }
+      }
+      block.setValid(false);
+    }
+  }
+
+  @Listener
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            return;
+    RegionService service = optService.get();
+
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      if (!block.isValid()) {
+        continue;
+      }
+
+      if (block.getOriginal().getState().getType() != this) {
+        continue;
+      }
+
+      Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+      if (optLoc.isPresent()) {
+        Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+        if (optRef.isPresent()) {
+          Region ref = optRef.get();
+          if (ref.isMember(player)) {
+            ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
+            player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
+          }
         }
-
-        RegionService service = optService.get();
-
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            if (!block.isValid()) {
-                continue;
-            }
-
-            if (block.getOriginal().getState().getType() != this) {
-                continue;
-            }
-
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-            if (optLoc.isPresent()) {
-                Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
-                if (optRef.isPresent()) {
-                    Region ref = optRef.get();
-                    if (ref.isMember(player)) {
-                        ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
-                        player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }

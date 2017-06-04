@@ -14,8 +14,8 @@ import net.minecraft.entity.ai.attributes.RangedAttribute;
 
 @NModule(name = "Tweaker System")
 public class TweakerSystem {
-    @NModuleTrigger(trigger = "PRE_INITIALIZATION")
-    public void preInit() {
-        ReflectiveModifier.modifyFieldValue(RangedAttribute.class, (RangedAttribute) SharedMonsterAttributes.MAX_HEALTH, "field_111118_b", Double.MAX_VALUE);
-    }
+  @NModuleTrigger(trigger = "PRE_INITIALIZATION")
+  public void preInit() {
+    ReflectiveModifier.modifyFieldValue(RangedAttribute.class, (RangedAttribute) SharedMonsterAttributes.MAX_HEALTH, "field_111118_b", Double.MAX_VALUE);
+  }
 }

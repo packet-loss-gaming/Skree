@@ -35,138 +35,138 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class MarketBuyCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        Player player = (Player) src;
-
-        if (!canBuyOrSell(player)) {
-            player.sendMessage(Text.of(TextColors.RED, "You cannot buy or sell from this area."));
-            return CommandResult.empty();
-        }
-
-        String itemName = args.<String>getOne("item").get();
-        List<String> targetItems;
-        if (itemName.endsWith("#armor")) {
-            String armorType = itemName.replace("#armor", " ");
-            targetItems = Lists.newArrayList(
-                    armorType + "helmet",
-                    armorType + "chestplate",
-                    armorType + "leggings",
-                    armorType + "boots"
-            );
-        } else {
-            targetItems = Lists.newArrayList(itemName);
-        }
-
-        BigDecimal price = BigDecimal.ZERO;
-
-        for (String anItem : targetItems) {
-            Optional<BigDecimal> optPrice = service.getPrice(anItem);
-            if (!optPrice.isPresent()) {
-                src.sendMessage(Text.of(TextColors.RED, "That item is not available for purchase."));
-                return CommandResult.empty();
-            }
-
-            price = price.add(optPrice.get());
-        }
-        Optional<Integer> optAmt = args.getOne("amount");
-        int amt = Math.max(1, optAmt.isPresent() ? optAmt.get() : 0);
-        price = price.multiply(BigDecimal.valueOf(amt));
-
-        BigDecimal funds = MarketImplUtil.getMoney(player);
-        BigDecimal newBalance = funds.subtract(price);
-
-        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            BigDecimal neededAmt = newBalance.multiply(BigDecimal.valueOf(-1));
-
-            src.sendMessage(Text.of(TextColors.RED, "You do not have enough money to purchase that item(s)."));
-            src.sendMessage(Text.of(TextColors.RED, "You need an additional ",
-                    TextColors.WHITE, format(neededAmt), TextColors.RED, "."
-            ));
-
-            return CommandResult.empty();
-        }
-
-        List<Clause<String, Integer>> newStocks = new ArrayList<>();
-        for (String anItem : targetItems) {
-            Optional<Integer> optStock = service.getStock(anItem);
-            if (optStock.orElse(0) < amt) {
-                src.sendMessage(Text.of(TextColors.RED, "There is not enough stock to satisfy your order."));
-                return CommandResult.empty();
-            }
-
-            newStocks.add(new Clause<>(anItem, optStock.get() - amt));
-        }
-
-        // Accumulate items
-        List<ItemStack> itemStacks = new ArrayList<>(targetItems.size());
-        for (String anItem : targetItems) {
-            Optional<ItemStack> stack = service.getItem(anItem);
-            if (!stack.isPresent()) {
-                // TODO Auto reporting
-                src.sendMessage(Text.of(TextColors.RED, "An item stack could not be resolved, please report this!"));
-                return CommandResult.empty();
-            }
-            int total = amt;
-            while (total > 0) {
-                int increment = Math.min(total, stack.get().getMaxStackQuantity());
-                total -= increment;
-                itemStacks.add(newItemStack(stack.get(), increment));
-            }
-        }
-
-        // Alright, all items have been found
-        if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
-            // TODO Auto reporting
-            src.sendMessage(Text.of(TextColors.RED, "Failed to adjust your balance, please report this!"));
-            return CommandResult.empty();
-        }
-
-        Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(
-                player, itemStacks, Cause.source(SkreePlugin.container()).build()
-        );
-
-        if (!transactions.getKey()) {
-            // TODO Auto reporting
-            src.sendMessage(Text.of(TextColors.RED, "Failed to give all items, please report this!"));
-            return CommandResult.empty();
-        }
-
-        // Items have been given process stocks
-        for (Clause<String, Integer> stock : newStocks) {
-            service.setStock(stock.getKey(), stock.getValue());
-        }
-
-        if (!service.logTransactionByStack(player.getUniqueId(), transactions.getValue())) {
-            // TODO Auto reporting
-            // Not critical, continue
-            src.sendMessage(Text.of(TextColors.RED, "Failed to log transactions, please report this!"));
-        }
-
-        player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) purchased for ", TextColors.WHITE, format(price), TextColors.YELLOW, "!"));
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Purchase an item"))
-                .arguments(flags().valueFlag(integer(Text.of("amount")), "a").buildWith(remainingJoinedStrings(Text.of("item"))))
-                .executor(new MarketBuyCommand())
-                .build();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
+
+    MarketService service = optService.get();
+
+    Player player = (Player) src;
+
+    if (!canBuyOrSell(player)) {
+      player.sendMessage(Text.of(TextColors.RED, "You cannot buy or sell from this area."));
+      return CommandResult.empty();
+    }
+
+    String itemName = args.<String>getOne("item").get();
+    List<String> targetItems;
+    if (itemName.endsWith("#armor")) {
+      String armorType = itemName.replace("#armor", " ");
+      targetItems = Lists.newArrayList(
+          armorType + "helmet",
+          armorType + "chestplate",
+          armorType + "leggings",
+          armorType + "boots"
+      );
+    } else {
+      targetItems = Lists.newArrayList(itemName);
+    }
+
+    BigDecimal price = BigDecimal.ZERO;
+
+    for (String anItem : targetItems) {
+      Optional<BigDecimal> optPrice = service.getPrice(anItem);
+      if (!optPrice.isPresent()) {
+        src.sendMessage(Text.of(TextColors.RED, "That item is not available for purchase."));
+        return CommandResult.empty();
+      }
+
+      price = price.add(optPrice.get());
+    }
+    Optional<Integer> optAmt = args.getOne("amount");
+    int amt = Math.max(1, optAmt.isPresent() ? optAmt.get() : 0);
+    price = price.multiply(BigDecimal.valueOf(amt));
+
+    BigDecimal funds = MarketImplUtil.getMoney(player);
+    BigDecimal newBalance = funds.subtract(price);
+
+    if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+      BigDecimal neededAmt = newBalance.multiply(BigDecimal.valueOf(-1));
+
+      src.sendMessage(Text.of(TextColors.RED, "You do not have enough money to purchase that item(s)."));
+      src.sendMessage(Text.of(TextColors.RED, "You need an additional ",
+          TextColors.WHITE, format(neededAmt), TextColors.RED, "."
+      ));
+
+      return CommandResult.empty();
+    }
+
+    List<Clause<String, Integer>> newStocks = new ArrayList<>();
+    for (String anItem : targetItems) {
+      Optional<Integer> optStock = service.getStock(anItem);
+      if (optStock.orElse(0) < amt) {
+        src.sendMessage(Text.of(TextColors.RED, "There is not enough stock to satisfy your order."));
+        return CommandResult.empty();
+      }
+
+      newStocks.add(new Clause<>(anItem, optStock.get() - amt));
+    }
+
+    // Accumulate items
+    List<ItemStack> itemStacks = new ArrayList<>(targetItems.size());
+    for (String anItem : targetItems) {
+      Optional<ItemStack> stack = service.getItem(anItem);
+      if (!stack.isPresent()) {
+        // TODO Auto reporting
+        src.sendMessage(Text.of(TextColors.RED, "An item stack could not be resolved, please report this!"));
+        return CommandResult.empty();
+      }
+      int total = amt;
+      while (total > 0) {
+        int increment = Math.min(total, stack.get().getMaxStackQuantity());
+        total -= increment;
+        itemStacks.add(newItemStack(stack.get(), increment));
+      }
+    }
+
+    // Alright, all items have been found
+    if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
+      // TODO Auto reporting
+      src.sendMessage(Text.of(TextColors.RED, "Failed to adjust your balance, please report this!"));
+      return CommandResult.empty();
+    }
+
+    Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(
+        player, itemStacks, Cause.source(SkreePlugin.container()).build()
+    );
+
+    if (!transactions.getKey()) {
+      // TODO Auto reporting
+      src.sendMessage(Text.of(TextColors.RED, "Failed to give all items, please report this!"));
+      return CommandResult.empty();
+    }
+
+    // Items have been given process stocks
+    for (Clause<String, Integer> stock : newStocks) {
+      service.setStock(stock.getKey(), stock.getValue());
+    }
+
+    if (!service.logTransactionByStack(player.getUniqueId(), transactions.getValue())) {
+      // TODO Auto reporting
+      // Not critical, continue
+      src.sendMessage(Text.of(TextColors.RED, "Failed to log transactions, please report this!"));
+    }
+
+    player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) purchased for ", TextColors.WHITE, format(price), TextColors.YELLOW, "!"));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Purchase an item"))
+        .arguments(flags().valueFlag(integer(Text.of("amount")), "a").buildWith(remainingJoinedStrings(Text.of("item"))))
+        .executor(new MarketBuyCommand())
+        .build();
+  }
 }

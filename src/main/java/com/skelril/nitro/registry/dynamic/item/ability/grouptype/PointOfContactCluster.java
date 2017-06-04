@@ -14,18 +14,18 @@ import com.skelril.nitro.registry.dynamic.item.ability.PointOfContact;
 import java.util.List;
 
 public class PointOfContactCluster extends AbilityCluster {
-    private List<PointOfContact> pointOfContact;
+  private List<PointOfContact> pointOfContact;
 
-    public List<PointOfContact> getPointOfContactAbilties() {
-        return pointOfContact;
-    }
+  public List<PointOfContact> getPointOfContactAbilties() {
+    return pointOfContact;
+  }
 
-    public PointOfContact getNextAbilityToRun() {
-        return Probability.pickOneOf(getPointOfContactAbilties());
-    }
+  public PointOfContact getNextAbilityToRun() {
+    return Probability.pickOneOf(getPointOfContactAbilties());
+  }
 
-    @Override
-    public ClusterListener getListenerFor(String itemID, AbilityCooldownHandler coolDownManager) {
-        return new PointOfContactClusterListener(this, itemID, coolDownManager);
-    }
+  @Override
+  public ClusterListener getListenerFor(String itemID, AbilityCooldownHandler coolDownManager) {
+    return new PointOfContactClusterListener(this, itemID, coolDownManager);
+  }
 }

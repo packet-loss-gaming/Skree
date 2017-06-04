@@ -22,85 +22,85 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Set;
 
 public abstract class CustomPickaxe extends ItemPickaxe implements ICustomPickaxe {
-    protected CustomPickaxe() {
-        super(ToolMaterial.DIAMOND);
-        this.maxStackSize = __getMaxStackSize();
-        this.setCreativeTab(__getCreativeTab());
+  protected CustomPickaxe() {
+    super(ToolMaterial.DIAMOND);
+    this.maxStackSize = __getMaxStackSize();
+    this.setCreativeTab(__getCreativeTab());
 
-        this.setMaxDamage(__getMaxUses());
-    }
+    this.setMaxDamage(__getMaxUses());
+  }
 
-    // Modified Native ItemTool methods
+  // Modified Native ItemTool methods
 
-    @Override
-    public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false; // Use functionality defined in Item
-    }
+  @Override
+  public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
+    return false; // Use functionality defined in Item
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return HashMultimap.create(); // Use functionality defined in Item
-    }
+  @Override
+  public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return HashMultimap.create(); // Use functionality defined in Item
+  }
 
-    @Override
-    public int __superGetHarvestLevel(ItemStack stack, String toolClass) {
-        return super.getHarvestLevel(stack, toolClass);
-    }
+  @Override
+  public int __superGetHarvestLevel(ItemStack stack, String toolClass) {
+    return super.getHarvestLevel(stack, toolClass);
+  }
 
-    @Override
-    public Set<String> __superGetToolClasses(ItemStack stack) {
-        return super.getToolClasses(stack);
-    }
+  @Override
+  public Set<String> __superGetToolClasses(ItemStack stack) {
+    return super.getToolClasses(stack);
+  }
 
-    @Override
-    public boolean canHarvestBlock(IBlockState blockIn) {
-        return ICustomPickaxe.super.canHarvestBlock(blockIn);
-    }
-    
-    @Override
-    public float getStrVsBlock(ItemStack stack, IBlockState state) {
-        return ICustomPickaxe.super.getStrVsBlock(stack, state);
-    }
+  @Override
+  public boolean canHarvestBlock(IBlockState blockIn) {
+    return ICustomPickaxe.super.canHarvestBlock(blockIn);
+  }
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        return ICustomPickaxe.super.hitEntity(stack, target, attacker);
-    }
+  @Override
+  public float getStrVsBlock(ItemStack stack, IBlockState state) {
+    return ICustomPickaxe.super.getStrVsBlock(stack, state);
+  }
 
-    @Override
-    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
-        return ICustomPickaxe.super.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
-    }
+  @Override
+  public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+    return ICustomPickaxe.super.hitEntity(stack, target, attacker);
+  }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean isFull3D() {
-        return ICustomPickaxe.super.isFull3D();
-    }
+  @Override
+  public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+    return ICustomPickaxe.super.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
+  }
 
-    @Override
-    public int getItemEnchantability() {
-        return ICustomPickaxe.super.getItemEnchantability();
-    }
+  @SideOnly(Side.CLIENT)
+  @Override
+  public boolean isFull3D() {
+    return ICustomPickaxe.super.isFull3D();
+  }
 
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return ICustomPickaxe.super.getIsRepairable(toRepair, repair);
-    }
+  @Override
+  public int getItemEnchantability() {
+    return ICustomPickaxe.super.getItemEnchantability();
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return ICustomPickaxe.super.getItemAttributeModifiers(equipmentSlot);
-    }
+  @Override
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    return ICustomPickaxe.super.getIsRepairable(toRepair, repair);
+  }
 
-    @Override
-    public int getHarvestLevel(ItemStack stack, String toolClass) {
-        return ICustomPickaxe.super.getHarvestLevel(stack, toolClass);
-    }
+  @Override
+  public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return ICustomPickaxe.super.getItemAttributeModifiers(equipmentSlot);
+  }
 
-    @Override
-    public Set<String> getToolClasses(ItemStack stack) {
-        return ICustomPickaxe.super.getToolClasses(stack);
-    }
+  @Override
+  public int getHarvestLevel(ItemStack stack, String toolClass) {
+    return ICustomPickaxe.super.getHarvestLevel(stack, toolClass);
+  }
+
+  @Override
+  public Set<String> getToolClasses(ItemStack stack) {
+    return ICustomPickaxe.super.getToolClasses(stack);
+  }
 }
 

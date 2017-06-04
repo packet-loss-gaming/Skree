@@ -11,5 +11,5 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public interface PointOfContact extends Ability {
-    void run(Living owner, Location<World> target);
+  void run(Living owner, Location<World> target);
 }

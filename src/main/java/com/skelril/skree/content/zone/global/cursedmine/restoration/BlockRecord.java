@@ -12,37 +12,43 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class BlockRecord implements Comparable<BlockRecord> {
-    // Block Information
-    private final BlockSnapshot snapshot;
+  // Block Information
+  private final BlockSnapshot snapshot;
 
-    // Time Information
-    private final long time;
+  // Time Information
+  private final long time;
 
-    public BlockRecord(BlockSnapshot snapshot) {
-        this.snapshot = snapshot;
-        this.time = System.currentTimeMillis();
+  public BlockRecord(BlockSnapshot snapshot) {
+    this.snapshot = snapshot;
+    this.time = System.currentTimeMillis();
+  }
+
+  public long getTime() {
+    return time;
+  }
+
+  public Location<World> getLocation() {
+    return snapshot.getLocation().get();
+  }
+
+  public void revert() {
+    snapshot.restore(true, BlockChangeFlag.ALL);
+  }
+
+  // Oldest to newest
+  @Override
+  public int compareTo(BlockRecord record) {
+
+    if (record == null) {
+      return -1;
     }
 
-    public long getTime() {
-        return time;
+    if (this.getTime() == record.getTime()) {
+      return 0;
     }
-
-    public Location<World> getLocation() {
-        return snapshot.getLocation().get();
+    if (this.getTime() > record.getTime()) {
+      return 1;
     }
-
-    public void revert() {
-        snapshot.restore(true, BlockChangeFlag.ALL);
-    }
-
-    // Oldest to newest
-    @Override
-    public int compareTo(BlockRecord record) {
-
-        if (record == null) return -1;
-
-        if (this.getTime() == record.getTime()) return 0;
-        if (this.getTime() > record.getTime()) return 1;
-        return -1;
-    }
+    return -1;
+  }
 }

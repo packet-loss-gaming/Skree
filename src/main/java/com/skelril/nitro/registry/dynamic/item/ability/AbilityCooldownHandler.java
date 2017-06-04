@@ -10,29 +10,29 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class AbilityCooldownHandler {
-    private AbilityCooldownProfile profile;
-    private AbilityCooldownManager manager;
+  private AbilityCooldownProfile profile;
+  private AbilityCooldownManager manager;
 
-    public AbilityCooldownHandler(AbilityCooldownProfile profile, AbilityCooldownManager manager) {
-        this.profile = profile;
-        this.manager = manager;
-    }
+  public AbilityCooldownHandler(AbilityCooldownProfile profile, AbilityCooldownManager manager) {
+    this.profile = profile;
+    this.manager = manager;
+  }
 
-    public boolean canUseAbility(Entity entity) {
-        return entity instanceof Player && canUseAbility((Player) entity);
-    }
+  public boolean canUseAbility(Entity entity) {
+    return entity instanceof Player && canUseAbility((Player) entity);
+  }
 
-    private boolean canUseAbility(Player player) {
-        return manager.canUseAbility(player, profile);
-    }
+  private boolean canUseAbility(Player player) {
+    return manager.canUseAbility(player, profile);
+  }
 
-    public void useAbility(Entity entity) {
-        if (entity instanceof Player) {
-            useAbility((Player) entity);
-        }
+  public void useAbility(Entity entity) {
+    if (entity instanceof Player) {
+      useAbility((Player) entity);
     }
+  }
 
-    private void useAbility(Player player) {
-        manager.usedAbility(player, profile);
-    }
+  private void useAbility(Player player) {
+    manager.usedAbility(player, profile);
+  }
 }

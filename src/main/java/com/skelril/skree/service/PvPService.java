@@ -10,7 +10,9 @@ import com.skelril.skree.service.internal.pvp.PvPState;
 import org.spongepowered.api.entity.living.player.Player;
 
 public interface PvPService {
-    void setPvPState(Player player, PvPState state);
-    PvPState getPvPState(Player player);
-    PvPState getDefaultState(Player player);
+  void setPvPState(Player player, PvPState state);
+
+  PvPState getPvPState(Player player);
+
+  PvPState getDefaultState(Player player);
 }

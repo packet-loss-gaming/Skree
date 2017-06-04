@@ -17,109 +17,109 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RunManager {
-    private static final long MAX_TIME = 75;
-    private static final int MAX_TASK = 5;
+  private static final long MAX_TIME = 75;
+  private static final int MAX_TASK = 5;
 
-    private static SupervisingRunContext supervisor = new SupervisingRunContext();
-    private static List<RunningOperation> runners = new ArrayList<>();
+  private static SupervisingRunContext supervisor = new SupervisingRunContext();
+  private static List<RunningOperation> runners = new ArrayList<>();
 
-    static {
-        Task.builder().execute(() -> {
-            supervisor.resume();
+  static {
+    Task.builder().execute(() -> {
+      supervisor.resume();
 
-            List<Runnable> callBacks = new ArrayList<>();
+      List<Runnable> callBacks = new ArrayList<>();
 
-            while (!runners.isEmpty() && supervisor.shouldContinue()) {
-                Iterator<RunningOperation> it = runners.iterator();
+      while (!runners.isEmpty() && supervisor.shouldContinue()) {
+        Iterator<RunningOperation> it = runners.iterator();
 
-                while (it.hasNext()) {
-                    TaskRunContext taskRunContext = new TaskRunContext();
-                    RunningOperation next = it.next();
-                    if (next.complete(taskRunContext)) {
-                        // Queue up the call backs, they can add a new runner,
-                        // which will cause a CME if executed here
-                        callBacks.add(next.getCallBack());
-                        it.remove();
-                    }
-                }
-            }
+        while (it.hasNext()) {
+          TaskRunContext taskRunContext = new TaskRunContext();
+          RunningOperation next = it.next();
+          if (next.complete(taskRunContext)) {
+            // Queue up the call backs, they can add a new runner,
+            // which will cause a CME if executed here
+            callBacks.add(next.getCallBack());
+            it.remove();
+          }
+        }
+      }
 
-            callBacks.forEach(Runnable::run);
-        }).intervalTicks(20).submit(SkreePlugin.inst());
+      callBacks.forEach(Runnable::run);
+    }).intervalTicks(20).submit(SkreePlugin.inst());
+  }
+
+  public static void runOperation(Operation operation, Runnable callBack) {
+    runners.add(new RunningOperation(operation, callBack));
+  }
+
+  private static Operation runOperation(Operation operation, RunContext context) {
+    Operation next = operation;
+    while (next != null && context.shouldContinue()) {
+      try {
+        next = next.resume(context);
+      } catch (WorldEditException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
 
-    public static void runOperation(Operation operation, Runnable callBack) {
-        runners.add(new RunningOperation(operation, callBack));
+    if (next != null) {
+      return next;
+    } else {
+      return null;
+    }
+  }
+
+  private static class RunningOperation {
+    private final Runnable callBack;
+    private Operation next;
+
+    public RunningOperation(Operation next, Runnable callBack) {
+      this.next = next;
+      this.callBack = callBack;
     }
 
-    private static Operation runOperation(Operation operation, RunContext context) {
-        Operation next = operation;
-        while (next != null && context.shouldContinue()) {
-            try {
-                next = next.resume(context);
-            } catch (WorldEditException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        if (next != null) {
-            return next;
-        } else {
-            return null;
-        }
+    public boolean complete(RunContext context) {
+      return (next = runOperation(next, context)) == null;
     }
 
-    private static class RunningOperation {
-        private final Runnable callBack;
-        private Operation next;
+    public Runnable getCallBack() {
+      return callBack;
+    }
+  }
 
-        public RunningOperation(Operation next, Runnable callBack) {
-            this.next = next;
-            this.callBack = callBack;
-        }
+  private static abstract class TimeContext extends RunContext {
+    private long curStart = System.currentTimeMillis();
 
-        public boolean complete(RunContext context) {
-            return (next = runOperation(next, context)) == null;
-        }
-
-        public Runnable getCallBack() {
-            return callBack;
-        }
+    public void resume() {
+      if (!shouldContinue()) {
+        curStart = System.currentTimeMillis();
+      }
     }
 
-    private static abstract class TimeContext extends RunContext {
-        private long curStart = System.currentTimeMillis();
-
-        public void resume() {
-            if (!shouldContinue()) {
-                curStart = System.currentTimeMillis();
-            }
-        }
-
-        public boolean shouldContinue() {
-            return System.currentTimeMillis() - curStart < getTimeRequirement();
-        }
-
-        public abstract long getTimeRequirement();
+    public boolean shouldContinue() {
+      return System.currentTimeMillis() - curStart < getTimeRequirement();
     }
 
-    private static class SupervisingRunContext extends TimeContext {
-        @Override
-        public long getTimeRequirement() {
-            return MAX_TIME;
-        }
+    public abstract long getTimeRequirement();
+  }
+
+  private static class SupervisingRunContext extends TimeContext {
+    @Override
+    public long getTimeRequirement() {
+      return MAX_TIME;
+    }
+  }
+
+  private static class TaskRunContext extends TimeContext {
+    @Override
+    public boolean shouldContinue() {
+      return supervisor.shouldContinue() && super.shouldContinue();
     }
 
-    private static class TaskRunContext extends TimeContext {
-        @Override
-        public boolean shouldContinue() {
-            return supervisor.shouldContinue() && super.shouldContinue();
-        }
-
-        @Override
-        public long getTimeRequirement() {
-            return MAX_TIME / Math.min(MAX_TASK, runners.size());
-        }
+    @Override
+    public long getTimeRequirement() {
+      return MAX_TIME / Math.min(MAX_TASK, runners.size());
     }
+  }
 }

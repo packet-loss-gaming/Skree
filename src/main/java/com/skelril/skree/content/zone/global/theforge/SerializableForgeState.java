@@ -17,38 +17,38 @@ import java.util.List;
 import java.util.Map;
 
 class SerializableForgeState {
-    private List<JsonElement> item = new ArrayList<>();
-    private List<Integer> quantity = new ArrayList<>();
+  private List<JsonElement> item = new ArrayList<>();
+  private List<Integer> quantity = new ArrayList<>();
 
-    public SerializableForgeState() {
-        this(new ForgeState());
+  public SerializableForgeState() {
+    this(new ForgeState());
+  }
+
+  public SerializableForgeState(ForgeState forgeState) {
+    forgeState.getResults().forEach((key, value) -> {
+      try {
+        item.add(ItemSerializer.serializeItemStack(key));
+        quantity.add(value);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
+  }
+
+  private Map<ItemStack, Integer> getResults() {
+    Map<ItemStack, Integer> results = new HashMap<>();
+    for (int i = 0; i < item.size(); ++i) {
+      try {
+        results.put(ItemSerializer.deserializeItemStack(item.get(i)), quantity.get(i));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
-    public SerializableForgeState(ForgeState forgeState) {
-        forgeState.getResults().forEach((key, value) -> {
-            try {
-                item.add(ItemSerializer.serializeItemStack(key));
-                quantity.add(value);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
+    return results;
+  }
 
-    private Map<ItemStack, Integer> getResults() {
-        Map<ItemStack, Integer> results = new HashMap<>();
-        for (int i = 0; i < item.size(); ++i) {
-            try {
-                results.put(ItemSerializer.deserializeItemStack(item.get(i)), quantity.get(i));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return results;
-    }
-
-    public ForgeState toForgeState() {
-        return new ForgeState(getResults());
-    }
+  public ForgeState toForgeState() {
+    return new ForgeState(getResults());
+  }
 }

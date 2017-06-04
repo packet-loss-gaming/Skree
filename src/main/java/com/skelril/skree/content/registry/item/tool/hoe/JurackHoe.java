@@ -17,30 +17,30 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class JurackHoe extends CustomHoe implements Craftable {
-    @Override
-    public String __getType() {
-        return "jurack";
-    }
+  @Override
+  public String __getType() {
+    return "jurack";
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.JURACK.getDurability();
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.JURACK.getDurability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.JURACK;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.JURACK;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AA ",
-                " B ",
-                " B ",
-                'A', newItemStack("skree:jurack"),
-                'B', new ItemStack(Items.STICK)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AA ",
+        " B ",
+        " B ",
+        'A', newItemStack("skree:jurack"),
+        'B', new ItemStack(Items.STICK)
+    );
+  }
 }

@@ -19,70 +19,70 @@ import org.spongepowered.api.entity.living.player.Player;
 
 public class ForgeTransformer {
 
-    /*
-     * Position transformations
-     */
-    public static Vector3i tf(BlockPos blockPos) {
-        return new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-    }
+  /*
+   * Position transformations
+   */
+  public static Vector3i tf(BlockPos blockPos) {
+    return new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+  }
 
-    public static BlockPos tf(Vector3i blockPos) {
-        return new BlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-    }
+  public static BlockPos tf(Vector3i blockPos) {
+    return new BlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+  }
 
-    /*
-    * Player transformations
-    */
-    public static EntityTNTPrimed tf(PrimedTNT tntEnt) {
-        return (EntityTNTPrimed) tntEnt;
-    }
+  /*
+  * Player transformations
+  */
+  public static EntityTNTPrimed tf(PrimedTNT tntEnt) {
+    return (EntityTNTPrimed) tntEnt;
+  }
 
-    public static PrimedTNT tf(EntityTNTPrimed tntEnt) {
-        return (PrimedTNT) tntEnt;
-    }
+  public static PrimedTNT tf(EntityTNTPrimed tntEnt) {
+    return (PrimedTNT) tntEnt;
+  }
 
-    /*
-     * World transformations
-     */
-    public static World tf(org.spongepowered.api.world.World world) {
-        return (World) world;
-    }
+  /*
+   * World transformations
+   */
+  public static World tf(org.spongepowered.api.world.World world) {
+    return (World) world;
+  }
 
-    public static org.spongepowered.api.world.World tf(World world) {
-        return (org.spongepowered.api.world.World) world;
-    }
+  public static org.spongepowered.api.world.World tf(World world) {
+    return (org.spongepowered.api.world.World) world;
+  }
 
-    /*
-     * ItemStack transformations
-     */
-    public static ItemStack tf(org.spongepowered.api.item.inventory.ItemStack stack) {
-        return (ItemStack) (Object) stack;
-    }
+  /*
+   * ItemStack transformations
+   */
+  public static ItemStack tf(org.spongepowered.api.item.inventory.ItemStack stack) {
+    return (ItemStack) (Object) stack;
+  }
 
-    public static org.spongepowered.api.item.inventory.ItemStack tf(ItemStack stack) {
-        return (org.spongepowered.api.item.inventory.ItemStack) (Object) stack;
-    }
+  public static org.spongepowered.api.item.inventory.ItemStack tf(ItemStack stack) {
+    return (org.spongepowered.api.item.inventory.ItemStack) (Object) stack;
+  }
 
-    /*
-     * Player transformations
-     */
-    public static EntityPlayer tf(Player player) {
-        return (EntityPlayer) player;
-    }
+  /*
+   * Player transformations
+   */
+  public static EntityPlayer tf(Player player) {
+    return (EntityPlayer) player;
+  }
 
-    public static Player tf(EntityPlayer player) {
-        return (Player) player;
-    }
+  public static Player tf(EntityPlayer player) {
+    return (Player) player;
+  }
 
 
-    /*
-     * Living transformations
-     */
-    public static EntityLivingBase tf(Living living) {
-        return (EntityLivingBase) living;
-    }
+  /*
+   * Living transformations
+   */
+  public static EntityLivingBase tf(Living living) {
+    return (EntityLivingBase) living;
+  }
 
-    public static Living tf(EntityLivingBase living) {
-        return (Living) living;
-    }
+  public static Living tf(EntityLivingBase living) {
+    return (Living) living;
+  }
 }

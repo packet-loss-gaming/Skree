@@ -7,5 +7,5 @@
 package com.skelril.nitro.registry.item;
 
 public interface CookedItem {
-    void registerIngredients();
+  void registerIngredients();
 }

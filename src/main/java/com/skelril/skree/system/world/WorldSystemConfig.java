@@ -9,14 +9,14 @@ package com.skelril.skree.system.world;
 import java.util.List;
 
 public class WorldSystemConfig {
-    private List<ArchetypeConfig> archetypes;
-    private List<WorldConfig> worlds;
+  private List<ArchetypeConfig> archetypes;
+  private List<WorldConfig> worlds;
 
-    public List<ArchetypeConfig> getArchetypes() {
-        return archetypes;
-    }
+  public List<ArchetypeConfig> getArchetypes() {
+    return archetypes;
+  }
 
-    public List<WorldConfig> getWorlds() {
-        return worlds;
-    }
+  public List<WorldConfig> getWorlds() {
+    return worlds;
+  }
 }

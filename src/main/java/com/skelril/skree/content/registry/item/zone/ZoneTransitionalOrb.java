@@ -37,98 +37,98 @@ import java.util.Optional;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent, Craftable {
-    @Override
-    public String __getID() {
-        return "zone_transitional_orb";
+  @Override
+  public String __getId() {
+    return "zone_transitional_orb";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 16;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.MATERIALS;
+  }
+
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this, 8),
+        new ItemStack(CustomItemTypes.ZONE_MASTER_ORB)
+    );
+  }
+
+  @Listener
+  public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+    if (!optItemStack.isPresent()) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 16;
+    ItemStack itemStack = tf(optItemStack.get());
+    if (itemStack.getItem() != this) {
+      return;
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.MATERIALS;
+    if (rejoinInstance(player)) {
+      event.setUseBlockResult(Tristate.FALSE);
+    }
+  }
+
+  private boolean isInInstanceWorld(Player player) {
+    Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+    if (!optWorldService.isPresent()) {
+      return false;
     }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this, 8),
-                new ItemStack(CustomItemTypes.ZONE_MASTER_ORB)
-        );
+    WorldService worldService = optWorldService.get();
+    WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
+
+    return wrapper.getWorlds().contains(player.getLocation().getExtent());
+  }
+
+  private void saveLocation(Player player, Location<World> location) {
+    RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+    respawnService.push(player, location);
+  }
+
+  private boolean rejoinInstance(Player player) {
+    Optional<ZoneService> optZoneService = Sponge.getServiceManager().provide(ZoneService.class);
+    if (!optZoneService.isPresent()) {
+      return false;
     }
 
-    @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (!optItemStack.isPresent()) {
-            return;
-        }
-
-        ItemStack itemStack = tf(optItemStack.get());
-        if (itemStack.getItem() != this) {
-            return;
-        }
-
-        if (rejoinInstance(player)) {
-            event.setUseBlockResult(Tristate.FALSE);
-        }
+    if (isInInstanceWorld(player)) {
+      return false;
     }
 
-    private boolean isInInstanceWorld(Player player) {
-        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-        if (!optWorldService.isPresent()) {
-            return false;
-        }
+    Location<World> priorLocation = player.getLocation();
 
-        WorldService worldService = optWorldService.get();
-        WorldEffectWrapper wrapper = worldService.getEffectWrapper(InstanceWorldWrapper.class).get();
-
-        return wrapper.getWorlds().contains(player.getLocation().getExtent());
+    ZoneService zoneService = optZoneService.get();
+    switch (zoneService.rejoin(player).getValue()) {
+      case ADDED:
+        saveLocation(player, priorLocation);
+        Task.builder().execute(() -> {
+          tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+          tf(player).inventoryContainer.detectAndSendChanges();
+        }).delayTicks(1).submit(SkreePlugin.inst());
+        break;
+      case NO_REJOIN:
+        player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
+        break;
+      case REF_LOST:
+        player.sendMessage(Text.of(TextColors.RED, "Your connection with your previous zone has been severed."));
+        break;
+      case DESPAWNED:
+        player.sendMessage(Text.of(TextColors.RED, "The your previous zone has despawned."));
+        break;
+      default:
+        player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin your previous zone."));
+        break;
     }
 
-    private void saveLocation(Player player, Location<World> location) {
-        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
-        respawnService.push(player, location);
-    }
-
-    private boolean rejoinInstance(Player player) {
-        Optional<ZoneService> optZoneService = Sponge.getServiceManager().provide(ZoneService.class);
-        if (!optZoneService.isPresent()) {
-            return false;
-        }
-
-        if (isInInstanceWorld(player)) {
-            return false;
-        }
-
-        Location<World> priorLocation = player.getLocation();
-
-        ZoneService zoneService = optZoneService.get();
-        switch (zoneService.rejoin(player).getValue()) {
-            case ADDED:
-                saveLocation(player, priorLocation);
-                Task.builder().execute(() -> {
-                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                    tf(player).inventoryContainer.detectAndSendChanges();
-                }).delayTicks(1).submit(SkreePlugin.inst());
-                break;
-            case NO_REJOIN:
-                player.sendMessage(Text.of(TextColors.RED, "You cannot rejoin your previous zone."));
-                break;
-            case REF_LOST:
-                player.sendMessage(Text.of(TextColors.RED, "Your connection with your previous zone has been severed."));
-                break;
-            case DESPAWNED:
-                player.sendMessage(Text.of(TextColors.RED, "The your previous zone has despawned."));
-                break;
-            default:
-                player.sendMessage(Text.of(TextColors.RED, "Failed to rejoin your previous zone."));
-                break;
-        }
-
-        return true;
-    }
+    return true;
+  }
 }

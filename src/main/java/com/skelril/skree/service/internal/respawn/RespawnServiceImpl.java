@@ -23,50 +23,50 @@ import org.spongepowered.api.world.World;
 import java.util.*;
 
 public class RespawnServiceImpl implements RespawnService {
-    private Map<Player, Stack<Location<World>>> playerRespawnStack = new WeakHashMap<>();
+  private Map<Player, Stack<Location<World>>> playerRespawnStack = new WeakHashMap<>();
 
-    @Override
-    public Location<World> getDefault(Player target) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+  @Override
+  public Location<World> getDefault(Player target) {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        Optional<Map<UUID, RespawnLocation>> optRespawnLocations = target.get(Keys.RESPAWN_LOCATIONS);
-        if (optRespawnLocations.isPresent()) {
-            BuildWorldWrapper buildWrapper = service.getEffectWrapper(BuildWorldWrapper.class).get();
-            UUID buildWorldId = buildWrapper.getPrimaryWorld().getUniqueId();
+    Optional<Map<UUID, RespawnLocation>> optRespawnLocations = target.get(Keys.RESPAWN_LOCATIONS);
+    if (optRespawnLocations.isPresent()) {
+      BuildWorldWrapper buildWrapper = service.getEffectWrapper(BuildWorldWrapper.class).get();
+      UUID buildWorldId = buildWrapper.getPrimaryWorld().getUniqueId();
 
-            RespawnLocation targetLocation = optRespawnLocations.get().get(buildWorldId);
-            if (targetLocation != null) {
-                Optional<Location<World>> optLocation = targetLocation.asLocation();
-                if (optLocation.isPresent()) {
-                    return optLocation.get();
-                }
-            }
+      RespawnLocation targetLocation = optRespawnLocations.get().get(buildWorldId);
+      if (targetLocation != null) {
+        Optional<Location<World>> optLocation = targetLocation.asLocation();
+        if (optLocation.isPresent()) {
+          return optLocation.get();
         }
-
-        return service.getEffectWrapper(MainWorldWrapper.class).get().getPrimaryWorld().getSpawnLocation();
+      }
     }
 
-    @Override
-    public void push(Player player, Location<World> target) {
-        playerRespawnStack.putIfAbsent(player, new Stack<>());
-        playerRespawnStack.get(player).push(target);
-    }
+    return service.getEffectWrapper(MainWorldWrapper.class).get().getPrimaryWorld().getSpawnLocation();
+  }
 
-    @Override
-    public Optional<Location<World>> peek(Player player) {
-        Stack<Location<World>> stack = playerRespawnStack.getOrDefault(player, new Stack<>());
-        return stack.isEmpty() ? Optional.empty() : Optional.of(stack.peek());
-    }
+  @Override
+  public void push(Player player, Location<World> target) {
+    playerRespawnStack.putIfAbsent(player, new Stack<>());
+    playerRespawnStack.get(player).push(target);
+  }
 
-    @Override
-    public Optional<Location<World>> pop(Player player) {
-        Stack<Location<World>> stack = playerRespawnStack.getOrDefault(player, new Stack<>());
-        return stack.isEmpty() ? Optional.empty() : Optional.of(stack.pop());
-    }
+  @Override
+  public Optional<Location<World>> peek(Player player) {
+    Stack<Location<World>> stack = playerRespawnStack.getOrDefault(player, new Stack<>());
+    return stack.isEmpty() ? Optional.empty() : Optional.of(stack.peek());
+  }
 
-    @Listener
-    public void onPlayerRespawn(RespawnPlayerEvent event) {
-        Player player = event.getTargetEntity();
-        event.setToTransform(new Transform<>(pop(player).orElse(getDefault(player))));
-    }
+  @Override
+  public Optional<Location<World>> pop(Player player) {
+    Stack<Location<World>> stack = playerRespawnStack.getOrDefault(player, new Stack<>());
+    return stack.isEmpty() ? Optional.empty() : Optional.of(stack.pop());
+  }
+
+  @Listener
+  public void onPlayerRespawn(RespawnPlayerEvent event) {
+    Player player = event.getTargetEntity();
+    event.setToTransform(new Transform<>(pop(player).orElse(getDefault(player))));
+  }
 }

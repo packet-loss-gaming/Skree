@@ -7,5 +7,5 @@
 package com.skelril.skree.system;
 
 public interface ServiceProvider<T> {
-    T getService();
+  T getService();
 }

@@ -17,22 +17,22 @@ import com.skelril.skree.content.registry.block.utility.MagicLadder;
 import com.skelril.skree.content.registry.block.utility.MagicPlatform;
 
 public class CustomBlockTypes {
-    /* ** Pitfall ** */
-    public static final Pitfall PITFALL = new Pitfall();
+  /* ** Pitfall ** */
+  public static final Pitfall PITFALL = new Pitfall();
 
-    /* ** Region ** */
-    public static final RegionMarker REGION_MARKER = new RegionMarker();
-    public static final RegionMaster REGION_MASTER = new RegionMaster();
+  /* ** Region ** */
+  public static final RegionMarker REGION_MARKER = new RegionMarker();
+  public static final RegionMaster REGION_MASTER = new RegionMaster();
 
-    /* ** Utility ** */
-    public static final MagicLadder MAGIC_LADDER = new MagicLadder();
-    public static final MagicPlatform MAGIC_PLATFORM = new MagicPlatform();
+  /* ** Utility ** */
+  public static final MagicLadder MAGIC_LADDER = new MagicLadder();
+  public static final MagicPlatform MAGIC_PLATFORM = new MagicPlatform();
 
-    /* ** Wilderness ** */
-    public static final GraveStone GRAVE_STONE = new GraveStone();
+  /* ** Wilderness ** */
+  public static final GraveStone GRAVE_STONE = new GraveStone();
 
-    public static final JurackOre JURACK_ORE = new JurackOre();
+  public static final JurackOre JURACK_ORE = new JurackOre();
 
-    public static final MagicMushroom MAGIC_MUSHROOM = new MagicMushroom();
-    public static final MagicStone MAGIC_STONE = new MagicStone();
+  public static final MagicMushroom MAGIC_MUSHROOM = new MagicMushroom();
+  public static final MagicStone MAGIC_STONE = new MagicStone();
 }

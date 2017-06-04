@@ -23,68 +23,68 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class CursedMineManager extends GlobalZoneManager<CursedMineInstance> implements Runnable, LocationZone<CursedMineInstance> {
-    private HitList hitList = new HitList();
+  private HitList hitList = new HitList();
 
-    public CursedMineManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new CursedMineListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+  public CursedMineManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new CursedMineListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
 
-        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+    Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+  }
+
+  public HitList getHitList() {
+    return hitList;
+  }
+
+  @Override
+  public void init(ZoneSpaceAllocator allocator, Consumer<CursedMineInstance> callback) {
+    Function<Clause<ZoneRegion, ZoneRegion.State>, CursedMineInstance> initFunc = clause -> {
+      ZoneRegion region = clause.getKey();
+
+      return new CursedMineInstance(region, hitList);
+    };
+
+    Consumer<CursedMineInstance> postInitFunc = instance -> {
+      instance.init();
+
+      callback.accept(instance);
+    };
+
+    allocator.regionFor(getSystemName(), initFunc, postInitFunc);
+  }
+
+  @Override
+  public String getName() {
+    return "Cursed Mine";
+  }
+
+  @Override
+  public void run() {
+    Optional<CursedMineInstance> optInst = getActiveZone();
+    if (optInst.isPresent()) {
+      CursedMineInstance inst = optInst.get();
+      if (inst.isActive()) {
+        inst.run();
+        return;
+      }
+      zone.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = zone.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), zone.getRegion());
+      }
+
+      zone = null;
     }
-
-    public HitList getHitList() {
-        return hitList;
-    }
-
-    @Override
-    public void init(ZoneSpaceAllocator allocator, Consumer<CursedMineInstance> callback) {
-        Function<Clause<ZoneRegion, ZoneRegion.State>, CursedMineInstance> initFunc = clause -> {
-            ZoneRegion region = clause.getKey();
-
-            return new CursedMineInstance(region, hitList);
-        };
-
-        Consumer<CursedMineInstance> postInitFunc = instance -> {
-            instance.init();
-
-            callback.accept(instance);
-        };
-
-        allocator.regionFor(getSystemName(), initFunc, postInitFunc);
-    }
-
-    @Override
-    public String getName() {
-        return "Cursed Mine";
-    }
-
-    @Override
-    public void run() {
-        Optional<CursedMineInstance> optInst = getActiveZone();
-        if (optInst.isPresent()) {
-            CursedMineInstance inst = optInst.get();
-            if (inst.isActive()) {
-                inst.run();
-                return;
-            }
-            zone.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = zone.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), zone.getRegion());
-            }
-
-            zone = null;
-        }
-    }
+  }
 }

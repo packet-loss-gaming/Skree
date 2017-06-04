@@ -19,20 +19,20 @@ import org.spongepowered.api.Sponge;
 @NModule(name = "Modifier System")
 public class ModifierSystem implements ServiceProvider<ModifierService> {
 
-    private ModifierService service;
+  private ModifierService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new LazyMySQLModifierService();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new LazyMySQLModifierService();
 
-        // Register the service
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ModifierService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), ModExtendCommand.aquireSpec(), "modextend");
-    }
+    // Register the service
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ModifierNotifier());
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ModifierService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), ModExtendCommand.aquireSpec(), "modextend");
+  }
 
-    @Override
-    public ModifierService getService() {
-        return service;
-    }
+  @Override
+  public ModifierService getService() {
+    return service;
+  }
 }

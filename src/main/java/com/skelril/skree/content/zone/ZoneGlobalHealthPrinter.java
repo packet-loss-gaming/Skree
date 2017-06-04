@@ -26,34 +26,34 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneGlobalHealthPrinter<T> extends ZoneApplicableListener<T> {
-    private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
-            CombinedText.of(
-                    TextColors.DARK_AQUA,
-                    "Entity Health: ",
-                    new PlaceHolderText("health int"),
-                    " / ",
-                    new PlaceHolderText("max health int")
-            ),
-            CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
-    );
+  private final EntityHealthPrinter healthPrinter = new EntityHealthPrinter(
+      CombinedText.of(
+          TextColors.DARK_AQUA,
+          "Entity Health: ",
+          new PlaceHolderText("health int"),
+          " / ",
+          new PlaceHolderText("max health int")
+      ),
+      CombinedText.of(TextColors.GOLD, TextStyles.BOLD, "KO!")
+  );
 
-    public ZoneGlobalHealthPrinter(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
+  public ZoneGlobalHealthPrinter(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    if (!isApplicable(event.getTargetEntity())) {
+      return;
     }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity())) {
-            return;
-        }
-
-        new PlayerCombatParser() {
-            @Override
-            public void processPlayerAttack(Player attacker, Living defender) {
-                Task.builder().delayTicks(1).execute(
-                        () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
-                ).submit(SkreePlugin.inst());
-            }
-        }.parse(event);
-    }
+    new PlayerCombatParser() {
+      @Override
+      public void processPlayerAttack(Player attacker, Living defender) {
+        Task.builder().delayTicks(1).execute(
+            () -> healthPrinter.print(MessageChannel.fixed(attacker), defender)
+        ).submit(SkreePlugin.inst());
+      }
+    }.parse(event);
+  }
 }

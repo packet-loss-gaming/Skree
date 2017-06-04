@@ -9,13 +9,13 @@ package com.skelril.nitro.registry.dynamic.recipe;
 import com.skelril.nitro.registry.dynamic.Loader;
 
 public class ShapedRecipeLoader implements Loader<ShapedRecipeConfig> {
-    @Override
-    public void load(ShapedRecipeConfig config) {
-        config.registerRecipie();
-    }
+  @Override
+  public void load(ShapedRecipeConfig config) {
+    config.registerRecipie();
+  }
 
-    @Override
-    public Class<ShapedRecipeConfig> getConfigClass() {
-        return ShapedRecipeConfig.class;
-    }
+  @Override
+  public Class<ShapedRecipeConfig> getConfigClass() {
+    return ShapedRecipeConfig.class;
+  }
 }

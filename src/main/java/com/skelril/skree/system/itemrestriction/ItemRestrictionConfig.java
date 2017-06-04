@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ItemRestrictionConfig {
-    private Set<String> blockedItems = new HashSet<>();
+  private Set<String> blockedItems = new HashSet<>();
 
-    public Set<String> getBlockedItems() {
-        return blockedItems;
-    }
+  public Set<String> getBlockedItems() {
+    return blockedItems;
+  }
 }

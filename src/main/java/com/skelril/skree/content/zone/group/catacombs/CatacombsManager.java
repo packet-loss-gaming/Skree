@@ -33,116 +33,116 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implements Runnable, LocationZone<CatacombsInstance> {
-    private final BossManager<Zombie, CatacombsBossDetail> bossManager = new BossManager<>();
-    private final BossManager<Zombie, CatacombsBossDetail> waveMobManager = new BossManager<>();
+  private final BossManager<Zombie, CatacombsBossDetail> bossManager = new BossManager<>();
+  private final BossManager<Zombie, CatacombsBossDetail> waveMobManager = new BossManager<>();
 
-    public CatacombsManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new CatacombsListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZonePvPListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneInventoryProtector<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneImmutableBlockListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneCreatureDropBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+  public CatacombsManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new CatacombsListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZonePvPListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneInventoryProtector<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneImmutableBlockListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneCreatureDropBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
 
-        setUpBoss();
-        setUpWave();
-        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+    setUpBoss();
+    setUpWave();
+    Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+  }
+
+  private void setUpBoss() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(bossManager, Zombie.class)
+    );
+
+
+    List<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> bindProcessor = bossManager.getBindProcessor();
+    bindProcessor.add(new NamedBindInstruction<>("Necromancer"));
+    bindProcessor.add(new CatacombsHealthInstruction(250));
+
+    List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
+    unbindProcessor.add(new CheckedSpawnWave());
+    unbindProcessor.add(new WaveDropInstruction(2));
+
+    List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
+    damageProcessor.add(new WaveDamageModifier());
+  }
+
+  private void setUpWave() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(waveMobManager, Zombie.class)
+    );
+
+    List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = waveMobManager.getUnbindProcessor();
+    unbindProcessor.add(new CheckedSpawnWave());
+    unbindProcessor.add(new WaveDropInstruction(1));
+
+    List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = waveMobManager.getDamageProcessor();
+    damageProcessor.add(new WaveDamageModifier());
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<CatacombsInstance>> callback) {
+    allocator.regionFor(getSystemName(), clause -> {
+      ZoneRegion region = clause.getKey();
+
+      CatacombsInstance instance = new CatacombsInstance(region, bossManager, waveMobManager);
+      instance.init();
+      zones.add(instance);
+
+      callback.accept(Optional.of(instance));
+    });
+  }
+
+  @Override
+  public String getName() {
+    return "Catacombs";
+  }
+
+  @Override
+  public void run() {
+    Iterator<CatacombsInstance> it = zones.iterator();
+    while (it.hasNext()) {
+      CatacombsInstance next = it.next();
+      if (next.isActive()) {
+        next.run();
+        continue;
+      }
+      next.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), next.getRegion());
+      }
+
+      it.remove();
     }
-
-    private void setUpBoss() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(bossManager, Zombie.class)
-        );
-
-
-        List<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> bindProcessor = bossManager.getBindProcessor();
-        bindProcessor.add(new NamedBindInstruction<>("Necromancer"));
-        bindProcessor.add(new CatacombsHealthInstruction(250));
-
-        List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
-        unbindProcessor.add(new CheckedSpawnWave());
-        unbindProcessor.add(new WaveDropInstruction(2));
-
-        List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
-        damageProcessor.add(new WaveDamageModifier());
-    }
-
-    private void setUpWave() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(waveMobManager, Zombie.class)
-        );
-
-        List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = waveMobManager.getUnbindProcessor();
-        unbindProcessor.add(new CheckedSpawnWave());
-        unbindProcessor.add(new WaveDropInstruction(1));
-
-        List<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> damageProcessor = waveMobManager.getDamageProcessor();
-        damageProcessor.add(new WaveDamageModifier());
-    }
-
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<CatacombsInstance>> callback) {
-        allocator.regionFor(getSystemName(), clause -> {
-            ZoneRegion region = clause.getKey();
-
-            CatacombsInstance instance = new CatacombsInstance(region, bossManager, waveMobManager);
-            instance.init();
-            zones.add(instance);
-
-            callback.accept(Optional.of(instance));
-        });
-    }
-
-    @Override
-    public String getName() {
-        return "Catacombs";
-    }
-
-    @Override
-    public void run() {
-        Iterator<CatacombsInstance> it = zones.iterator();
-        while (it.hasNext()) {
-            CatacombsInstance next = it.next();
-            if (next.isActive()) {
-                next.run();
-                continue;
-            }
-            next.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), next.getRegion());
-            }
-
-            it.remove();
-        }
-    }
+  }
 }

@@ -13,12 +13,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.function.Consumer;
 
 public class SlapCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        player.setVelocity(new Vector3d(
-                Probability.getRandom(5.0) - 2.5,
-                Probability.getRandom(4),
-                Probability.getRandom(5.0) - 2.5)
-        );
-    }
+  @Override
+  public void accept(Player player) {
+    player.setVelocity(new Vector3d(
+        Probability.getRandom(5.0) - 2.5,
+        Probability.getRandom(4),
+        Probability.getRandom(5.0) - 2.5)
+    );
+  }
 }

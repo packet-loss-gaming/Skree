@@ -21,77 +21,84 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface PlayerCombatParser extends CombatParser {
-    default void parse(DamageEntityEvent event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Living)) {
-            return;
-        }
-
-        Optional<DamageSource> optDamageSource = event.getCause().first(DamageSource.class);
-        if (optDamageSource.isPresent()) {
-            Entity srcEntity = null;
-            Entity indirectSrcEntity = null;
-            if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
-                srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
-                indirectSrcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getSource();
-            } else if (optDamageSource.get() instanceof EntityDamageSource) {
-                srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
-            }
-
-            if (!(srcEntity instanceof Living)) {
-                if (entity instanceof Player) {
-                    processNonLivingAttack(optDamageSource.get(), (Player) entity);
-                }
-                return;
-            }
-
-            Living living = (Living) srcEntity;
-            if (verify(living)) {
-                if (entity instanceof Player && living instanceof Player) {
-                    processPvP((Player) living, (Player) entity);
-                    processPvP((Player) living, (Player) entity, indirectSrcEntity);
-                } else if (entity instanceof Player) {
-                    processMonsterAttack(living, (Player) entity);
-                } else if (living instanceof Player) {
-                    processPlayerAttack((Player) living, (Living) entity);
-                }
-            }
-        }
+  default void parse(DamageEntityEvent event) {
+    Entity entity = event.getTargetEntity();
+    if (!(entity instanceof Living)) {
+      return;
     }
 
-    default void parse(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
+    Optional<DamageSource> optDamageSource = event.getCause().first(DamageSource.class);
+    if (optDamageSource.isPresent()) {
+      Entity srcEntity = null;
+      Entity indirectSrcEntity = null;
+      if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
+        srcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getIndirectSource();
+        indirectSrcEntity = ((IndirectEntityDamageSource) optDamageSource.get()).getSource();
+      } else if (optDamageSource.get() instanceof EntityDamageSource) {
+        srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();
+      }
+
+      if (!(srcEntity instanceof Living)) {
+        if (entity instanceof Player) {
+          processNonLivingAttack(optDamageSource.get(), (Player) entity);
         }
+        return;
+      }
 
-        Projectile projectile = optProjectile.get();
-        ProjectileSource source = optProjectile.get().getShooter();
-        if (!(source instanceof Player)) {
-            return;
+      Living living = (Living) srcEntity;
+      if (verify(living)) {
+        if (entity instanceof Player && living instanceof Player) {
+          processPvP((Player) living, (Player) entity);
+          processPvP((Player) living, (Player) entity, indirectSrcEntity);
+        } else if (entity instanceof Player) {
+          processMonsterAttack(living, (Player) entity);
+        } else if (living instanceof Player) {
+          processPlayerAttack((Player) living, (Living) entity);
         }
-
-        Player attacker = (Player) source;
-
-        for (Entity anEntity : event.getEntities()) {
-            if (anEntity instanceof Player) {
-                Player defender = (Player) anEntity;
-
-                processPvP(attacker, defender);
-                processPvP(attacker, defender, projectile);
-            }
-        }
+      }
     }
-    default boolean verify(Living living) {
-        return true;
+  }
+
+  default void parse(CollideEntityEvent.Impact event) {
+    Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
+    if (!optProjectile.isPresent()) {
+      return;
     }
 
-    default void processPvP(Player attacker, Player defender) { }
-    default void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) { }
+    Projectile projectile = optProjectile.get();
+    ProjectileSource source = optProjectile.get().getShooter();
+    if (!(source instanceof Player)) {
+      return;
+    }
 
-    default void processMonsterAttack(Living attacker, Player defender) { }
+    Player attacker = (Player) source;
 
-    default void processPlayerAttack(Player attacker, Living defender) { }
+    for (Entity anEntity : event.getEntities()) {
+      if (anEntity instanceof Player) {
+        Player defender = (Player) anEntity;
 
-    default void processNonLivingAttack(DamageSource attacker, Player defender) { }
+        processPvP(attacker, defender);
+        processPvP(attacker, defender, projectile);
+      }
+    }
+  }
+
+  default boolean verify(Living living) {
+    return true;
+  }
+
+  default void processPvP(Player attacker, Player defender) {
+  }
+
+  default void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
+  }
+
+  default void processMonsterAttack(Living attacker, Player defender) {
+  }
+
+  default void processPlayerAttack(Player attacker, Living defender) {
+  }
+
+  default void processNonLivingAttack(DamageSource attacker, Player defender) {
+  }
 }

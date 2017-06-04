@@ -14,22 +14,22 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 public class BarrierWorldGeneratorModifier implements WorldGeneratorModifier {
-    @Override
-    public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
-        for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
-            worldGenerator.getBiomeSettings(biomeType).getPopulators().clear();
-        }
-
-        worldGenerator.setBaseGenerationPopulator(new BarrierBlockTerrainGenerator());
+  @Override
+  public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
+    for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
+      worldGenerator.getBiomeSettings(biomeType).getPopulators().clear();
     }
 
-    @Override
-    public String getId() {
-        return "skree:barrier";
-    }
+    worldGenerator.setBaseGenerationPopulator(new BarrierBlockTerrainGenerator());
+  }
 
-    @Override
-    public String getName() {
-        return "Barrier";
-    }
+  @Override
+  public String getId() {
+    return "skree:barrier";
+  }
+
+  @Override
+  public String getName() {
+    return "Barrier";
+  }
 }

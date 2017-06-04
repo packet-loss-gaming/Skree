@@ -22,64 +22,64 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SkyWarsManager extends GroupZoneManager<SkyWarsInstance> implements Runnable, LocationZone<SkyWarsInstance> {
-    public SkyWarsManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new SkyWarsListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneImmutableBlockListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+  public SkyWarsManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new SkyWarsListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneImmutableBlockListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
 
-        Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
+    Task.builder().intervalTicks(10).execute(this).submit(SkreePlugin.inst());
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<SkyWarsInstance>> callback) {
+    allocator.regionFor(getSystemName(), clause -> {
+      ZoneRegion region = clause.getKey();
+
+      SkyWarsInstance instance = new SkyWarsInstance(region);
+      instance.init();
+      zones.add(instance);
+
+      callback.accept(Optional.of(instance));
+    });
+  }
+
+  @Override
+  public String getName() {
+    return "Sky Wars";
+  }
+
+  @Override
+  public void run() {
+    Iterator<SkyWarsInstance> it = zones.iterator();
+    while (it.hasNext()) {
+      SkyWarsInstance next = it.next();
+      if (next.isActive()) {
+        next.run();
+        continue;
+      }
+      next.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), next.getRegion());
+      }
+
+      it.remove();
     }
-
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<SkyWarsInstance>> callback) {
-        allocator.regionFor(getSystemName(), clause -> {
-            ZoneRegion region = clause.getKey();
-
-            SkyWarsInstance instance = new SkyWarsInstance(region);
-            instance.init();
-            zones.add(instance);
-
-            callback.accept(Optional.of(instance));
-        });
-    }
-
-    @Override
-    public String getName() {
-        return "Sky Wars";
-    }
-
-    @Override
-    public void run() {
-        Iterator<SkyWarsInstance> it = zones.iterator();
-        while (it.hasNext()) {
-            SkyWarsInstance next = it.next();
-            if (next.isActive()) {
-                next.run();
-                continue;
-            }
-            next.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), next.getRegion());
-            }
-
-            it.remove();
-        }
-    }
+  }
 
 }
 

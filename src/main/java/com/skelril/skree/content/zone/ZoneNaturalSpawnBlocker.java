@@ -22,28 +22,28 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneNaturalSpawnBlocker<T> extends ZoneApplicableListener<T> {
-    public ZoneNaturalSpawnBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
-    }
+  public ZoneNaturalSpawnBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
 
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event, @First SpawnCause spawnCause) {
-        for (Entity entity : event.getEntities()) {
-            if (isApplicable(entity)) {
-                SpawnType spawnType = spawnCause.getType();
-                if (spawnType == SpawnTypes.CUSTOM || spawnType == SpawnTypes.WORLD_SPAWNER) {
-                    /* SpongeCommon/679 */
-                    if (entity.getType() != EntityTypes.EXPERIENCE_ORB && entity.getType() != EntityTypes.PRIMED_TNT && !(entity instanceof Projectile)) {
-                        event.setCancelled(true);
-                    }
-                }
-
-                /* SpongeCommon/584 */
-                if (spawnType == SpawnTypes.DROPPED_ITEM && entity.getType() == EntityTypes.ZOMBIE) {
-                    event.setCancelled(true);
-                }
-                break;
-            }
+  @Listener
+  public void onEntitySpawn(SpawnEntityEvent event, @First SpawnCause spawnCause) {
+    for (Entity entity : event.getEntities()) {
+      if (isApplicable(entity)) {
+        SpawnType spawnType = spawnCause.getType();
+        if (spawnType == SpawnTypes.CUSTOM || spawnType == SpawnTypes.WORLD_SPAWNER) {
+          /* SpongeCommon/679 */
+          if (entity.getType() != EntityTypes.EXPERIENCE_ORB && entity.getType() != EntityTypes.PRIMED_TNT && !(entity instanceof Projectile)) {
+            event.setCancelled(true);
+          }
         }
+
+        /* SpongeCommon/584 */
+        if (spawnType == SpawnTypes.DROPPED_ITEM && entity.getType() == EntityTypes.ZOMBIE) {
+          event.setCancelled(true);
+        }
+        break;
+      }
     }
+  }
 }

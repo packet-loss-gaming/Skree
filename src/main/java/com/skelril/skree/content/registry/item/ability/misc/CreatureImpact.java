@@ -29,48 +29,48 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CreatureImpact implements PointOfContact {
-    private int count = 125;
-    private String creature;
+  private int count = 125;
+  private String creature;
 
-    private EntityType getEntityType() {
-        return Sponge.getRegistry().getType(EntityType.class, creature).get();
+  private EntityType getEntityType() {
+    return Sponge.getRegistry().getType(EntityType.class, creature).get();
+  }
+
+  private static Cause getSpawnCause() {
+    return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
+  }
+
+  public static void mobBarrage(Location target, EntityType type, int count) {
+    final List<Entity> entities = new ArrayList<>();
+
+    for (int i = 0; i < count; i++) {
+      Entity entity = target.getExtent().createEntity(type, target.getPosition());
+      entity.offer(Keys.PERSISTS, false);
+      entities.add(entity);
     }
 
-    private static Cause getSpawnCause() {
-        return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
-    }
+    target.getExtent().spawnEntities(entities, getSpawnCause());
 
-    public static void mobBarrage(Location target, EntityType type, int count) {
-        final List<Entity> entities = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            Entity entity = target.getExtent().createEntity(type, target.getPosition());
-            entity.offer(Keys.PERSISTS, false);
-            entities.add(entity);
+    Task.builder().delay(30, TimeUnit.SECONDS).execute(() -> {
+      for (Entity entity : entities) {
+        if (!entity.isRemoved()) {
+          entity.remove();
+          ParticleGenerator.smoke(entity.getLocation(), 1);
         }
+      }
+    }).submit(SkreePlugin.inst());
+  }
 
-        target.getExtent().spawnEntities(entities, getSpawnCause());
+  @Override
+  public void run(Living owner, Location<World> target) {
+    EntityType targetType = getEntityType();
 
-        Task.builder().delay(30, TimeUnit.SECONDS).execute(() -> {
-            for (Entity entity : entities) {
-                if (!entity.isRemoved()) {
-                    entity.remove();
-                    ParticleGenerator.smoke(entity.getLocation(), 1);
-                }
-            }
-        }).submit(SkreePlugin.inst());
+    mobBarrage(target, targetType, count);
+
+    if (targetType == EntityTypes.BAT) {
+      notify(owner, Text.of(TextColors.YELLOW, "Your bow releases a batty attack."));
+    } else {
+      notify(owner, Text.of(TextColors.YELLOW, "Your bow releases a " + targetType.getName().toLowerCase() + " attack."));
     }
-
-    @Override
-    public void run(Living owner, Location<World> target) {
-        EntityType targetType = getEntityType();
-
-        mobBarrage(target, targetType, count);
-
-        if (targetType == EntityTypes.BAT) {
-            notify(owner, Text.of(TextColors.YELLOW, "Your bow releases a batty attack."));
-        } else {
-            notify(owner, Text.of(TextColors.YELLOW, "Your bow releases a " + targetType.getName().toLowerCase() + " attack."));
-        }
-    }
+  }
 }

@@ -14,25 +14,25 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneApplicableListener<T> {
-    private final Function<Location<World>, Optional<T>> applicabilityFunct;
+  private final Function<Location<World>, Optional<T>> applicabilityFunct;
 
-    public ZoneApplicableListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        this.applicabilityFunct = applicabilityFunct;
-    }
+  public ZoneApplicableListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    this.applicabilityFunct = applicabilityFunct;
+  }
 
-    public boolean isApplicable(Entity entity) {
-        return isApplicable(entity.getLocation());
-    }
+  public boolean isApplicable(Entity entity) {
+    return isApplicable(entity.getLocation());
+  }
 
-    public boolean isApplicable(Location<World> location) {
-        return getApplicable(location).isPresent();
-    }
+  public boolean isApplicable(Location<World> location) {
+    return getApplicable(location).isPresent();
+  }
 
-    public Optional<T> getApplicable(Entity entity) {
-        return getApplicable(entity.getLocation());
-    }
+  public Optional<T> getApplicable(Entity entity) {
+    return getApplicable(entity.getLocation());
+  }
 
-    public Optional<T> getApplicable(Location<World> location) {
-        return applicabilityFunct.apply(location);
-    }
+  public Optional<T> getApplicable(Location<World> location) {
+    return applicabilityFunct.apply(location);
+  }
 }

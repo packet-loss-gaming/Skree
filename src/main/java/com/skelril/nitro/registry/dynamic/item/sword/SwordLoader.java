@@ -11,17 +11,17 @@ import com.skelril.nitro.registry.dynamic.item.ItemLoader;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class SwordLoader extends ItemLoader<LoadedSword, SwordConfig> {
-    public SwordLoader(GameIntegrator integrator, AbilityRegistry registry) {
-        super(integrator, registry);
-    }
+  public SwordLoader(GameIntegrator integrator, AbilityRegistry registry) {
+    super(integrator, registry);
+  }
 
-    @Override
-    public LoadedSword constructFromConfig(SwordConfig config) {
-        return new LoadedSword(config);
-    }
+  @Override
+  public LoadedSword constructFromConfig(SwordConfig config) {
+    return new LoadedSword(config);
+  }
 
-    @Override
-    public Class<SwordConfig> getConfigClass() {
-        return SwordConfig.class;
-    }
+  @Override
+  public Class<SwordConfig> getConfigClass() {
+    return SwordConfig.class;
+  }
 }

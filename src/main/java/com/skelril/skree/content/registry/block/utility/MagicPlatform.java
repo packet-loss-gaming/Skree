@@ -26,55 +26,55 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicPlatform extends Block implements ICustomBlock, Craftable {
-    public MagicPlatform() {
-        super(Material.WOOD);
-        this.setCreativeTab(CreativeTabs.DECORATIONS);
+  public MagicPlatform() {
+    super(Material.WOOD);
+    this.setCreativeTab(CreativeTabs.DECORATIONS);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(0.4F);
-        this.setSoundType(SoundType.WOOD);
-    }
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(0.4F);
+    this.setSoundType(SoundType.WOOD);
+  }
 
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
-    }
+  @Override
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
+  }
 
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
+  @Override
+  public boolean isFullCube(IBlockState state) {
+    return false;
+  }
 
-    @Override
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-        return true;
-    }
+  @Override
+  public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+    return true;
+  }
 
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
+  @Override
+  public boolean isOpaqueCube(IBlockState state) {
+    return false;
+  }
 
-    @Override
-    public String __getID() {
-        return "magic_platform";
-    }
+  @Override
+  public String __getID() {
+    return "magic_platform";
+  }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
+  @SideOnly(Side.CLIENT)
+  @Override
+  public BlockRenderLayer getBlockLayer() {
+    return BlockRenderLayer.CUTOUT;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                " B ",
-                "   ",
-                'A', new ItemStack(Items.STICK),
-                'B', newItemStack("skree:fairy_dust")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        " B ",
+        "   ",
+        'A', new ItemStack(Items.STICK),
+        'B', newItemStack("skree:fairy_dust")
+    );
+  }
 }

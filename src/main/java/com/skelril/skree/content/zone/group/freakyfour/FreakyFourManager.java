@@ -26,103 +26,103 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FreakyFourManager extends GroupZoneManager<FreakyFourInstance> implements Runnable, LocationZone<FreakyFourInstance> {
-    private final FreakyFourConfig config = new FreakyFourConfig();
+  private final FreakyFourConfig config = new FreakyFourConfig();
 
-    private final CharlotteBossManager charlotteManager = new CharlotteBossManager(config);
-    private final FrimusBossManager frimusManager = new FrimusBossManager(config);
-    private final DaBombBossManager daBombManager = new DaBombBossManager(config);
-    private final SnipeeBossManager snipeeManager = new SnipeeBossManager(config);
+  private final CharlotteBossManager charlotteManager = new CharlotteBossManager(config);
+  private final FrimusBossManager frimusManager = new FrimusBossManager(config);
+  private final DaBombBossManager daBombManager = new DaBombBossManager(config);
+  private final SnipeeBossManager snipeeManager = new SnipeeBossManager(config);
 
 
-    public FreakyFourManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new FreakyFourListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneInventoryProtector<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneCreatureDropBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+  public FreakyFourManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new FreakyFourListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneInventoryProtector<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneCreatureDropBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
 
-        registerManagerListeners();
+    registerManagerListeners();
 
-        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+    Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+  }
+
+  private void registerManagerListeners() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(charlotteManager, Living.class)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(charlotteManager.getMinionManager(), CaveSpider.class)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(frimusManager, Living.class)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(daBombManager, Living.class)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(snipeeManager, Living.class)
+    );
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<FreakyFourInstance>> callback) {
+    allocator.regionFor(getSystemName(), clause -> {
+      ZoneRegion region = clause.getKey();
+
+      FreakyFourInstance instance = new FreakyFourInstance(region, config, charlotteManager, frimusManager, daBombManager, snipeeManager);
+      instance.init();
+      zones.add(instance);
+
+      callback.accept(Optional.of(instance));
+    });
+  }
+
+  @Override
+  public String getName() {
+    return "Freaky Four";
+  }
+
+  @Override
+  public void run() {
+    Iterator<FreakyFourInstance> it = zones.iterator();
+    while (it.hasNext()) {
+      FreakyFourInstance next = it.next();
+      if (next.isActive()) {
+        next.run();
+        continue;
+      }
+      next.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), next.getRegion());
+      }
+
+      it.remove();
     }
-
-    private void registerManagerListeners() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(charlotteManager, Living.class)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(charlotteManager.getMinionManager(), CaveSpider.class)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(frimusManager, Living.class)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(daBombManager, Living.class)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(snipeeManager, Living.class)
-        );
-    }
-
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<FreakyFourInstance>> callback) {
-        allocator.regionFor(getSystemName(), clause -> {
-            ZoneRegion region = clause.getKey();
-
-            FreakyFourInstance instance = new FreakyFourInstance(region, config, charlotteManager, frimusManager, daBombManager, snipeeManager);
-            instance.init();
-            zones.add(instance);
-
-            callback.accept(Optional.of(instance));
-        });
-    }
-
-    @Override
-    public String getName() {
-        return "Freaky Four";
-    }
-
-    @Override
-    public void run() {
-        Iterator<FreakyFourInstance> it = zones.iterator();
-        while (it.hasNext()) {
-            FreakyFourInstance next = it.next();
-            if (next.isActive()) {
-                next.run();
-                continue;
-            }
-            next.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), next.getRegion());
-            }
-
-            it.remove();
-        }
-    }
+  }
 }

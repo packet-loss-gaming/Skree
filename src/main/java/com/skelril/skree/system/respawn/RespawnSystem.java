@@ -16,19 +16,19 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Respawn System")
 public class RespawnSystem implements ServiceProvider<RespawnService> {
-    private RespawnService service;
+  private RespawnService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new RespawnServiceImpl();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new RespawnServiceImpl();
 
-        // Register the service
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), RespawnService.class, service);
-    }
+    // Register the service
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), RespawnService.class, service);
+  }
 
-    @Override
-    public RespawnService getService() {
-        return service;
-    }
+  @Override
+  public RespawnService getService() {
+    return service;
+  }
 }

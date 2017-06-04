@@ -25,54 +25,54 @@ import java.util.UUID;
 
 public class ProjectileWatcherServiceImpl implements ProjectileWatcherService, Runnable {
 
-    private Map<UUID, TrackedProjectileInfo> watched = new HashMap<>();
-    private Task task = null;
+  private Map<UUID, TrackedProjectileInfo> watched = new HashMap<>();
+  private Task task = null;
 
-    @Listener
-    public void onProjectileLaunch(SpawnEntityEvent event) {
-        for (Entity entity : event.getEntities()) {
-            if (!(entity instanceof Projectile)) {
-                continue;
-            }
+  @Listener
+  public void onProjectileLaunch(SpawnEntityEvent event) {
+    for (Entity entity : event.getEntities()) {
+      if (!(entity instanceof Projectile)) {
+        continue;
+      }
 
-            track((Projectile) entity, event.getCause());
-        }
+      track((Projectile) entity, event.getCause());
     }
+  }
 
-    public boolean hasChanged(TrackedProjectileInfo info) {
-        Location newLoc = info.getProjectile().getLocation();
-        Location oldLoc = info.getLastLocation();
-        return !newLoc.equals(oldLoc);
+  public boolean hasChanged(TrackedProjectileInfo info) {
+    Location newLoc = info.getProjectile().getLocation();
+    Location oldLoc = info.getLastLocation();
+    return !newLoc.equals(oldLoc);
+  }
+
+  @Override
+  public void track(Projectile projectile, Cause cause) {
+    watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, cause));
+    if (task == null) {
+      task = Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(SkreePlugin.inst());
     }
+  }
 
-    @Override
-    public void track(Projectile projectile, Cause cause) {
-        watched.put(projectile.getUniqueId(), new TrackedProjectileInfoImpl(projectile, cause));
-        if (task == null) {
-            task = Task.builder().execute(this).delayTicks(1).intervalTicks(1).submit(SkreePlugin.inst());
-        }
+  @Override
+  public void run() {
+    Iterator<TrackedProjectileInfo> it = watched.values().iterator();
+    boolean updated = false;
+
+    while (it.hasNext()) {
+      TrackedProjectileInfo entry = it.next();
+
+      if (hasChanged(entry)) {
+        entry.updateLocation();
+        updated = true;
+
+        Sponge.getEventManager().post(new ProjectileTickEvent(entry));
+      } else {
+        it.remove();
+      }
     }
-
-    @Override
-    public void run() {
-        Iterator<TrackedProjectileInfo> it = watched.values().iterator();
-        boolean updated = false;
-
-        while (it.hasNext()) {
-            TrackedProjectileInfo entry = it.next();
-
-            if (hasChanged(entry)) {
-                entry.updateLocation();
-                updated = true;
-
-                Sponge.getEventManager().post(new ProjectileTickEvent(entry));
-            } else {
-                it.remove();
-            }
-        }
-        if (!updated && task != null) {
-            task.cancel();
-            task = null;
-        }
+    if (!updated && task != null) {
+      task.cancel();
+      task = null;
     }
+  }
 }

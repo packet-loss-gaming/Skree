@@ -15,39 +15,39 @@ import net.minecraft.init.Blocks;
 import java.util.Collection;
 
 public interface ICustomShovel extends ICustomTool {
-    @Override
-    default double __getAttackSpeed() {
-        return -3.0F; // TODO
-    }
+  @Override
+  default double __getAttackSpeed() {
+    return -3.0F; // TODO
+  }
 
-    @Override
-    default String __getToolClass() {
-        return "shovel";
-    }
+  @Override
+  default String __getToolClass() {
+    return "shovel";
+  }
 
-    @Override
-    default Collection<Block> __getEffectiveBlocks() {
-        return Lists.newArrayList(
-                Blocks.CLAY,
-                Blocks.DIRT,
-                Blocks.FARMLAND,
-                Blocks.GRASS,
-                Blocks.GRAVEL,
-                Blocks.MYCELIUM,
-                Blocks.SAND,
-                Blocks.SNOW,
-                Blocks.SNOW_LAYER,
-                Blocks.SOUL_SAND
-        );
-    }
+  @Override
+  default Collection<Block> __getEffectiveBlocks() {
+    return Lists.newArrayList(
+        Blocks.CLAY,
+        Blocks.DIRT,
+        Blocks.FARMLAND,
+        Blocks.GRASS,
+        Blocks.GRAVEL,
+        Blocks.MYCELIUM,
+        Blocks.SAND,
+        Blocks.SNOW,
+        Blocks.SNOW_LAYER,
+        Blocks.SOUL_SAND
+    );
+  }
 
-    // Modified Native ItemTool methods
+  // Modified Native ItemTool methods
 
-    /**
-     * Check whether this Item can harvest the given Block
-     */
-    default boolean canHarvestBlock(IBlockState blockIn) {
-        Block block = blockIn.getBlock();
-        return block == Blocks.SNOW_LAYER || block == Blocks.SNOW;
-    }
+  /**
+   * Check whether this Item can harvest the given Block
+   */
+  default boolean canHarvestBlock(IBlockState blockIn) {
+    Block block = blockIn.getBlock();
+    return block == Blocks.SNOW_LAYER || block == Blocks.SNOW;
+  }
 }

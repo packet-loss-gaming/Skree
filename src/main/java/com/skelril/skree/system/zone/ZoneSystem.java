@@ -40,37 +40,37 @@ import java.util.Optional;
 @NModule(name = "Zone System")
 public class ZoneSystem implements ServiceProvider<ZoneService> {
 
-    private ZoneService service;
+  private ZoneService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
-    public void init() {
-        Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
-        World world = optService.get().getEffectWrapper(InstanceWorldWrapper.class).get().getWorlds().iterator().next();
-        Task.builder().execute(() -> {
-            WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
+  @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
+  public void init() {
+    Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
+    World world = optService.get().getEffectWrapper(InstanceWorldWrapper.class).get().getWorlds().iterator().next();
+    Task.builder().execute(() -> {
+      WorldResolver instWorldResolver = new WorldResolver(world, WorldEdit.getInstance());
 
-            service = new ZoneServiceImpl(new CacheBasedAllocator(Decorators.ZONE_PRIMARY_DECORATOR, instWorldResolver));
+      service = new ZoneServiceImpl(new CacheBasedAllocator(Decorators.ZONE_PRIMARY_DECORATOR, instWorldResolver));
 
-            service.registerManager(new CursedMineManager());
-            service.registerManager(new TempleOfFateManager());
-            service.registerManager(new TheForgeManager());
+      service.registerManager(new CursedMineManager());
+      service.registerManager(new TempleOfFateManager());
+      service.registerManager(new TheForgeManager());
 
-            service.registerManager(new CatacombsManager());
-            service.registerManager(new DesmireDungeonManager());
-            service.registerManager(new FreakyFourManager());
-            service.registerManager(new GoldRushManager());
-            service.registerManager(new JungleRaidManager());
-            service.registerManager(new PatientXManager());
-            service.registerManager(new ShnugglesPrimeManager());
-            service.registerManager(new SkyWarsManager());
+      service.registerManager(new CatacombsManager());
+      service.registerManager(new DesmireDungeonManager());
+      service.registerManager(new FreakyFourManager());
+      service.registerManager(new GoldRushManager());
+      service.registerManager(new JungleRaidManager());
+      service.registerManager(new PatientXManager());
+      service.registerManager(new ShnugglesPrimeManager());
+      service.registerManager(new SkyWarsManager());
 
-            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
-            Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
-        }).delayTicks(1).submit(SkreePlugin.inst());
-    }
+      Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
+      Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");
+    }).delayTicks(1).submit(SkreePlugin.inst());
+  }
 
-    @Override
-    public ZoneService getService() {
-        return service;
-    }
+  @Override
+  public ZoneService getService() {
+    return service;
+  }
 }

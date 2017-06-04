@@ -12,13 +12,13 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 public interface StatisticEntityCollection {
-    Collection<Entity> getEntities();
+  Collection<Entity> getEntities();
 
-    default int getCountOf(Predicate<Entity> predicate) {
-        return (int) getEntities().stream().filter(predicate).count();
-    }
+  default int getCountOf(Predicate<Entity> predicate) {
+    return (int) getEntities().stream().filter(predicate).count();
+  }
 
-    default float getPercentComposition(Predicate<Entity> predicate) {
-        return (float) getCountOf(predicate) / getEntities().size();
-    }
+  default float getPercentComposition(Predicate<Entity> predicate) {
+    return (float) getCountOf(predicate) / getEntities().size();
+  }
 }

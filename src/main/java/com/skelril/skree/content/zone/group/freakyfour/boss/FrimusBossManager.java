@@ -35,62 +35,62 @@ import java.util.Optional;
 
 public class FrimusBossManager extends BossManager<Living, ZoneBossDetail<FreakyFourInstance>> {
 
-    private FreakyFourConfig config;
+  private FreakyFourConfig config;
 
-    public FrimusBossManager(FreakyFourConfig config) {
-        this.config = config;
-        handleBinds();
-        handleUnbinds();
-        handleDamage();
-        handleDamaged();
-    }
+  public FrimusBossManager(FreakyFourConfig config) {
+    this.config = config;
+    handleBinds();
+    handleUnbinds();
+    handleDamage();
+    handleDamaged();
+  }
 
-    private void handleBinds() {
+  private void handleBinds() {
 
-        List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
-        bindProcessor.add(new NamedBindInstruction<>("Frimus"));
-        bindProcessor.add(new HealthBindInstruction<>(config.frimusHP));
-    }
+    List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
+    bindProcessor.add(new NamedBindInstruction<>("Frimus"));
+    bindProcessor.add(new HealthBindInstruction<>(config.frimusHP));
+  }
 
-    private void handleUnbinds() {
-        List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
-        unbindProcessor.add(new FreakyFourBossDeath());
-    }
+  private void handleUnbinds() {
+    List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
+    unbindProcessor.add(new FreakyFourBossDeath());
+  }
 
-    private void handleDamage() {
-        List<Instruction<DamageCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            Entity attacked = condition.getAttacked();
-            if (attacked instanceof Living) {
-                EntityHealthUtil.forceDamage(
-                        (Living) attacked,
-                        Math.max(
-                                1,
-                                Probability.getRandom(EntityHealthUtil.getHealth((Living) attacked)) - 5
-                        )
-                );
-                condition.getEvent().setBaseDamage(0);
-            }
-            return Optional.empty();
-        });
-    }
+  private void handleDamage() {
+    List<Instruction<DamageCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damageProcessor = getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      Entity attacked = condition.getAttacked();
+      if (attacked instanceof Living) {
+        EntityHealthUtil.forceDamage(
+            (Living) attacked,
+            Math.max(
+                1,
+                Probability.getRandom(EntityHealthUtil.getHealth((Living) attacked)) - 5
+            )
+        );
+        condition.getEvent().setBaseDamage(0);
+      }
+      return Optional.empty();
+    });
+  }
 
-    private void handleDamaged() {
-        List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
-        damagedProcessor.add((condition, boss) -> {
-            DamageEntityEvent event = condition.getEvent();
+  private void handleDamaged() {
+    List<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> damagedProcessor = getDamagedProcessor();
+    damagedProcessor.add((condition, boss) -> {
+      DamageEntityEvent event = condition.getEvent();
 
-            new PlayerCombatParser() {
-                @Override
-                public void processPlayerAttack(Player attacker, Living defender) {
-                    if (condition.getDamageSource().get() instanceof IndirectEntityDamageSource) {
-                        attacker.sendMessage(Text.of(TextColors.RED, "Projectiles can't harm me... Mwahahaha!"));
-                        event.setCancelled(true);
-                    }
-                }
-            }.parse(event);
+      new PlayerCombatParser() {
+        @Override
+        public void processPlayerAttack(Player attacker, Living defender) {
+          if (condition.getDamageSource().get() instanceof IndirectEntityDamageSource) {
+            attacker.sendMessage(Text.of(TextColors.RED, "Projectiles can't harm me... Mwahahaha!"));
+            event.setCancelled(true);
+          }
+        }
+      }.parse(event);
 
-            return Optional.empty();
-        });
-    }
+      return Optional.empty();
+    });
+  }
 }

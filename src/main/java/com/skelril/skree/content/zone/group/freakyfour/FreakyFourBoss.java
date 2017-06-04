@@ -10,18 +10,18 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 
 public enum FreakyFourBoss {
-    CHARLOTTE(EntityTypes.SPIDER),
-    FRIMUS(EntityTypes.BLAZE),
-    DA_BOMB(EntityTypes.CREEPER),
-    SNIPEE(EntityTypes.SKELETON);
+  CHARLOTTE(EntityTypes.SPIDER),
+  FRIMUS(EntityTypes.BLAZE),
+  DA_BOMB(EntityTypes.CREEPER),
+  SNIPEE(EntityTypes.SKELETON);
 
-    private EntityType type;
+  private EntityType type;
 
-    private FreakyFourBoss(EntityType type) {
-        this.type = type;
-    }
+  private FreakyFourBoss(EntityType type) {
+    this.type = type;
+  }
 
-    public EntityType getEntityType() {
-        return type;
-    }
+  public EntityType getEntityType() {
+    return type;
+  }
 }

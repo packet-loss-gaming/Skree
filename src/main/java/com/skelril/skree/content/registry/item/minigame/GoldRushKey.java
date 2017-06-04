@@ -14,26 +14,26 @@ import java.util.List;
 
 public class GoldRushKey extends CustomItem {
 
-    @Override
-    public String __getID() {
-        return "gold_rush_key";
-    }
+  @Override
+  public String __getId() {
+    return "gold_rush_key";
+  }
 
-    @Override
-    public List<String> __getMeshDefinitions() {
-        List<String> baseList = new ArrayList<>();
-        baseList.add("gold_rush_red_key");
-        baseList.add("gold_rush_blue_key");
-        return baseList;
-    }
+  @Override
+  public List<String> __getMeshDefinitions() {
+    List<String> baseList = new ArrayList<>();
+    baseList.add("gold_rush_red_key");
+    baseList.add("gold_rush_blue_key");
+    return baseList;
+  }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
-    }
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return null;
-    }
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return null;
+  }
 }

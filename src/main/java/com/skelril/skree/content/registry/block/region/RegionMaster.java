@@ -45,164 +45,164 @@ import java.util.WeakHashMap;
 
 public class RegionMaster extends Block implements ICustomBlock, EventAwareContent {
 
-    private Map<Player, Vector3d> recentlyClicked = new WeakHashMap<>();
+  private Map<Player, Vector3d> recentlyClicked = new WeakHashMap<>();
 
-    public RegionMaster() {
-        super(new Material(MapColor.STONE));
-        this.setCreativeTab(CreativeTabs.DECORATIONS);
+  public RegionMaster() {
+    super(new Material(MapColor.STONE));
+    this.setCreativeTab(CreativeTabs.DECORATIONS);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(1.5F);
-        this.setResistance(6000000.0F);
-        this.setSoundType(SoundType.GLASS);
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(1.5F);
+    this.setResistance(6000000.0F);
+    this.setSoundType(SoundType.GLASS);
+  }
+
+  @Override
+  public String __getID() {
+    return "region_master";
+  }
+
+  @Override
+  public boolean isOpaqueCube(IBlockState state) {
+    return false;
+  }
+
+  @SideOnly(Side.CLIENT)
+  public BlockRenderLayer getBlockLayer() {
+    return BlockRenderLayer.CUTOUT;
+  }
+
+  @Listener
+  public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      return;
     }
 
-    @Override
-    public String __getID() {
-        return "region_master";
-    }
+    RegionService service = optService.get();
 
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      if (!block.isValid()) {
+        continue;
+      }
 
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
+      if (block.getFinal().getState().getType() != this) {
+        continue;
+      }
 
-    @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            return;
-        }
-
-        RegionService service = optService.get();
-
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            if (!block.isValid()) {
-                continue;
-            }
-
-            if (block.getFinal().getState().getType() != this) {
-                continue;
-            }
-
-            Optional<Location<World>> optLoc = block.getFinal().getLocation();
-            if (optLoc.isPresent()) {
-                Optional<Region> optOriginRef = service.getSelectedRegion(player);
-                Optional<Region> optRef = service.getOrCreate(optLoc.get(), player);
-                if (optRef.isPresent()) {
-                    Region ref = optRef.get();
-
-                    Vector3d masterBlock = ref.getMasterBlock();
-                    Vector3d blockPos = optLoc.get().getPosition();
-                    // Determine if this is a new region or not
-                    if (!masterBlock.equals(blockPos)) {
-                        if (blockPos.equals(recentlyClicked.get(player))) {
-                            // Update the master block
-                            ref.setMasterBlock(new RegionPoint(blockPos));
-
-                            // Delete the existing master block
-                            optLoc.get().getExtent().setBlockType(
-                                    masterBlock.toInt(),
-                                    BlockTypes.AIR,
-                                    BlockChangeFlag.NONE,
-                                    Cause.source(SkreePlugin.container()).build()
-                            );
-
-                            player.sendMessage(
-                                    Text.of(
-                                            TextColors.YELLOW,
-                                            "Master block moved."
-                                    )
-                            );
-                        } else {
-                            recentlyClicked.put(player, blockPos);
-                            block.setValid(false);
-                            player.sendMessage(
-                                    Text.of(
-                                            TextColors.YELLOW,
-                                            "Place the master block again to move this region's master block."
-                                    )
-                            );
-                        }
-                    }
-
-                    service.setSelectedRegion(player, ref);
-
-                    if (!ref.equals(optOriginRef.orElse(null))) {
-                        player.sendMessage(Text.of(TextColors.YELLOW, "Active region set!"));
-                    }
-                }
-            }
-        }
-    }
-
-    @Listener
-    public void onBlockInteract(InteractBlockEvent.Primary event, @Root Player player) {
-        BlockSnapshot targetBlock = event.getTargetBlock();
-        if (targetBlock.getState().getType() != this) {
-            return;
-        }
-
-        Optional<Location<World>> optLoc = targetBlock.getLocation();
-        if (!optLoc.isPresent()) {
-            return;
-        }
-
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            return;
-        }
-
-        RegionService service = optService.get();
-        Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+      Optional<Location<World>> optLoc = block.getFinal().getLocation();
+      if (optLoc.isPresent()) {
+        Optional<Region> optOriginRef = service.getSelectedRegion(player);
+        Optional<Region> optRef = service.getOrCreate(optLoc.get(), player);
         if (optRef.isPresent()) {
-            Region ref = optRef.get();
-            service.setSelectedRegion(player, ref);
-            player.sendMessage(Text.of(TextColors.YELLOW, "Region selected!"));
-        }
-    }
+          Region ref = optRef.get();
 
-    @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            return;
-        }
+          Vector3d masterBlock = ref.getMasterBlock();
+          Vector3d blockPos = optLoc.get().getPosition();
+          // Determine if this is a new region or not
+          if (!masterBlock.equals(blockPos)) {
+            if (blockPos.equals(recentlyClicked.get(player))) {
+              // Update the master block
+              ref.setMasterBlock(new RegionPoint(blockPos));
 
-        RegionService service = optService.get();
+              // Delete the existing master block
+              optLoc.get().getExtent().setBlockType(
+                  masterBlock.toInt(),
+                  BlockTypes.AIR,
+                  BlockChangeFlag.NONE,
+                  Cause.source(SkreePlugin.container()).build()
+              );
 
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            if (!block.isValid()) {
-                continue;
-            }
-
-            if (block.getOriginal().getState().getType() != this) {
-                continue;
-            }
-
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-            if (!optLoc.isPresent()) {
-                continue;
-            }
-
-            Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
-            if (!optRef.isPresent()) {
-                continue;
-            }
-
-            Region ref = optRef.get();
-            if (!ref.getFullPoints().isEmpty()) {
-                block.setValid(false);
-                player.sendMessage(Text.of(TextColors.RED, "You must first delete all markers!"));
+              player.sendMessage(
+                  Text.of(
+                      TextColors.YELLOW,
+                      "Master block moved."
+                  )
+              );
             } else {
-                service.rem(optLoc.get());
-                player.sendMessage(Text.of(TextColors.YELLOW, "Region deleted!"));
+              recentlyClicked.put(player, blockPos);
+              block.setValid(false);
+              player.sendMessage(
+                  Text.of(
+                      TextColors.YELLOW,
+                      "Place the master block again to move this region's master block."
+                  )
+              );
             }
+          }
+
+          service.setSelectedRegion(player, ref);
+
+          if (!ref.equals(optOriginRef.orElse(null))) {
+            player.sendMessage(Text.of(TextColors.YELLOW, "Active region set!"));
+          }
         }
+      }
     }
+  }
+
+  @Listener
+  public void onBlockInteract(InteractBlockEvent.Primary event, @Root Player player) {
+    BlockSnapshot targetBlock = event.getTargetBlock();
+    if (targetBlock.getState().getType() != this) {
+      return;
+    }
+
+    Optional<Location<World>> optLoc = targetBlock.getLocation();
+    if (!optLoc.isPresent()) {
+      return;
+    }
+
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      return;
+    }
+
+    RegionService service = optService.get();
+    Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+    if (optRef.isPresent()) {
+      Region ref = optRef.get();
+      service.setSelectedRegion(player, ref);
+      player.sendMessage(Text.of(TextColors.YELLOW, "Region selected!"));
+    }
+  }
+
+  @Listener
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      return;
+    }
+
+    RegionService service = optService.get();
+
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      if (!block.isValid()) {
+        continue;
+      }
+
+      if (block.getOriginal().getState().getType() != this) {
+        continue;
+      }
+
+      Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+      if (!optLoc.isPresent()) {
+        continue;
+      }
+
+      Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+      if (!optRef.isPresent()) {
+        continue;
+      }
+
+      Region ref = optRef.get();
+      if (!ref.getFullPoints().isEmpty()) {
+        block.setValid(false);
+        player.sendMessage(Text.of(TextColors.RED, "You must first delete all markers!"));
+      } else {
+        service.rem(optLoc.get());
+        player.sendMessage(Text.of(TextColors.YELLOW, "Region deleted!"));
+      }
+    }
+  }
 }

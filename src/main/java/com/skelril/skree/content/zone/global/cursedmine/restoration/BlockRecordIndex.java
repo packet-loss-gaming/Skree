@@ -7,7 +7,9 @@
 package com.skelril.skree.content.zone.global.cursedmine.restoration;
 
 public interface BlockRecordIndex {
-    void revertByTime(long time);
-    void revertAll();
-    int size();
+  void revertByTime(long time);
+
+  void revertAll();
+
+  int size();
 }

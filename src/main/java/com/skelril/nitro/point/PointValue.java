@@ -9,6 +9,7 @@ package com.skelril.nitro.point;
 import java.util.Collection;
 
 public interface PointValue<A, B> extends Comparable<PointValue<A, B>> {
-    Collection<A> getSatisfiers();
-    B getPoints();
+  Collection<A> getSatisfiers();
+
+  B getPoints();
 }

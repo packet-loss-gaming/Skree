@@ -13,18 +13,21 @@ import org.spongepowered.api.world.World;
 import java.util.Collection;
 
 public interface WorldEffectWrapper {
-    String getName();
+  String getName();
 
-    default boolean isApplicable(Entity entity) {
-        return isApplicable(entity.getWorld());
-    }
-    default boolean isApplicable(Location<World> location) {
-        return isApplicable(location.getExtent());
-    }
-    boolean isApplicable(World world);
+  default boolean isApplicable(Entity entity) {
+    return isApplicable(entity.getWorld());
+  }
 
-    void addWorld(World world);
+  default boolean isApplicable(Location<World> location) {
+    return isApplicable(location.getExtent());
+  }
 
-    World getPrimaryWorld();
-    Collection<World> getWorlds();
+  boolean isApplicable(World world);
+
+  void addWorld(World world);
+
+  World getPrimaryWorld();
+
+  Collection<World> getWorlds();
 }

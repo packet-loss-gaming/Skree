@@ -13,11 +13,11 @@ import java.math.BigInteger;
 import java.util.function.BiFunction;
 
 public class CofferResolver extends SimplePointDropResolver<BigInteger> {
-    public CofferResolver(int maxCoffers) {
-        this(maxCoffers, (a, b) -> (int) (a * b));
-    }
+  public CofferResolver(int maxCoffers) {
+    this(maxCoffers, (a, b) -> (int) (a * b));
+  }
 
-    public CofferResolver(int maxCoffers, BiFunction<Integer, Double, Integer> modifierFunction) {
-        super(CofferValueMap.inst(), BigInteger::valueOf, maxCoffers, modifierFunction);
-    }
+  public CofferResolver(int maxCoffers, BiFunction<Integer, Double, Integer> modifierFunction) {
+    super(CofferValueMap.inst(), BigInteger::valueOf, maxCoffers, modifierFunction);
+  }
 }

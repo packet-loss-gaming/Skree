@@ -8,23 +8,23 @@ package com.skelril.nitro.registry;
 
 public abstract class ItemTier {
 
-    private String tierName;
+  private String tierName;
 
-    public ItemTier(String tierName) {
-        this.tierName = tierName;
-    }
+  public ItemTier(String tierName) {
+    this.tierName = tierName;
+  }
 
-    public String getTierName() {
-        return tierName;
-    }
+  public String getTierName() {
+    return tierName;
+  }
 
-    public abstract int getHarvestLevel();
+  public abstract int getHarvestLevel();
 
-    public abstract int getDurability();
+  public abstract int getDurability();
 
-    public abstract float getEfficienyOnProperMaterial();
+  public abstract float getEfficienyOnProperMaterial();
 
-    public abstract float getDamage();
+  public abstract float getDamage();
 
-    public abstract int getEnchantability();
+  public abstract int getEnchantability();
 }

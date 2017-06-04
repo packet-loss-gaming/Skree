@@ -9,5 +9,5 @@ package com.skelril.nitro.text;
 import org.spongepowered.api.text.Text;
 
 public interface GeneratedText {
-    Text getText();
+  Text getText();
 }

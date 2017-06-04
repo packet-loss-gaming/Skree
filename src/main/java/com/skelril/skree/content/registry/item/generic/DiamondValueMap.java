@@ -19,25 +19,25 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class DiamondValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> DIAMOND_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.DIAMOND)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.DIAMOND_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> DIAMOND_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.DIAMOND)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.DIAMOND_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final DiamondValueMap map = new DiamondValueMap();
+  private static final DiamondValueMap MAP = new DiamondValueMap();
 
-    protected DiamondValueMap() {
-        super(DIAMOND_VALUE_MAP);
-    }
+  protected DiamondValueMap() {
+    super(DIAMOND_VALUE_MAP);
+  }
 
-    public static DiamondValueMap inst() {
-        return map;
-    }
+  public static DiamondValueMap inst() {
+    return MAP;
+  }
 }

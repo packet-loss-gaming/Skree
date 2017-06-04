@@ -15,14 +15,17 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public interface RegionService {
-    Optional<Region> get(Location<World> location);
-    Optional<Region> getOrCreate(Location<World> location, User user);
-    Optional<Region> getMarkedRegion(Location<World> location);
+  Optional<Region> get(Location<World> location);
 
-    void rem(Location<World> location);
+  Optional<Region> getOrCreate(Location<World> location, User user);
 
-    int cleanup();
+  Optional<Region> getMarkedRegion(Location<World> location);
 
-    void setSelectedRegion(Player player, Region region);
-    Optional<Region> getSelectedRegion(Player player);
+  void rem(Location<World> location);
+
+  int cleanup();
+
+  void setSelectedRegion(Player player, Region region);
+
+  Optional<Region> getSelectedRegion(Player player);
 }

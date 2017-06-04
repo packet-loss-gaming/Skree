@@ -27,53 +27,53 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class Pitfall extends Block implements ICustomBlock, Craftable {
 
-    public Pitfall() {
-        super(Material.CLAY);
-        this.setCreativeTab(CreativeTabs.DECORATIONS);
+  public Pitfall() {
+    super(Material.CLAY);
+    this.setCreativeTab(CreativeTabs.DECORATIONS);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(0.6F);
-        this.setSoundType(SoundType.STONE);
-    }
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(0.6F);
+    this.setSoundType(SoundType.STONE);
+  }
 
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
-    }
+  @Override
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    return new AxisAlignedBB(0F, .9375F, 0F, 1F, 1F, 1F);
+  }
 
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
+  @Override
+  public boolean isFullCube(IBlockState state) {
+    return false;
+  }
 
-    @Override
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-        return true;
-    }
+  @Override
+  public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+    return true;
+  }
 
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
+  @Override
+  public boolean isOpaqueCube(IBlockState state) {
+    return false;
+  }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
+  @SideOnly(Side.CLIENT)
+  @Override
+  public BlockRenderLayer getBlockLayer() {
+    return BlockRenderLayer.CUTOUT;
+  }
 
-    @Override
-    public String __getID() {
-        return "pitfall";
-    }
+  @Override
+  public String __getID() {
+    return "pitfall";
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this, 3),
-                new ItemStack(Blocks.CLAY),
-                newItemStack("skree:fairy_dust")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this, 3),
+        new ItemStack(Blocks.CLAY),
+        newItemStack("skree:fairy_dust")
+    );
+  }
 }
 

@@ -24,44 +24,44 @@ import java.util.Optional;
 
 public class MarketTrackItemCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
-        if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
-            return CommandResult.empty();
-        }
-
-        ItemStack item = held.get();
-
-        if (service.addItem(item)) {
-            src.sendMessage(Text.of(TextColors.YELLOW, "Your held item is now being tracked."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
-            return CommandResult.empty();
-        }
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Introduce an item to the market"))
-                .executor(new MarketTrackItemCommand())
-                .build();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
+
+    MarketService service = optService.get();
+
+    Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
+    if (!held.isPresent()) {
+      src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
+      return CommandResult.empty();
+    }
+
+    ItemStack item = held.get();
+
+    if (service.addItem(item)) {
+      src.sendMessage(Text.of(TextColors.YELLOW, "Your held item is now being tracked."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
+      return CommandResult.empty();
+    }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Introduce an item to the market"))
+        .executor(new MarketTrackItemCommand())
+        .build();
+  }
 }

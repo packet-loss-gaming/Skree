@@ -16,16 +16,16 @@ import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
 public class SolidWorldTerrainGenerator implements GenerationPopulator {
-    @Override
-    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeVolume biomes) {
-        Vector3i min = buffer.getBlockMin();
-        Vector3i max = buffer.getBlockMax();
-        for (int y = min.getY(); y <= max.getY() - 5; ++y) {
-            for (int x = min.getX(); x <= max.getX(); ++x) {
-                for (int z = min.getZ(); z <= max.getZ(); ++z) {
-                    buffer.setBlockType(x, y, z, BlockTypes.BEDROCK, Cause.source(SkreePlugin.container()).build());
-                }
-            }
+  @Override
+  public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeVolume biomes) {
+    Vector3i min = buffer.getBlockMin();
+    Vector3i max = buffer.getBlockMax();
+    for (int y = min.getY(); y <= max.getY() - 5; ++y) {
+      for (int x = min.getX(); x <= max.getX(); ++x) {
+        for (int z = min.getZ(); z <= max.getZ(); ++z) {
+          buffer.setBlockType(x, y, z, BlockTypes.BEDROCK, Cause.source(SkreePlugin.container()).build());
         }
+      }
     }
+  }
 }

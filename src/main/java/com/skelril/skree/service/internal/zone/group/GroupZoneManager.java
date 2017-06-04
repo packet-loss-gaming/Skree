@@ -14,10 +14,10 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class GroupZoneManager<T extends Zone> implements ZoneManager<T> {
-    protected List<T> zones = new ArrayList<>();
+  protected List<T> zones = new ArrayList<>();
 
-    @Override
-    public Collection<T> getActiveZones() {
-        return new ArrayList<>(zones);
-    }
+  @Override
+  public Collection<T> getActiveZones() {
+    return new ArrayList<>(zones);
+  }
 }

@@ -12,23 +12,23 @@ import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 public class ProjectileTickEvent extends AbstractEvent implements TargetEntityEvent {
-    private final TrackedProjectileInfo projectile;
+  private final TrackedProjectileInfo projectile;
 
-    public ProjectileTickEvent(TrackedProjectileInfo projectile) {
-        this.projectile = projectile;
-    }
+  public ProjectileTickEvent(TrackedProjectileInfo projectile) {
+    this.projectile = projectile;
+  }
 
-    @Override
-    public Projectile getTargetEntity() {
-        return projectile.getProjectile();
-    }
+  @Override
+  public Projectile getTargetEntity() {
+    return projectile.getProjectile();
+  }
 
-    public TrackedProjectileInfo getProjectileInfo() {
-        return projectile;
-    }
+  public TrackedProjectileInfo getProjectileInfo() {
+    return projectile;
+  }
 
-    @Override
-    public Cause getCause() {
-        return projectile.getCause();
-    }
+  @Override
+  public Cause getCause() {
+    return projectile.getCause();
+  }
 }

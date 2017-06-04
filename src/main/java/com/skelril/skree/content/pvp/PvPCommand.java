@@ -28,57 +28,58 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class PvPCommand implements CommandExecutor {
 
-    private TextColor getColor(PvPState state) {
-        return state.allowByDefault() ? TextColors.DARK_RED : TextColors.DARK_GREEN;
-    }
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  private TextColor getColor(PvPState state) {
+    return state.allowByDefault() ? TextColors.DARK_RED : TextColors.DARK_GREEN;
+  }
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The PvP service is not currently running."));
-            return CommandResult.empty();
-        }
-        PvPService service = optService.get();
-
-        Player player = (Player) src;
-        Optional<PvPState> stateArg = args.getOne("status");
-        PvPState state = stateArg.orElse(service.getPvPState(player));
-        service.setPvPState(player, state);
-
-        player.sendMessage(Text.of(
-                TextColors.BLUE,
-                "Your Opt-in PvP Settings", (stateArg.isPresent() ? " Changed!" : "")
-        ));
-        player.sendMessage(Text.of(
-                TextColors.YELLOW,
-                "  Currently: ", getColor(state), state.toString()
-        ));
-
-        PvPState defaultState = service.getDefaultState(player);
-        player.sendMessage(Text.of(
-                TextColors.YELLOW,
-                "  Upon disconnect: ", getColor(defaultState), defaultState.toString()
-        ));
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        Map<String, PvPState> map = new HashMap<>();
-
-        map.put("allow", PvPState.ALLOWED);
-        map.put("deny", PvPState.DENIED);
-
-        return CommandSpec.builder()
-                .description(Text.of("Change your opt-in PvP status"))
-                .permission("skree.pvp")
-                .arguments(optional(onlyOne(choices(Text.of("status"), map))))
-                .executor(new PvPCommand()).build();
+    Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The PvP service is not currently running."));
+      return CommandResult.empty();
     }
+    PvPService service = optService.get();
+
+    Player player = (Player) src;
+    Optional<PvPState> stateArg = args.getOne("status");
+    PvPState state = stateArg.orElse(service.getPvPState(player));
+    service.setPvPState(player, state);
+
+    player.sendMessage(Text.of(
+        TextColors.BLUE,
+        "Your Opt-in PvP Settings", (stateArg.isPresent() ? " Changed!" : "")
+    ));
+    player.sendMessage(Text.of(
+        TextColors.YELLOW,
+        "  Currently: ", getColor(state), state.toString()
+    ));
+
+    PvPState defaultState = service.getDefaultState(player);
+    player.sendMessage(Text.of(
+        TextColors.YELLOW,
+        "  Upon disconnect: ", getColor(defaultState), defaultState.toString()
+    ));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    Map<String, PvPState> map = new HashMap<>();
+
+    map.put("allow", PvPState.ALLOWED);
+    map.put("deny", PvPState.DENIED);
+
+    return CommandSpec.builder()
+        .description(Text.of("Change your opt-in PvP status"))
+        .permission("skree.pvp")
+        .arguments(optional(onlyOne(choices(Text.of("status"), map))))
+        .executor(new PvPCommand()).build();
+  }
 }

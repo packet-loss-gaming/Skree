@@ -19,25 +19,25 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class CoalValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> COAL_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.COAL)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.COAL_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> COAL_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.COAL)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.COAL_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final CoalValueMap map = new CoalValueMap();
+  private static final CoalValueMap MAP = new CoalValueMap();
 
-    protected CoalValueMap() {
-        super(COAL_VALUE_MAP);
-    }
+  protected CoalValueMap() {
+    super(COAL_VALUE_MAP);
+  }
 
-    public static CoalValueMap inst() {
-        return map;
-    }
+  public static CoalValueMap inst() {
+    return MAP;
+  }
 }

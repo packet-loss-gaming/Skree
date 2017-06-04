@@ -28,49 +28,49 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class MarketSetPriceCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        BigDecimal price;
-        try {
-            price = new BigDecimal(args.<String>getOne("price").get());
-        } catch (NumberFormatException ex) {
-            src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
-            return CommandResult.empty();
-        }
-
-        Optional<String> optAlias = args.getOne("alias");
-        Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
-        if (optAlias.isPresent()) {
-            String alias = optAlias.get();
-            if (service.setBasePrice(alias, price)) {
-                src.sendMessage(Text.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
-                return CommandResult.success();
-            }
-        } else if (held.isPresent()) {
-            if (service.setBasePrice(held.get(), price)) {
-                src.sendMessage(Text.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
-                return CommandResult.success();
-            }
-        }
-
-        src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
-        return CommandResult.empty();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Set the price of an item"))
-                .arguments(seq(onlyOne(string(Text.of("price"))), optional(remainingJoinedStrings(Text.of("alias")))))
-                .executor(new MarketSetPriceCommand())
-                .build();
+    MarketService service = optService.get();
+
+    BigDecimal price;
+    try {
+      price = new BigDecimal(args.<String>getOne("price").get());
+    } catch (NumberFormatException ex) {
+      src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
+      return CommandResult.empty();
     }
+
+    Optional<String> optAlias = args.getOne("alias");
+    Optional<ItemStack> held = src instanceof Player ? ((Player) src).getItemInHand(HandTypes.MAIN_HAND) : Optional.empty();
+    if (optAlias.isPresent()) {
+      String alias = optAlias.get();
+      if (service.setBasePrice(alias, price)) {
+        src.sendMessage(Text.of(TextColors.YELLOW, alias + "'s price has been set to " + format(price)));
+        return CommandResult.success();
+      }
+    } else if (held.isPresent()) {
+      if (service.setBasePrice(held.get(), price)) {
+        src.sendMessage(Text.of(TextColors.YELLOW, "Your held item's price has been set to " + format(price)));
+        return CommandResult.success();
+      }
+    }
+
+    src.sendMessage(Text.of(TextColors.RED, "No valid alias specified, and you're not holding a tracked item."));
+    return CommandResult.empty();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Set the price of an item"))
+        .arguments(seq(onlyOne(string(Text.of("price"))), optional(remainingJoinedStrings(Text.of("alias")))))
+        .executor(new MarketSetPriceCommand())
+        .build();
+  }
 }

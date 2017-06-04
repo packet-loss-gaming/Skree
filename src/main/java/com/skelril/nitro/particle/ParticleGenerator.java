@@ -14,27 +14,27 @@ import org.spongepowered.api.world.World;
 
 
 public class ParticleGenerator {
-    private static final ParticleEffect FLAME = ParticleEffect.builder().type(ParticleTypes.FLAME).quantity(1).build();
+  private static final ParticleEffect FLAME = ParticleEffect.builder().type(ParticleTypes.FLAME).quantity(1).build();
 
-    public static void mobSpawnerFlames(Location<World> location, int intensity) {
-        for (int i = 0; i < 20 * intensity; ++i ) {
-            location.getExtent().spawnParticles(FLAME, location.getPosition().add(
-                    Probability.getRangedRandom(-.5, .5),
-                    Probability.getRangedRandom(0.0, 1.0),
-                    Probability.getRangedRandom(-.5, .5)
-            ));
-        }
+  public static void mobSpawnerFlames(Location<World> location, int intensity) {
+    for (int i = 0; i < 20 * intensity; ++i) {
+      location.getExtent().spawnParticles(FLAME, location.getPosition().add(
+          Probability.getRangedRandom(-.5, .5),
+          Probability.getRangedRandom(0.0, 1.0),
+          Probability.getRangedRandom(-.5, .5)
+      ));
     }
+  }
 
-    private static final ParticleEffect SMOKE = ParticleEffect.builder().type(ParticleTypes.SMOKE).quantity(1).build();
+  private static final ParticleEffect SMOKE = ParticleEffect.builder().type(ParticleTypes.SMOKE).quantity(1).build();
 
-    public static void smoke(Location<World> location, int intensity) {
-        for (int i = 0; i < 20 * intensity; ++i ) {
-            location.getExtent().spawnParticles(SMOKE, location.getPosition().add(
-                    Probability.getRangedRandom(-.5, .5),
-                    Probability.getRangedRandom(0.0, 1.0),
-                    Probability.getRangedRandom(-.5, .5)
-            ));
-        }
+  public static void smoke(Location<World> location, int intensity) {
+    for (int i = 0; i < 20 * intensity; ++i) {
+      location.getExtent().spawnParticles(SMOKE, location.getPosition().add(
+          Probability.getRangedRandom(-.5, .5),
+          Probability.getRangedRandom(0.0, 1.0),
+          Probability.getRangedRandom(-.5, .5)
+      ));
     }
+  }
 }

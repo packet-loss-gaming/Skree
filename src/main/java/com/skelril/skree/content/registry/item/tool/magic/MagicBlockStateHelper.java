@@ -26,91 +26,91 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStackCollection;
 
 public class MagicBlockStateHelper {
 
-    private static int workingLadder = 0;
-    private static int workingPlatform = 0;
+  private static int workingLadder = 0;
+  private static int workingPlatform = 0;
 
-    private static int foundLadder = 0;
-    private static int foundPlatform = 0;
+  private static int foundLadder = 0;
+  private static int foundPlatform = 0;
 
-    protected static void dropItems(Location<World> loc, Cause cause) {
-        ItemStack ladder = ItemStackFactory.newItemStack((BlockType) CustomBlockTypes.MAGIC_LADDER);
-        ItemStack platform = ItemStackFactory.newItemStack((BlockType) CustomBlockTypes.MAGIC_PLATFORM);
+  protected static void dropItems(Location<World> loc, Cause cause) {
+    ItemStack ladder = ItemStackFactory.newItemStack((BlockType) CustomBlockTypes.MAGIC_LADDER);
+    ItemStack platform = ItemStackFactory.newItemStack((BlockType) CustomBlockTypes.MAGIC_PLATFORM);
 
-        Collection<ItemStack> drops = new ArrayList<>();
-        drops.addAll(newItemStackCollection(ladder, foundLadder));
-        drops.addAll(newItemStackCollection(platform, foundPlatform));
+    Collection<ItemStack> drops = new ArrayList<>();
+    drops.addAll(newItemStackCollection(ladder, foundLadder));
+    drops.addAll(newItemStackCollection(platform, foundPlatform));
 
-        new ItemDropper(loc).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+    new ItemDropper(loc).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
 
-        resetCounts();
+    resetCounts();
+  }
+
+  protected static void resetCounts() {
+    foundLadder = foundPlatform = 0;
+  }
+
+  protected static void startLadder(Location<World> block) {
+    if (workingLadder-- > 0) {
+      return;
     }
 
-    protected static void resetCounts() {
-        foundLadder = foundPlatform = 0;
+    ladder(block);
+    ladderRecursion(block);
+    workingLadder = foundLadder - 1;
+    workingPlatform = foundPlatform;
+  }
+
+  protected static void startPlatform(Location<World> block) {
+    if (workingPlatform-- > 0) {
+      return;
     }
 
-    protected static void startLadder(Location<World> block) {
-        if (workingLadder-- > 0) {
-            return;
-        }
+    platform(block);
+    platformRecursion(block);
+    workingLadder = foundLadder;
+    workingPlatform = foundPlatform - 1;
+  }
 
-        ladder(block);
-        ladderRecursion(block);
-        workingLadder = foundLadder - 1;
-        workingPlatform = foundPlatform;
+  private static void recursiveDiscovery(Location<World> block) {
+    platform(block);
+    ladder(block);
+  }
+
+  private static void ladderRecursion(Location<World> block) {
+    recursiveDiscovery(block.add(Direction.UP.asOffset()));
+    platform(block.add(Direction.EAST.asOffset()));
+    platform(block.add(Direction.WEST.asOffset()));
+    platform(block.add(Direction.NORTH.asOffset()));
+    platform(block.add(Direction.SOUTH.asOffset()));
+  }
+
+  private static void ladder(Location<World> block) {
+    if (block.getBlockType() != CustomBlockTypes.MAGIC_LADDER) {
+      return;
     }
 
-    protected static void startPlatform(Location<World> block) {
-        if (workingPlatform-- > 0) {
-            return;
-        }
+    ++foundLadder;
+    block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
 
-        platform(block);
-        platformRecursion(block);
-        workingLadder = foundLadder;
-        workingPlatform = foundPlatform - 1;
+    ladderRecursion(block);
+  }
+
+  private static void platformRecursion(Location<World> block) {
+    ladder(block.add(Direction.UP.asOffset()));
+    recursiveDiscovery(block.add(Direction.EAST.asOffset()));
+    recursiveDiscovery(block.add(Direction.WEST.asOffset()));
+    recursiveDiscovery(block.add(Direction.NORTH.asOffset()));
+    recursiveDiscovery(block.add(Direction.SOUTH.asOffset()));
+  }
+
+  private static void platform(Location<World> block) {
+    if (block.getBlockType() != CustomBlockTypes.MAGIC_PLATFORM) {
+      return;
     }
 
-    private static void recursiveDiscovery(Location<World> block) {
-        platform(block);
-        ladder(block);
-    }
+    ++foundPlatform;
+    block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
 
-    private static void ladderRecursion(Location<World> block) {
-        recursiveDiscovery(block.add(Direction.UP.asOffset()));
-        platform(block.add(Direction.EAST.asOffset()));
-        platform(block.add(Direction.WEST.asOffset()));
-        platform(block.add(Direction.NORTH.asOffset()));
-        platform(block.add(Direction.SOUTH.asOffset()));
-    }
-
-    private static void ladder(Location<World> block) {
-        if (block.getBlockType() != CustomBlockTypes.MAGIC_LADDER) {
-            return;
-        }
-
-        ++foundLadder;
-        block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
-
-        ladderRecursion(block);
-    }
-
-    private static void platformRecursion(Location<World> block) {
-        ladder(block.add(Direction.UP.asOffset()));
-        recursiveDiscovery(block.add(Direction.EAST.asOffset()));
-        recursiveDiscovery(block.add(Direction.WEST.asOffset()));
-        recursiveDiscovery(block.add(Direction.NORTH.asOffset()));
-        recursiveDiscovery(block.add(Direction.SOUTH.asOffset()));
-    }
-
-    private static void platform(Location<World> block) {
-        if (block.getBlockType() != CustomBlockTypes.MAGIC_PLATFORM) {
-            return;
-        }
-
-        ++foundPlatform;
-        block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
-
-        platformRecursion(block);
-    }
+    platformRecursion(block);
+  }
 }

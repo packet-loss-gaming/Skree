@@ -20,18 +20,18 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import java.util.Optional;
 
 public class HealableInstruction implements Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>> {
-    @Override
-    public Optional<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
-            DamagedCondition damagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> boss
-    ) {
-        Optional<DamageSource> optDmgSource = damagedCondition.getDamageSource();
-        if (optDmgSource.isPresent()) {
-            if (optDmgSource.get().getType() == DamageTypes.EXPLOSIVE) {
-                DamageEntityEvent event = damagedCondition.getEvent();
-                EntityHealthUtil.heal(boss.getTargetEntity().get(), event.getFinalDamage());
-                event.setCancelled(true);
-            }
-        }
-        return Optional.empty();
+  @Override
+  public Optional<Instruction<DamagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
+      DamagedCondition damagedCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> boss
+  ) {
+    Optional<DamageSource> optDmgSource = damagedCondition.getDamageSource();
+    if (optDmgSource.isPresent()) {
+      if (optDmgSource.get().getType() == DamageTypes.EXPLOSIVE) {
+        DamageEntityEvent event = damagedCondition.getEvent();
+        EntityHealthUtil.heal(boss.getTargetEntity().get(), event.getFinalDamage());
+        event.setCancelled(true);
+      }
     }
+    return Optional.empty();
+  }
 }

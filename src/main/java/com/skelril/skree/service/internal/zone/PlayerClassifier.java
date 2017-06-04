@@ -7,6 +7,6 @@
 package com.skelril.skree.service.internal.zone;
 
 public enum PlayerClassifier {
-    PARTICIPANT,
-    SPECTATOR
+  PARTICIPANT,
+  SPECTATOR
 }

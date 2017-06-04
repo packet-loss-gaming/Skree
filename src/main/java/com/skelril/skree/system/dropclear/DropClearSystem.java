@@ -18,21 +18,21 @@ import org.spongepowered.api.Sponge;
 @NModule(name = "Drop Clear System")
 public class DropClearSystem implements ServiceProvider<DropClearService> {
 
-    private DropClearService service;
+  private DropClearService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new DropClearServiceImpl(1000, 3);
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new DropClearServiceImpl(1000, 3);
 
-        // Register the service & command
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    // Register the service & command
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DropClearService.class, service);
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
 
-        Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
-    }
+    Sponge.getCommandManager().register(SkreePlugin.inst(), DropClearCommand.aquireSpec(120), "dropclear", "dc");
+  }
 
-    @Override
-    public DropClearService getService() {
-        return service;
-    }
+  @Override
+  public DropClearService getService() {
+    return service;
+  }
 }

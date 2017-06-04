@@ -31,99 +31,99 @@ import com.skelril.skree.content.registry.item.zone.ZoneSlaveOrb;
 import com.skelril.skree.content.registry.item.zone.ZoneTransitionalOrb;
 
 public class CustomItemTypes {
-    /* ** Minigame ** */
-    public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
-    public static final PrizeBox PRIZE_BOX = new PrizeBox();
-    public static final SkyFeather SKY_FEATHER = new SkyFeather();
+  /* ** Minigame ** */
+  public static final GoldRushKey GOLD_RUSH_KEY = new GoldRushKey();
+  public static final PrizeBox PRIZE_BOX = new PrizeBox();
+  public static final SkyFeather SKY_FEATHER = new SkyFeather();
 
-    /* ** Standard ** */
+  /* ** Standard ** */
 
-    /* Currency */
+  /* Currency */
 
-    // Coffer Base Item
-    public static final CofferItem TESTRIL = new CofferItem("testril", 1);
+  // Coffer Base Item
+  public static final CofferItem TESTRIL = new CofferItem("testril", 1);
 
-    // Coffer Child Items
-    public static final CondensedCofferItem AQUIS = new CondensedCofferItem("aquis", TESTRIL);
-    public static final CondensedCofferItem MARSINCO = new CondensedCofferItem("marsinco", AQUIS);
-    public static final CondensedCofferItem POSTRE = new CondensedCofferItem("postre", MARSINCO);
-    public static final CondensedCofferItem EQESTA = new CondensedCofferItem("eqesta", POSTRE);
-    public static final CondensedCofferItem REDISTRAL = new CondensedCofferItem("redistral", EQESTA);
-    public static final CondensedCofferItem RETESRUM = new CondensedCofferItem("retesrum", REDISTRAL);
-    public static final CondensedCofferItem MESARDITH = new CondensedCofferItem("mesardith", RETESRUM);
+  // Coffer Child Items
+  public static final CondensedCofferItem AQUIS = new CondensedCofferItem("aquis", TESTRIL);
+  public static final CondensedCofferItem MARSINCO = new CondensedCofferItem("marsinco", AQUIS);
+  public static final CondensedCofferItem POSTRE = new CondensedCofferItem("postre", MARSINCO);
+  public static final CondensedCofferItem EQESTA = new CondensedCofferItem("eqesta", POSTRE);
+  public static final CondensedCofferItem REDISTRAL = new CondensedCofferItem("redistral", EQESTA);
+  public static final CondensedCofferItem RETESRUM = new CondensedCofferItem("retesrum", REDISTRAL);
+  public static final CondensedCofferItem MESARDITH = new CondensedCofferItem("mesardith", RETESRUM);
 
-    /* Armors */
-    public static final JurackHelmet JURACK_HELMET = new JurackHelmet();
-    public static final JurackChestplate JURACK_CHESTPLATE = new JurackChestplate();
-    public static final JurackLeggings JURACK_LEGGINGS = new JurackLeggings();
-    public static final JurackBoots JURACK_BOOTS = new JurackBoots();
+  /* Armors */
+  public static final JurackHelmet JURACK_HELMET = new JurackHelmet();
+  public static final JurackChestplate JURACK_CHESTPLATE = new JurackChestplate();
+  public static final JurackLeggings JURACK_LEGGINGS = new JurackLeggings();
+  public static final JurackBoots JURACK_BOOTS = new JurackBoots();
 
-    public static final CrystalHelmet CRYSTAL_HELMET = new CrystalHelmet();
-    public static final CrystalChestplate CRYSTAL_CHESTPLATE = new CrystalChestplate();
-    public static final CrystalLeggings CRYSTAL_LEGGINGS = new CrystalLeggings();
-    public static final CrystalBoots CRYSTAL_BOOTS = new CrystalBoots();
+  public static final CrystalHelmet CRYSTAL_HELMET = new CrystalHelmet();
+  public static final CrystalChestplate CRYSTAL_CHESTPLATE = new CrystalChestplate();
+  public static final CrystalLeggings CRYSTAL_LEGGINGS = new CrystalLeggings();
+  public static final CrystalBoots CRYSTAL_BOOTS = new CrystalBoots();
 
-    public static final GuardianHelmet GUARDIAN_HELMET = new GuardianHelmet();
-    public static final GuardianChestplate GUARDIAN_CHESTPLATE = new GuardianChestplate();
-    public static final GuardianLeggings GUARDIAN_LEGGINGS = new GuardianLeggings();
-    public static final GuardianBoots GUARDIAN_BOOTS = new GuardianBoots();
+  public static final GuardianHelmet GUARDIAN_HELMET = new GuardianHelmet();
+  public static final GuardianChestplate GUARDIAN_CHESTPLATE = new GuardianChestplate();
+  public static final GuardianLeggings GUARDIAN_LEGGINGS = new GuardianLeggings();
+  public static final GuardianBoots GUARDIAN_BOOTS = new GuardianBoots();
 
-    public static final DivineHelmet DIVINE_HELMET = new DivineHelmet();
-    public static final DivineChestplate DIVINE_CHESTPLATE = new DivineChestplate();
-    public static final DivineLeggings DIVINE_LEGGINGS = new DivineLeggings();
-    public static final DivineBoots DIVINE_BOOTS = new DivineBoots();
+  public static final DivineHelmet DIVINE_HELMET = new DivineHelmet();
+  public static final DivineChestplate DIVINE_CHESTPLATE = new DivineChestplate();
+  public static final DivineLeggings DIVINE_LEGGINGS = new DivineLeggings();
+  public static final DivineBoots DIVINE_BOOTS = new DivineBoots();
 
-    public static final TormentorHelmet TORMENTOR_HELMET = new TormentorHelmet();
-    public static final TormentorChestplate TORMENTOR_CHESTPLATE = new TormentorChestplate();
-    public static final TormentorLeggings TORMENTOR_LEGGINGS = new TormentorLeggings();
-    public static final TormentorBoots TORMENTOR_BOOTS = new TormentorBoots();
+  public static final TormentorHelmet TORMENTOR_HELMET = new TormentorHelmet();
+  public static final TormentorChestplate TORMENTOR_CHESTPLATE = new TormentorChestplate();
+  public static final TormentorLeggings TORMENTOR_LEGGINGS = new TormentorLeggings();
+  public static final TormentorBoots TORMENTOR_BOOTS = new TormentorBoots();
 
-    public static final WraithHelmet WRAITH_HELMET = new WraithHelmet();
-    public static final WraithChestplate WRAITH_CHESTPLATE = new WraithChestplate();
-    public static final WraithLeggings WRAITH_LEGGINGS = new WraithLeggings();
-    public static final WraithBoots WRAITH_BOOTS = new WraithBoots();
+  public static final WraithHelmet WRAITH_HELMET = new WraithHelmet();
+  public static final WraithChestplate WRAITH_CHESTPLATE = new WraithChestplate();
+  public static final WraithLeggings WRAITH_LEGGINGS = new WraithLeggings();
+  public static final WraithBoots WRAITH_BOOTS = new WraithBoots();
 
-    /* Combat Items */
-    public static final RedFeather RED_FEATHER = new RedFeather();
+  /* Combat Items */
+  public static final RedFeather RED_FEATHER = new RedFeather();
 
-    /* Convenience Items */
-    public static final BrokenGlass BROKEN_GLASS = new BrokenGlass();
+  /* Convenience Items */
+  public static final BrokenGlass BROKEN_GLASS = new BrokenGlass();
 
-    /* Zone Items */
-    public static final ZoneMasterOrb ZONE_MASTER_ORB = new ZoneMasterOrb();
-    public static final ZoneSlaveOrb ZONE_SLAVE_ORB = new ZoneSlaveOrb();
-    public static final ZoneTransitionalOrb ZONE_TRANSITIONAL_ORB = new ZoneTransitionalOrb();
+  /* Zone Items */
+  public static final ZoneMasterOrb ZONE_MASTER_ORB = new ZoneMasterOrb();
+  public static final ZoneSlaveOrb ZONE_SLAVE_ORB = new ZoneSlaveOrb();
+  public static final ZoneTransitionalOrb ZONE_TRANSITIONAL_ORB = new ZoneTransitionalOrb();
 
-    /* Tools */
-    public static final WoodTerragu WOOD_TERRAGU = new WoodTerragu();
-    public static final StoneTerragu STONE_TERRAGU = new StoneTerragu();
-    public static final IronTerragu IRON_TERRAGU = new IronTerragu();
-    public static final GoldTerragu GOLD_TERRAGU = new GoldTerragu();
-    public static final DiamondTerragu DIAMOND_TERRAGU = new DiamondTerragu();
-    public static final JurackTerragu JURACK_TERRAGU = new JurackTerragu();
-    public static final CrystalTerragu CRYSTAL_TERRAGU = new CrystalTerragu();
+  /* Tools */
+  public static final WoodTerragu WOOD_TERRAGU = new WoodTerragu();
+  public static final StoneTerragu STONE_TERRAGU = new StoneTerragu();
+  public static final IronTerragu IRON_TERRAGU = new IronTerragu();
+  public static final GoldTerragu GOLD_TERRAGU = new GoldTerragu();
+  public static final DiamondTerragu DIAMOND_TERRAGU = new DiamondTerragu();
+  public static final JurackTerragu JURACK_TERRAGU = new JurackTerragu();
+  public static final CrystalTerragu CRYSTAL_TERRAGU = new CrystalTerragu();
 
-    public static final JurackAxe JURACK_AXE = new JurackAxe();
-    public static final CrystalAxe CRYSTAL_AXE = new CrystalAxe();
+  public static final JurackAxe JURACK_AXE = new JurackAxe();
+  public static final CrystalAxe CRYSTAL_AXE = new CrystalAxe();
 
-    public static final JurackHoe JURACK_HOE = new JurackHoe();
-    public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
+  public static final JurackHoe JURACK_HOE = new JurackHoe();
+  public static final CrystalHoe CRYSTAL_HOE = new CrystalHoe();
 
-    public static final HardenedDiamondPickaxe HARDENED_DIAMOND_PICKAXE = new HardenedDiamondPickaxe();
-    public static final JurackPickaxe JURACK_PICKAXE = new JurackPickaxe();
-    public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
+  public static final HardenedDiamondPickaxe HARDENED_DIAMOND_PICKAXE = new HardenedDiamondPickaxe();
+  public static final JurackPickaxe JURACK_PICKAXE = new JurackPickaxe();
+  public static final CrystalPickaxe CRYSTAL_PICKAXE = new CrystalPickaxe();
 
-    public static final JurackShovel JURACK_SHOVEL = new JurackShovel();
-    public static final CrystalShovel CRYSTAL_SHOVEL = new CrystalShovel();
+  public static final JurackShovel JURACK_SHOVEL = new JurackShovel();
+  public static final CrystalShovel CRYSTAL_SHOVEL = new CrystalShovel();
 
-    public static final FocusTeleporter FOCUS_TELEPORTER = new FocusTeleporter();
-    public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
-    public static final Luminositor LUMINOSITOR = new Luminositor();
-    public static final MagicWand MAGIC_WAND = new MagicWand();
-    public static final NetherBowl NETHER_BOWL = new NetherBowl();
-    public static final PactScroll PACT_SCROLL = new PactScroll();
-    public static final PhantomClock PHANTOM_CLOCK = new PhantomClock();
-    public static final PhantomHymn PHANTOM_HYMN = new PhantomHymn();
-    public static final ScrollOfSummation SCROLL_OF_SUMMATION = new ScrollOfSummation();
-    public static final SkullOfTheFallen SKULL_OF_THE_FALLEN = new SkullOfTheFallen();
+  public static final FocusTeleporter FOCUS_TELEPORTER = new FocusTeleporter();
+  public static final HymnOfSummation HYMN_OF_SUMMATION = new HymnOfSummation();
+  public static final Luminositor LUMINOSITOR = new Luminositor();
+  public static final MagicWand MAGIC_WAND = new MagicWand();
+  public static final NetherBowl NETHER_BOWL = new NetherBowl();
+  public static final PactScroll PACT_SCROLL = new PactScroll();
+  public static final PhantomClock PHANTOM_CLOCK = new PhantomClock();
+  public static final PhantomHymn PHANTOM_HYMN = new PhantomHymn();
+  public static final ScrollOfSummation SCROLL_OF_SUMMATION = new ScrollOfSummation();
+  public static final SkullOfTheFallen SKULL_OF_THE_FALLEN = new SkullOfTheFallen();
 }

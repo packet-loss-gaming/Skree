@@ -15,22 +15,22 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public abstract class CustomItem extends Item implements ICustomItem {
-    protected CustomItem() {
-        this.maxStackSize = __getMaxStackSize();
-        this.setCreativeTab(__getCreativeTab());
+  protected CustomItem() {
+    this.maxStackSize = __getMaxStackSize();
+    this.setCreativeTab(__getCreativeTab());
 
-        if (this instanceof DegradableItem) {
-            this.setMaxDamage(((DegradableItem) this).__getMaxUses());
-        }
-
-        if (__getMeshDefinitions().size() > 1) {
-            this.setMaxDamage(0);
-            this.setHasSubtypes(true);
-        }
+    if (this instanceof DegradableItem) {
+      this.setMaxDamage(((DegradableItem) this).__getMaxUses());
     }
 
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-        ICustomItem.super.getSubItems(itemIn, tab, subItems);
+    if (__getMeshDefinitions().size() > 1) {
+      this.setMaxDamage(0);
+      this.setHasSubtypes(true);
     }
+  }
+
+  @SideOnly(Side.CLIENT)
+  public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+    ICustomItem.super.getSubItems(itemIn, tab, subItems);
+  }
 }

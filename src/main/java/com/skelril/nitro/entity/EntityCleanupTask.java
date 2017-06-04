@@ -17,48 +17,49 @@ import java.util.function.Predicate;
 
 public abstract class EntityCleanupTask implements IntegratedRunnable {
 
-    private final World world;
-    private final Predicate<Entity> predicate;
-    private final TimeFilter filter;
+  private final World world;
+  private final Predicate<Entity> predicate;
+  private final TimeFilter filter;
 
-    private WorldStatisticsEntityCollection profile;
+  private WorldStatisticsEntityCollection profile;
 
-    public EntityCleanupTask(World world, Predicate<Entity> predicate) {
-        this(world, predicate, new TimeFilter(10, 5));
+  public EntityCleanupTask(World world, Predicate<Entity> predicate) {
+    this(world, predicate, new TimeFilter(10, 5));
+  }
+
+  public EntityCleanupTask(World world, Predicate<Entity> predicate, TimeFilter filter) {
+    this.world = world;
+    this.predicate = predicate;
+    this.filter = filter;
+  }
+
+  public WorldStatisticsEntityCollection getLastProfile() {
+    return profile;
+  }
+
+  @Override
+  public boolean run(int times) {
+    if (filter.matchesFilter(times)) {
+      notifyCleanProgress(times);
     }
+    return true;
+  }
 
-    public EntityCleanupTask(World world, Predicate<Entity> predicate, TimeFilter filter) {
-        this.world = world;
-        this.predicate = predicate;
-        this.filter = filter;
-    }
+  public abstract void notifyCleanProgress(int times);
 
-    public WorldStatisticsEntityCollection getLastProfile() {
-        return profile;
-    }
+  public abstract void notifyCleanBeginning();
 
-    @Override
-    public boolean run(int times) {
-        if (filter.matchesFilter(times)) {
-            notifyCleanProgress(times);
-        }
-        return true;
-    }
+  public abstract void notifyCleanEnding();
 
-    public abstract void notifyCleanProgress(int times);
+  @Override
+  public void end() {
+    notifyCleanBeginning();
 
-    public abstract void notifyCleanBeginning();
-    public abstract void notifyCleanEnding();
+    profile = WorldStatisticsEntityCollection.createFor(world, predicate);
 
-    @Override
-    public void end() {
-        notifyCleanBeginning();
+    Collection<? extends Entity> entities = profile.getEntities();
+    entities.stream().forEach(Entity::remove);
 
-        profile = WorldStatisticsEntityCollection.createFor(world, predicate);
-
-        Collection<? extends Entity> entities = profile.getEntities();
-        entities.stream().forEach(Entity::remove);
-
-        notifyCleanEnding();
-    }
+    notifyCleanEnding();
+  }
 }

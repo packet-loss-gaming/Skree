@@ -12,11 +12,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
 
 public class ItemStackConfig {
-    protected String id;
-    protected int data = 0;
+  protected String id;
+  protected int data = 0;
 
-    public ItemStack toNSMStack() {
-        ItemType spongeType = Sponge.getRegistry().getType(ItemType.class, id).get();
-        return new ItemStack((Item) spongeType, 1, data);
-    }
+  public ItemStack toNSMStack() {
+    ItemType spongeType = Sponge.getRegistry().getType(ItemType.class, id).get();
+    return new ItemStack((Item) spongeType, 1, data);
+  }
 }

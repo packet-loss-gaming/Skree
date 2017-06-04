@@ -14,34 +14,34 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class GuardianLeggings extends CustomLeggings implements Craftable {
-    @Override
-    public int __getMaxUsesBaseModifier() {
-        return 60;
-    }
+  @Override
+  public int __getMaxUsesBaseModifier() {
+    return 60;
+  }
 
-    @Override
-    public String __getType() {
-        return "guardian";
-    }
+  @Override
+  public String __getType() {
+    return "guardian";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return (ItemStack) (Object) newItemStack("skree:holy_ingot");
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return (ItemStack) (Object) newItemStack("skree:holy_ingot");
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return 10;
-    }
+  @Override
+  public int __getEnchantability() {
+    return 10;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                "A A",
-                "A A",
-                'A', newItemStack("skree:holy_ingot")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        "A A",
+        "A A",
+        'A', newItemStack("skree:holy_ingot")
+    );
+  }
 }

@@ -20,32 +20,32 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneRelativePositionListener<T extends Zone> extends ZoneApplicableListener<T> {
-    public ZoneRelativePositionListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
+  public ZoneRelativePositionListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
+
+
+  @Listener
+  public void onBlockInteract(InteractBlockEvent.Secondary event, @First Player player) {
+    Optional<Location<World>> optLocation = event.getTargetBlock().getLocation();
+    if (!optLocation.isPresent()) {
+      return;
     }
 
+    Location<World> location = optLocation.get();
 
-    @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary event, @First Player player) {
-        Optional<Location<World>> optLocation = event.getTargetBlock().getLocation();
-        if (!optLocation.isPresent()) {
-            return;
-        }
-
-        Location<World> location = optLocation.get();
-
-        Optional<T> optInst = getApplicable(location);
-        if (!optInst.isPresent()) {
-            return;
-        }
-
-        T inst = optInst.get();
-        Vector3i minPoint = inst.getRegion().getMinimumPoint();
-        Vector3i clickedPoint = location.getBlockPosition();
-
-        Vector3i offset = clickedPoint.sub(minPoint);
-
-        player.sendMessage(Text.of("Offset: ", offset));
+    Optional<T> optInst = getApplicable(location);
+    if (!optInst.isPresent()) {
+      return;
     }
+
+    T inst = optInst.get();
+    Vector3i minPoint = inst.getRegion().getMinimumPoint();
+    Vector3i clickedPoint = location.getBlockPosition();
+
+    Vector3i offset = clickedPoint.sub(minPoint);
+
+    player.sendMessage(Text.of("Offset: ", offset));
+  }
 }
 

@@ -17,25 +17,25 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class ItemCraftBlockingListener {
-    private Collection<String> blockedItems;
+  private Collection<String> blockedItems;
 
-    public ItemCraftBlockingListener(Collection<String> blockedItems) {
-        this.blockedItems = blockedItems;
-    }
+  public ItemCraftBlockingListener(Collection<String> blockedItems) {
+    this.blockedItems = blockedItems;
+  }
 
-    @Listener
-    @Exclude(value = ChangeInventoryEvent.Held.class)
-    public void onItemCraft(ChangeInventoryEvent event) {
-        event.getTransactions().forEach((t) -> {
-            if (blockedItems.contains(t.getFinal().getType().getId())) {
-                Optional<Player> optPlayer = event.getCause().first(Player.class);
-                if (optPlayer.isPresent()) {
-                    Player player = optPlayer.get();
-                    player.sendMessage(Text.of(TextColors.RED, "This item has been disabled."));
-                }
+  @Listener
+  @Exclude(value = ChangeInventoryEvent.Held.class)
+  public void onItemCraft(ChangeInventoryEvent event) {
+    event.getTransactions().forEach((t) -> {
+      if (blockedItems.contains(t.getFinal().getType().getId())) {
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+          Player player = optPlayer.get();
+          player.sendMessage(Text.of(TextColors.RED, "This item has been disabled."));
+        }
 
-                event.setCancelled(true);
-            }
-        });
-    }
+        event.setCancelled(true);
+      }
+    });
+  }
 }

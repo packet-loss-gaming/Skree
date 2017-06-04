@@ -19,57 +19,57 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 class LoadedBow extends ItemBow {
-    private BowConfig config;
+  private BowConfig config;
 
-    public LoadedBow(BowConfig config) {
-        this.config = config;
+  public LoadedBow(BowConfig config) {
+    this.config = config;
 
-        setMaxDamage();
-        setMaxStackSize();
-        setCreativeTab();
+    setMaxDamage();
+    setMaxStackSize();
+    setCreativeTab();
 
-        applyPropertyOverrides();
-    }
+    applyPropertyOverrides();
+  }
 
-    // Config Loading
+  // Config Loading
 
-    private void setMaxDamage() {
-        this.setMaxDamage(config.getMaxUses());
-    }
+  private void setMaxDamage() {
+    this.setMaxDamage(config.getMaxUses());
+  }
 
-    private void setMaxStackSize() {
-        this.setMaxStackSize(1);
-    }
+  private void setMaxStackSize() {
+    this.setMaxStackSize(1);
+  }
 
-    private void setCreativeTab() {
-        this.setCreativeTab(CreativeTabs.COMBAT);
-    }
+  private void setCreativeTab() {
+    this.setCreativeTab(CreativeTabs.COMBAT);
+  }
 
-    private void applyPropertyOverrides() {
-        this.addPropertyOverride(new ResourceLocation("skree", "pull"), new IItemPropertyGetter() {
-            @SideOnly(Side.CLIENT)
-            public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
-                if (living == null) {
-                    return 0.0F;
-                } else {
-                    ItemStack itemstack = living.getActiveItemStack();
-                    return itemstack != null ? (item.getMaxItemUseDuration() - living.getItemInUseCount()) / 20.0F : 0.0F;
-                }
-            }
-        });
-        this.addPropertyOverride(new ResourceLocation("skree", "pulling"), new IItemPropertyGetter() {
-            @SideOnly(Side.CLIENT)
-            public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
-                return living != null && living.isHandActive() && living.getActiveItemStack() == item ? 1.0F : 0.0F;
-            }
-        });
-    }
+  private void applyPropertyOverrides() {
+    this.addPropertyOverride(new ResourceLocation("skree", "pull"), new IItemPropertyGetter() {
+      @SideOnly(Side.CLIENT)
+      public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
+        if (living == null) {
+          return 0.0F;
+        } else {
+          ItemStack itemstack = living.getActiveItemStack();
+          return itemstack != null ? (item.getMaxItemUseDuration() - living.getItemInUseCount()) / 20.0F : 0.0F;
+        }
+      }
+    });
+    this.addPropertyOverride(new ResourceLocation("skree", "pulling"), new IItemPropertyGetter() {
+      @SideOnly(Side.CLIENT)
+      public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase living) {
+        return living != null && living.isHandActive() && living.getActiveItemStack() == item ? 1.0F : 0.0F;
+      }
+    });
+  }
 
-    // NMS Overrides
+  // NMS Overrides
 
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        ItemStack mat = config.getRepairItemStack();
-        return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
-    }
+  @Override
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    ItemStack mat = config.getRepairItemStack();
+    return mat != null && net.minecraftforge.oredict.OreDictionary.itemMatches(mat, repair, false);
+  }
 }

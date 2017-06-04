@@ -7,31 +7,31 @@
 package com.skelril.skree.system.world;
 
 public class WorldConfig {
-    private String name;
-    private String archetype;
-    private String wrapper;
+  private String name;
+  private String archetype;
+  private String wrapper;
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getArchetype() {
-        return archetype;
-    }
+  public String getArchetype() {
+    return archetype;
+  }
 
-    public void setArchetype(String archetype) {
-        this.archetype = archetype;
-    }
+  public void setArchetype(String archetype) {
+    this.archetype = archetype;
+  }
 
-    public String getWrapper() {
-        return wrapper;
-    }
+  public String getWrapper() {
+    return wrapper;
+  }
 
-    public void setWrapper(String wrapper) {
-        this.wrapper = wrapper;
-    }
+  public void setWrapper(String wrapper) {
+    this.wrapper = wrapper;
+  }
 }

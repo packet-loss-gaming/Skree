@@ -13,15 +13,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface ZoneSpaceAllocator {
-    WorldResolver getWorldResolver();
+  WorldResolver getWorldResolver();
 
-    float getLoad();
+  float getLoad();
 
-    default void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
-        regionFor(managerName, zoneRegionStateClause -> new Clause<>(zoneRegionStateClause.getKey(), State.NEW), callBack);
-    }
+  default void regionFor(String managerName, Consumer<Clause<ZoneRegion, ZoneRegion.State>> callBack) {
+    regionFor(managerName, zoneRegionStateClause -> new Clause<>(zoneRegionStateClause.getKey(), State.NEW), callBack);
+  }
 
-    <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack);
+  <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack);
 
-    void release(String managerName, ZoneWorldBoundingBox region);
+  void release(String managerName, ZoneWorldBoundingBox region);
 }

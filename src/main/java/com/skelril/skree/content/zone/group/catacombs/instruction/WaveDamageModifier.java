@@ -17,13 +17,13 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import java.util.Optional;
 
 public class WaveDamageModifier implements Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>> {
-    @Override
-    public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        int wave = zombieCatacombsBossDetailBoss.getDetail().getWave();
-        DamageEntityEvent event = damageCondition.getEvent();
-        event.setBaseDamage(Probability.getRandom(Probability.getRandom(wave * .2)) + event.getBaseDamage());
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    int wave = zombieCatacombsBossDetailBoss.getDetail().getWave();
+    DamageEntityEvent event = damageCondition.getEvent();
+    event.setBaseDamage(Probability.getRandom(Probability.getRandom(wave * .2)) + event.getBaseDamage());
+    return Optional.empty();
+  }
 }

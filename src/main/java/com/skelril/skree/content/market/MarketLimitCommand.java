@@ -24,24 +24,24 @@ import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class MarketLimitCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        src.sendMessage(Text.of(TextColors.DARK_RED, "Feature not yet implemented."));
-        return CommandResult.success();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("View a player's limits"))
-                .arguments(optional(string(Text.of("player"))))
-                .executor(new MarketLimitCommand())
-                .build();
-    }
+    src.sendMessage(Text.of(TextColors.DARK_RED, "Feature not yet implemented."));
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("View a player's limits"))
+        .arguments(optional(string(Text.of("player"))))
+        .executor(new MarketLimitCommand())
+        .build();
+  }
 }

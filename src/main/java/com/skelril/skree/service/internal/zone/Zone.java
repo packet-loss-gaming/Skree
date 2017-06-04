@@ -16,32 +16,37 @@ import java.util.stream.Collectors;
 
 public interface Zone {
 
-    boolean init();
+  boolean init();
 
-    default boolean end() {
-        if (isActive()) {
-            return false;
-        }
-        forceEnd();
-        return true;
+  default boolean end() {
+    if (isActive()) {
+      return false;
     }
-    void forceEnd();
+    forceEnd();
+    return true;
+  }
 
-    boolean isActive();
+  void forceEnd();
 
-    Clause<Player, ZoneStatus> add(Player player);
-    Clause<Player, ZoneStatus> remove(Player player);
+  boolean isActive();
 
-    default Collection<Clause<Player, ZoneStatus>> add(Collection<Player> players) {
-        return players.stream().map(this::add).collect(Collectors.toList());
-    }
-    default Collection<Clause<Player, ZoneStatus>> remove(Collection<Player> players) {
-        return players.stream().map(this::remove).collect(Collectors.toList());
-    }
+  Clause<Player, ZoneStatus> add(Player player);
 
-    ZoneWorldBoundingBox getRegion();
-    Collection<Player> getPlayers(PlayerClassifier classifier);
-    default MessageChannel getPlayerMessageChannel(PlayerClassifier classifier) {
-        return MessageChannel.fixed(Sets.newHashSet(getPlayers(classifier)));
-    }
+  Clause<Player, ZoneStatus> remove(Player player);
+
+  default Collection<Clause<Player, ZoneStatus>> add(Collection<Player> players) {
+    return players.stream().map(this::add).collect(Collectors.toList());
+  }
+
+  default Collection<Clause<Player, ZoneStatus>> remove(Collection<Player> players) {
+    return players.stream().map(this::remove).collect(Collectors.toList());
+  }
+
+  ZoneWorldBoundingBox getRegion();
+
+  Collection<Player> getPlayers(PlayerClassifier classifier);
+
+  default MessageChannel getPlayerMessageChannel(PlayerClassifier classifier) {
+    return MessageChannel.fixed(Sets.newHashSet(getPlayers(classifier)));
+  }
 }

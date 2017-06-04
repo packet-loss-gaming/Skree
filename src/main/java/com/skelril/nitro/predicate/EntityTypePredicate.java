@@ -14,14 +14,14 @@ import java.util.function.Predicate;
 
 public class EntityTypePredicate implements Predicate<Entity> {
 
-    private Collection<EntityType> entityTypes;
+  private Collection<EntityType> entityTypes;
 
-    public EntityTypePredicate(Collection<EntityType> entityTypes) {
-        this.entityTypes = entityTypes;
-    }
+  public EntityTypePredicate(Collection<EntityType> entityTypes) {
+    this.entityTypes = entityTypes;
+  }
 
-    @Override
-    public boolean test(Entity entity) {
-        return entityTypes.contains(entity.getType());
-    }
+  @Override
+  public boolean test(Entity entity) {
+    return entityTypes.contains(entity.getType());
+  }
 }

@@ -27,6 +27,7 @@ buildscript {
     }
 }
 
+apply plugin: 'checkstyle'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 configurations {
@@ -95,6 +96,10 @@ jar {
             exclude 'META-INF', 'META-INF/**'
         }
     }
+}
+
+tasks.withType(Checkstyle) {
+    exclude '**/skree/db/schema/**'
 }
 
 task codegen << {

@@ -18,19 +18,19 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ButterFingersCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        List<ItemStack> drops = new ArrayList<>();
-        while (true) {
-            Optional<ItemStack> optDrop = player.getInventory().poll();
-            if (!optDrop.isPresent()) {
-                break;
-            }
-            drops.add(optDrop.get());
-        }
-
-        Collections.shuffle(drops);
-
-        new ItemDropper(player.getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+  @Override
+  public void accept(Player player) {
+    List<ItemStack> drops = new ArrayList<>();
+    while (true) {
+      Optional<ItemStack> optDrop = player.getInventory().poll();
+      if (!optDrop.isPresent()) {
+        break;
+      }
+      drops.add(optDrop.get());
     }
+
+    Collections.shuffle(drops);
+
+    new ItemDropper(player.getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+  }
 }

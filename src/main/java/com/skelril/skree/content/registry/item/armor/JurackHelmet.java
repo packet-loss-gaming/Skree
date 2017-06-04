@@ -14,34 +14,34 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class JurackHelmet extends CustomHelmet implements Craftable {
-    @Override
-    public int __getMaxUsesBaseModifier() {
-        return 60;
-    }
+  @Override
+  public int __getMaxUsesBaseModifier() {
+    return 60;
+  }
 
-    @Override
-    public String __getType() {
-        return "jurack";
-    }
+  @Override
+  public String __getType() {
+    return "jurack";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return (ItemStack) (Object) newItemStack("skree:jurack");
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return (ItemStack) (Object) newItemStack("skree:jurack");
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return 10;
-    }
+  @Override
+  public int __getEnchantability() {
+    return 10;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "   ",
-                "AAA",
-                "A A",
-                'A', newItemStack("skree:jurack")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "   ",
+        "AAA",
+        "A A",
+        'A', newItemStack("skree:jurack")
+    );
+  }
 }

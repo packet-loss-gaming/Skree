@@ -7,15 +7,15 @@
 package com.skelril.skree.service.internal.zone;
 
 public enum ZoneStatus {
-    ADDED,
-    REMOVED,
+  ADDED,
+  REMOVED,
 
-    REF_LOST,
+  REF_LOST,
 
-    NO_REJOIN,
-    ERROR,
-    MAX_GROUP_SIZE_EXCEEDED,
-    CREATION_FAILED,
-    EXIST_AND_ACTIVE,
-    DESPAWNED
+  NO_REJOIN,
+  ERROR,
+  MAX_GROUP_SIZE_EXCEEDED,
+  CREATION_FAILED,
+  EXIST_AND_ACTIVE,
+  DESPAWNED
 }

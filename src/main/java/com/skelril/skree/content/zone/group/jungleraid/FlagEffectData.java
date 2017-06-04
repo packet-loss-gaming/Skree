@@ -9,6 +9,6 @@ package com.skelril.skree.content.zone.group.jungleraid;
 import java.util.UUID;
 
 public class FlagEffectData {
-    public int amt = 7;
-    public UUID titan = null;
+  public int amt = 7;
+  public UUID titan = null;
 }

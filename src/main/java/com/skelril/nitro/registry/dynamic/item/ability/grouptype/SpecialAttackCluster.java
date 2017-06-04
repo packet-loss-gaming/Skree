@@ -13,9 +13,9 @@ import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
 import java.util.List;
 
 public abstract class SpecialAttackCluster extends AbilityCluster {
-    public abstract List<SpecialAttack> getSpecialAttacks();
+  public abstract List<SpecialAttack> getSpecialAttacks();
 
-    public SpecialAttack getNextAttackToRun() {
-        return Probability.pickOneOf(getSpecialAttacks());
-    }
+  public SpecialAttack getNextAttackToRun() {
+    return Probability.pickOneOf(getSpecialAttacks());
+  }
 }

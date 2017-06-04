@@ -17,23 +17,23 @@ import static com.skelril.nitro.entity.EntityHealthUtil.getHealth;
 import static com.skelril.nitro.entity.EntityHealthUtil.getMaxHealth;
 
 public class LifeLeech implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        final double ownerMax = getMaxHealth(owner);
-        final double targetMax = getMaxHealth(target);
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    final double ownerMax = getMaxHealth(owner);
+    final double targetMax = getMaxHealth(target);
 
-        final double ownerHP = getHealth(owner) / ownerMax;
-        final double targetHP = getHealth(target) / targetMax;
+    final double ownerHP = getHealth(owner) / ownerMax;
+    final double targetHP = getHealth(target) / targetMax;
 
-        if (ownerHP > targetHP) {
-            owner.offer(Keys.HEALTH, Math.min(ownerMax, ownerMax * (ownerHP + .1)));
+    if (ownerHP > targetHP) {
+      owner.offer(Keys.HEALTH, Math.min(ownerMax, ownerMax * (ownerHP + .1)));
 
-            notify(owner, Text.of(TextColors.YELLOW, "Your weapon heals you."));
-        } else {
-            target.offer(Keys.HEALTH, targetMax * ownerHP);
-            owner.offer(Keys.HEALTH, Math.min(ownerMax, ownerMax * targetHP * 1.1));
+      notify(owner, Text.of(TextColors.YELLOW, "Your weapon heals you."));
+    } else {
+      target.offer(Keys.HEALTH, targetMax * ownerHP);
+      owner.offer(Keys.HEALTH, Math.min(ownerMax, ownerMax * targetHP * 1.1));
 
-            notify(owner, Text.of(TextColors.YELLOW, "You leech the health of your foe."));
-        }
+      notify(owner, Text.of(TextColors.YELLOW, "You leech the health of your foe."));
     }
+  }
 }

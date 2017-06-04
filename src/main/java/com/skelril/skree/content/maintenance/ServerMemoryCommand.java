@@ -16,24 +16,24 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public class ServerMemoryCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        int mb = 1024 * 1024;
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    int mb = 1024 * 1024;
 
-        Runtime runtime = Runtime.getRuntime();
+    Runtime runtime = Runtime.getRuntime();
 
-        src.sendMessage(Text.of(TextColors.YELLOW, "Used memory: ", (runtime.totalMemory() - runtime.freeMemory()) / mb));
-        src.sendMessage(Text.of(TextColors.YELLOW, "Free memory: ", runtime.freeMemory() / mb));
-        src.sendMessage(Text.of(TextColors.YELLOW, "Total memory: ", runtime.totalMemory() / mb));
-        src.sendMessage(Text.of(TextColors.YELLOW, "Max memory: ", runtime.maxMemory() / mb));
+    src.sendMessage(Text.of(TextColors.YELLOW, "Used memory: ", (runtime.totalMemory() - runtime.freeMemory()) / mb));
+    src.sendMessage(Text.of(TextColors.YELLOW, "Free memory: ", runtime.freeMemory() / mb));
+    src.sendMessage(Text.of(TextColors.YELLOW, "Total memory: ", runtime.totalMemory() / mb));
+    src.sendMessage(Text.of(TextColors.YELLOW, "Max memory: ", runtime.maxMemory() / mb));
 
-        return CommandResult.success();
-    }
+    return CommandResult.success();
+  }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("View memory information"))
-                .executor(new ServerMemoryCommand())
-                .build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("View memory information"))
+        .executor(new ServerMemoryCommand())
+        .build();
+  }
 }

@@ -19,64 +19,64 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class DiamondTerragu extends CustomTerragu implements Craftable {
-    @Override
-    public String __getType() {
-        return "diamond";
-    }
+  @Override
+  public String __getType() {
+    return "diamond";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return null;
-    }
-    
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.DIAMOND.getDamage();
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return null;
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.DIAMOND.getEnchantability();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.DIAMOND.getDamage();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.DIAMOND;
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.DIAMOND.getEnchantability();
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.DIAMOND.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.DIAMOND;
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.DIAMOND.getDurability() * 10;
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.DIAMOND.getEfficienyOnProperMaterial();
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Primary.MainHand event) {
-        super.process(event);
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.DIAMOND.getDurability() * 10;
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Secondary.MainHand event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Primary.MainHand event) {
+    super.process(event);
+  }
 
-    @Listener
-    public void process(ChangeBlockEvent.Break event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Secondary.MainHand event) {
+    super.process(event);
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(Items.DIAMOND_PICKAXE),
-                new ItemStack(Items.DIAMOND_AXE),
-                new ItemStack(Items.DIAMOND_SHOVEL),
-                newItemStack("skree:unstable_catalyst")
-        );
-    }
+  @Listener
+  public void process(ChangeBlockEvent.Break event) {
+    super.process(event);
+  }
+
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(Items.DIAMOND_PICKAXE),
+        new ItemStack(Items.DIAMOND_AXE),
+        new ItemStack(Items.DIAMOND_SHOVEL),
+        newItemStack("skree:unstable_catalyst")
+    );
+  }
 }

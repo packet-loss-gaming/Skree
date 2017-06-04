@@ -10,27 +10,27 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
 class LoadedSimpleItem extends Item {
-    private SimpleItemConfig config;
+  private SimpleItemConfig config;
 
-    protected LoadedSimpleItem(SimpleItemConfig config) {
-        this.config = config;
+  protected LoadedSimpleItem(SimpleItemConfig config) {
+    this.config = config;
 
-        setMaxStackSize();
-        setCreativeTab();
+    setMaxStackSize();
+    setCreativeTab();
+  }
+
+  // Config Loading
+
+  private void setMaxStackSize() {
+    this.setMaxStackSize(config.getMaxStackSize());
+  }
+
+  private void setCreativeTab() {
+    for (CreativeTabs creativeTab : CreativeTabs.CREATIVE_TAB_ARRAY) {
+      if (creativeTab.tabLabel.equals(config.getCreativeTab())) {
+        this.setCreativeTab(creativeTab);
+        break;
+      }
     }
-
-    // Config Loading
-
-    private void setMaxStackSize() {
-        this.setMaxStackSize(config.getMaxStackSize());
-    }
-
-    private void setCreativeTab() {
-        for (CreativeTabs creativeTab : CreativeTabs.CREATIVE_TAB_ARRAY) {
-            if (creativeTab.tabLabel.equals(config.getCreativeTab())) {
-                this.setCreativeTab(creativeTab);
-                break;
-            }
-        }
-    }
+  }
 }

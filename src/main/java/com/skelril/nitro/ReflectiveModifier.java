@@ -10,19 +10,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class ReflectiveModifier {
-    public static <T> void modifyFieldValue(Class<T> clazz, T object, String feildName, Object value) {
-        try {
-            Field field = clazz.getDeclaredField(feildName); // Found in the MCP Mappings
-            field.setAccessible(true);
+  public static <T> void modifyFieldValue(Class<T> clazz, T object, String feildName, Object value) {
+    try {
+      Field field = clazz.getDeclaredField(feildName); // Found in the MCP Mappings
+      field.setAccessible(true);
 
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
 
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
-            field.set(object, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            System.out.println("Exception while modifying inaccessible variable: " + e.getMessage());
-        }
+      field.set(object, value);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      System.out.println("Exception while modifying inaccessible variable: " + e.getMessage());
     }
+  }
 }

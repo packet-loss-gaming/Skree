@@ -30,54 +30,54 @@ import static org.spongepowered.api.command.args.GenericArguments.allOf;
 import static org.spongepowered.api.command.args.GenericArguments.user;
 
 public class RegionAddMemberCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
-            return CommandResult.empty();
-        }
-
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        RegionService service = optService.get();
-
-        Player player = (Player) src;
-
-        Optional<Region> optRef = service.getSelectedRegion(player);
-        if (!optRef.isPresent()) {
-            player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
-            return CommandResult.empty();
-        }
-
-        Region ref = optRef.get();
-
-        if (!ref.getMembers().contains(player.getUniqueId())) {
-            player.sendMessage(Text.of(TextColors.RED, "You must be a member of the region to modify it!"));
-            return CommandResult.empty();
-        }
-
-        List<UUID> newMembers = args.<User>getAll("player").stream().map(Identifiable::getUniqueId).filter(
-                a -> !ref.getMembers().contains(a)
-        ).collect(Collectors.toList());
-
-        ref.addMember(newMembers);
-
-        player.sendMessage(Text.of(TextColors.YELLOW, "Added ", newMembers.size(), " players to the region."));
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Add a player to a region"))
-                .arguments(allOf(user(Text.of("player"))))
-                .executor(new RegionAddMemberCommand())
-                .build();
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
+      return CommandResult.empty();
     }
+
+    RegionService service = optService.get();
+
+    Player player = (Player) src;
+
+    Optional<Region> optRef = service.getSelectedRegion(player);
+    if (!optRef.isPresent()) {
+      player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
+      return CommandResult.empty();
+    }
+
+    Region ref = optRef.get();
+
+    if (!ref.getMembers().contains(player.getUniqueId())) {
+      player.sendMessage(Text.of(TextColors.RED, "You must be a member of the region to modify it!"));
+      return CommandResult.empty();
+    }
+
+    List<UUID> newMembers = args.<User>getAll("player").stream().map(Identifiable::getUniqueId).filter(
+        a -> !ref.getMembers().contains(a)
+    ).collect(Collectors.toList());
+
+    ref.addMember(newMembers);
+
+    player.sendMessage(Text.of(TextColors.YELLOW, "Added ", newMembers.size(), " players to the region."));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Add a player to a region"))
+        .arguments(allOf(user(Text.of("player"))))
+        .executor(new RegionAddMemberCommand())
+        .build();
+  }
 }
 

@@ -9,13 +9,13 @@ package com.skelril.nitro.registry.dynamic.recipe;
 import com.skelril.nitro.registry.dynamic.Loader;
 
 public class CookedRecipieLoader implements Loader<CookedRecipeConfig> {
-    @Override
-    public void load(CookedRecipeConfig config) {
-        config.registerRecipie();
-    }
+  @Override
+  public void load(CookedRecipeConfig config) {
+    config.registerRecipie();
+  }
 
-    @Override
-    public Class<CookedRecipeConfig> getConfigClass() {
-        return CookedRecipeConfig.class;
-    }
+  @Override
+  public Class<CookedRecipeConfig> getConfigClass() {
+    return CookedRecipeConfig.class;
+  }
 }

@@ -20,27 +20,27 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class RegionCleanupCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        RegionService service = optService.get();
-
-        int removedCount = service.cleanup();
-        src.sendMessage(Text.of(TextColors.YELLOW, removedCount, " region components invalidated."));
-
-        return CommandResult.success();
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Cleanup bad region component database entries"))
-                .executor(new RegionCleanupCommand())
-                .build();
-    }
+    RegionService service = optService.get();
+
+    int removedCount = service.cleanup();
+    src.sendMessage(Text.of(TextColors.YELLOW, removedCount, " region components invalidated."));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Cleanup bad region component database entries"))
+        .executor(new RegionCleanupCommand())
+        .build();
+  }
 }

@@ -11,17 +11,17 @@ import com.skelril.nitro.registry.dynamic.item.ItemLoader;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class FoodLoader extends ItemLoader<LoadedFood, FoodConfig> {
-    public FoodLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
-        super(integrator, abilityRegistry);
-    }
+  public FoodLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
+    super(integrator, abilityRegistry);
+  }
 
-    @Override
-    public LoadedFood constructFromConfig(FoodConfig config) {
-        return new LoadedFood(config);
-    }
+  @Override
+  public LoadedFood constructFromConfig(FoodConfig config) {
+    return new LoadedFood(config);
+  }
 
-    @Override
-    public Class<FoodConfig> getConfigClass() {
-        return FoodConfig.class;
-    }
+  @Override
+  public Class<FoodConfig> getConfigClass() {
+    return FoodConfig.class;
+  }
 }

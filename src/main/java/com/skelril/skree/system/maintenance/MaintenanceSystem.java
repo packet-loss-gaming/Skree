@@ -14,8 +14,8 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Maintenance System")
 public class MaintenanceSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        Sponge.getCommandManager().register(SkreePlugin.inst(), ServerMemoryCommand.aquireSpec(), "servermemory");
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    Sponge.getCommandManager().register(SkreePlugin.inst(), ServerMemoryCommand.aquireSpec(), "servermemory");
+  }
 }

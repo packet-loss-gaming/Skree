@@ -18,23 +18,27 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface ZoneService {
-    static String mangleManagerName(String managerName) {
-        return managerName.toLowerCase().replace(" ", "");
-    }
+  static String mangleManagerName(String managerName) {
+    return managerName.toLowerCase().replace(" ", "");
+  }
 
-    void registerManager(ZoneManager<?> manager);
-    Set<String> getManagerNames();
+  void registerManager(ZoneManager<?> manager);
 
-    Optional<Integer> getMaxGroupSize(String managerName);
+  Set<String> getManagerNames();
 
-    void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
-    void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
+  Optional<Integer> getMaxGroupSize(String managerName);
 
-    <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager);
+  void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
 
-    <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
-    <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
+  void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
 
-    Clause<Player, ZoneStatus> rejoin(Player player);
-    Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players);
+  <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager);
+
+  <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback);
+
+  <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback);
+
+  Clause<Player, ZoneStatus> rejoin(Player player);
+
+  Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players);
 }

@@ -22,34 +22,34 @@ import java.util.Optional;
 import static org.spongepowered.api.command.args.GenericArguments.remainingJoinedStrings;
 
 public class MarketRemoveAliasCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        String alias = args.<String>getOne("alias").get();
-
-        if (service.remAlias(alias)) {
-            src.sendMessage(Text.of(TextColors.YELLOW, alias + " removed from the market."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "The alias was not in the market, and could not be removed."));
-            return CommandResult.empty();
-        }
-
-        return CommandResult.success();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Remove an alias for an item"))
-                .arguments(remainingJoinedStrings(Text.of("alias")))
-                .executor(new MarketRemoveAliasCommand())
-                .build();
+    MarketService service = optService.get();
+
+    String alias = args.<String>getOne("alias").get();
+
+    if (service.remAlias(alias)) {
+      src.sendMessage(Text.of(TextColors.YELLOW, alias + " removed from the market."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "The alias was not in the market, and could not be removed."));
+      return CommandResult.empty();
     }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Remove an alias for an item"))
+        .arguments(remainingJoinedStrings(Text.of("alias")))
+        .executor(new MarketRemoveAliasCommand())
+        .build();
+  }
 }

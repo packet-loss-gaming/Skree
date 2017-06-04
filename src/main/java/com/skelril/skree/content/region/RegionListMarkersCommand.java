@@ -26,54 +26,54 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RegionListMarkersCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
-            return CommandResult.empty();
-        }
-
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        RegionService service = optService.get();
-
-        Player player = (Player) src;
-
-        Optional<Region> optRef = service.getSelectedRegion(player);
-        if (!optRef.isPresent()) {
-            player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
-            return CommandResult.empty();
-        }
-
-        Region ref = optRef.get();
-
-        PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
-
-        List<RegionPoint> points = ref.getPoints();
-        List<Text> result = ref.getFullPoints().stream()
-                .map(a -> Text.of(
-                        (points.contains(a) ? TextColors.GREEN : TextColors.RED),
-                        a.getFloorX(), ", ", a.getFloorY(), ", ", a.getFloorZ()
-                )).collect(Collectors.toList());
-
-        pagination.builder()
-                .contents(result)
-                .title(Text.of(TextColors.GOLD, "Region Markers"))
-                .padding(Text.of(" "))
-                .sendTo(src);
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("List markers of region"))
-                .executor(new RegionListMarkersCommand())
-                .build();
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
+      return CommandResult.empty();
     }
+
+    RegionService service = optService.get();
+
+    Player player = (Player) src;
+
+    Optional<Region> optRef = service.getSelectedRegion(player);
+    if (!optRef.isPresent()) {
+      player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
+      return CommandResult.empty();
+    }
+
+    Region ref = optRef.get();
+
+    PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
+
+    List<RegionPoint> points = ref.getPoints();
+    List<Text> result = ref.getFullPoints().stream()
+        .map(a -> Text.of(
+            (points.contains(a) ? TextColors.GREEN : TextColors.RED),
+            a.getFloorX(), ", ", a.getFloorY(), ", ", a.getFloorZ()
+        )).collect(Collectors.toList());
+
+    pagination.builder()
+        .contents(result)
+        .title(Text.of(TextColors.GOLD, "Region Markers"))
+        .padding(Text.of(" "))
+        .sendTo(src);
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("List markers of region"))
+        .executor(new RegionListMarkersCommand())
+        .build();
+  }
 }

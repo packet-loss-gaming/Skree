@@ -7,11 +7,11 @@
 package com.skelril.nitro.numeric;
 
 public class MathExt {
-    public static double bound(double input, double min, double max) {
-        return Math.min(max, Math.max(min, input));
-    }
+  public static double bound(double input, double min, double max) {
+    return Math.min(max, Math.max(min, input));
+  }
 
-    public static int bound(int input, int min, int max) {
-        return Math.min(max, Math.max(min, input));
-    }
+  public static int bound(int input, int min, int max) {
+    return Math.min(max, Math.max(min, input));
+  }
 }

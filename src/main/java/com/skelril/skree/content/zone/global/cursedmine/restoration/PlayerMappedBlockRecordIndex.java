@@ -17,107 +17,109 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerMappedBlockRecordIndex implements BlockRecordIndex {
 
-    private Map<UUID, Map<Location<World>, BlockRecord>> recordMap = new ConcurrentHashMap<>();
+  private Map<UUID, Map<Location<World>, BlockRecord>> recordMap = new ConcurrentHashMap<>();
 
-    public boolean addItem(UUID player, BlockRecord record) {
+  public boolean addItem(UUID player, BlockRecord record) {
 
-        if (!recordMap.containsKey(player)) {
-            recordMap.put(player, new HashMap<>());
+    if (!recordMap.containsKey(player)) {
+      recordMap.put(player, new HashMap<>());
+    }
+    Map<Location<World>, BlockRecord> playerRecord = recordMap.get(player);
+    Location<World> blockPos = record.getLocation();
+    if (playerRecord.containsKey(blockPos)) {
+      return false;
+    }
+    playerRecord.put(blockPos, record);
+    return true;
+  }
+
+  public boolean hasRecordForPlayerAt(UUID player, Location<World> location) {
+    return recordMap.getOrDefault(player, new HashMap<>()).containsKey(location);
+  }
+
+  @Override
+  public void revertByTime(long time) {
+
+    Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
+    Map<Location<World>, BlockRecord> activeRecordList;
+    while (primeIt.hasNext()) {
+      activeRecordList = primeIt.next();
+
+      Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
+      BlockRecord activeRecord;
+      while (it.hasNext()) {
+        activeRecord = it.next().getValue();
+        if (System.currentTimeMillis() - activeRecord.getTime() >= time) {
+          activeRecord.revert();
+          it.remove();
         }
-        Map<Location<World>, BlockRecord> playerRecord = recordMap.get(player);
-        Location<World> blockPos = record.getLocation();
-        if (playerRecord.containsKey(blockPos)) {
-            return false;
-        }
-        playerRecord.put(blockPos, record);
-        return true;
+      }
+
+      if (activeRecordList.isEmpty()) {
+        primeIt.remove();
+      }
+    }
+  }
+
+  public boolean hasRecordForPlayer(UUID player) {
+
+    return recordMap.containsKey(player);
+  }
+
+  public void revertByPlayer(UUID player) {
+
+    if (!hasRecordForPlayer(player)) {
+      return;
     }
 
-    public boolean hasRecordForPlayerAt(UUID player, Location<World> location) {
-        return recordMap.getOrDefault(player, new HashMap<>()).containsKey(location);
+    Map<Location<World>, BlockRecord> activeRecordList = recordMap.get(player);
+
+    if (activeRecordList.isEmpty()) {
+      recordMap.remove(player);
+      return;
     }
 
-    @Override
-    public void revertByTime(long time) {
-
-        Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
-        Map<Location<World>, BlockRecord> activeRecordList;
-        while (primeIt.hasNext()) {
-            activeRecordList = primeIt.next();
-
-            Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
-            BlockRecord activeRecord;
-            while (it.hasNext()) {
-                activeRecord = it.next().getValue();
-                if (System.currentTimeMillis() - activeRecord.getTime() >= time) {
-                    activeRecord.revert();
-                    it.remove();
-                }
-            }
-
-            if (activeRecordList.isEmpty()) {
-                primeIt.remove();
-            }
-        }
+    Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
+    BlockRecord activeRecord;
+    while (it.hasNext()) {
+      activeRecord = it.next().getValue();
+      activeRecord.revert();
+      it.remove();
     }
 
-    public boolean hasRecordForPlayer(UUID player) {
+    recordMap.remove(player);
+  }
 
-        return recordMap.containsKey(player);
+  @Override
+  public void revertAll() {
+
+    Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
+    Map<Location<World>, BlockRecord> activeRecordList;
+    while (primeIt.hasNext()) {
+      activeRecordList = primeIt.next();
+
+      Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
+      BlockRecord activeRecord;
+      while (it.hasNext()) {
+        activeRecord = it.next().getValue();
+        activeRecord.revert();
+        it.remove();
+      }
+
+      if (activeRecordList.isEmpty()) {
+        primeIt.remove();
+      }
     }
+  }
 
-    public void revertByPlayer(UUID player) {
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof PlayerMappedBlockRecordIndex && recordMap.equals(((PlayerMappedBlockRecordIndex) o).recordMap);
+  }
 
-        if (!hasRecordForPlayer(player)) return;
+  @Override
+  public int size() {
 
-        Map<Location<World>, BlockRecord> activeRecordList = recordMap.get(player);
-
-        if (activeRecordList.isEmpty()) {
-            recordMap.remove(player);
-            return;
-        }
-
-        Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
-        BlockRecord activeRecord;
-        while (it.hasNext()) {
-            activeRecord = it.next().getValue();
-            activeRecord.revert();
-            it.remove();
-        }
-
-        recordMap.remove(player);
-    }
-
-    @Override
-    public void revertAll() {
-
-        Iterator<Map<Location<World>, BlockRecord>> primeIt = recordMap.values().iterator();
-        Map<Location<World>, BlockRecord> activeRecordList;
-        while (primeIt.hasNext()) {
-            activeRecordList = primeIt.next();
-
-            Iterator<Map.Entry<Location<World>, BlockRecord>> it = activeRecordList.entrySet().iterator();
-            BlockRecord activeRecord;
-            while (it.hasNext()) {
-                activeRecord = it.next().getValue();
-                activeRecord.revert();
-                it.remove();
-            }
-
-            if (activeRecordList.isEmpty()) {
-                primeIt.remove();
-            }
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof PlayerMappedBlockRecordIndex && recordMap.equals(((PlayerMappedBlockRecordIndex) o).recordMap);
-    }
-
-    @Override
-    public int size() {
-
-        return recordMap.size();
-    }
+    return recordMap.size();
+  }
 }

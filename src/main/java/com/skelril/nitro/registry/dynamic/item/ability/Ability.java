@@ -11,9 +11,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 public interface Ability {
-    default void notify(Living living, Text message) {
-        if (living instanceof Player) {
-            ((Player) living).sendMessage(message);
-        }
+  default void notify(Living living, Text message) {
+    if (living instanceof Player) {
+      ((Player) living).sendMessage(message);
     }
+  }
 }

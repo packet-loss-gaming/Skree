@@ -17,53 +17,53 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EntityHealthPrinter {
-    private CombinedText living;
-    private CombinedText dead;
+  private CombinedText living;
+  private CombinedText dead;
 
-    public EntityHealthPrinter(@Nullable CombinedText living, @Nullable CombinedText dead) {
-        this.living = living;
-        this.dead = dead;
+  public EntityHealthPrinter(@Nullable CombinedText living, @Nullable CombinedText dead) {
+    this.living = living;
+    this.dead = dead;
+  }
+
+  public void print(MessageChannel sink, Living entity) {
+    Double health = entity.get(Keys.HEALTH).get();
+    if (health > 0) {
+      printLiving(sink, entity);
+    } else {
+      printDead(sink, entity);
+    }
+  }
+
+  private Map<String, Object> getFormatMap(Living living) {
+    Double health = living.get(Keys.HEALTH).get();
+    Double maxHealth = living.get(Keys.MAX_HEALTH).get();
+
+    Map<String, Object> map = new HashMap<>();
+    map.put("health", health);
+    map.put("max health", maxHealth);
+    map.put("health int", (int) Math.ceil(health));
+    map.put("max health int", (int) Math.ceil(maxHealth));
+
+    return map;
+  }
+
+  private Text format(CombinedText formatStr, Living living) {
+    return formatStr.substitue(getFormatMap(living));
+  }
+
+  private void printLiving(MessageChannel channel, Living entity) {
+    if (living == null) {
+      return;
     }
 
-    public void print(MessageChannel sink, Living entity) {
-        Double health = entity.get(Keys.HEALTH).get();
-        if (health > 0) {
-            printLiving(sink, entity);
-        } else {
-            printDead(sink, entity);
-        }
+    channel.send(format(living, entity));
+  }
+
+  private void printDead(MessageChannel channel, Living entity) {
+    if (dead == null) {
+      return;
     }
 
-    private Map<String, Object> getFormatMap(Living living) {
-        Double health = living.get(Keys.HEALTH).get();
-        Double maxHealth = living.get(Keys.MAX_HEALTH).get();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("health", health);
-        map.put("max health", maxHealth);
-        map.put("health int", (int) Math.ceil(health));
-        map.put("max health int", (int) Math.ceil(maxHealth));
-
-        return map;
-    }
-
-    private Text format(CombinedText formatStr, Living living) {
-        return formatStr.substitue(getFormatMap(living));
-    }
-
-    private void printLiving(MessageChannel channel, Living entity) {
-        if (living == null) {
-            return;
-        }
-
-        channel.send(format(living, entity));
-    }
-
-    private void printDead(MessageChannel channel, Living entity) {
-        if (dead == null) {
-            return;
-        }
-
-        channel.send(format(dead, entity));
-    }
+    channel.send(format(dead, entity));
+  }
 }

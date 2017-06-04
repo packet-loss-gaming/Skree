@@ -19,23 +19,23 @@ import static com.skelril.nitro.entity.EntityHealthUtil.getHealth;
 import static com.skelril.nitro.entity.EntityHealthUtil.getMaxHealth;
 
 public class SoulSmite implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        final double targetMax = getMaxHealth(target);
-        final double targetHP = getHealth(target) / targetMax;
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    final double targetMax = getMaxHealth(target);
+    final double targetHP = getHealth(target) / targetMax;
 
-        target.offer(Keys.HEALTH, (targetHP / 2) * targetMax);
-        Task.builder().delayTicks(20 * (int) Math.min(20, targetMax / 5 + 1)).execute(() -> {
-            if (!target.isRemoved()) {
-                double newTargetMax = getMaxHealth(target);
-                double newTargetHP = getHealth(target) / newTargetMax;
-                if (newTargetHP < targetHP) {
-                    target.offer(Keys.HEALTH, targetHP * newTargetMax);
-                }
-            }
-            notify(owner, Text.of(TextColors.YELLOW, "Your sword releases its grasp on its victim."));
-        }).submit(SkreePlugin.inst());
+    target.offer(Keys.HEALTH, (targetHP / 2) * targetMax);
+    Task.builder().delayTicks(20 * (int) Math.min(20, targetMax / 5 + 1)).execute(() -> {
+      if (!target.isRemoved()) {
+        double newTargetMax = getMaxHealth(target);
+        double newTargetHP = getHealth(target) / newTargetMax;
+        if (newTargetHP < targetHP) {
+          target.offer(Keys.HEALTH, targetHP * newTargetMax);
+        }
+      }
+      notify(owner, Text.of(TextColors.YELLOW, "Your sword releases its grasp on its victim."));
+    }).submit(SkreePlugin.inst());
 
-        notify(owner, Text.of(TextColors.YELLOW, "Your sword steals its victims health for a short time."));
-    }
+    notify(owner, Text.of(TextColors.YELLOW, "Your sword steals its victims health for a short time."));
+  }
 }

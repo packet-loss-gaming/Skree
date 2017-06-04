@@ -21,31 +21,31 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable {
 
-    public MagicLadder() {
-        super();
+  public MagicLadder() {
+    super();
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(0.4F);
-        this.setSoundType(SoundType.LADDER);
-    }
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(0.4F);
+    this.setSoundType(SoundType.LADDER);
+  }
 
-    @Override
-    public String __getID() {
-        return "magic_ladder";
-    }
+  @Override
+  public String __getID() {
+    return "magic_ladder";
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(Blocks.LADDER),
-                newItemStack("skree:fairy_dust")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(Blocks.LADDER),
+        newItemStack("skree:fairy_dust")
+    );
+  }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
+  @SideOnly(Side.CLIENT)
+  @Override
+  public BlockRenderLayer getBlockLayer() {
+    return BlockRenderLayer.CUTOUT;
+  }
 }

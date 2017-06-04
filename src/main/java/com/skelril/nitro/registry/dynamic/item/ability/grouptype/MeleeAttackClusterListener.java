@@ -21,63 +21,63 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.Optional;
 
 public class MeleeAttackClusterListener implements ClusterListener {
-    private MeleeAttackCluster attackCluster;
-    private String itemID;
-    private AbilityCooldownHandler cooldownHandler;
+  private MeleeAttackCluster attackCluster;
+  private String itemID;
+  private AbilityCooldownHandler cooldownHandler;
 
-    public MeleeAttackClusterListener(MeleeAttackCluster attackCluster, String itemID, AbilityCooldownHandler cooldownHandler) {
-        this.attackCluster = attackCluster;
-        this.itemID = itemID;
-        this.cooldownHandler = cooldownHandler;
+  public MeleeAttackClusterListener(MeleeAttackCluster attackCluster, String itemID, AbilityCooldownHandler cooldownHandler) {
+    this.attackCluster = attackCluster;
+    this.itemID = itemID;
+    this.cooldownHandler = cooldownHandler;
+  }
+
+  public Optional<Living> getSource(Cause cause) {
+    Optional<EntityDamageSource> optEntityDamageSource = cause.first(EntityDamageSource.class);
+    if (!optEntityDamageSource.isPresent()) {
+      return Optional.empty();
     }
 
-    public Optional<Living> getSource(Cause cause) {
-        Optional<EntityDamageSource> optEntityDamageSource = cause.first(EntityDamageSource.class);
-        if (!optEntityDamageSource.isPresent()) {
-            return Optional.empty();
-        }
-
-        EntityDamageSource damageSource = optEntityDamageSource.get();
-        Entity source = damageSource.getSource();
-        if (!(source instanceof Living)) {
-            return Optional.empty();
-        }
-
-        return Optional.of((Living) source);
+    EntityDamageSource damageSource = optEntityDamageSource.get();
+    Entity source = damageSource.getSource();
+    if (!(source instanceof Living)) {
+      return Optional.empty();
     }
 
-    public boolean isApplicable(Living sourceEntity) {
-        if (!(sourceEntity instanceof ArmorEquipable)) {
-            return false;
-        }
+    return Optional.of((Living) source);
+  }
 
-        Optional<ItemStack> optHeldItem = ((ArmorEquipable) sourceEntity).getItemInHand(HandTypes.MAIN_HAND);
-        return optHeldItem.isPresent() && optHeldItem.get().getItem().getId().equals(itemID);
+  public boolean isApplicable(Living sourceEntity) {
+    if (!(sourceEntity instanceof ArmorEquipable)) {
+      return false;
     }
 
-    @Listener(order = Order.LATE)
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Entity targetEntity = event.getTargetEntity();
-        if (!(targetEntity instanceof Living)) {
-            return;
-        }
+    Optional<ItemStack> optHeldItem = ((ArmorEquipable) sourceEntity).getItemInHand(HandTypes.MAIN_HAND);
+    return optHeldItem.isPresent() && optHeldItem.get().getItem().getId().equals(itemID);
+  }
 
-        Optional<Living> optSourceEntity = getSource(event.getCause());
-        if (!optSourceEntity.isPresent()) {
-            return;
-        }
-
-        Living sourceEntity = optSourceEntity.get();
-        if (!isApplicable(sourceEntity)) {
-            return;
-        }
-
-        if (cooldownHandler.canUseAbility(sourceEntity)) {
-            cooldownHandler.useAbility(sourceEntity);
-        } else {
-            return;
-        }
-
-        attackCluster.getNextAttackToRun().run(sourceEntity, (Living) targetEntity, event);
+  @Listener(order = Order.LATE)
+  public void onPlayerCombat(DamageEntityEvent event) {
+    Entity targetEntity = event.getTargetEntity();
+    if (!(targetEntity instanceof Living)) {
+      return;
     }
+
+    Optional<Living> optSourceEntity = getSource(event.getCause());
+    if (!optSourceEntity.isPresent()) {
+      return;
+    }
+
+    Living sourceEntity = optSourceEntity.get();
+    if (!isApplicable(sourceEntity)) {
+      return;
+    }
+
+    if (cooldownHandler.canUseAbility(sourceEntity)) {
+      cooldownHandler.useAbility(sourceEntity);
+    } else {
+      return;
+    }
+
+    attackCluster.getNextAttackToRun().run(sourceEntity, (Living) targetEntity, event);
+  }
 }

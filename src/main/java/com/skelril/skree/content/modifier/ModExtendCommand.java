@@ -31,51 +31,51 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class ModExtendCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Modifier service not found."));
-            return CommandResult.empty();
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "Modifier service not found."));
+      return CommandResult.empty();
+    }
+    ModifierService service = optService.get();
+
+    String modifier = args.<String>getOne("modifier").get();
+    int minutes = args.<Integer>getOne("minutes").get();
+
+    boolean wasActive = service.isActive(modifier);
+
+    service.extend(modifier, TimeUnit.MINUTES.toMillis(minutes));
+
+    String friendlyName = StringUtils.capitalize(modifier.replace("_", " ").toLowerCase());
+    String friendlyTime = PrettyText.date(service.expiryOf(modifier));
+
+    String change = wasActive ? " extended" : " enabled";
+    String rawMessage = friendlyName + change + " till " + friendlyTime + "!";
+
+    MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawMessage));
+    GameChatterPlugin.inst().sendSystemMessage(rawMessage);
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    Map<String, String> choices = new HashMap<>();
+    for (Field field : Modifiers.class.getFields()) {
+      try {
+        Object result = field.get(null);
+        if (result instanceof String) {
+          choices.put((String) result, (String) result);
         }
-        ModifierService service = optService.get();
-
-        String modifier = args.<String>getOne("modifier").get();
-        int minutes = args.<Integer>getOne("minutes").get();
-
-        boolean wasActive = service.isActive(modifier);
-
-        service.extend(modifier, TimeUnit.MINUTES.toMillis(minutes));
-
-        String friendlyName = StringUtils.capitalize(modifier.replace("_", " ").toLowerCase());
-        String friendlyTime = PrettyText.date(service.expiryOf(modifier));
-
-        String change = wasActive ? " extended" : " enabled";
-        String rawMessage = friendlyName + change + " till " + friendlyTime + "!";
-
-        MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, rawMessage));
-        GameChatterPlugin.inst().sendSystemMessage(rawMessage);
-
-        return CommandResult.success();
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
     }
 
-    public static CommandSpec aquireSpec() {
-        Map<String, String> choices = new HashMap<>();
-        for (Field field : Modifiers.class.getFields()) {
-            try {
-                Object result = field.get(null);
-                if (result instanceof String) {
-                    choices.put((String) result, (String) result);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        return CommandSpec.builder()
-                .description(Text.of("Extend modifiers"))
-                .permission("skree.modifier")
-                .arguments(seq(onlyOne(choices(Text.of("modifier"), choices)), onlyOne(integer(Text.of("minutes")))))
-                .executor(new ModExtendCommand()).build();
-    }
+    return CommandSpec.builder()
+        .description(Text.of("Extend modifiers"))
+        .permission("skree.modifier")
+        .arguments(seq(onlyOne(choices(Text.of("modifier"), choices)), onlyOne(integer(Text.of("minutes")))))
+        .executor(new ModExtendCommand()).build();
+  }
 }

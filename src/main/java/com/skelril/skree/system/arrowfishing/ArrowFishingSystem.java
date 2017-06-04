@@ -14,9 +14,9 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Arrow Fishing System")
 public class ArrowFishingSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        ArrowFishingHandler fishing = new ArrowFishingHandler();
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), fishing);
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    ArrowFishingHandler fishing = new ArrowFishingHandler();
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), fishing);
+  }
 }

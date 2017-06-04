@@ -7,9 +7,9 @@
 package com.skelril.skree.content.world.wilderness;
 
 public class WildernessConfig {
-    private WildernessDropConfig dropAmplification;
+  private WildernessDropConfig dropAmplification;
 
-    public WildernessDropConfig getDropAmplificationConfig() {
-        return dropAmplification;
-    }
+  public WildernessDropConfig getDropAmplificationConfig() {
+    return dropAmplification;
+  }
 }

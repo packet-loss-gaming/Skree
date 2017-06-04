@@ -21,29 +21,29 @@ import java.util.Optional;
 
 public class MarketSimulateCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        src.sendMessage(Text.of(TextColors.YELLOW, "Starting market update..."));
-        service.updatePrices();
-        src.sendMessage(Text.of(TextColors.YELLOW, "Update completed!"));
-
-        return CommandResult.success();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Simulate market price and stock changes"))
-                .executor(new MarketSimulateCommand())
-                .build();
-    }
+    MarketService service = optService.get();
+
+    src.sendMessage(Text.of(TextColors.YELLOW, "Starting market update..."));
+    service.updatePrices();
+    src.sendMessage(Text.of(TextColors.YELLOW, "Update completed!"));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Simulate market price and stock changes"))
+        .executor(new MarketSimulateCommand())
+        .build();
+  }
 }
 

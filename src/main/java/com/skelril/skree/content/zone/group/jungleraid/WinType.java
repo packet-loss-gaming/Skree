@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.zone.group.jungleraid;
 
-public enum  WinType {
-    SOLO,
-    TEAM,
-    DRAW
+public enum WinType {
+  SOLO,
+  TEAM,
+  DRAW
 }

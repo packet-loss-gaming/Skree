@@ -37,171 +37,172 @@ import java.util.stream.Collectors;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class MarketImplUtil {
-    public static String format(BigDecimal decimal) {
-        DecimalFormat df = new DecimalFormat("#,###.##");
-        return df.format(decimal);
+  public static String format(BigDecimal decimal) {
+    DecimalFormat df = new DecimalFormat("#,###.##");
+    return df.format(decimal);
+  }
+
+  public static BigDecimal getMoney(Player player) {
+    EntityPlayer playerEnt = tf(player);
+    BigInteger totalValue = BigInteger.ZERO;
+    for (net.minecraft.item.ItemStack stack : playerEnt.inventory.mainInventory) {
+      Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(stack)));
+      if (value.isPresent()) {
+        totalValue = totalValue.add(value.get());
+      }
+    }
+    return new BigDecimal(totalValue);
+  }
+
+  public static boolean canBuyOrSell(Player player) {
+    Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
+    if (optService.isPresent()) {
+      WorldService service = optService.get();
+      Collection<World> okayWorlds = new HashSet<>();
+      okayWorlds.addAll(service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds());
+      okayWorlds.addAll(service.getEffectWrapper(BuildWorldWrapper.class).get().getWorlds());
+      return okayWorlds.contains(player.getWorld());
+    }
+    return true;
+  }
+
+  public enum QueryMode {
+    EVERYTHING,
+    HOT_BAR,
+    HELD
+  }
+
+  public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, @Nullable ItemStack filter) {
+    EntityPlayer playerEnt = tf(player);
+
+    BigDecimal totalPrice = BigDecimal.ZERO;
+    List<Integer> ints = new ArrayList<>();
+
+    int min;
+    int max;
+    switch (mode) {
+      case HELD:
+        min = playerEnt.inventory.currentItem;
+        max = min + 1;
+        break;
+      case HOT_BAR:
+        min = 0;
+        max = 9;
+        break;
+      case EVERYTHING:
+        min = 0;
+        max = playerEnt.inventory.mainInventory.length;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid query mode provided!");
     }
 
-    public static BigDecimal getMoney(Player player) {
-        EntityPlayer playerEnt = tf(player);
-        BigInteger totalValue = BigInteger.ZERO;
-        for (net.minecraft.item.ItemStack stack : playerEnt.inventory.mainInventory) {
-            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(stack)));
-            if (value.isPresent()) {
-                totalValue = totalValue.add(value.get());
-            }
+    for (int i = min; i < max; ++i) {
+      net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i];
+      if (stack == null) {
+        continue;
+      }
+
+      if (filter != null) {
+        if (!ItemComparisonUtil.isSimilar(filter, tf(stack))) {
+          continue;
         }
-        return new BigDecimal(totalValue);
-    }
+      }
 
-    public static boolean canBuyOrSell(Player player) {
-        Optional<WorldService> optService = Sponge.getServiceManager().provide(WorldService.class);
-        if (optService.isPresent()) {
-            WorldService service = optService.get();
-            Collection<World> okayWorlds = new HashSet<>();
-            okayWorlds.addAll(service.getEffectWrapper(MainWorldWrapper.class).get().getWorlds());
-            okayWorlds.addAll(service.getEffectWrapper(BuildWorldWrapper.class).get().getWorlds());
-            return okayWorlds.contains(player.getWorld());
-        }
-        return true;
-    }
-
-    public enum QueryMode {
-        EVERYTHING,
-        HOT_BAR,
-        HELD
-    }
-
-    public static Clause<BigDecimal, List<Integer>> getChanges(Player player, MarketService service, QueryMode mode, @Nullable ItemStack filter) {
-        EntityPlayer playerEnt = tf(player);
-
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        List<Integer> ints = new ArrayList<>();
-
-        int min, max;
-        switch (mode) {
-            case HELD:
-                min = playerEnt.inventory.currentItem;
-                max = min + 1;
-                break;
-            case HOT_BAR:
-                min = 0;
-                max = 9;
-                break;
-            case EVERYTHING:
-                min = 0;
-                max = playerEnt.inventory.mainInventory.length;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid query mode provided!");
-        }
-
-        for (int i = min; i < max; ++i) {
-            net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i];
-            if (stack == null) {
-                continue;
-            }
-
-            if (filter != null) {
-                if (!ItemComparisonUtil.isSimilar(filter, tf(stack))) {
-                    continue;
-                }
-            }
-
-            Optional<BigDecimal> optPrice = service.getPrice(tf(stack));
-            if (optPrice.isPresent()) {
-                double percentageSale = 1;
-                if (stack.isItemStackDamageable()) {
-                    percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
-                }
-
-                BigDecimal unitPrice = optPrice.get().multiply(new BigDecimal(percentageSale));
-                unitPrice = unitPrice.multiply(service.getSellFactor(unitPrice));
-
-                totalPrice = totalPrice.add(unitPrice.multiply(new BigDecimal(stack.stackSize)));
-                ints.add(i);
-            }
+      Optional<BigDecimal> optPrice = service.getPrice(tf(stack));
+      if (optPrice.isPresent()) {
+        double percentageSale = 1;
+        if (stack.isItemStackDamageable()) {
+          percentageSale = 1 - ((double) stack.getItemDamage() / (double) stack.getMaxDamage());
         }
 
-        return new Clause<>(totalPrice, ints);
+        BigDecimal unitPrice = optPrice.get().multiply(new BigDecimal(percentageSale));
+        unitPrice = unitPrice.multiply(service.getSellFactor(unitPrice));
+
+        totalPrice = totalPrice.add(unitPrice.multiply(new BigDecimal(stack.stackSize)));
+        ints.add(i);
+      }
     }
 
-    public static List<Clause<ItemStack, Integer>> removeAtPos(Player player, List<Integer> ints) {
-        EntityPlayer playerEnt = tf(player);
-        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
-        List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
-        for (int i : ints) {
-            Clause<ItemStack, Integer> existingTransaction = null;
-            for (Clause<ItemStack, Integer> transaction : transactions) {
-                if (ItemComparisonUtil.isSimilar(transaction.getKey(), tf(mainInv[i]))) {
-                    existingTransaction = transaction;
-                    break;
-                }
-            }
+    return new Clause<>(totalPrice, ints);
+  }
 
-            if (existingTransaction != null) {
-                existingTransaction.setValue(existingTransaction.getValue() + -(mainInv[i].stackSize));
-            } else {
-                transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
-            }
-
-            mainInv[i] = null;
+  public static List<Clause<ItemStack, Integer>> removeAtPos(Player player, List<Integer> ints) {
+    EntityPlayer playerEnt = tf(player);
+    net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+    List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
+    for (int i : ints) {
+      Clause<ItemStack, Integer> existingTransaction = null;
+      for (Clause<ItemStack, Integer> transaction : transactions) {
+        if (ItemComparisonUtil.isSimilar(transaction.getKey(), tf(mainInv[i]))) {
+          existingTransaction = transaction;
+          break;
         }
-        return transactions;
+      }
+
+      if (existingTransaction != null) {
+        existingTransaction.setValue(existingTransaction.getValue() + -(mainInv[i].stackSize));
+      } else {
+        transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
+      }
+
+      mainInv[i] = null;
+    }
+    return transactions;
+  }
+
+  public static boolean setBalanceTo(Player player, BigDecimal decimal, Cause cause) {
+    EntityPlayer playerEnt = tf(player);
+    net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+
+    Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.toBigInteger());
+    Iterator<ItemStack> resultIt = results.iterator();
+
+    // Loop through replacing empty slots and the old coffers with the new balance
+    for (int i = 0; i < mainInv.length; ++i) {
+      Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(mainInv[i])));
+      if (value.isPresent()) {
+        mainInv[i] = null;
+      }
+
+      if (mainInv[i] == null && resultIt.hasNext()) {
+        mainInv[i] = tf(resultIt.next());
+        resultIt.remove();
+      }
     }
 
-    public static boolean setBalanceTo(Player player, BigDecimal decimal, Cause cause) {
-        EntityPlayer playerEnt = tf(player);
-        net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+    // Add remaining currency
+    new ItemDropper(player.getLocation()).dropStacks(results, SpawnTypes.PLUGIN);
+    return true;
+  }
 
-        Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.toBigInteger());
-        Iterator<ItemStack> resultIt = results.iterator();
+  public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
+    List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
+    List<ItemStackSnapshot> itemBuffer = new ArrayList<>();
+    itemBuffer.addAll(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()));
 
-        // Loop through replacing empty slots and the old coffers with the new balance
-        for (int i = 0; i < mainInv.length; ++i) {
-            Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(mainInv[i])));
-            if (value.isPresent()) {
-                mainInv[i] = null;
-            }
+    PlayerInventory playerInventory = player.getInventory().query(PlayerInventory.class);
+    List<Inventory> inventories = new ArrayList<>();
+    inventories.add(playerInventory.getHotbar());
+    inventories.add(playerInventory.getMain());
 
-            if (mainInv[i] == null && resultIt.hasNext()) {
-                mainInv[i] = tf(resultIt.next());
-                resultIt.remove();
-            }
-        }
+    // Loop through replacing empty space with the requested items
+    for (Inventory inventory : inventories) {
+      List<ItemStackSnapshot> newBuffer = new ArrayList<>();
+      for (ItemStackSnapshot snapshot : itemBuffer) {
+        ItemStack stack = snapshot.createStack();
 
-        // Add remaining currency
-        new ItemDropper(player.getLocation()).dropStacks(results, SpawnTypes.PLUGIN);
-        return true;
+        InventoryTransactionResult result = inventory.offer(stack);
+        newBuffer.addAll(result.getRejectedItems());
+
+        transactions.add(new Clause<>(stack, stack.getQuantity()));
+      }
+      itemBuffer = newBuffer;
     }
 
-    public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
-        List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
-        List<ItemStackSnapshot> itemBuffer = new ArrayList<>();
-        itemBuffer.addAll(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()));
+    // Drop remaining items
+    new ItemDropper(player.getLocation()).dropStackSnapshots(itemBuffer, SpawnTypes.PLUGIN);
 
-        PlayerInventory playerInventory = player.getInventory().query(PlayerInventory.class);
-        List<Inventory> inventories = new ArrayList<>();
-        inventories.add(playerInventory.getHotbar());
-        inventories.add(playerInventory.getMain());
-
-        // Loop through replacing empty space with the requested items
-        for (Inventory inventory : inventories) {
-            List<ItemStackSnapshot> newBuffer = new ArrayList<>();
-            for (ItemStackSnapshot snapshot : itemBuffer) {
-                ItemStack stack = snapshot.createStack();
-
-                InventoryTransactionResult result = inventory.offer(stack);
-                newBuffer.addAll(result.getRejectedItems());
-
-                transactions.add(new Clause<>(stack, stack.getQuantity()));
-            }
-            itemBuffer = newBuffer;
-        }
-
-        // Drop remaining items
-        new ItemDropper(player.getLocation()).dropStackSnapshots(itemBuffer, SpawnTypes.PLUGIN);
-
-        return new Clause<>(true, transactions);
-    }
+    return new Clause<>(true, transactions);
+  }
 }

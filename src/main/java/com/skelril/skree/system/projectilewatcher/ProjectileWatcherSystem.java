@@ -16,19 +16,19 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Projectile Watcher System")
 public class ProjectileWatcherSystem implements ServiceProvider<ProjectileWatcherService> {
-    private ProjectileWatcherService service;
+  private ProjectileWatcherService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new ProjectileWatcherServiceImpl();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new ProjectileWatcherServiceImpl();
 
-        // Register the service & command
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ProjectileWatcherService.class, service);
-    }
+    // Register the service & command
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ProjectileWatcherService.class, service);
+  }
 
-    @Override
-    public ProjectileWatcherService getService() {
-        return service;
-    }
+  @Override
+  public ProjectileWatcherService getService() {
+    return service;
+  }
 }

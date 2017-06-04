@@ -21,56 +21,56 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoaderRegistry {
-    private Map<Loader, Path> loaders = new HashMap<>();
-    private Map<String, String> constants = new HashMap<>();
+  private Map<Loader, Path> loaders = new HashMap<>();
+  private Map<String, String> constants = new HashMap<>();
 
-    public void registerLoader(Loader loader, Path path) {
-        loaders.put(loader, path);
+  public void registerLoader(Loader loader, Path path) {
+    loaders.put(loader, path);
+  }
+
+  public void registerConstant(String constantName, String value) {
+    constants.putIfAbsent(constantName, value);
+  }
+
+  private static final PebbleEngine TEMPLATE_ENGINE = new PebbleEngine.Builder().loader(new StringLoader()).build();
+
+  private String renderTemplate(String templateContent) throws PebbleException, IOException {
+    PebbleTemplate compiledTemplate = TEMPLATE_ENGINE.getTemplate(templateContent);
+
+    Map<String, Object> context = new HashMap<>();
+
+    for (Map.Entry<String, String> entry : constants.entrySet()) {
+      String constant = entry.getKey();
+      String value = entry.getValue();
+
+      context.put(constant, value);
     }
 
-    public void registerConstant(String constantName, String value) {
-        constants.putIfAbsent(constantName, value);
+    try (Writer writer = new StringWriter()) {
+      compiledTemplate.evaluate(writer, context);
+
+      return writer.toString();
     }
+  }
 
-    private final PebbleEngine TEMPLATE_ENGINE = new PebbleEngine.Builder().loader(new StringLoader()).build();
-
-    private String renderTemplate(String templateContent) throws PebbleException, IOException {
-        PebbleTemplate compiledTemplate = TEMPLATE_ENGINE.getTemplate(templateContent);
-
-        Map<String, Object> context = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : constants.entrySet()) {
-            String constant = entry.getKey();
-            String value = entry.getValue();
-
-            context.put(constant, value);
-        }
-
-        try (Writer writer = new StringWriter()) {
-            compiledTemplate.evaluate(writer, context);
-
-            return writer.toString();
-        }
-    }
-
-    public void loadAll() {
-        loaders.forEach((loader, path) -> {
+  public void loadAll() {
+    loaders.forEach((loader, path) -> {
+      try {
+        Files.walk(path).forEach(subPath -> {
+          String filename = subPath.getFileName().toString();
+          if (filename.endsWith(".json.peb")) {
             try {
-                Files.walk(path).forEach(subPath -> {
-                    String filename = subPath.getFileName().toString();
-                    if (filename.endsWith(".json.peb")) {
-                        try {
-                            String fileContent = Joiner.on('\n').join(Files.readAllLines(subPath));
-                            loader.load(renderTemplate(fileContent));
-                        } catch (Exception e) {
-                            System.err.println("Error loading: " + filename);
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
+              String fileContent = Joiner.on('\n').join(Files.readAllLines(subPath));
+              loader.load(renderTemplate(fileContent));
+            } catch (Exception e) {
+              System.err.println("Error loading: " + filename);
+              e.printStackTrace();
             }
+          }
         });
-    }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
+  }
 }

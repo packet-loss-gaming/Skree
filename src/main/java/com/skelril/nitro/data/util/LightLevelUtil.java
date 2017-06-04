@@ -17,29 +17,29 @@ import java.util.Optional;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class LightLevelUtil {
-    public static Optional<Integer> getMaxLightLevel(Location<World> valueStore) {
-        /*
-        Optional<LightEmissionProperty> lightEmissionProperty = valueStore.getProperty(LightEmissionProperty.class);
-        Optional<SkyLuminanceProperty> skyLuminanceProperty = valueStore.getProperty(SkyLuminanceProperty.class);
+  public static Optional<Integer> getMaxLightLevel(Location<World> valueStore) {
+    /*
+    Optional<LightEmissionProperty> lightEmissionProperty = valueStore.getProperty(LightEmissionProperty.class);
+    Optional<SkyLuminanceProperty> skyLuminanceProperty = valueStore.getProperty(SkyLuminanceProperty.class);
 
-        if (!lightEmissionProperty.isPresent() || !skyLuminanceProperty.isPresent()) {
-            return Optional.empty();
-        }
-
-        //noinspection ConstantConditions
-        return Optional.of(Math.max(lightEmissionProperty.get().getValue(), skyLuminanceProperty.get().getValue()));
-        */
-        return Optional.of(getMaxLightLevelNMS(valueStore));
+    if (!lightEmissionProperty.isPresent() || !skyLuminanceProperty.isPresent()) {
+        return Optional.empty();
     }
 
-    private static int getMaxLightLevelNMS(Location<World> loc) {
-        BlockPos bpos = tf(loc.getBlockPosition());
+    //noinspection ConstantConditions
+    return Optional.of(Math.max(lightEmissionProperty.get().getValue(), skyLuminanceProperty.get().getValue()));
+    */
+    return Optional.of(getMaxLightLevelNMS(valueStore));
+  }
 
-        net.minecraft.world.World nmsWorld = ((net.minecraft.world.World) loc.getExtent());
+  private static int getMaxLightLevelNMS(Location<World> loc) {
+    BlockPos bpos = tf(loc.getBlockPosition());
 
-        int sky = nmsWorld.getLightFor(EnumSkyBlock.SKY, bpos) - nmsWorld.getSkylightSubtracted();
-        int block = nmsWorld.getLightFor(EnumSkyBlock.BLOCK, bpos);
+    net.minecraft.world.World nmsWorld = ((net.minecraft.world.World) loc.getExtent());
 
-        return Math.max(sky, block);
-    }
+    int sky = nmsWorld.getLightFor(EnumSkyBlock.SKY, bpos) - nmsWorld.getSkylightSubtracted();
+    int block = nmsWorld.getLightFor(EnumSkyBlock.BLOCK, bpos);
+
+    return Math.max(sky, block);
+  }
 }

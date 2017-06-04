@@ -30,52 +30,52 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class WorldCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-
-        Optional<WorldProperties> optProperties = args.getOne("world");
-
-        if (!optProperties.isPresent()) {
-            src.sendMessage(Text.of(TextColors.YELLOW, "You are in: " + ((Player) src).getWorld().getName() + "."));
-            return CommandResult.empty();
-        }
-
-        Optional<World> optWorld = Sponge.getServer().getWorld(optProperties.get().getWorldName());
-        if (!optWorld.isPresent()) {
-            src.sendMessage(Text.of(TextColors.RED, "No loaded world by that name found."));
-            return CommandResult.empty();
-        }
-
-        World world = optWorld.get();
-        if (!WorldEntryPermissionCheck.checkDestination((Player) src, world)) {
-            src.sendMessage(Text.of(TextColors.RED, "You do not have permission to access worlds of this type."));
-            return CommandResult.empty();
-        }
-
-        Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Entity) src, optWorld.get().getSpawnLocation());
-        if (optLoc.isPresent()) {
-            src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
-        } else if (args.hasAny("f")) {
-            ((Player) src).setLocation(optWorld.get().getSpawnLocation());
-            src.sendMessage(Text.of(TextColors.YELLOW, "Force entered world: " + world.getName() + " successfully!"));
-        } else {
-            src.sendMessage(Text.of(TextColors.YELLOW, "Failed to enter " + world.getName()  + " please report this!"));
-        }
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Teleport to a different world"))
-                .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
-                .executor(new WorldCommand()).build();
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+
+    Optional<WorldProperties> optProperties = args.getOne("world");
+
+    if (!optProperties.isPresent()) {
+      src.sendMessage(Text.of(TextColors.YELLOW, "You are in: " + ((Player) src).getWorld().getName() + "."));
+      return CommandResult.empty();
     }
+
+    Optional<World> optWorld = Sponge.getServer().getWorld(optProperties.get().getWorldName());
+    if (!optWorld.isPresent()) {
+      src.sendMessage(Text.of(TextColors.RED, "No loaded world by that name found."));
+      return CommandResult.empty();
+    }
+
+    World world = optWorld.get();
+    if (!WorldEntryPermissionCheck.checkDestination((Player) src, world)) {
+      src.sendMessage(Text.of(TextColors.RED, "You do not have permission to access worlds of this type."));
+      return CommandResult.empty();
+    }
+
+    Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Entity) src, optWorld.get().getSpawnLocation());
+    if (optLoc.isPresent()) {
+      src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
+    } else if (args.hasAny("f")) {
+      ((Player) src).setLocation(optWorld.get().getSpawnLocation());
+      src.sendMessage(Text.of(TextColors.YELLOW, "Force entered world: " + world.getName() + " successfully!"));
+    } else {
+      src.sendMessage(Text.of(TextColors.YELLOW, "Failed to enter " + world.getName() + " please report this!"));
+    }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Teleport to a different world"))
+        .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
+        .executor(new WorldCommand()).build();
+  }
 }

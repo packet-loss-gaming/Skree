@@ -13,17 +13,18 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 
 public interface Loader<ConfigType> {
-    default GsonBuilder getGsonBuilder() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-    }
+  default GsonBuilder getGsonBuilder() {
+    return new GsonBuilder()
+        .setPrettyPrinting()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+  }
 
-    default void load(String configContent) throws IOException {
-        Gson gson = getGsonBuilder().create();
-        load(gson.fromJson(configContent, getConfigClass()));
-    }
+  default void load(String configContent) throws IOException {
+    Gson gson = getGsonBuilder().create();
+    load(gson.fromJson(configContent, getConfigClass()));
+  }
 
-    void load(ConfigType configObject);
-    Class<ConfigType> getConfigClass();
+  void load(ConfigType configObject);
+
+  Class<ConfigType> getConfigClass();
 }

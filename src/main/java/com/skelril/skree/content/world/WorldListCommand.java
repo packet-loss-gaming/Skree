@@ -26,39 +26,39 @@ import java.util.stream.Collectors;
 
 public class WorldListCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        List<WorldEffectWrapper> worldEffectWrapperList = service.getEffectWrappers().stream().sorted(
-                (a, b) -> a.getName().compareToIgnoreCase(b.getName())
-        ).collect(Collectors.toList());
+    List<WorldEffectWrapper> worldEffectWrapperList = service.getEffectWrappers().stream().sorted(
+        (a, b) -> a.getName().compareToIgnoreCase(b.getName())
+    ).collect(Collectors.toList());
 
-        for (WorldEffectWrapper wrapper : worldEffectWrapperList) {
-            String worldType = wrapper.getName();
-            if (!src.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport")) {
-                continue;
-            }
+    for (WorldEffectWrapper wrapper : worldEffectWrapperList) {
+      String worldType = wrapper.getName();
+      if (!src.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport")) {
+        continue;
+      }
 
-            src.sendMessage(Text.of(TextColors.GOLD, "Available ", worldType, " worlds (click to teleport):"));
-            for (World world : wrapper.getWorlds()) {
-                String worldName = world.getName();
-                String prettyName = worldName.replaceAll("_", " ");
+      src.sendMessage(Text.of(TextColors.GOLD, "Available ", worldType, " worlds (click to teleport):"));
+      for (World world : wrapper.getWorlds()) {
+        String worldName = world.getName();
+        String prettyName = worldName.replaceAll("_", " ");
 
-                src.sendMessage(Text.of(
-                        TextColors.YELLOW,
-                        TextActions.runCommand("/world " + worldName),
-                        TextActions.showText(Text.of("Teleport to " + prettyName)),
-                        " - ", prettyName
-                ));
-            }
-        }
-        return CommandResult.success();
+        src.sendMessage(Text.of(
+            TextColors.YELLOW,
+            TextActions.runCommand("/world " + worldName),
+            TextActions.showText(Text.of("Teleport to " + prettyName)),
+            " - ", prettyName
+        ));
+      }
     }
+    return CommandResult.success();
+  }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-            .description(Text.of("List available worlds"))
-            .executor(new WorldListCommand()).build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("List available worlds"))
+        .executor(new WorldListCommand()).build();
+  }
 }

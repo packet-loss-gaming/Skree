@@ -40,93 +40,93 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class FocusTeleporter extends CustomItem implements Craftable, EventAwareContent, Teleporter {
 
-    @Override
-    public String __getID() {
-        return "focus_teleporter";
+  @Override
+  public String __getId() {
+    return "focus_teleporter";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.TOOLS;
+  }
+
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        "BCB",
+        "BBB",
+        'A', newItemStack("skree:red_shard"),
+        'B', newItemStack("skree:sea_crystal"),
+        'C', newItemStack("skree:ender_focus")
+    );
+  }
+
+  @Listener
+  public void onLeftClick(InteractBlockEvent.Primary.MainHand event, @First Player player) {
+    Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+
+    if (!optHeldItem.isPresent()) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
+    org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
+    if (held.getItem() != this) {
+      return;
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.TOOLS;
+    Location<World> destination = player.getLocation();
+    if (!WorldEntryPermissionCheck.checkDestination(player, destination.getExtent())) {
+      player.sendMessage(Text.of(TextColors.RED, "You do not have permission to create a teleporter to this location."));
+      return;
     }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                "BCB",
-                "BBB",
-                'A', newItemStack("skree:red_shard"),
-                'B', newItemStack("skree:sea_crystal"),
-                'C', newItemStack("skree:ender_focus")
-        );
+    setDestination(held, destination);
+    player.setItemInHand(HandTypes.MAIN_HAND, held);
+    event.setCancelled(true);
+  }
+
+  @Listener
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+
+    if (!optHeldItem.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onLeftClick(InteractBlockEvent.Primary.MainHand event, @First Player player) {
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-
-        if (!optHeldItem.isPresent()) {
-            return;
-        }
-
-        org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
-        if (held.getItem() != this) {
-            return;
-        }
-
-        Location<World> destination = player.getLocation();
-        if (!WorldEntryPermissionCheck.checkDestination(player, destination.getExtent())) {
-            player.sendMessage(Text.of(TextColors.RED, "You do not have permission to create a teleporter to this location."));
-            return;
-        }
-
-        setDestination(held, destination);
-        player.setItemInHand(HandTypes.MAIN_HAND, held);
-        event.setCancelled(true);
+    org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
+    if (held.getItem() != this) {
+      return;
     }
 
-    @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-
-        if (!optHeldItem.isPresent()) {
-            return;
-        }
-
-        org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
-        if (held.getItem() != this) {
-            return;
-        }
-
-        Optional<Location<World>> optDestination = getDestination(held);
-        if (!optDestination.isPresent()) {
-            return;
-        }
-
-        Inventory result = player.getInventory().query((ItemType) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
-        if (result.size() > 0) {
-            Task.builder().execute(() -> {
-                result.poll(1);
-                player.setLocation(optDestination.get());
-            }).delayTicks(1).submit(SkreePlugin.inst());
-
-            event.setUseBlockResult(Tristate.FALSE);
-        }
+    Optional<Location<World>> optDestination = getDestination(held);
+    if (!optDestination.isPresent()) {
+      return;
     }
 
-    // Modified Native Item methods
+    Inventory result = player.getInventory().query((ItemType) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
+    if (result.size() > 0) {
+      Task.builder().execute(() -> {
+        result.poll(1);
+        player.setLocation(optDestination.get());
+      }).delayTicks(1).submit(SkreePlugin.inst());
 
-    @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<String> optDestStr = getClientDestination(stack);
-        tooltip.add("Destination: " + (optDestStr.isPresent() ? optDestStr.get() : "Not set"));
+      event.setUseBlockResult(Tristate.FALSE);
     }
+  }
+
+  // Modified Native Item methods
+
+  @SuppressWarnings("unchecked")
+  @SideOnly(Side.CLIENT)
+  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+    Optional<String> optDestStr = getClientDestination(stack);
+    tooltip.add("Destination: " + (optDestStr.isPresent() ? optDestStr.get() : "Not set"));
+  }
 }

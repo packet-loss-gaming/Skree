@@ -23,497 +23,497 @@ import static com.skelril.skree.db.schema.tables.ItemData.ITEM_DATA;
 
 public class MarketServiceImpl implements MarketService {
 
-    private void validateAlias(String alias) {
-        if (!alias.matches(VALID_ALIAS_REGEX)) {
-            throw new IllegalArgumentException("Aliases must match the pattern " + VALID_ALIAS_REGEX);
-        }
+  private void validateAlias(String alias) {
+    if (!alias.matches(VALID_ALIAS_REGEX)) {
+      throw new IllegalArgumentException("Aliases must match the pattern " + VALID_ALIAS_REGEX);
+    }
+  }
+
+  @Override
+  public Optional<ItemStack> getItem(String alias) {
+    validateAlias(alias);
+
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Record2<String, String> result = create.select(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
+          .from(ITEM_DATA)
+          .where(ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES)
+                  .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+              )
+          ).fetchOne();
+      return result == null ? Optional.empty() : Optional.ofNullable(
+          getItemStack(
+              new Clause<>(
+                  result.getValue(ITEM_DATA.MC_ID),
+                  result.getValue(ITEM_DATA.VARIANT)
+              )
+          )
+      );
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public BigDecimal getSellFactor(BigDecimal buyPrice) {
+    return new BigDecimal(0.7);
+  }
+
+  private BigDecimal getNewValue(BigDecimal baseValue) {
+    double random = 1D / (5 + Probability.getRandom(5));
+
+    BigDecimal multiplier = new BigDecimal(random);
+    BigDecimal change = baseValue.multiply(multiplier);
+
+    if (Probability.getChance(2)) {
+      change = change.negate();
     }
 
-    @Override
-    public Optional<ItemStack> getItem(String alias) {
-        validateAlias(alias);
+    return baseValue.add(change);
+  }
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Record2<String, String> result = create.select(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
-                    .from(ITEM_DATA)
-                    .where(ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-                    ).fetchOne();
-            return result == null ? Optional.empty() : Optional.ofNullable(
-                    getItemStack(
-                            new Clause<>(
-                                    result.getValue(ITEM_DATA.MC_ID),
-                                    result.getValue(ITEM_DATA.VARIANT)
-                            )
-                    )
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+  private int getNewStock(BigDecimal baseValue, int existingStock) {
+    int adjustedBaseValue;
+    try {
+      adjustedBaseValue = baseValue.round(MathContext.DECIMAL64).intValueExact();
+    } catch (ArithmeticException ex) {
+      adjustedBaseValue = Integer.MAX_VALUE;
     }
 
-    @Override
-    public BigDecimal getSellFactor(BigDecimal buyPrice) {
-        return new BigDecimal(0.7);
+    adjustedBaseValue = (int) Math.sqrt(adjustedBaseValue);
+    adjustedBaseValue = Math.max(3, adjustedBaseValue);
+
+    int changeUnit = Math.max(100, (Probability.getRangedRandom(20, 200) - adjustedBaseValue) * 100);
+    int baseChange = Probability.getChance(32) ? Probability.getRandom(20) * changeUnit : changeUnit;
+    int change = Probability.getRandom(Probability.getRandom(Math.max(1, baseChange - adjustedBaseValue)));
+
+    if (Probability.getChance(adjustedBaseValue)) {
+      existingStock += change;
+    } else {
+      existingStock -= change;
     }
 
-    private BigDecimal getNewValue(BigDecimal baseValue) {
-        double random = 1D / (5 + Probability.getRandom(5));
+    return Math.max(0, existingStock);
+  }
 
-        BigDecimal multiplier = new BigDecimal(random);
-        BigDecimal change = baseValue.multiply(multiplier);
+  @Override
+  public void updatePrices() {
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Result<Record3<Integer, BigDecimal, Integer>> results = create.select(ITEM_DATA.ID, ITEM_DATA.VALUE, ITEM_DATA.STOCK)
+          .from(ITEM_DATA)
+          .fetch();
 
-        if (Probability.getChance(2)) {
-            change = change.negate();
-        }
+      Collection<UpdateConditionStep<ItemDataRecord>> updates = new ArrayList<>();
 
-        return baseValue.add(change);
+      for (Record3<Integer, BigDecimal, Integer> result : results) {
+        int itemId = result.getValue(ITEM_DATA.ID);
+        BigDecimal baseValue = result.getValue(ITEM_DATA.VALUE);
+        BigDecimal newValue = getNewValue(baseValue);
+        int newStock = getNewStock(baseValue, result.getValue(ITEM_DATA.STOCK));
+
+        updates.add(create.update(ITEM_DATA)
+            .set(ITEM_DATA.CURRENT_VALUE, newValue)
+            .set(ITEM_DATA.STOCK, newStock)
+            .where(ITEM_DATA.ID.equal(itemId)));
+      }
+
+      create.batch(updates).execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 
-    private int getNewStock(BigDecimal baseValue, int existingStock) {
-        int adjustedBaseValue;
-        try {
-            adjustedBaseValue = baseValue.round(MathContext.DECIMAL64).intValueExact();
-        } catch (ArithmeticException ex) {
-            adjustedBaseValue = Integer.MAX_VALUE;
-        }
+  @Override
+  public Optional<Integer> getStock(String alias) {
+    validateAlias(alias);
 
-        adjustedBaseValue = (int) Math.sqrt(adjustedBaseValue);
-        adjustedBaseValue = Math.max(3, adjustedBaseValue);
-
-        int changeUnit = Math.max(100, (Probability.getRangedRandom(20, 200) - adjustedBaseValue) * 100);
-        int baseChange = Probability.getChance(32) ? Probability.getRandom(20) * changeUnit : changeUnit;
-        int change = Probability.getRandom(Probability.getRandom(Math.max(1, baseChange - adjustedBaseValue)));
-
-        if (Probability.getChance(adjustedBaseValue)) {
-            existingStock += change;
-        } else {
-            existingStock -= change;
-        }
-
-        return Math.max(0, existingStock);
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
+          ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES)
+                  .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+          )
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public void updatePrices() {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Result<Record3<Integer, BigDecimal, Integer>> results = create.select(ITEM_DATA.ID, ITEM_DATA.VALUE, ITEM_DATA.STOCK)
-                    .from(ITEM_DATA)
-                    .fetch();
+  @Override
+  public Optional<Integer> getStock(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            Collection<UpdateConditionStep<ItemDataRecord>> updates = new ArrayList<>();
-
-            for (Record3<Integer, BigDecimal, Integer> result : results) {
-                int itemId = result.getValue(ITEM_DATA.ID);
-                BigDecimal baseValue = result.getValue(ITEM_DATA.VALUE);
-                BigDecimal newValue = getNewValue(baseValue);
-                int newStock = getNewStock(baseValue, result.getValue(ITEM_DATA.STOCK));
-
-                updates.add(create.update(ITEM_DATA)
-                        .set(ITEM_DATA.CURRENT_VALUE, newValue)
-                        .set(ITEM_DATA.STOCK, newStock)
-                        .where(ITEM_DATA.ID.equal(itemId)));
-            }
-
-            create.batch(updates).execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+      DSLContext create = DSL.using(con);
+      Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
+          ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<Integer> getStock(String alias) {
-        validateAlias(alias);
+  @Override
+  public boolean setStock(String alias, int quantity) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
-                    ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
+          ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+          )
+      ).execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public Optional<Integer> getStock(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public boolean setStock(ItemStack stack, int quantity) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            DSLContext create = DSL.using(con);
-            Record1<Integer> result = create.select(ITEM_DATA.STOCK).from(ITEM_DATA).where(
-                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.STOCK));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+      DSLContext create = DSL.using(con);
+      int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
+          ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+      ).execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean setStock(String alias, int quantity) {
-        validateAlias(alias);
+  @Override
+  public Optional<BigDecimal> getPrice(String alias) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
-                    ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-            ).execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
+          ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES)
+                  .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+          )
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public boolean setStock(ItemStack stack, int quantity) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public Optional<BigDecimal> getPrice(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
-                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-            ).execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+      DSLContext create = DSL.using(con);
+      Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
+          ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<BigDecimal> getPrice(String alias) {
-        validateAlias(alias);
+  @Override
+  public Optional<BigDecimal> getBasePrice(String alias) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
-                    ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
+          ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES)
+                  .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+          )
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<BigDecimal> getPrice(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public Optional<BigDecimal> getBasePrice(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_DATA.CURRENT_VALUE).from(ITEM_DATA).where(
-                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.CURRENT_VALUE));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+      DSLContext create = DSL.using(con);
+      Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
+          ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<BigDecimal> getBasePrice(String alias) {
-        validateAlias(alias);
+  @Override
+  public boolean setBasePrice(String alias, BigDecimal price) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
-                    ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES)
-                                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      int changed = create.update(ITEM_DATA)
+          .set(ITEM_DATA.VALUE, price)
+          .set(ITEM_DATA.CURRENT_VALUE, price)
+          .where(ITEM_DATA.ID.equal(
+              create.select(ITEM_ALIASES.ITEM_ID)
+                  .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+              )
+          ).execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public Optional<BigDecimal> getBasePrice(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public boolean setBasePrice(ItemStack stack, BigDecimal price) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            DSLContext create = DSL.using(con);
-            Record1<BigDecimal> result = create.select(ITEM_DATA.VALUE).from(ITEM_DATA).where(
-                    ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.getValue(ITEM_DATA.VALUE));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+      DSLContext create = DSL.using(con);
+      int changed = create.update(ITEM_DATA)
+          .set(ITEM_DATA.VALUE, price)
+          .set(ITEM_DATA.CURRENT_VALUE, price)
+          .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+          ).execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean setBasePrice(String alias, BigDecimal price) {
-        validateAlias(alias);
+  @Override
+  public boolean addItem(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA)
-                    .set(ITEM_DATA.VALUE, price)
-                    .set(ITEM_DATA.CURRENT_VALUE, price)
-                    .where(ITEM_DATA.ID.equal(
-                            create.select(ITEM_ALIASES.ITEM_ID)
-                                    .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    )
-            ).execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+      DSLContext create = DSL.using(con);
+      int changed = create.insertInto(ITEM_DATA)
+          .columns(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
+          .values(idVariant.getKey(), idVariant.getValue())
+          .onDuplicateKeyIgnore()
+          .execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean setBasePrice(ItemStack stack, BigDecimal price) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public boolean remItem(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-            DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA)
-                    .set(ITEM_DATA.VALUE, price)
-                    .set(ITEM_DATA.CURRENT_VALUE, price)
-                    .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-            ).execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+      DSLContext create = DSL.using(con);
+      int changed = create.deleteFrom(ITEM_DATA)
+          .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
+          .execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean addItem(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public boolean setPrimaryAlias(String alias) {
+    validateAlias(alias);
 
-            DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_DATA)
-                    .columns(ITEM_DATA.MC_ID, ITEM_DATA.VARIANT)
-                    .values(idVariant.getKey(), idVariant.getValue())
-                    .onDuplicateKeyIgnore()
-                    .execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      int changed = create.update(ITEM_DATA).set(
+          ITEM_DATA.PRIMARY_ALIAS,
+          DSL.select(ITEM_ALIASES.ID).from(ITEM_ALIASES).where(
+              ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+          )
+      ).where(
+          ITEM_DATA.ID.equal(
+              DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
+                  ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+              )
+          )
+      ).execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean remItem(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public boolean addAlias(String alias, ItemStack stack) {
+    validateAlias(alias);
 
-            DSLContext create = DSL.using(con);
-            int changed = create.deleteFrom(ITEM_DATA)
-                    .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
-                    .execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
+
+      DSLContext create = DSL.using(con);
+      int changed = create.insertInto(ITEM_ALIASES)
+          .columns(ITEM_ALIASES.ITEM_ID, ITEM_ALIASES.ALIAS)
+          .select(create.select(ITEM_DATA.ID, DSL.val(alias.toLowerCase()))
+              .from(ITEM_DATA)
+              .where(ITEM_DATA.MC_ID.equal(idVariant.getKey())
+                  .and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
+              )
+          ).onDuplicateKeyIgnore().execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean setPrimaryAlias(String alias) {
-        validateAlias(alias);
+  @Override
+  public boolean remAlias(String alias) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            int changed = create.update(ITEM_DATA).set(
-                    ITEM_DATA.PRIMARY_ALIAS,
-                    DSL.select(ITEM_ALIASES.ID).from(ITEM_ALIASES).where(
-                            ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
-                    )
-            ).where(
-                    ITEM_DATA.ID.equal(
-                            DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
-                                    ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
-                            )
-                    )
-            ).execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      int changed = create.deleteFrom(ITEM_ALIASES)
+          .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
+          .execute();
+      return changed > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return false;
+  }
 
-    @Override
-    public boolean addAlias(String alias, ItemStack stack) {
-        validateAlias(alias);
+  @Override
+  public Optional<String> getAlias(String alias) {
+    validateAlias(alias);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
-
-            DSLContext create = DSL.using(con);
-            int changed = create.insertInto(ITEM_ALIASES)
-                    .columns(ITEM_ALIASES.ITEM_ID, ITEM_ALIASES.ALIAS)
-                    .select(create.select(ITEM_DATA.ID, DSL.val(alias.toLowerCase()))
-                            .from(ITEM_DATA)
-                            .where(ITEM_DATA.MC_ID.equal(idVariant.getKey())
-                                            .and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
-                            )
-                    ).onDuplicateKeyIgnore().execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
+          ITEM_ALIASES.ID.equal(
+              DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
+                  ITEM_DATA.ID.equal(
+                      DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
+                          ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
+                      )
+                  )
+              )
+          )
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.value1());
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public boolean remAlias(String alias) {
-        validateAlias(alias);
+  @Override
+  public Optional<String> getAlias(ItemStack stack) {
+    try (Connection con = SQLHandle.getConnection()) {
+      Clause<String, String> idVariant = getIDVariant(stack);
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            int changed = create.deleteFrom(ITEM_ALIASES)
-                    .where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
-                    .execute();
-            return changed > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+      DSLContext create = DSL.using(con);
+      Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
+          ITEM_ALIASES.ID.equal(
+              DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
+                  ITEM_DATA.MC_ID.equal(idVariant.getKey())
+                      .and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
+          )
+      ).fetchOne();
+      return result == null ? Optional.empty() : Optional.of(result.value1());
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<String> getAlias(String alias) {
-        validateAlias(alias);
+  @Override
+  public List<ItemDescriptor> getPrices() {
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
+          .from(ITEM_DATA, ITEM_ALIASES)
+          .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID))
+          .fetch();
 
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
-                    ITEM_ALIASES.ID.equal(
-                            DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
-                                    ITEM_DATA.ID.equal(
-                                            DSL.select(ITEM_ALIASES.ITEM_ID).from(ITEM_ALIASES).where(
-                                                    ITEM_ALIASES.ALIAS.equal(alias.toLowerCase())
-                                            )
-                                    )
-                            )
-                    )
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.value1());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+      return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return new ArrayList<>();
+  }
 
-    @Override
-    public Optional<String> getAlias(ItemStack stack) {
-        try (Connection con = SQLHandle.getConnection()) {
-            Clause<String, String> idVariant = getIDVariant(stack);
+  @Override
+  public List<ItemDescriptor> getPrices(String aliasConstraint) {
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
+          .from(ITEM_DATA, ITEM_ALIASES)
+          .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID)).and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
+          .fetch();
 
-            DSLContext create = DSL.using(con);
-            Record1<String> result = create.select(ITEM_ALIASES.ALIAS).from(ITEM_ALIASES).where(
-                    ITEM_ALIASES.ID.equal(
-                            DSL.select(ITEM_DATA.PRIMARY_ALIAS).from(ITEM_DATA).where(
-                                    ITEM_DATA.MC_ID.equal(idVariant.getKey())
-                                            .and(ITEM_DATA.VARIANT.equal(idVariant.getValue())))
-                    )
-            ).fetchOne();
-            return result == null ? Optional.empty() : Optional.of(result.value1());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+      return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+    return new ArrayList<>();
+  }
 
-    @Override
-    public List<ItemDescriptor> getPrices() {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
-                    .from(ITEM_DATA, ITEM_ALIASES)
-                    .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID))
-                    .fetch();
-
-            return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
+  private <R, T> Map<T, Integer> condenseCount(Collection<Clause<R, Integer>> input, Function<R, T> remap) {
+    Map<T, Integer> count = new HashMap<>();
+    for (Clause<R, Integer> entry : input) {
+      count.merge(remap.apply(entry.getKey()), entry.getValue(), (a, b) -> a + b);
     }
+    return count;
+  }
 
-    @Override
-    public List<ItemDescriptor> getPrices(String aliasConstraint) {
-        try (Connection con = SQLHandle.getConnection()) {
-            DSLContext create = DSL.using(con);
-            Result<Record3<String, BigDecimal, Integer>> result = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
-                    .from(ITEM_DATA, ITEM_ALIASES)
-                    .where(ITEM_DATA.PRIMARY_ALIAS.equal(ITEM_ALIASES.ID)).and(ITEM_ALIASES.ALIAS.like(aliasConstraint))
-                    .fetch();
+  @Override
+  public boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity) {
+    // Map<String, Integer> aliasCount = condenseCount(itemQuantity, (a) -> a);
+    return true;
+  }
 
-            return result.stream().map(entry -> new ItemDescriptor(entry.value1(), entry.value2(), entry.value3())).collect(Collectors.toList());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
+  @Override
+  public boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity) {
+    // Map<Clause<String, String>, Integer> itemCount = condenseCount(itemQuantity, this::getIDVariant);
+    return true;
+  }
 
-    private <R, T> Map<T, Integer> condenseCount(Collection<Clause<R, Integer>> input, Function<R, T> remap) {
-        Map<T, Integer> count = new HashMap<>();
-        for (Clause<R, Integer> entry : input) {
-            count.merge(remap.apply(entry.getKey()), entry.getValue(), (a, b) -> a + b);
-        }
-        return count;
-    }
+  private static Map<String, TypeDeducer> varientResolutionMap = new HashMap<>();
 
-    @Override
-    public boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity) {
-        // Map<String, Integer> aliasCount = condenseCount(itemQuantity, (a) -> a);
-        return true;
-    }
+  private TypeDeducer getDeducer(String type) {
+    return varientResolutionMap.getOrDefault(type, new DeducerOfSimpleType());
+  }
 
-    @Override
-    public boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity) {
-        // Map<Clause<String, String>, Integer> itemCount = condenseCount(itemQuantity, this::getIDVariant);
-        return true;
-    }
+  private ItemStack getItemStack(Clause<String, String> idVariant) {
+    return getDeducer(idVariant.getKey()).getItemStack(idVariant);
+  }
 
-    private static Map<String, TypeDeducer> varientResolutionMap = new HashMap<>();
-
-    private TypeDeducer getDeducer(String type) {
-        return varientResolutionMap.getOrDefault(type, new DeducerOfSimpleType());
-    }
-
-    private ItemStack getItemStack(Clause<String, String> idVariant) {
-        return getDeducer(idVariant.getKey()).getItemStack(idVariant);
-    }
-
-    private Clause<String, String> getIDVariant(ItemStack stack) {
-        return getDeducer(stack.getItem().getId()).getVariant(stack);
-    }
+  private Clause<String, String> getIDVariant(ItemStack stack) {
+    return getDeducer(stack.getItem().getId()).getVariant(stack);
+  }
 }

@@ -15,15 +15,15 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public class WorldEntryPermissionCheck {
-    public static boolean checkDestination(Player player, World world) {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+  public static boolean checkDestination(Player player, World world) {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        Optional<WorldEffectWrapper> optEffectWrapper = service.getEffectWrapperFor(world);
-        String worldType = "misc";
-        if (optEffectWrapper.isPresent()) {
-            worldType = optEffectWrapper.get().getName();
-        }
-
-        return player.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport");
+    Optional<WorldEffectWrapper> optEffectWrapper = service.getEffectWrapperFor(world);
+    String worldType = "misc";
+    if (optEffectWrapper.isPresent()) {
+      worldType = optEffectWrapper.get().getName();
     }
+
+    return player.hasPermission("skree.world." + worldType.toLowerCase() + ".teleport");
+  }
 }

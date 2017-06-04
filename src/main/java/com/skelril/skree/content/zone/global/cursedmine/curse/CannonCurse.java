@@ -16,9 +16,9 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import java.util.function.Consumer;
 
 public class CannonCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        Entity entity = player.getWorld().createEntity(EntityTypes.FIREBALL, player.getLocation().getPosition());
-        player.getWorld().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-    }
+  @Override
+  public void accept(Player player) {
+    Entity entity = player.getWorld().createEntity(EntityTypes.FIREBALL, player.getLocation().getPosition());
+    player.getWorld().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+  }
 }

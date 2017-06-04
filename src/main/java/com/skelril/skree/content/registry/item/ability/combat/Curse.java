@@ -19,20 +19,20 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class Curse implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
-        if (!optPotionEffectData.isPresent()) {
-            return;
-        }
-
-        PotionEffectData potionEffectData = optPotionEffectData.get();
-
-        int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 24);
-        potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WITHER, 2, duration));
-
-        target.offer(potionEffectData);
-
-        notify(owner, Text.of(TextColors.YELLOW, "Your weapon curses its victim."));
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
+    if (!optPotionEffectData.isPresent()) {
+      return;
     }
+
+    PotionEffectData potionEffectData = optPotionEffectData.get();
+
+    int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 24);
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WITHER, 2, duration));
+
+    target.offer(potionEffectData);
+
+    notify(owner, Text.of(TextColors.YELLOW, "Your weapon curses its victim."));
+  }
 }

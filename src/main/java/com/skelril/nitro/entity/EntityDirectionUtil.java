@@ -10,18 +10,18 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.Living;
 
 public class EntityDirectionUtil {
-    public static Vector3d getFacingVector(Living living) {
-        Vector3d rot = living.getHeadRotation();
+  public static Vector3d getFacingVector(Living living) {
+    Vector3d rot = living.getHeadRotation();
 
-        double xRot = (rot.getY() + 90) % 360;
-        double yRot = rot.getX() * -1;
+    double xRot = (rot.getY() + 90) % 360;
+    double yRot = rot.getX() * -1;
 
-        double h = Math.cos(Math.toRadians(yRot));
+    double h = Math.cos(Math.toRadians(yRot));
 
-        return new Vector3d(
-                h * Math.cos(Math.toRadians(xRot)),
-                Math.sin(Math.toRadians(yRot)),
-                h * Math.sin(Math.toRadians(xRot))
-        );
-    }
+    return new Vector3d(
+        h * Math.cos(Math.toRadians(xRot)),
+        Math.sin(Math.toRadians(yRot)),
+        h * Math.sin(Math.toRadians(xRot))
+    );
+  }
 }

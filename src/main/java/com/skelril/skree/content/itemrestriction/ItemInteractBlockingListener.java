@@ -16,21 +16,21 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class ItemInteractBlockingListener {
-    private Collection<String> blockedItems;
+  private Collection<String> blockedItems;
 
-    public ItemInteractBlockingListener(Collection<String> blockedItems) {
-        this.blockedItems = blockedItems;
-    }
+  public ItemInteractBlockingListener(Collection<String> blockedItems) {
+    this.blockedItems = blockedItems;
+  }
 
-    @Listener
-    public void onItemUse(InteractItemEvent event) {
-        if (blockedItems.contains(event.getItemStack().getType().getId())) {
-            Optional<Player> optPlayer = event.getCause().first(Player.class);
-            if (optPlayer.isPresent()) {
-                Player player = optPlayer.get();
-                player.sendMessage(Text.of(TextColors.RED, "This item has been disabled."));
-            }
-            event.setCancelled(true);
-        }
+  @Listener
+  public void onItemUse(InteractItemEvent event) {
+    if (blockedItems.contains(event.getItemStack().getType().getId())) {
+      Optional<Player> optPlayer = event.getCause().first(Player.class);
+      if (optPlayer.isPresent()) {
+        Player player = optPlayer.get();
+        player.sendMessage(Text.of(TextColors.RED, "This item has been disabled."));
+      }
+      event.setCancelled(true);
     }
+  }
 }

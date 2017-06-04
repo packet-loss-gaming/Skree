@@ -23,48 +23,48 @@ import org.spongepowered.api.text.Text;
 import java.util.Optional;
 
 public class TheForgeListener {
-    private final TheForgeManager manager;
+  private final TheForgeManager manager;
 
-    public TheForgeListener(TheForgeManager manager) {
-        this.manager = manager;
+  public TheForgeListener(TheForgeManager manager) {
+    this.manager = manager;
+  }
+
+  // Poor man's flight check
+  private boolean isFlying(Player player) {
+    BlockType blockBelow = player.getLocation().add(0, -1, 0).getBlockType();
+    BlockType blockBelowBelow = player.getLocation().add(0, -2, 0).getBlockType();
+    return blockBelow == BlockTypes.AIR && blockBelowBelow == BlockTypes.AIR;
+  }
+
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    Optional<TheForgeInstance> optInst = manager.getApplicableZone(projectile);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    // Poor man's flight check
-    private boolean isFlying(Player player) {
-        BlockType blockBelow = player.getLocation().add(0, -1, 0).getBlockType();
-        BlockType blockBelowBelow = player.getLocation().add(0, -2, 0).getBlockType();
-        return blockBelow == BlockTypes.AIR && blockBelowBelow == BlockTypes.AIR;
-    }
-
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        Optional<TheForgeInstance> optInst = manager.getApplicableZone(projectile);
-        if (!optInst.isPresent()) {
-            return;
+    new PlayerCombatParser() {
+      @Override
+      public void processMonsterAttack(Living attacker, Player defender) {
+        if (!(event instanceof DamageEntityEvent)) {
+          return;
         }
 
-        new PlayerCombatParser() {
-            @Override
-            public void processMonsterAttack(Living attacker, Player defender) {
-                if (!(event instanceof DamageEntityEvent)) {
-                    return;
-                }
-
-                DamageEntityEvent dEvent = (DamageEntityEvent) event;
-                if (isFlying(defender)) {
-                    dEvent.setBaseDamage(dEvent.getBaseDamage() * 3);
-                }
-            }
-        }.parse(event);
-    }
-
-    @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
-        Optional<TheForgeInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            if (event.getMessage().toPlain().contains("died")) {
-                event.setMessage(Text.of(player.getName(), " was incinerated at The Forge"));
-            }
+        DamageEntityEvent dEvent = (DamageEntityEvent) event;
+        if (isFlying(defender)) {
+          dEvent.setBaseDamage(dEvent.getBaseDamage() * 3);
         }
+      }
+    }.parse(event);
+  }
+
+  @Listener
+  public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
+    Optional<TheForgeInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      if (event.getMessage().toPlain().contains("died")) {
+        event.setMessage(Text.of(player.getName(), " was incinerated at The Forge"));
+      }
     }
+  }
 }

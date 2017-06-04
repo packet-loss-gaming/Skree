@@ -29,138 +29,138 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public class JungleRaidListener {
-    private final JungleRaidManager manager;
+  private final JungleRaidManager manager;
 
-    public JungleRaidListener(JungleRaidManager manager) {
-        this.manager = manager;
+  public JungleRaidListener(JungleRaidManager manager) {
+    this.manager = manager;
+  }
+
+  @Listener
+  public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (!optInst.isPresent()) {
-            return;
-        }
+    JungleRaidInstance inst = optInst.get();
+    if (inst.getState() == JungleRaidState.LOBBY) {
+      event.setCancelled(true);
+    }
+  }
 
-        JungleRaidInstance inst = optInst.get();
-        if (inst.getState() == JungleRaidState.LOBBY) {
-            event.setCancelled(true);
-        }
+  @Listener
+  public void onPlayerInteract(InteractBlockEvent event) {
+    Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
+    if (!optBlockLoc.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerInteract(InteractBlockEvent event) {
-        Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
-        if (!optBlockLoc.isPresent()) {
-            return;
-        }
+    Location<World> blockLoc = optBlockLoc.get();
 
-        Location<World> blockLoc = optBlockLoc.get();
-
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(blockLoc);
-        if (!optInst.isPresent()) {
-            return;
-        }
-
-        JungleRaidInstance inst = optInst.get();
-        if (inst.getState() == JungleRaidState.LOBBY && event.getTargetBlock().getState().getType() == BlockTypes.WALL_SIGN) {
-            if (blockLoc.equals(inst.getLeftFlagActivationSign())) {
-                inst.leftFlagListSign();
-            } else if (blockLoc.equals(inst.getRightFlagActivationSign())) {
-                inst.rightFlagListSign();
-            } else if (blockLoc.equals(inst.getLeftClassActivationSign())) {
-                inst.leftClassListSign();
-            } else if (blockLoc.equals(inst.getRightClassActivationSign())) {
-                inst.rightClassListSign();
-            } else {
-                inst.tryToggleFlagSignAt(blockLoc);
-
-                Optional<Player> optPlayer = event.getCause().first(Player.class);
-                if (optPlayer.isPresent()) {
-                    inst.tryUseClassSignAt(blockLoc, optPlayer.get());
-                }
-            }
-        }
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(blockLoc);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
-        return new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender) {
-                if (inst.getState() != JungleRaidState.IN_PROGRESS) {
-                    attacker.sendMessage(Text.of(TextColors.RED, "You can't attack players right now!"));
-                    event.setCancelled(true);
-                    return;
-                }
+    JungleRaidInstance inst = optInst.get();
+    if (inst.getState() == JungleRaidState.LOBBY && event.getTargetBlock().getState().getType() == BlockTypes.WALL_SIGN) {
+      if (blockLoc.equals(inst.getLeftFlagActivationSign())) {
+        inst.leftFlagListSign();
+      } else if (blockLoc.equals(inst.getRightFlagActivationSign())) {
+        inst.rightFlagListSign();
+      } else if (blockLoc.equals(inst.getLeftClassActivationSign())) {
+        inst.leftClassListSign();
+      } else if (blockLoc.equals(inst.getRightClassActivationSign())) {
+        inst.rightClassListSign();
+      } else {
+        inst.tryToggleFlagSignAt(blockLoc);
 
-                if (inst.isFriendlyFire(attacker, defender)) {
-                    attacker.sendMessage(Text.of(TextColors.RED, "Don't hit your team mates!"));
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (event instanceof DamageEntityEvent) {
-                    inst.recordAttack(attacker, defender);
-
-                    attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
-                }
-            }
-        };
+        Optional<Player> optPlayer = event.getCause().first(Player.class);
+        if (optPlayer.isPresent()) {
+          inst.tryUseClassSignAt(blockLoc, optPlayer.get());
+        }
+      }
     }
+  }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
-        if (!optInst.isPresent()) {
-            return;
+  private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPvP(Player attacker, Player defender) {
+        if (inst.getState() != JungleRaidState.IN_PROGRESS) {
+          attacker.sendMessage(Text.of(TextColors.RED, "You can't attack players right now!"));
+          event.setCancelled(true);
+          return;
         }
 
-        JungleRaidInstance inst = optInst.get();
-
-        createFor(event, inst).parse(event);
-    }
-
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(projectile);
-        if (!optInst.isPresent()) {
-            return;
+        if (inst.isFriendlyFire(attacker, defender)) {
+          attacker.sendMessage(Text.of(TextColors.RED, "Don't hit your team mates!"));
+          event.setCancelled(true);
+          return;
         }
 
-        JungleRaidInstance inst = optInst.get();
+        if (event instanceof DamageEntityEvent) {
+          inst.recordAttack(attacker, defender);
 
-        createFor(event, inst).parse(event);
-    }
-
-    @Listener
-    public void onClientLeave(ClientConnectionEvent.Disconnect event) {
-        Player player = event.getTargetEntity();
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            JungleRaidInstance inst = optInst.get();
-
-            inst.playerLost(player);
+          attacker.sendMessage(Text.of(TextColors.YELLOW, "You've hit ", defender.getName(), "!"));
         }
+      }
+    };
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerTeleport(MoveEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
-        if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
-            JungleRaidInstance inst = optInst.get();
+    JungleRaidInstance inst = optInst.get();
 
-            inst.playerLost(player);
-            inst.tryInventoryRestore(player);
-        }
+    createFor(event, inst).parse(event);
+  }
+
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(projectile);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            JungleRaidInstance inst = optInst.get();
+    JungleRaidInstance inst = optInst.get();
 
-            inst.playerLost(player);
-        }
+    createFor(event, inst).parse(event);
+  }
+
+  @Listener
+  public void onClientLeave(ClientConnectionEvent.Disconnect event) {
+    Player player = event.getTargetEntity();
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      JungleRaidInstance inst = optInst.get();
+
+      inst.playerLost(player);
     }
+  }
+
+  @Listener
+  public void onPlayerTeleport(MoveEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
+    if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
+      JungleRaidInstance inst = optInst.get();
+
+      inst.playerLost(player);
+      inst.tryInventoryRestore(player);
+    }
+  }
+
+  @Listener
+  public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      JungleRaidInstance inst = optInst.get();
+
+      inst.playerLost(player);
+    }
+  }
 }

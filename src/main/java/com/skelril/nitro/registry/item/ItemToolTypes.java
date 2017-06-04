@@ -7,8 +7,8 @@
 package com.skelril.nitro.registry.item;
 
 public class ItemToolTypes {
-    public static final ItemToolType SWORD = new ItemToolType(4);
-    public static final ItemToolType AXE = new ItemToolType(3);
-    public static final ItemToolType PICKAXE = new ItemToolType(2);
-    public static final ItemToolType SHOVEL = new ItemToolType(1);
+  public static final ItemToolType SWORD = new ItemToolType(4);
+  public static final ItemToolType AXE = new ItemToolType(3);
+  public static final ItemToolType PICKAXE = new ItemToolType(2);
+  public static final ItemToolType SHOVEL = new ItemToolType(1);
 }

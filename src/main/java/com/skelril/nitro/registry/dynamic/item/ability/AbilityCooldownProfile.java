@@ -7,18 +7,18 @@
 package com.skelril.nitro.registry.dynamic.item.ability;
 
 public class AbilityCooldownProfile {
-    private String pool;
-    private double seconds;
+  private String pool;
+  private double seconds;
 
-    public String getPool() {
-        return pool;
-    }
+  public String getPool() {
+    return pool;
+  }
 
-    public double getSeconds() {
-        return seconds;
-    }
+  public double getSeconds() {
+    return seconds;
+  }
 
-    public boolean isEnforced() {
-        return seconds > 0;
-    }
+  public boolean isEnforced() {
+    return seconds > 0;
+  }
 }

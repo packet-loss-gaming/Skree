@@ -19,29 +19,29 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class GoldValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> GOLD_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.GOLD_NUGGET)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT)),
-                    BigInteger.valueOf(9)
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.GOLD_BLOCK)),
-                    BigInteger.valueOf(81)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> GOLD_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.GOLD_NUGGET)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT)),
+          BigInteger.valueOf(9)
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.GOLD_BLOCK)),
+          BigInteger.valueOf(81)
+      )
+  );
 
 
-    private static final GoldValueMap map = new GoldValueMap();
+  private static final GoldValueMap MAP = new GoldValueMap();
 
-    protected GoldValueMap() {
-        super(GOLD_VALUE_MAP);
-    }
+  protected GoldValueMap() {
+    super(GOLD_VALUE_MAP);
+  }
 
-    public static GoldValueMap inst() {
-        return map;
-    }
+  public static GoldValueMap inst() {
+    return MAP;
+  }
 }

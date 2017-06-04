@@ -21,139 +21,139 @@ import java.util.Optional;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class SkyFeather extends CustomItem {
-    @Override
-    public String __getID() {
-        return "sky_feather";
+  @Override
+  public String __getId() {
+    return "sky_feather";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return null;
+  }
+
+  @Override
+  public int getMaxDamage(net.minecraft.item.ItemStack stack) {
+    Optional<Data> optData = getDataFor(stack);
+    if (!optData.isPresent()) {
+      return 0;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
+    return optData.get().uses;
+  }
+
+  @Override
+  public String getHighlightTip(net.minecraft.item.ItemStack item, String displayName) {
+    Optional<String> optSuffix = getSuffix(item);
+
+    return optSuffix.isPresent() ? displayName + " [" + optSuffix.get() + "]" : displayName;
+  }
+
+  @SuppressWarnings("unchecked")
+  @SideOnly(Side.CLIENT)
+  public void addInformation(net.minecraft.item.ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+    Optional<Data> optData = getDataFor(stack);
+    if (optData.isPresent()) {
+      Data data = optData.get();
+      tooltip.add(ChatFormatting.GOLD + "Uses: " + (data.uses != -1 ? data.uses : "Infinite"));
+      tooltip.add(ChatFormatting.GOLD + "Radius: " + data.radius);
+      tooltip.add(ChatFormatting.GOLD + "Flight: " + data.flight);
+      tooltip.add(ChatFormatting.GOLD + "Push Back: " + data.pushBack);
+    }
+  }
+
+  public static Optional<String> getSuffix(ItemStack stack) {
+    return getSuffix(tf(stack));
+  }
+
+  private static Optional<String> getSuffix(net.minecraft.item.ItemStack stack) {
+    Optional<Data> optData = getDataFor(stack);
+    if (!optData.isPresent()) {
+      return Optional.empty();
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return null;
+    Data data = optData.get();
+    int uses = data.uses;
+    double flight = data.flight;
+    double pushBack = data.pushBack;
+
+    String suffix;
+    if (uses == -1) {
+      if (flight == pushBack && flight > 2) {
+        suffix = "Doom";
+      } else {
+        suffix = "Infinite";
+      }
+    } else {
+      if (flight == pushBack) {
+        suffix = "Balance";
+      } else if (flight > pushBack) {
+        suffix = "Flight";
+      } else {
+        suffix = "Push Back";
+      }
     }
 
-    @Override
-    public int getMaxDamage(net.minecraft.item.ItemStack stack) {
-        Optional<Data> optData = getDataFor(stack);
-        if (!optData.isPresent()) {
-            return 0;
-        }
+    return Optional.of(suffix);
+  }
 
-        return optData.get().uses;
+  public static Optional<Data> getDataFor(ItemStack stack) {
+    return getDataFor(tf(stack));
+  }
+
+  private static Optional<Data> getDataFor(net.minecraft.item.ItemStack stack) {
+    if (stack.getTagCompound() == null) {
+      return Optional.empty();
     }
 
-    @Override
-    public String getHighlightTip(net.minecraft.item.ItemStack item, String displayName) {
-        Optional<String> optSuffix = getSuffix(item);
-
-        return optSuffix.isPresent() ? displayName + " [" + optSuffix.get() + "]" : displayName;
+    if (!stack.getTagCompound().hasKey("skree_feather_data")) {
+      return Optional.empty();
     }
 
-    @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
-    public void addInformation(net.minecraft.item.ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
-        Optional<Data> optData = getDataFor(stack);
-        if (optData.isPresent()) {
-            Data data = optData.get();
-            tooltip.add(ChatFormatting.GOLD + "Uses: " + (data.uses != -1 ? data.uses : "Infinite"));
-            tooltip.add(ChatFormatting.GOLD + "Radius: " + data.radius);
-            tooltip.add(ChatFormatting.GOLD + "Flight: " + data.flight);
-            tooltip.add(ChatFormatting.GOLD + "Push Back: " + data.pushBack);
-        }
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
+    int uses = tag.getInteger("uses");
+    double radius = tag.getDouble("radius");
+    double flight = tag.getDouble("flight");
+    double pushBack = tag.getDouble("push_back");
+
+    return Optional.of(new Data(uses, radius, flight, pushBack));
+  }
+
+  public static void setFeatherProperties(ItemStack stack, int uses, double radius, double flight, double pushBack) {
+    setFeatherProperties(tf(stack), uses, radius, flight, pushBack);
+  }
+
+  private static void setFeatherProperties(net.minecraft.item.ItemStack stack, int uses, double radius, double flight, double pushBack) {
+    if (stack.getTagCompound() == null) {
+      stack.setTagCompound(new NBTTagCompound());
     }
 
-    public static Optional<String> getSuffix(ItemStack stack) {
-        return getSuffix(tf(stack));
+    if (!stack.getTagCompound().hasKey("skree_feather_data")) {
+      stack.getTagCompound().setTag("skree_feather_data", new NBTTagCompound());
     }
 
-    private static Optional<String> getSuffix(net.minecraft.item.ItemStack stack) {
-        Optional<Data> optData = getDataFor(stack);
-        if (!optData.isPresent()) {
-            return Optional.empty();
-        }
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
+    tag.setInteger("uses", uses);
+    tag.setDouble("radius", radius);
+    tag.setDouble("flight", flight);
+    tag.setDouble("push_back", pushBack);
+  }
 
-        Data data = optData.get();
-        int uses = data.uses;
-        double flight = data.flight;
-        double pushBack = data.pushBack;
+  public static class Data {
+    public final int uses;
+    public final double radius;
+    public final double flight;
+    public final double pushBack;
 
-        String suffix;
-        if (uses == -1) {
-            if (flight == pushBack && flight > 2) {
-                suffix = "Doom";
-            } else {
-                suffix = "Infinite";
-            }
-        } else {
-            if (flight == pushBack) {
-                suffix = "Balance";
-            } else if (flight > pushBack) {
-                suffix = "Flight";
-            } else {
-                suffix = "Push Back";
-            }
-        }
-
-        return Optional.of(suffix);
+    public Data(int uses, double radius, double flight, double pushBack) {
+      this.uses = uses;
+      this.radius = radius;
+      this.flight = flight;
+      this.pushBack = pushBack;
     }
-
-    public static Optional<Data> getDataFor(ItemStack stack) {
-        return getDataFor(tf(stack));
-    }
-
-    private static Optional<Data> getDataFor(net.minecraft.item.ItemStack stack) {
-        if (stack.getTagCompound() == null) {
-            return Optional.empty();
-        }
-
-        if (!stack.getTagCompound().hasKey("skree_feather_data")) {
-            return Optional.empty();
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
-        int uses = tag.getInteger("uses");
-        double radius = tag.getDouble("radius");
-        double flight = tag.getDouble("flight");
-        double pushBack = tag.getDouble("push_back");
-
-        return Optional.of(new Data(uses, radius, flight, pushBack));
-    }
-
-    public static void setFeatherProperties(ItemStack stack, int uses, double radius, double flight, double pushBack) {
-        setFeatherProperties(tf(stack), uses, radius, flight, pushBack);
-    }
-
-    private static void setFeatherProperties(net.minecraft.item.ItemStack stack, int uses, double radius, double flight, double pushBack) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
-        }
-
-        if (!stack.getTagCompound().hasKey("skree_feather_data")) {
-            stack.getTagCompound().setTag("skree_feather_data", new NBTTagCompound());
-        }
-
-        NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
-        tag.setInteger("uses", uses);
-        tag.setDouble("radius", radius);
-        tag.setDouble("flight", flight);
-        tag.setDouble("push_back", pushBack);
-    }
-
-    public static class Data {
-        public final int uses;
-        public final double radius;
-        public final double flight;
-        public final double pushBack;
-
-        public Data(int uses, double radius, double flight, double pushBack) {
-            this.uses = uses;
-            this.radius = radius;
-            this.flight = flight;
-            this.pushBack = pushBack;
-        }
-    }
+  }
 }

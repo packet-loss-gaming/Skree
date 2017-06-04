@@ -18,16 +18,16 @@ import java.io.IOException;
 
 @NModule(name = "Aid System")
 public class AidSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        try {
-            AntiPeskConfig config = ConfigLoader.loadConfig("anti_pesk.json", AntiPeskConfig.class);
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    try {
+      AntiPeskConfig config = ConfigLoader.loadConfig("anti_pesk.json", AntiPeskConfig.class);
 
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ChatCommandAid());
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiPeskListener(config));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ChatCommandAid());
+      Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new AntiPeskListener(config));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 }
 

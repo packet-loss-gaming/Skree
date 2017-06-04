@@ -13,8 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 public interface RespawnQueueService {
-    default void enque(Player player, ItemStack stack) {
-        enque(player, Collections.singleton(stack));
-    }
-    void enque(Player player, Collection<ItemStack> stacks);
+  default void enque(Player player, ItemStack stack) {
+    enque(player, Collections.singleton(stack));
+  }
+
+  void enque(Player player, Collection<ItemStack> stacks);
 }

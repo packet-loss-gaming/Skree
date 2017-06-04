@@ -20,19 +20,19 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneInventoryProtector<T> extends ZoneApplicableListener<T> {
-    public ZoneInventoryProtector(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
+  public ZoneInventoryProtector(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
+
+  @Listener
+  public void onItemSpawn(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
+    Entity entity = spawnCause.getEntity();
+    if (entity.getType() != EntityTypes.PLAYER) {
+      return;
     }
 
-    @Listener
-    public void onItemSpawn(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
-        Entity entity = spawnCause.getEntity();
-        if (entity.getType() != EntityTypes.PLAYER) {
-            return;
-        }
-
-        if (isApplicable(entity.getLocation())) {
-            event.setCancelled(true);
-        }
+    if (isApplicable(entity.getLocation())) {
+      event.setCancelled(true);
     }
+  }
 }

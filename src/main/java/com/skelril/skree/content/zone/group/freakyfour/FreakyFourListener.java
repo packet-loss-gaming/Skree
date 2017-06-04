@@ -36,100 +36,100 @@ import java.util.Optional;
 
 public class FreakyFourListener {
 
-    private final FreakyFourManager manager;
+  private final FreakyFourManager manager;
 
-    public FreakyFourListener(FreakyFourManager manager) {
-        this.manager = manager;
+  public FreakyFourListener(FreakyFourManager manager) {
+    this.manager = manager;
+  }
+
+  @Listener
+  public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+    if (manager.getApplicableZone(player).isPresent()) {
+      for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+        if (block.getOriginal().getState().getType() != BlockTypes.WEB) {
+          event.setCancelled(true);
+          return;
+        }
+      }
+    }
+  }
+
+  @Listener
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @Named(NamedCause.SOURCE) Player player) {
+    Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+    if (!optHeldItem.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
-        if (manager.getApplicableZone(player).isPresent()) {
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                if (block.getOriginal().getState().getType() != BlockTypes.WEB) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
+    if (CustomItemTypes.PHANTOM_HYMN != optHeldItem.get().getItem()) {
+      return;
     }
 
-    @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @Named(NamedCause.SOURCE) Player player) {
-        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (!optHeldItem.isPresent()) {
-            return;
-        }
+    event.setUseBlockResult(Tristate.FALSE);
 
-        if (CustomItemTypes.PHANTOM_HYMN != optHeldItem.get().getItem()) {
-            return;
-        }
-
-        event.setUseBlockResult(Tristate.FALSE);
-
-        Optional<FreakyFourInstance> optInst = manager.getApplicableZone(player);
-        if (!optInst.isPresent()) {
-            return;
-        }
-
-        FreakyFourInstance inst = optInst.get();
-
-        FreakyFourBoss boss = inst.getCurrentboss().orElse(null);
-        if (boss == null) {
-            inst.setCurrentboss(FreakyFourBoss.CHARLOTTE);
-            player.sendMessage(Text.of(TextColors.RED, "You think you can beat us? Ha! we'll see about that..."));
-        } else if (!inst.isSpawned(boss)) {
-            switch (boss) {
-                case CHARLOTTE:
-                    inst.setCurrentboss(FreakyFourBoss.FRIMUS);
-                    break;
-                case FRIMUS:
-                    inst.setCurrentboss(FreakyFourBoss.DA_BOMB);
-                    break;
-                case DA_BOMB:
-                    inst.setCurrentboss(FreakyFourBoss.SNIPEE);
-                    break;
-                case SNIPEE:
-                    inst.setCurrentboss(null);
-                    inst.forceEnd();
-                    return;
-            }
-        } else {
-            return;
-        }
-        boss = inst.getCurrentboss().orElse(null);
-
-        if (!inst.getRegion(boss).contains(player.getLocation().getPosition())) {
-            player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(boss)));
-        }
-
-        inst.spawnBoss(boss);
+    Optional<FreakyFourInstance> optInst = manager.getApplicableZone(player);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onCreeperExplode(ExplosionEvent.Pre event, @First Creeper entity) {
-        Optional<FreakyFourInstance> optInst = manager.getApplicableZone(entity);
-        if (!optInst.isPresent()) {
-            return;
-        }
+    FreakyFourInstance inst = optInst.get();
 
-        FreakyFourInstance inst = optInst.get();
+    FreakyFourBoss boss = inst.getCurrentboss().orElse(null);
+    if (boss == null) {
+      inst.setCurrentboss(FreakyFourBoss.CHARLOTTE);
+      player.sendMessage(Text.of(TextColors.RED, "You think you can beat us? Ha! we'll see about that..."));
+    } else if (!inst.isSpawned(boss)) {
+      switch (boss) {
+        case CHARLOTTE:
+          inst.setCurrentboss(FreakyFourBoss.FRIMUS);
+          break;
+        case FRIMUS:
+          inst.setCurrentboss(FreakyFourBoss.DA_BOMB);
+          break;
+        case DA_BOMB:
+          inst.setCurrentboss(FreakyFourBoss.SNIPEE);
+          break;
+        case SNIPEE:
+          inst.setCurrentboss(null);
+          inst.forceEnd();
+          return;
+      }
+    } else {
+      return;
+    }
+    boss = inst.getCurrentboss().orElse(null);
 
-        Optional<Living> boss = inst.getBoss(FreakyFourBoss.DA_BOMB);
-        if (!boss.isPresent() || !boss.get().equals(entity)) {
-            return;
-        }
-
-        inst.dabombDetonate(entity.get(Keys.HEALTH).get() / entity.get(Keys.MAX_HEALTH).get());
-        throwBack(entity);
-
-        event.setCancelled(true);
+    if (!inst.getRegion(boss).contains(player.getLocation().getPosition())) {
+      player.setLocation(new Location<>(inst.getRegion().getExtent(), inst.getCenter(boss)));
     }
 
-    private void throwBack(Living entity) {
-        Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
-        vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
-        vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
-        entity.setVelocity(vel);
+    inst.spawnBoss(boss);
+  }
+
+  @Listener
+  public void onCreeperExplode(ExplosionEvent.Pre event, @First Creeper entity) {
+    Optional<FreakyFourInstance> optInst = manager.getApplicableZone(entity);
+    if (!optInst.isPresent()) {
+      return;
     }
+
+    FreakyFourInstance inst = optInst.get();
+
+    Optional<Living> boss = inst.getBoss(FreakyFourBoss.DA_BOMB);
+    if (!boss.isPresent() || !boss.get().equals(entity)) {
+      return;
+    }
+
+    inst.dabombDetonate(entity.get(Keys.HEALTH).get() / entity.get(Keys.MAX_HEALTH).get());
+    throwBack(entity);
+
+    event.setCancelled(true);
+  }
+
+  private void throwBack(Living entity) {
+    Vector3d vel = EntityDirectionUtil.getFacingVector(entity);
+    vel = vel.mul(-Probability.getRangedRandom(1.2, 1.5));
+    vel = new Vector3d(vel.getX(), MathExt.bound(vel.getY(), .175, .8), vel.getZ());
+    entity.setVelocity(vel);
+  }
 }

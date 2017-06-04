@@ -21,49 +21,49 @@ import java.io.IOException;
 
 @NModule(name = "Database System")
 public class DatabaseSystem implements ServiceProvider<DatabaseService> {
-    private DatabaseService service;
+  private DatabaseService service;
 
-    private void setupHandle(String database, String username, String password) {
-        SQLHandle.setDatabase(database);
-        SQLHandle.setUsername(username);
-        SQLHandle.setPassword(password);
+  private void setupHandle(String database, String username, String password) {
+    SQLHandle.setDatabase(database);
+    SQLHandle.setUsername(username);
+    SQLHandle.setPassword(password);
+  }
+
+  private void runMigrations(String database, String username, String password) {
+    Flyway flyway = new Flyway();
+    flyway.setDataSource(database, username, password);
+    flyway.setSchemas("mc_db");
+    flyway.migrate();
+  }
+
+  @NModuleTrigger(trigger = "PRE_INITIALIZATION")
+  public void init() {
+    try {
+      Class.forName("org.mariadb.jdbc.Driver").newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+      e.printStackTrace();
     }
 
-    private void runMigrations(String database, String username, String password) {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(database, username, password);
-        flyway.setSchemas("mc_db");
-        flyway.migrate();
+    try {
+      DatabaseConfig config = ConfigLoader.loadConfig("database.json", DatabaseConfig.class);
+
+      String database = config.getDatabase();
+      String username = config.getUsername();
+      String password = config.getPassword();
+
+      setupHandle(database, username, password);
+      runMigrations(database, username, password);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
-    @NModuleTrigger(trigger = "PRE_INITIALIZATION")
-    public void init() {
-        try {
-            Class.forName("org.mariadb.jdbc.Driver").newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    service = new DatabaseServiceImpl();
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DatabaseService.class, service);
+  }
 
-        try {
-            DatabaseConfig config = ConfigLoader.loadConfig("database.json", DatabaseConfig.class);
-
-            String database = config.getDatabase();
-            String username = config.getUsername();
-            String password = config.getPassword();
-
-            setupHandle(database, username, password);
-            runMigrations(database, username, password);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        service = new DatabaseServiceImpl();
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), DatabaseService.class, service);
-    }
-
-    @Override
-    public DatabaseService getService() {
-        return service;
-    }
+  @Override
+  public DatabaseService getService() {
+    return service;
+  }
 }

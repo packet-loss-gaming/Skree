@@ -25,44 +25,45 @@ import static com.skelril.nitro.probability.Probability.getRangedRandom;
 import static org.spongepowered.api.command.args.GenericArguments.player;
 
 public class HeartsCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Player targetPlayer = args.<Player>getOne(Text.of("player")).get();
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Player targetPlayer = args.<Player>getOne(Text.of("player")).get();
 
-        IntegratedRunnable runnable = new IntegratedRunnable() {
-            @Override
-            public boolean run(int times) {
-                for (int i = 0; i < 75; ++i) {
-                    ParticleEffect effect = ParticleEffect.builder().type(ParticleTypes.HEART).quantity(1).build();
+    IntegratedRunnable runnable = new IntegratedRunnable() {
+      @Override
+      public boolean run(int times) {
+        for (int i = 0; i < 75; ++i) {
+          ParticleEffect effect = ParticleEffect.builder().type(ParticleTypes.HEART).quantity(1).build();
 
-                    targetPlayer.getWorld().spawnParticles(effect, targetPlayer.getLocation().getPosition().add(
-                            getRangedRandom(-5.0, 5.0),
-                            getRangedRandom(-2, 5.0),
-                            getRangedRandom(-5.0, 5.0)
-                    ));
-                }
-                return true;
-            }
+          targetPlayer.getWorld().spawnParticles(effect, targetPlayer.getLocation().getPosition().add(
+              getRangedRandom(-5.0, 5.0),
+              getRangedRandom(-2, 5.0),
+              getRangedRandom(-5.0, 5.0)
+          ));
+        }
+        return true;
+      }
 
-            @Override
-            public void end() { }
-        };
+      @Override
+      public void end() {
+      }
+    };
 
-        TimedRunnable timedRunnable = new TimedRunnable<>(runnable, 20);
+    TimedRunnable timedRunnable = new TimedRunnable<>(runnable, 20);
 
-        timedRunnable.setTask(Task.builder().execute(
-                timedRunnable
-        ).intervalTicks(5).submit(SkreePlugin.inst()));
+    timedRunnable.setTask(Task.builder().execute(
+        timedRunnable
+    ).intervalTicks(5).submit(SkreePlugin.inst()));
 
 
-        return CommandResult.success();
-    }
+    return CommandResult.success();
+  }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Spawn hearts around a target player"))
-                .permission("skree.hearts")
-                .arguments(player(Text.of("player")))
-                .executor(new HeartsCommand()).build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Spawn hearts around a target player"))
+        .permission("skree.hearts")
+        .arguments(player(Text.of("player")))
+        .executor(new HeartsCommand()).build();
+  }
 }

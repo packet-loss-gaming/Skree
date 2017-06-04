@@ -7,8 +7,8 @@
 package com.skelril.skree.content.zone.group.jungleraid;
 
 public enum JungleRaidState {
-    LOBBY,
-    INITIALIZE,
-    IN_PROGRESS,
-    DONE
+  LOBBY,
+  INITIALIZE,
+  IN_PROGRESS,
+  DONE
 }

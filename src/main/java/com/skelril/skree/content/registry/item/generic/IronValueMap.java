@@ -19,25 +19,25 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class IronValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> IRON_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.IRON_INGOT)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.IRON_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> IRON_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.IRON_INGOT)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.IRON_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final IronValueMap map = new IronValueMap();
+  private static final IronValueMap MAP = new IronValueMap();
 
-    protected IronValueMap() {
-        super(IRON_VALUE_MAP);
-    }
+  protected IronValueMap() {
+    super(IRON_VALUE_MAP);
+  }
 
-    public static IronValueMap inst() {
-        return map;
-    }
+  public static IronValueMap inst() {
+    return MAP;
+  }
 }

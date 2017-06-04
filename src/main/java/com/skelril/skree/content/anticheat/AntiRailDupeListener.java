@@ -24,25 +24,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AntiRailDupeListener {
-    private static final List<BlockType> railBlocks = new ArrayList<>();
+  private static final List<BlockType> RAIL_BLOCKS = new ArrayList<>();
 
-    static {
-        railBlocks.add(BlockTypes.RAIL);
-        railBlocks.add(BlockTypes.ACTIVATOR_RAIL);
-        railBlocks.add(BlockTypes.DETECTOR_RAIL);
-        railBlocks.add(BlockTypes.GOLDEN_RAIL);
-    }
+  static {
+    RAIL_BLOCKS.add(BlockTypes.RAIL);
+    RAIL_BLOCKS.add(BlockTypes.ACTIVATOR_RAIL);
+    RAIL_BLOCKS.add(BlockTypes.DETECTOR_RAIL);
+    RAIL_BLOCKS.add(BlockTypes.GOLDEN_RAIL);
+  }
 
-    @Listener
-    public void onPistonMove(ChangeBlockEvent event, @Named(NamedCause.SOURCE) Piston piston) {
-        event.getTransactions().stream().map(Transaction::getFinal).forEach(block -> {
-            BlockType finalType = block.getState().getType();
-            if (railBlocks.contains(finalType)) {
-                Location<World> location = block.getLocation().get();
-                Task.builder().execute(() -> {
-                    location.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
-                }).delayTicks(1).submit(SkreePlugin.inst());
-            }
-        });
-    }
+  @Listener
+  public void onPistonMove(ChangeBlockEvent event, @Named(NamedCause.SOURCE) Piston piston) {
+    event.getTransactions().stream().map(Transaction::getFinal).forEach(block -> {
+      BlockType finalType = block.getState().getType();
+      if (RAIL_BLOCKS.contains(finalType)) {
+        Location<World> location = block.getLocation().get();
+        Task.builder().execute(() -> {
+          location.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+        }).delayTicks(1).submit(SkreePlugin.inst());
+      }
+    });
+  }
 }

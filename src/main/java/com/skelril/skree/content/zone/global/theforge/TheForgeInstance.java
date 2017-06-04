@@ -50,213 +50,214 @@ import static com.skelril.skree.content.modifier.Modifiers.TRIPLE_FACTORY_PRODUC
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class TheForgeInstance extends LegacyZoneBase implements Runnable {
-    private ForgeState state;
+  private ForgeState state;
 
-    private Location<World> centralDropPoint;
+  private Location<World> centralDropPoint;
 
-    public TheForgeInstance(ZoneRegion region) {
-        super(region);
-    }
+  public TheForgeInstance(ZoneRegion region) {
+    super(region);
+  }
 
-    private void setUp() {
-        Vector3d centerPoint = getRegion().getCenter();
-        centralDropPoint = new Location<>(
-                getRegion().getExtent(),
-                new Vector3d(
-                        centerPoint.getX(),
-                        getRegion().getMinimumPoint().getY() + 11,
-                        centerPoint.getZ()
-                )
-        );
-
-        state = ForgeState.load();
-    }
-
-    @Override
-    public boolean init() {
-        remove();
-        setUp();
-        return true;
-    }
-
-    private Optional<ItemStack> getResultingItemStack(ItemStackSnapshot snapshot) {
-        net.minecraft.item.ItemStack result = FurnaceRecipes.instance().getSmeltingResult(tf(snapshot.createStack()));
-        if (result == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(tf(result));
-    }
-
-    private int getQuantityToSupply(ItemStackSnapshot snapshot) {
-        int total = 0;
-
-        for (int i = 0; i < snapshot.getCount(); ++i) {
-            total += Probability.getRandom(8);
-        }
-
-        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-        if (optService.isPresent() && optService.get().isActive(TRIPLE_FACTORY_PRODUCTION)) {
-            total *= 3;
-        }
-
-        return total;
-    }
-
-    private void addResource(ItemStackSnapshot snapshot) {
-        Optional<ItemStack> optResult = getResultingItemStack(snapshot);
-        if (!optResult.isPresent()) {
-            return;
-        }
-
-        state.getResults().merge(optResult.get(), getQuantityToSupply(snapshot), (a, b) -> a + b);
-    }
-
-    private void runOreCheck() {
-        for (Item item : getContained(Item.class)) {
-            BlockType belowType = item.getLocation().add(0, -1, 0).getBlockType();
-            if (belowType == BlockTypes.GOLD_BLOCK) {
-                addResource(item.item().get());
-                item.remove();
-            }
-        }
-
-        state.save();
-    }
-
-    private void killPlayersInLava() {
-        for (Player player : getPlayers(PARTICIPANT)) {
-            if (player.getLocation().getBlockType() != BlockTypes.LAVA) {
-                continue;
-            }
-
-            if (player.get(Keys.HEALTH).get() <= 0) {
-                continue;
-            }
-
-            player.offer(Keys.HEALTH, 0D);
-        }
-    }
-
-    private int getQuantityToProduce() {
-        int max = getPlayers(PARTICIPANT).size() * 9;
-
-        Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
-        if (optService.isPresent() && optService.get().isActive(HEXA_FACTORY_SPEED)) {
-            max *= 6;
-        }
-
-        return Probability.getRangedRandom(max / 3, max);
-    }
-
-    private List<ItemStack> getProduce() {
-        Map<ItemStack, Integer> results = state.getResults();
-        int quantityToProduce = getQuantityToProduce();
-
-        List<ItemStack> produce = new ArrayList<>();
-        while (!results.isEmpty() && quantityToProduce > 0) {
-            ItemStack stackToMake = Probability.pickOneOf(results.keySet());
-            int supply = results.get(stackToMake);
-            if (supply >= quantityToProduce) {
-                results.put(stackToMake, supply - quantityToProduce);
-
-                for (int i = 0; i < quantityToProduce; ++i) {
-                    produce.add(newItemStack(stackToMake));
-                }
-
-                quantityToProduce = 0;
-            } else {
-                results.remove(stackToMake);
-
-                for (int i = 0; i < supply; ++i) {
-                    produce.add(newItemStack(stackToMake));
-                }
-
-                quantityToProduce = quantityToProduce - supply;
-            }
-        }
-
-        return produce;
-    }
-
-    private final List<Vector3d> pointAdjustments = Lists.newArrayList(
-            new Vector3d(-.5, 0, 0),
-            new Vector3d(.5, 0, 0),
-            new Vector3d(0, 0, -.5),
-            new Vector3d(0, 0, .5)
+  private void setUp() {
+    Vector3d centerPoint = getRegion().getCenter();
+    centralDropPoint = new Location<>(
+        getRegion().getExtent(),
+        new Vector3d(
+            centerPoint.getX(),
+            getRegion().getMinimumPoint().getY() + 11,
+            centerPoint.getZ()
+        )
     );
 
-    private void dropResults() {
-        Location<World> targetDropPoint = centralDropPoint.add(Probability.pickOneOf(pointAdjustments));
+    state = ForgeState.load();
+  }
 
-        new FixedPointItemDropper(targetDropPoint).dropStacks(getProduce(), SpawnTypes.PLUGIN);
+  @Override
+  public boolean init() {
+    remove();
+    setUp();
+    return true;
+  }
 
-        state.save();
+  private Optional<ItemStack> getResultingItemStack(ItemStackSnapshot snapshot) {
+    net.minecraft.item.ItemStack result = FurnaceRecipes.instance().getSmeltingResult(tf(snapshot.createStack()));
+    if (result == null) {
+      return Optional.empty();
     }
 
-    private static final List<EntityType> possibleMobs = Lists.newArrayList(
-            EntityTypes.SKELETON, EntityTypes.ZOMBIE, EntityTypes.CREEPER, EntityTypes.SPIDER
-    );
+    return Optional.of(tf(result));
+  }
 
-    private static Cause getSpawnCause() {
-        return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
+  private int getQuantityToSupply(ItemStackSnapshot snapshot) {
+    int total = 0;
+
+    for (int i = 0; i < snapshot.getCount(); ++i) {
+      total += Probability.getRandom(8);
     }
-    private void summonMobs() {
-        if (getContained().size() > 50) {
-            return;
+
+    Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+    if (optService.isPresent() && optService.get().isActive(TRIPLE_FACTORY_PRODUCTION)) {
+      total *= 3;
+    }
+
+    return total;
+  }
+
+  private void addResource(ItemStackSnapshot snapshot) {
+    Optional<ItemStack> optResult = getResultingItemStack(snapshot);
+    if (!optResult.isPresent()) {
+      return;
+    }
+
+    state.getResults().merge(optResult.get(), getQuantityToSupply(snapshot), (a, b) -> a + b);
+  }
+
+  private void runOreCheck() {
+    for (Item item : getContained(Item.class)) {
+      BlockType belowType = item.getLocation().add(0, -1, 0).getBlockType();
+      if (belowType == BlockTypes.GOLD_BLOCK) {
+        addResource(item.item().get());
+        item.remove();
+      }
+    }
+
+    state.save();
+  }
+
+  private void killPlayersInLava() {
+    for (Player player : getPlayers(PARTICIPANT)) {
+      if (player.getLocation().getBlockType() != BlockTypes.LAVA) {
+        continue;
+      }
+
+      if (player.get(Keys.HEALTH).get() <= 0) {
+        continue;
+      }
+
+      player.offer(Keys.HEALTH, 0D);
+    }
+  }
+
+  private int getQuantityToProduce() {
+    int max = getPlayers(PARTICIPANT).size() * 9;
+
+    Optional<ModifierService> optService = Sponge.getServiceManager().provide(ModifierService.class);
+    if (optService.isPresent() && optService.get().isActive(HEXA_FACTORY_SPEED)) {
+      max *= 6;
+    }
+
+    return Probability.getRangedRandom(max / 3, max);
+  }
+
+  private List<ItemStack> getProduce() {
+    Map<ItemStack, Integer> results = state.getResults();
+    int quantityToProduce = getQuantityToProduce();
+
+    List<ItemStack> produce = new ArrayList<>();
+    while (!results.isEmpty() && quantityToProduce > 0) {
+      ItemStack stackToMake = Probability.pickOneOf(results.keySet());
+      int supply = results.get(stackToMake);
+      if (supply >= quantityToProduce) {
+        results.put(stackToMake, supply - quantityToProduce);
+
+        for (int i = 0; i < quantityToProduce; ++i) {
+          produce.add(newItemStack(stackToMake));
         }
 
-        List<Entity> entities = new ArrayList<>();
+        quantityToProduce = 0;
+      } else {
+        results.remove(stackToMake);
 
-        for (int i = Probability.getRandom(getPlayers(PARTICIPANT).size() * 5); i > 0; --i) {
-            Entity e = getRegion().getExtent().createEntity(Probability.pickOneOf(possibleMobs), getRandomEntryPoint().getPosition());
-            if (e instanceof Skeleton) {
-                ((Skeleton) e).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
-            }
-            entities.add(e);
+        for (int i = 0; i < supply; ++i) {
+          produce.add(newItemStack(stackToMake));
         }
 
-        getRegion().getExtent().spawnEntities(entities, getSpawnCause());
+        quantityToProduce = quantityToProduce - supply;
+      }
     }
 
-    @Override
-    public void run() {
-        killPlayersInLava();
-        runOreCheck();
-        dropResults();
-        summonMobs();
+    return produce;
+  }
+
+  private final List<Vector3d> pointAdjustments = Lists.newArrayList(
+      new Vector3d(-.5, 0, 0),
+      new Vector3d(.5, 0, 0),
+      new Vector3d(0, 0, -.5),
+      new Vector3d(0, 0, .5)
+  );
+
+  private void dropResults() {
+    Location<World> targetDropPoint = centralDropPoint.add(Probability.pickOneOf(pointAdjustments));
+
+    new FixedPointItemDropper(targetDropPoint).dropStacks(getProduce(), SpawnTypes.PLUGIN);
+
+    state.save();
+  }
+
+  private static final List<EntityType> POSSIBLE_MOBS = Lists.newArrayList(
+      EntityTypes.SKELETON, EntityTypes.ZOMBIE, EntityTypes.CREEPER, EntityTypes.SPIDER
+  );
+
+  private static Cause getSpawnCause() {
+    return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
+  }
+
+  private void summonMobs() {
+    if (getContained().size() > 50) {
+      return;
     }
 
-    @Override
-    public void forceEnd() {
-        remove(getPlayers(PARTICIPANT));
+    List<Entity> entities = new ArrayList<>();
+
+    for (int i = Probability.getRandom(getPlayers(PARTICIPANT).size() * 5); i > 0; --i) {
+      Entity e = getRegion().getExtent().createEntity(Probability.pickOneOf(POSSIBLE_MOBS), getRandomEntryPoint().getPosition());
+      if (e instanceof Skeleton) {
+        ((Skeleton) e).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
+      }
+      entities.add(e);
     }
 
-    private boolean isValidTeleportDestination(Location<World> targetPoint) {
-        return targetPoint.getBlockType() == BlockTypes.AIR
-                && targetPoint.add(0, -1, 0).getBlockType() == BlockTypes.STONEBRICK;
-    }
+    getRegion().getExtent().spawnEntities(entities, getSpawnCause());
+  }
 
-    private Location<World> getRandomEntryPoint() {
-        Vector3i minimumPoint = getRegion().getMinimumPoint();
-        Vector3i maximumPoint = getRegion().getMaximumPoint();
+  @Override
+  public void run() {
+    killPlayersInLava();
+    runOreCheck();
+    dropResults();
+    summonMobs();
+  }
 
-        Location<World> targetPoint;
-        do {
-            double targetX = Probability.getRangedRandom(minimumPoint.getX(), maximumPoint.getX()) + .5;
-            double targetY = minimumPoint.getY() + 7;
-            double targetZ = Probability.getRangedRandom(minimumPoint.getZ(), maximumPoint.getZ()) + .5;
+  @Override
+  public void forceEnd() {
+    remove(getPlayers(PARTICIPANT));
+  }
 
-            targetPoint = new Location<>(getRegion().getExtent(), targetX, targetY, targetZ);
-        } while (!isValidTeleportDestination(targetPoint));
+  private boolean isValidTeleportDestination(Location<World> targetPoint) {
+    return targetPoint.getBlockType() == BlockTypes.AIR
+        && targetPoint.add(0, -1, 0).getBlockType() == BlockTypes.STONEBRICK;
+  }
 
-        return targetPoint;
-    }
+  private Location<World> getRandomEntryPoint() {
+    Vector3i minimumPoint = getRegion().getMinimumPoint();
+    Vector3i maximumPoint = getRegion().getMaximumPoint();
 
-    @Override
-    public Clause<Player, ZoneStatus> add(Player player) {
-        player.setLocation(getRandomEntryPoint());
+    Location<World> targetPoint;
+    do {
+      double targetX = Probability.getRangedRandom(minimumPoint.getX(), maximumPoint.getX()) + .5;
+      double targetY = minimumPoint.getY() + 7;
+      double targetZ = Probability.getRangedRandom(minimumPoint.getZ(), maximumPoint.getZ()) + .5;
 
-        return new Clause<>(player, ZoneStatus.ADDED);
-    }
+      targetPoint = new Location<>(getRegion().getExtent(), targetX, targetY, targetZ);
+    } while (!isValidTeleportDestination(targetPoint));
+
+    return targetPoint;
+  }
+
+  @Override
+  public Clause<Player, ZoneStatus> add(Player player) {
+    player.setLocation(getRandomEntryPoint());
+
+    return new Clause<>(player, ZoneStatus.ADDED);
+  }
 }

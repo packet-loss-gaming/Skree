@@ -14,54 +14,57 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface Region {
-    UUID getID();
+  UUID getID();
 
-    String getWorldName();
+  String getWorldName();
 
-    RegionPoint getMasterBlock();
-    void setMasterBlock(RegionPoint masterBlock);
+  RegionPoint getMasterBlock();
 
-    String getName();
-    void setName(String name);
+  void setMasterBlock(RegionPoint masterBlock);
 
-    int getPowerLevel();
+  String getName();
 
-    double getArea();
-    double getMaximumArea();
+  void setName(String name);
 
-    Set<UUID> getMembers();
+  int getPowerLevel();
 
-    Set<RegionPoint> getFullPoints();
+  double getArea();
 
-    RegionPoint getMax();
+  double getMaximumArea();
 
-    RegionPoint getMin();
+  Set<UUID> getMembers();
 
-    List<RegionPoint> getPoints();
+  Set<RegionPoint> getFullPoints();
 
-    RegionErrorStatus addPoint(RegionPoint newPoint);
+  RegionPoint getMax();
 
-    RegionErrorStatus addPoint(Collection<RegionPoint> newPoints);
+  RegionPoint getMin();
 
-    RegionErrorStatus remPoint(RegionPoint oldPoint);
+  List<RegionPoint> getPoints();
 
-    RegionErrorStatus remPoint(Collection<RegionPoint> oldPoint);
+  RegionErrorStatus addPoint(RegionPoint newPoint);
 
-    boolean isMarkedPoint(RegionPoint point);
+  RegionErrorStatus addPoint(Collection<RegionPoint> newPoints);
 
-    void addMember(UUID newMember);
+  RegionErrorStatus remPoint(RegionPoint oldPoint);
 
-    void addMember(Collection<UUID> newMembers);
+  RegionErrorStatus remPoint(Collection<RegionPoint> oldPoint);
 
-    void remMember(UUID oldMember);
+  boolean isMarkedPoint(RegionPoint point);
 
-    void remMember(Collection<UUID> oldMembers);
+  void addMember(UUID newMember);
 
-    boolean isMember(Player player);
+  void addMember(Collection<UUID> newMembers);
 
-    boolean isEditPrevented(Player player, RegionPoint point);
+  void remMember(UUID oldMember);
 
-    boolean isActive();
+  void remMember(Collection<UUID> oldMembers);
 
-    boolean contains(RegionPoint pos);
+  boolean isMember(Player player);
+
+  boolean isEditPrevented(Player player, RegionPoint point);
+
+  boolean isActive();
+
+  boolean contains(RegionPoint pos);
 }

@@ -16,25 +16,25 @@ import java.util.UUID;
 
 public class PvPServiceImpl implements PvPService {
 
-    private HashMap<UUID, PvPState> stateMap = new HashMap<>();
+  private HashMap<UUID, PvPState> stateMap = new HashMap<>();
 
-    @Listener
-    public void onDisconnect(ClientConnectionEvent.Disconnect event) {
-        stateMap.remove(event.getTargetEntity().getUniqueId());
-    }
+  @Listener
+  public void onDisconnect(ClientConnectionEvent.Disconnect event) {
+    stateMap.remove(event.getTargetEntity().getUniqueId());
+  }
 
-    @Override
-    public void setPvPState(Player player, PvPState state) {
-        stateMap.put(player.getUniqueId(), state);
-    }
+  @Override
+  public void setPvPState(Player player, PvPState state) {
+    stateMap.put(player.getUniqueId(), state);
+  }
 
-    @Override
-    public PvPState getPvPState(Player player) {
-        return stateMap.getOrDefault(player.getUniqueId(), getDefaultState(player));
-    }
+  @Override
+  public PvPState getPvPState(Player player) {
+    return stateMap.getOrDefault(player.getUniqueId(), getDefaultState(player));
+  }
 
-    @Override
-    public PvPState getDefaultState(Player player) {
-        return PvPState.DENIED;
-    }
+  @Override
+  public PvPState getDefaultState(Player player) {
+    return PvPState.DENIED;
+  }
 }

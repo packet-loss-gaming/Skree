@@ -25,45 +25,45 @@ import java.util.Optional;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
-    public InstanceWorldWrapper() {
-        this(new ArrayList<>());
+  public InstanceWorldWrapper() {
+    this(new ArrayList<>());
+  }
+
+  public InstanceWorldWrapper(Collection<World> worlds) {
+    super("Instance", worlds);
+  }
+
+  @Override
+  public void addWorld(World world) {
+    super.addWorld(world);
+    tf(world).setAllowedSpawnTypes(false, false);
+  }
+
+  @Listener
+  public void onLogin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    if (!isApplicable(player)) {
+      return;
     }
 
-    public InstanceWorldWrapper(Collection<World> worlds) {
-        super("Instance", worlds);
+    Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+    if (!optWorldService.isPresent()) {
+      return;
     }
 
-    @Override
-    public void addWorld(World world) {
-        super.addWorld(world);
-        tf(world).setAllowedSpawnTypes(false, false);
+    WorldService worldService = optWorldService.get();
+
+    Collection<World> worlds = worldService.getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
+    player.setLocation(worlds.iterator().next().getSpawnLocation());
+  }
+
+  @Listener
+  public void onRespawn(RespawnPlayerEvent event) {
+    if (isApplicable(event.getToTransform().getExtent())) {
+      Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+      if (optWorldService.isPresent()) {
+        Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
+        event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
+      }
     }
-
-    @Listener
-    public void onLogin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-        if (!isApplicable(player)) {
-            return;
-        }
-
-        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-        if (!optWorldService.isPresent()) {
-            return;
-        }
-
-        WorldService worldService = optWorldService.get();
-
-        Collection<World> worlds = worldService.getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-        player.setLocation(worlds.iterator().next().getSpawnLocation());
-    }
-
-    @Listener
-    public void onRespawn(RespawnPlayerEvent event) {
-        if (isApplicable(event.getToTransform().getExtent())) {
-            Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-            if (optWorldService.isPresent()) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-                event.setToTransform(new Transform<>(worlds.iterator().next().getSpawnLocation()));
-            }
-        }
-    }
+  }
 }

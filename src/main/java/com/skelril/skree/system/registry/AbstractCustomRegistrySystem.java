@@ -13,19 +13,22 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AbstractCustomRegistrySystem {
-    private JarResourceLoader jarResourceLoader;
+  private JarResourceLoader jarResourceLoader;
 
-    public AbstractCustomRegistrySystem(String baseResourcePathName) {
-        this.jarResourceLoader = new JarResourceLoader(baseResourcePathName);
-    }
+  public AbstractCustomRegistrySystem(String baseResourcePathName) {
+    this.jarResourceLoader = new JarResourceLoader(baseResourcePathName);
+  }
 
-    protected void loadFromResources(Consumer<Function<String, Path>> execute) {
-        jarResourceLoader.loadFromResources(execute);
-    }
+  protected void loadFromResources(Consumer<Function<String, Path>> execute) {
+    jarResourceLoader.loadFromResources(execute);
+  }
 
-    public void preInit() { }
+  public void preInit() {
+  }
 
-    public void associate() { }
+  public void associate() {
+  }
 
-    public void init() { }
+  public void init() {
+  }
 }

@@ -27,155 +27,155 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class LegacyZoneBase implements Zone {
-    protected ZoneRegion region;
-    private boolean expired = false;
+  protected ZoneRegion region;
+  private boolean expired = false;
 
-    public LegacyZoneBase(ZoneRegion region) {
-        this.region = region;
-    }
+  public LegacyZoneBase(ZoneRegion region) {
+    this.region = region;
+  }
 
-    public boolean isActive() {
-        return !expired;
+  public boolean isActive() {
+    return !expired;
+  }
+
+  @Override
+  public Clause<Player, ZoneStatus> remove(Player player) {
+    RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+
+    Location<World> newLocation = respawnService.pop(player).orElse(respawnService.getDefault(player));
+    player.setLocation(newLocation);
+
+    return new Clause<>(player, ZoneStatus.REMOVED);
+  }
+
+  @Override
+  public ZoneRegion getRegion() {
+    return region;
+  }
+
+  @Override
+  public Collection<Player> getPlayers(PlayerClassifier classifier) {
+    return Sponge.getServer().getOnlinePlayers().stream().filter(this::contains).collect(Collectors.toList());
+  }
+
+  public Collection<Entity> getContained() {
+    return getContained(Entity.class);
+  }
+
+  private Collection<Entity> __getContained(Predicate<Location<World>> locationPredicate, Predicate<Entity> entityPredicate) {
+    return getRegion().getExtent().getEntities(e -> {
+      return entityPredicate.test(e) && locationPredicate.test(e.getLocation());
+    });
+  }
+
+  private class ZoneBoundingBoxPredicate implements Predicate<Location<World>> {
+
+    private ZoneBoundingBox box;
+
+    public ZoneBoundingBoxPredicate(ZoneBoundingBox box) {
+      this.box = box;
     }
 
     @Override
-    public Clause<Player, ZoneStatus> remove(Player player) {
-        RespawnService respawnService = Sponge.getServiceManager().provideUnchecked(RespawnService.class);
+    public boolean test(Location<World> location) {
+      return contains(location) && box.contains(location.getPosition());
+    }
+  }
 
-        Location<World> newLocation = respawnService.pop(player).orElse(respawnService.getDefault(player));
-        player.setLocation(newLocation);
+  private class EntityTypePredicate implements Predicate<Entity> {
 
-        return new Clause<>(player, ZoneStatus.REMOVED);
+    private List<EntityType> entityTypes;
+
+    public EntityTypePredicate(List<EntityType> entityTypes) {
+      this.entityTypes = entityTypes;
     }
 
     @Override
-    public ZoneRegion getRegion() {
-        return region;
+    public boolean test(Entity entity) {
+      for (EntityType entityType : entityTypes) {
+        if (entity.getType() == entityType) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  private class ClassPredicate implements Predicate<Entity> {
+
+    private List<Class<?>> classes;
+
+    public ClassPredicate(List<Class<?>> classes) {
+      this.classes = classes;
     }
 
     @Override
-    public Collection<Player> getPlayers(PlayerClassifier classifier) {
-        return Sponge.getServer().getOnlinePlayers().stream().filter(this::contains).collect(Collectors.toList());
-    }
-
-    public Collection<Entity> getContained() {
-        return getContained(Entity.class);
-    }
-
-    private Collection<Entity> __getContained(Predicate<Location<World>> locationPredicate, Predicate<Entity> entityPredicate) {
-        return getRegion().getExtent().getEntities(e -> {
-            return entityPredicate.test(e) && locationPredicate.test(e.getLocation());
-        });
-    }
-
-    private class ZoneBoundingBoxPredicate implements Predicate<Location<World>> {
-
-        private ZoneBoundingBox box;
-
-        public ZoneBoundingBoxPredicate(ZoneBoundingBox box) {
-            this.box = box;
+    public boolean test(Entity entity) {
+      for (Class<?> clazz : classes) {
+        if (clazz.isInstance(entity)) {
+          return true;
         }
-
-        @Override
-        public boolean test(Location<World> location) {
-            return contains(location) && box.contains(location.getPosition());
-        }
+      }
+      return false;
     }
+  }
 
-    private class EntityTypePredicate implements Predicate<Entity> {
+  @SuppressWarnings("unchecked")
+  public <T extends Entity> Collection<T> getContained(Class<T> clazz) {
+    return (Collection<T>) __getContained(this::contains, new ClassPredicate(Lists.newArrayList(clazz)));
+  }
 
-        private List<EntityType> entityTypes;
+  public Collection<Entity> getContained(Class<?>... classes) {
+    return __getContained(this::contains, new ClassPredicate(Lists.newArrayList(classes)));
+  }
 
-        public EntityTypePredicate(List<EntityType> entityTypes) {
-            this.entityTypes = entityTypes;
-        }
+  @SuppressWarnings("unchecked")
+  public <T extends Entity> Collection<T> getContained(ZoneBoundingBox box, Class<T> clazz) {
+    return (Collection<T>) __getContained(
+        new ZoneBoundingBoxPredicate(box),
+        new ClassPredicate(Lists.newArrayList(clazz))
+    );
+  }
 
-        @Override
-        public boolean test(Entity entity) {
-            for (EntityType entityType : entityTypes) {
-                if (entity.getType() == entityType) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+  public Collection<Entity> getContained(ZoneBoundingBox box, Class<?>... classes) {
+    return __getContained(
+        new ZoneBoundingBoxPredicate(box),
+        new ClassPredicate(Lists.newArrayList(classes))
+    );
+  }
 
-    private class ClassPredicate implements Predicate<Entity> {
+  public Collection<Entity> getContained(EntityType... types) {
+    return __getContained(this::contains, new EntityTypePredicate(Lists.newArrayList(types)));
+  }
 
-        private List<Class<?>> classes;
+  public Collection<Entity> getContained(ZoneBoundingBox box, EntityType... types) {
+    return __getContained(
+        new ZoneBoundingBoxPredicate(box),
+        new EntityTypePredicate(Lists.newArrayList(types))
+    );
+  }
 
-        public ClassPredicate(List<Class<?>> classes) {
-            this.classes = classes;
-        }
+  public boolean contains(Entity entity) {
+    return contains(entity.getLocation());
+  }
 
-        @Override
-        public boolean test(Entity entity) {
-            for (Class<?> clazz : classes) {
-                if (clazz.isInstance(entity)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+  public boolean contains(Location<World> location) {
+    return getRegion().getExtent().equals(location.getExtent()) && getRegion().contains(location.getPosition());
+  }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> Collection<T> getContained(Class<T> clazz) {
-        return (Collection<T>) __getContained(this::contains, new ClassPredicate(Lists.newArrayList(clazz)));
-    }
+  public void expire() {
+    expired = true;
+  }
 
-    public Collection<Entity> getContained(Class<?>... classes) {
-        return __getContained(this::contains, new ClassPredicate(Lists.newArrayList(classes)));
-    }
+  public boolean isEmpty() {
+    return getPlayers(PlayerClassifier.PARTICIPANT).isEmpty();
+  }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> Collection<T> getContained(ZoneBoundingBox box, Class<T> clazz) {
-        return (Collection<T>) __getContained(
-                new ZoneBoundingBoxPredicate(box),
-                new ClassPredicate(Lists.newArrayList(clazz))
-        );
-    }
+  public void remove() {
+    remove(Monster.class, ExperienceOrb.class, Item.class, Arrow.class);
+  }
 
-    public Collection<Entity> getContained(ZoneBoundingBox box, Class<?>... classes) {
-        return __getContained(
-                new ZoneBoundingBoxPredicate(box),
-                new ClassPredicate(Lists.newArrayList(classes))
-        );
-    }
-
-    public Collection<Entity> getContained(EntityType... types) {
-        return __getContained(this::contains, new EntityTypePredicate(Lists.newArrayList(types)));
-    }
-
-    public Collection<Entity> getContained(ZoneBoundingBox box, EntityType... types) {
-        return __getContained(
-                new ZoneBoundingBoxPredicate(box),
-                new EntityTypePredicate(Lists.newArrayList(types))
-        );
-    }
-
-    public boolean contains(Entity entity) {
-        return contains(entity.getLocation());
-    }
-
-    public boolean contains(Location<World> location) {
-        return getRegion().getExtent().equals(location.getExtent()) && getRegion().contains(location.getPosition());
-    }
-
-    public void expire() {
-        expired = true;
-    }
-
-    public boolean isEmpty() {
-        return getPlayers(PlayerClassifier.PARTICIPANT).isEmpty();
-    }
-
-    public void remove() {
-        remove(Monster.class, ExperienceOrb.class, Item.class, Arrow.class);
-    }
-
-    public void remove(Class<?>... classes) {
-        getContained(classes).stream().filter(e -> !(e instanceof Player)).forEach(Entity::remove);
-    }
+  public void remove(Class<?>... classes) {
+    getContained(classes).stream().filter(e -> !(e instanceof Player)).forEach(Entity::remove);
+  }
 }

@@ -16,10 +16,10 @@ import org.spongepowered.api.world.World;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public abstract class SkeletonArcherWanderer implements WanderingBoss<Skeleton> {
-    @Override
-    public Entity createEntity(Location<World> location) {
-        Skeleton skeleton = (Skeleton) location.getExtent().createEntity(getEntityType(), location.getPosition());
-        skeleton.setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
-        return skeleton;
-    }
+  @Override
+  public Entity createEntity(Location<World> location) {
+    Skeleton skeleton = (Skeleton) location.getExtent().createEntity(getEntityType(), location.getPosition());
+    skeleton.setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
+    return skeleton;
+  }
 }

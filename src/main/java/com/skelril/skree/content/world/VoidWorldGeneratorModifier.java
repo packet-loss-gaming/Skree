@@ -14,22 +14,22 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 public class VoidWorldGeneratorModifier implements WorldGeneratorModifier {
-    @Override
-    public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
-        for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
-            worldGenerator.getBiomeSettings(biomeType).getPopulators().clear();
-        }
-
-        worldGenerator.setBaseGenerationPopulator(new VoidTerrainGenerator());
+  @Override
+  public void modifyWorldGenerator(WorldProperties world, DataContainer settings, WorldGenerator worldGenerator) {
+    for (BiomeType biomeType : Sponge.getRegistry().getAllOf(BiomeType.class)) {
+      worldGenerator.getBiomeSettings(biomeType).getPopulators().clear();
     }
 
-    @Override
-    public String getId() {
-        return "skree:void";
-    }
+    worldGenerator.setBaseGenerationPopulator(new VoidTerrainGenerator());
+  }
 
-    @Override
-    public String getName() {
-        return "Void";
-    }
+  @Override
+  public String getId() {
+    return "skree:void";
+  }
+
+  @Override
+  public String getName() {
+    return "Void";
+  }
 }

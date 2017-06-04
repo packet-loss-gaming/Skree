@@ -9,13 +9,13 @@ package com.skelril.nitro.registry.dynamic.recipe;
 import com.skelril.nitro.registry.dynamic.Loader;
 
 public class ShapelessRecipeLoader implements Loader<ShapelessRecipeConfig> {
-    @Override
-    public void load(ShapelessRecipeConfig config) {
-        config.registerRecipie();
-    }
+  @Override
+  public void load(ShapelessRecipeConfig config) {
+    config.registerRecipie();
+  }
 
-    @Override
-    public Class<ShapelessRecipeConfig> getConfigClass() {
-        return ShapelessRecipeConfig.class;
-    }
+  @Override
+  public Class<ShapelessRecipeConfig> getConfigClass() {
+    return ShapelessRecipeConfig.class;
+  }
 }

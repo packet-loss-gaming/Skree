@@ -25,95 +25,95 @@ import java.lang.reflect.Method;
 
 public class CustomBlockSystem {
 
-    public void preInit() {
-        try {
-            iterate(CustomBlockSystem.class.getDeclaredMethod("register", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
-        }
+  public void preInit() {
+    try {
+      iterate(CustomBlockSystem.class.getDeclaredMethod("register", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
     }
+  }
 
-    public void associate() {
-        try {
-            iterate(CustomBlockSystem.class.getDeclaredMethod("registerAssociates", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
-        }
+  public void associate() {
+    try {
+      iterate(CustomBlockSystem.class.getDeclaredMethod("registerAssociates", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
     }
+  }
 
 
-    public void init() {
-        try {
-            iterate(CustomBlockSystem.class.getDeclaredMethod("render", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
-        }
+  public void init() {
+    try {
+      iterate(CustomBlockSystem.class.getDeclaredMethod("render", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
     }
+  }
 
 
-    private void iterate(Method method) {
-        method.setAccessible(true);
-        for (Field field : CustomBlockTypes.class.getFields()) {
-            try {
-                Object result = field.get(null);
-                method.invoke(this, result);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+  private void iterate(Method method) {
+    method.setAccessible(true);
+    for (Field field : CustomBlockTypes.class.getFields()) {
+      try {
+        Object result = field.get(null);
+        method.invoke(this, result);
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
     }
+  }
 
-    // Invoked via reflection
-    @SuppressWarnings("unused")
-    private void register(Object block) {
-        if (block instanceof Block && block instanceof ICustomBlock) {
-            ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+  // Invoked via reflection
+  @SuppressWarnings("unused")
+  private void register(Object block) {
+    if (block instanceof Block && block instanceof ICustomBlock) {
+      ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
 
-            GameRegistry.registerBlock((Block) block, ((ICustomBlock) block).__getID());
+      GameRegistry.registerBlock((Block) block, ((ICustomBlock) block).__getID());
 
-            // Add selective hooks
-            if (block instanceof EventAwareContent) {
-                Sponge.getEventManager().registerListeners(SkreePlugin.inst(), block);
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
+      // Add selective hooks
+      if (block instanceof EventAwareContent) {
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), block);
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
     }
+  }
 
-    @SuppressWarnings("unused")
-    private void registerAssociates(Object block) {
-        if (block instanceof Block && block instanceof ICustomBlock) {
-            if (block instanceof Craftable) {
-                ((Craftable) block).registerRecipes();
-            }
+  @SuppressWarnings("unused")
+  private void registerAssociates(Object block) {
+    if (block instanceof Block && block instanceof ICustomBlock) {
+      if (block instanceof Craftable) {
+        ((Craftable) block).registerRecipes();
+      }
 
-            if (block instanceof CookedItem) {
-                ((CookedItem) block).registerIngredients();
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
+      if (block instanceof CookedItem) {
+        ((CookedItem) block).registerIngredients();
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
     }
+  }
 
-    // Invoked via reflection
-    @SuppressWarnings("unused")
-    private void render(Object block) {
-        if (block instanceof Block && block instanceof ICustomBlock) {
-            if (Sponge.getPlatform().getExecutionType().isClient()) {
-                RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+  // Invoked via reflection
+  @SuppressWarnings("unused")
+  private void render(Object block) {
+    if (block instanceof Block && block instanceof ICustomBlock) {
+      if (Sponge.getPlatform().getExecutionType().isClient()) {
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
-                renderItem.getItemModelMesher().register(
-                        Item.getItemFromBlock((Block) block),
-                        0,
-                        new ModelResourceLocation(
-                                "skree:" + ((ICustomBlock) block).__getID(),
-                                "inventory"
-                        )
-                );
+        renderItem.getItemModelMesher().register(
+            Item.getItemFromBlock((Block) block),
+            0,
+            new ModelResourceLocation(
+                "skree:" + ((ICustomBlock) block).__getID(),
+                "inventory"
+            )
+        );
 
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
     }
+  }
 }

@@ -36,59 +36,59 @@ import java.util.Optional;
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
 public class StormBringer extends SkeletonArcherWanderer {
-    private final BossManager<Skeleton, WildernessBossDetail> bossManager = new BossManager<>();
+  private final BossManager<Skeleton, WildernessBossDetail> bossManager = new BossManager<>();
 
-    public StormBringer() {
-        setupStormBringer();
-    }
+  public StormBringer() {
+    setupStormBringer();
+  }
 
-    @Override
-    public EntityType getEntityType() {
-        return EntityTypes.SKELETON;
-    }
+  @Override
+  public EntityType getEntityType() {
+    return EntityTypes.SKELETON;
+  }
 
-    @Override
-    public void bind(Skeleton entity, WildernessBossDetail detail) {
-        bossManager.bind(new Boss<>(entity, detail));
-    }
+  @Override
+  public void bind(Skeleton entity, WildernessBossDetail detail) {
+    bossManager.bind(new Boss<>(entity, detail));
+  }
 
-    private void setupStormBringer() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(bossManager, Skeleton.class)
-        );
+  private void setupStormBringer() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(bossManager, Skeleton.class)
+    );
 
-        List<Instruction<BindCondition, Boss<Skeleton, WildernessBossDetail>>> bindProcessor = bossManager.getBindProcessor();
-        bindProcessor.add((condition, boss) -> {
-            Optional<Skeleton> optBossEnt = boss.getTargetEntity();
-            if (optBossEnt.isPresent()) {
-                Skeleton bossEnt = optBossEnt.get();
-                bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Storm Bringer"));
-                double bossHealth = 20 * 30 * boss.getDetail().getLevel();
-                setMaxHealth(bossEnt, bossHealth, true);
-            }
-            return Optional.empty();
-        });
+    List<Instruction<BindCondition, Boss<Skeleton, WildernessBossDetail>>> bindProcessor = bossManager.getBindProcessor();
+    bindProcessor.add((condition, boss) -> {
+      Optional<Skeleton> optBossEnt = boss.getTargetEntity();
+      if (optBossEnt.isPresent()) {
+        Skeleton bossEnt = optBossEnt.get();
+        bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Storm Bringer"));
+        double bossHealth = 20 * 30 * boss.getDetail().getLevel();
+        setMaxHealth(bossEnt, bossHealth, true);
+      }
+      return Optional.empty();
+    });
 
-        List<Instruction<DamageCondition, Boss<Skeleton, WildernessBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            Entity eToHit = condition.getAttacked();
-            if (!(eToHit instanceof Living)) {
-                return Optional.empty();
-            }
+    List<Instruction<DamageCondition, Boss<Skeleton, WildernessBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      Entity eToHit = condition.getAttacked();
+      if (!(eToHit instanceof Living)) {
+        return Optional.empty();
+      }
 
-            Living toHit = (Living) eToHit;
-            Location<World> targetLocation = toHit.getLocation();
-            for (int i = boss.getDetail().getLevel() * Probability.getRangedRandom(1, 10); i >= 0; --i) {
-                Task.builder().execute(() -> {
-                    Entity lightning = targetLocation.getExtent().createEntity(EntityTypes.LIGHTNING, targetLocation.getPosition());
-                    targetLocation.getExtent().spawnEntity(
-                            lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-                    );
-                }).delayTicks(5 * (6 + i)).submit(SkreePlugin.inst());
-            }
+      Living toHit = (Living) eToHit;
+      Location<World> targetLocation = toHit.getLocation();
+      for (int i = boss.getDetail().getLevel() * Probability.getRangedRandom(1, 10); i >= 0; --i) {
+        Task.builder().execute(() -> {
+          Entity lightning = targetLocation.getExtent().createEntity(EntityTypes.LIGHTNING, targetLocation.getPosition());
+          targetLocation.getExtent().spawnEntity(
+              lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+          );
+        }).delayTicks(5 * (6 + i)).submit(SkreePlugin.inst());
+      }
 
-            return Optional.empty();
-        });
-    }
+      return Optional.empty();
+    });
+  }
 }

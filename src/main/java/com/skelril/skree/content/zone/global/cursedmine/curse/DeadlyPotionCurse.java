@@ -26,31 +26,31 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class DeadlyPotionCurse implements Consumer<Player> {
-    private static Random random = new Random(System.currentTimeMillis());
+  private static Random random = new Random(System.currentTimeMillis());
 
-    private void throwSlashPotion(Location<World> location) {
+  private void throwSlashPotion(Location<World> location) {
 
-        PotionEffectType[] thrownTypes = new PotionEffectType[]{
-                PotionEffectTypes.INSTANT_DAMAGE, PotionEffectTypes.INSTANT_DAMAGE,
-                PotionEffectTypes.POISON, PotionEffectTypes.WEAKNESS
-        };
+    PotionEffectType[] thrownTypes = new PotionEffectType[] {
+        PotionEffectTypes.INSTANT_DAMAGE, PotionEffectTypes.INSTANT_DAMAGE,
+        PotionEffectTypes.POISON, PotionEffectTypes.WEAKNESS
+    };
 
-        Entity entity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
-        entity.setVelocity(new Vector3d(
-                random.nextDouble() * .5 - .25,
-                random.nextDouble() * .4 + .1,
-                random.nextDouble() * .5 - .25
-        ));
+    Entity entity = location.getExtent().createEntity(EntityTypes.SPLASH_POTION, location.getPosition());
+    entity.setVelocity(new Vector3d(
+        random.nextDouble() * .5 - .25,
+        random.nextDouble() * .4 + .1,
+        random.nextDouble() * .5 - .25
+    ));
 
-        PotionEffectType type = Probability.pickOneOf(thrownTypes);
-        PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
-        entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
+    PotionEffectType type = Probability.pickOneOf(thrownTypes);
+    PotionEffect effect = PotionEffect.of(type, 2, type.isInstant() ? 1 : 15 * 20);
+    entity.offer(Keys.POTION_EFFECTS, Lists.newArrayList(effect));
 
-        location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-    }
+    location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+  }
 
-    @Override
-    public void accept(Player player) {
-        throwSlashPotion(player.getLocation());
-    }
+  @Override
+  public void accept(Player player) {
+    throwSlashPotion(player.getLocation());
+  }
 }

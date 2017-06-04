@@ -25,44 +25,44 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZonePvPListener<T> extends ZoneApplicableListener<T> {
-    public ZonePvPListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
-    }
+  public ZonePvPListener(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
 
-    private PlayerCombatParser createFor(Cancellable event) {
-        return new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender) {
-                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-                if (optService.isPresent()) {
-                    PvPService service = optService.get();
-                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
-                        return;
-                    }
-                }
-
-                attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this area!"));
-
-                event.setCancelled(true);
-            }
-        };
-    }
-
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity())) {
+  private PlayerCombatParser createFor(Cancellable event) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPvP(Player attacker, Player defender) {
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+        if (optService.isPresent()) {
+          PvPService service = optService.get();
+          if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
             return;
+          }
         }
 
-        createFor(event).parse(event);
+        attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in this area!"));
+
+        event.setCancelled(true);
+      }
+    };
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    if (!isApplicable(event.getTargetEntity())) {
+      return;
     }
 
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        if (!isApplicable(projectile)) {
-            return;
-        }
+    createFor(event).parse(event);
+  }
 
-        createFor(event).parse(event);
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    if (!isApplicable(projectile)) {
+      return;
     }
+
+    createFor(event).parse(event);
+  }
 }

@@ -27,29 +27,36 @@ import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 
 public class ZoneMeCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
-        service.requestZone(args.<String>getOne("zone").get(), (Player) src, () -> {
-            src.sendMessage(Text.of(TextColors.YELLOW, "Job completed."));
-        }, (clause) -> {
-            if (clause.isPresent()) {
-                ZoneStatus status = clause.get().getValue();
-                src.sendMessage(Text.of(status == ZoneStatus.ADDED ? TextColors.GREEN : TextColors.RED, "Added with status: ", status));
-            }
-        });
-        src.sendMessage(Text.of(TextColors.YELLOW, "Creating requested zone."));
-        return CommandResult.success();
-    }
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
+    service.requestZone(
+        args.<String>getOne("zone").get(),
+        (Player) src,
+        () -> {
+          src.sendMessage(Text.of(TextColors.YELLOW, "Job completed."));
+        },
+        (clause) -> {
+          if (clause.isPresent()) {
+            ZoneStatus status = clause.get().getValue();
+            src.sendMessage(
+                Text.of(status == ZoneStatus.ADDED ? TextColors.GREEN : TextColors.RED, "Added with status: ", status)
+            );
+          }
+        }
+    );
+    src.sendMessage(Text.of(TextColors.YELLOW, "Creating requested zone."));
+    return CommandResult.success();
+  }
 
-    public static CommandSpec aquireSpec() {
-        ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
+  public static CommandSpec aquireSpec() {
+    ZoneService service = Sponge.getServiceManager().provide(ZoneService.class).get();
 
-        Map<String, String> options = service.getManagerNames().stream().collect(Collectors.toMap(a -> a, a -> a));
+    Map<String, String> options = service.getManagerNames().stream().collect(Collectors.toMap(a -> a, a -> a));
 
-        return CommandSpec.builder()
-                .description(Text.of("Create a zone"))
-                .permission("skree.zone.zoneme")
-                .arguments(onlyOne(choices(Text.of("zone"), options))).executor(new ZoneMeCommand()).build();
-    }
+    return CommandSpec.builder()
+        .description(Text.of("Create a zone"))
+        .permission("skree.zone.zoneme")
+        .arguments(onlyOne(choices(Text.of("zone"), options))).executor(new ZoneMeCommand()).build();
+  }
 }

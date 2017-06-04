@@ -21,35 +21,35 @@ import org.spongepowered.api.world.gen.PopulatorTypes;
 import java.util.Random;
 
 public class JurackOrePopulator implements Populator {
-    @Override
-    public PopulatorType getType() {
-        return PopulatorTypes.ORE;
-    }
+  @Override
+  public PopulatorType getType() {
+    return PopulatorTypes.ORE;
+  }
 
-    @Override
-    public void populate(World world, Extent volume, Random random) {
-        Vector3i min = volume.getBlockMin();
-        Vector3i max = volume.getBlockMax();
+  @Override
+  public void populate(World world, Extent volume, Random random) {
+    Vector3i min = volume.getBlockMin();
+    Vector3i max = volume.getBlockMax();
 
-        for (int x = min.getX(); x <= max.getX(); ++x) {
-            for (int z = min.getZ(); z <= max.getZ(); ++z) {
-                if (random.nextInt(20) != 0) {
-                    continue;
-                }
-
-                for (int y = min.getY(); y < 20; ++y) {
-                    Vector3i searchPoint = new Vector3i(x, y, z);
-                    if (world.getBlockType(searchPoint) == BlockTypes.LAVA) {
-                        Vector3i above = searchPoint.add(0, 1, 0);
-                        if (world.getBlockType(above) == BlockTypes.LAVA) {
-                            Vector3i lowPoint = searchPoint.add(0, -1, 0);
-                            if (world.getBlockType(lowPoint) == BlockTypes.STONE) {
-                                world.setBlockType(lowPoint, (BlockType) CustomBlockTypes.JURACK_ORE, Cause.source(SkreePlugin.container()).build());
-                            }
-                        }
-                    }
-                }
-            }
+    for (int x = min.getX(); x <= max.getX(); ++x) {
+      for (int z = min.getZ(); z <= max.getZ(); ++z) {
+        if (random.nextInt(20) != 0) {
+          continue;
         }
+
+        for (int y = min.getY(); y < 20; ++y) {
+          Vector3i searchPoint = new Vector3i(x, y, z);
+          if (world.getBlockType(searchPoint) == BlockTypes.LAVA) {
+            Vector3i above = searchPoint.add(0, 1, 0);
+            if (world.getBlockType(above) == BlockTypes.LAVA) {
+              Vector3i lowPoint = searchPoint.add(0, -1, 0);
+              if (world.getBlockType(lowPoint) == BlockTypes.STONE) {
+                world.setBlockType(lowPoint, (BlockType) CustomBlockTypes.JURACK_ORE, Cause.source(SkreePlugin.container()).build());
+              }
+            }
+          }
+        }
+      }
     }
+  }
 }

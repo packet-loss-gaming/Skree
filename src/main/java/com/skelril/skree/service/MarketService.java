@@ -14,53 +14,67 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public interface MarketService {
-    String VALID_ALIAS_REGEX = "^([A-Za-z-0-9 ]+|)$";
+  String VALID_ALIAS_REGEX = "^([A-Za-z-0-9 ]+|)$";
 
-    Optional<ItemStack> getItem(String alias);
+  Optional<ItemStack> getItem(String alias);
 
-    BigDecimal getSellFactor(BigDecimal buyPrice);
+  BigDecimal getSellFactor(BigDecimal buyPrice);
 
-    void updatePrices();
+  void updatePrices();
 
-    Optional<Integer> getStock(String alias);
-    Optional<Integer> getStock(ItemStack stack);
-    boolean setStock(String alias, int quantity);
-    boolean setStock(ItemStack stack, int quantity);
+  Optional<Integer> getStock(String alias);
 
-    Optional<BigDecimal> getPrice(String alias);
-    Optional<BigDecimal> getPrice(ItemStack stack);
-    Optional<BigDecimal> getBasePrice(String alias);
-    Optional<BigDecimal> getBasePrice(ItemStack stack);
-    boolean setBasePrice(String alias, BigDecimal price);
-    boolean setBasePrice(ItemStack stack, BigDecimal price);
+  Optional<Integer> getStock(ItemStack stack);
 
-    boolean addItem(ItemStack stack);
-    boolean remItem(ItemStack stack);
+  boolean setStock(String alias, int quantity);
 
-    boolean setPrimaryAlias(String alias);
-    boolean addAlias(String alias, ItemStack stack);
-    boolean remAlias(String alias);
+  boolean setStock(ItemStack stack, int quantity);
 
-    Optional<String> getAlias(String alias);
-    Optional<String> getAlias(ItemStack stack);
+  Optional<BigDecimal> getPrice(String alias);
 
-    /**
-     * A mapping of the primary alias to the price
-     * @return
-     */
-    List<ItemDescriptor> getPrices();
-    List<ItemDescriptor> getPrices(String aliasConstraint);
+  Optional<BigDecimal> getPrice(ItemStack stack);
 
-    /** Transactions **/
-    default boolean logTransactionByName(UUID user, Clause<String, Integer> itemQuantity) {
-        return logTransactionByName(user, Collections.singleton(itemQuantity));
-    }
+  Optional<BigDecimal> getBasePrice(String alias);
 
-    boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity);
+  Optional<BigDecimal> getBasePrice(ItemStack stack);
 
-    default boolean logTransactionByStack(UUID user, Clause<ItemStack, Integer> itemQuantity) {
-        return logTransactionByStack(user, Collections.singleton(itemQuantity));
-    }
+  boolean setBasePrice(String alias, BigDecimal price);
 
-    boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity);
+  boolean setBasePrice(ItemStack stack, BigDecimal price);
+
+  boolean addItem(ItemStack stack);
+
+  boolean remItem(ItemStack stack);
+
+  boolean setPrimaryAlias(String alias);
+
+  boolean addAlias(String alias, ItemStack stack);
+
+  boolean remAlias(String alias);
+
+  Optional<String> getAlias(String alias);
+
+  Optional<String> getAlias(ItemStack stack);
+
+  /**
+   * A mapping of the primary alias to the price
+   */
+  List<ItemDescriptor> getPrices();
+
+  List<ItemDescriptor> getPrices(String aliasConstraint);
+
+  /**
+   * Transactions
+   **/
+  default boolean logTransactionByName(UUID user, Clause<String, Integer> itemQuantity) {
+    return logTransactionByName(user, Collections.singleton(itemQuantity));
+  }
+
+  boolean logTransactionByName(UUID user, Collection<Clause<String, Integer>> itemQuantity);
+
+  default boolean logTransactionByStack(UUID user, Clause<ItemStack, Integer> itemQuantity) {
+    return logTransactionByStack(user, Collections.singleton(itemQuantity));
+  }
+
+  boolean logTransactionByStack(UUID user, Collection<Clause<ItemStack, Integer>> itemQuantity);
 }

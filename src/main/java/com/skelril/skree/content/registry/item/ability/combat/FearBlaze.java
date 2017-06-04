@@ -20,21 +20,21 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class FearBlaze implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        int duration = (int) (EntityHealthUtil.getHealth(owner) * 20);
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    int duration = (int) (EntityHealthUtil.getHealth(owner) * 20);
 
-        Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
-        if (optPotionEffectData.isPresent()) {
-            PotionEffectData potionEffectData = optPotionEffectData.get();
+    Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
+    if (optPotionEffectData.isPresent()) {
+      PotionEffectData potionEffectData = optPotionEffectData.get();
 
-            potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, duration));
+      potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, duration));
 
-            target.offer(potionEffectData);
-        }
-
-        target.offer(Keys.FIRE_TICKS, duration);
-
-        notify(owner, Text.of(TextColors.YELLOW, "Your sword releases a deadly blaze."));
+      target.offer(potionEffectData);
     }
+
+    target.offer(Keys.FIRE_TICKS, duration);
+
+    notify(owner, Text.of(TextColors.YELLOW, "Your sword releases a deadly blaze."));
+  }
 }

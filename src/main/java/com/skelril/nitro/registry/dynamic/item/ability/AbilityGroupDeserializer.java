@@ -15,36 +15,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AbilityGroupDeserializer implements JsonDeserializer<AbilityGroup> {
-    private static final Map<String, Class<? extends AbilityCluster>> clusterMapping = new HashMap<>();
+  private static final Map<String, Class<? extends AbilityCluster>> CLUSTER_MAPPING = new HashMap<>();
 
-    static {
-        clusterMapping.put("melee_attacks", MeleeAttackCluster.class);
-        clusterMapping.put("point_of_contact", PointOfContactCluster.class);
+  static {
+    CLUSTER_MAPPING.put("melee_attacks", MeleeAttackCluster.class);
+    CLUSTER_MAPPING.put("point_of_contact", PointOfContactCluster.class);
+  }
+
+  @Override
+  public AbilityGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    JsonObject object = json.getAsJsonObject();
+
+    AbilityCooldownProfile profile = null;
+    if (object.has("cool_down")) {
+      profile = context.deserialize(object.get("cool_down"), AbilityCooldownProfile.class);
     }
 
-    @Override
-    public AbilityGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonObject object = json.getAsJsonObject();
-
-        AbilityCooldownProfile profile = null;
-        if (object.has("cool_down")) {
-            profile = context.deserialize(object.get("cool_down"), AbilityCooldownProfile.class);
-        }
-
-        if (profile == null) {
-            profile = new AbilityCooldownProfile();
-        }
-
-        AbilityGroup group = new AbilityGroup(profile);
-
-        clusterMapping.forEach((key, clazz) -> {
-            if (!object.has(key)) {
-                return;
-            }
-
-            group.getClusters().add(context.deserialize(object, clazz));
-        });
-
-        return group;
+    if (profile == null) {
+      profile = new AbilityCooldownProfile();
     }
+
+    AbilityGroup group = new AbilityGroup(profile);
+
+    CLUSTER_MAPPING.forEach((key, clazz) -> {
+      if (!object.has(key)) {
+        return;
+      }
+
+      group.getClusters().add(context.deserialize(object, clazz));
+    });
+
+    return group;
+  }
 }

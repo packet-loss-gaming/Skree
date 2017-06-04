@@ -8,9 +8,9 @@ package com.skelril.skree.content.zone.group.desmiredungeon;
 
 public class DesmireDungeonListener {
 
-    private DesmireDungeonManager manager;
+  private DesmireDungeonManager manager;
 
-    public DesmireDungeonListener(DesmireDungeonManager manager) {
-        this.manager = manager;
-    }
+  public DesmireDungeonListener(DesmireDungeonManager manager) {
+    this.manager = manager;
+  }
 }

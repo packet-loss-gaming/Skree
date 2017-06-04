@@ -17,13 +17,13 @@ import org.spongepowered.api.scheduler.Task;
 import java.util.Optional;
 
 public class CheckedSpawnWave implements Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>> {
-    @Override
-    public Optional<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            UnbindCondition unbindCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        Task.builder().execute(() -> {
-            zombieCatacombsBossDetailBoss.getDetail().getZone().checkedSpawnWave();
-        }).delayTicks(1).submit(SkreePlugin.inst());
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      UnbindCondition unbindCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    Task.builder().execute(() -> {
+      zombieCatacombsBossDetailBoss.getDetail().getZone().checkedSpawnWave();
+    }).delayTicks(1).submit(SkreePlugin.inst());
+    return Optional.empty();
+  }
 }

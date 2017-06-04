@@ -9,14 +9,14 @@ package com.skelril.nitro.registry.dynamic.item.simple;
 import com.skelril.nitro.registry.dynamic.item.ItemConfig;
 
 public class SimpleItemConfig extends ItemConfig {
-    private int maxStackSize;
-    private String creativeTab;
+  private int maxStackSize;
+  private String creativeTab;
 
-    public int getMaxStackSize() {
-        return maxStackSize;
-    }
+  public int getMaxStackSize() {
+    return maxStackSize;
+  }
 
-    public String getCreativeTab() {
-        return creativeTab;
-    }
+  public String getCreativeTab() {
+    return creativeTab;
+  }
 }

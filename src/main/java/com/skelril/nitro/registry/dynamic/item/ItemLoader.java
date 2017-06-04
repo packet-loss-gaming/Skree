@@ -12,35 +12,35 @@ import com.skelril.nitro.registry.dynamic.item.ability.*;
 import net.minecraft.item.Item;
 
 public abstract class ItemLoader<ResultType extends Item, ConfigType extends ItemConfig> implements Loader<ConfigType> {
-    private GameIntegrator integrator;
-    private AbilityRegistry abilityRegistry;
+  private GameIntegrator integrator;
+  private AbilityRegistry abilityRegistry;
 
-    public ItemLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
-        this.integrator = integrator;
-        this.abilityRegistry = abilityRegistry;
-    }
+  public ItemLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
+    this.integrator = integrator;
+    this.abilityRegistry = abilityRegistry;
+  }
 
-    public abstract ResultType constructFromConfig(ConfigType config);
+  public abstract ResultType constructFromConfig(ConfigType config);
 
-    @Override
-    public GsonBuilder getGsonBuilder() {
-        GsonBuilder parentBuilder = Loader.super.getGsonBuilder();
+  @Override
+  public GsonBuilder getGsonBuilder() {
+    GsonBuilder parentBuilder = Loader.super.getGsonBuilder();
 
-        AbilityDeserializer abilityDeserializer = new AbilityDeserializer(abilityRegistry);
+    AbilityDeserializer abilityDeserializer = new AbilityDeserializer(abilityRegistry);
 
-        return parentBuilder
-                .registerTypeAdapter(Ability.class, abilityDeserializer)
-                .registerTypeAdapter(SpecialAttack.class, abilityDeserializer)
-                .registerTypeAdapter(PointOfContact.class, abilityDeserializer)
-                .registerTypeAdapter(AbilityGroup.class, new AbilityGroupDeserializer());
-    }
+    return parentBuilder
+        .registerTypeAdapter(Ability.class, abilityDeserializer)
+        .registerTypeAdapter(SpecialAttack.class, abilityDeserializer)
+        .registerTypeAdapter(PointOfContact.class, abilityDeserializer)
+        .registerTypeAdapter(AbilityGroup.class, new AbilityGroupDeserializer());
+  }
 
-    @Override
-    public void load(ConfigType config) {
-        registerWithGame(constructFromConfig(config), config);
-    }
+  @Override
+  public void load(ConfigType config) {
+    registerWithGame(constructFromConfig(config), config);
+  }
 
-    protected void registerWithGame(Item item, ItemConfig config) {
-        integrator.registerForProcessing(item, config);
-    }
+  protected void registerWithGame(Item item, ItemConfig config) {
+    integrator.registerForProcessing(item, config);
+  }
 }

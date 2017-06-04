@@ -13,24 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ItemConfig {
-    private String id;
-    private List<AbilityGroup> abilityGroups = new ArrayList<>();
+  private String id;
+  private List<AbilityGroup> abilityGroups = new ArrayList<>();
 
-    private int enchantability;
+  private int enchantability;
 
-    public String getID() {
-        return id;
-    }
+  public String getID() {
+    return id;
+  }
 
-    public List<AbilityGroup> getAbilityGroups() {
-        return abilityGroups;
-    }
+  public List<AbilityGroup> getAbilityGroups() {
+    return abilityGroups;
+  }
 
-    public List<String> getMeshDefinitions() {
-        return Lists.newArrayList(getID());
-    }
+  public List<String> getMeshDefinitions() {
+    return Lists.newArrayList(getID());
+  }
 
-    public int getEnchantability() {
-        return enchantability;
-    }
+  public int getEnchantability() {
+    return enchantability;
+  }
 }

@@ -19,93 +19,93 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class CustomArmor extends ItemArmor implements ICustomArmor {
 
-    public CustomArmor(EntityEquipmentSlot slotType) {
-        super(ArmorMaterial.DIAMOND, 4, slotType); // 4 is allegedly used for net.minecraft.client.renderer.entity.RenderPlayer
-                                                    // to determine which model to use
-                                                    // This just bases everything off the diamond armor model
+  public CustomArmor(EntityEquipmentSlot slotType) {
+    super(ArmorMaterial.DIAMOND, 4, slotType); // 4 is allegedly used for net.minecraft.client.renderer.entity.RenderPlayer
+    // to determine which model to use
+    // This just bases everything off the diamond armor model
 
-        // Refers to damageReduceAmount
-        ReflectiveModifier.modifyFieldValue(ItemArmor.class, this, "field_77879_b", __getDamageReductionAmount());
+    // Refers to damageReduceAmount
+    ReflectiveModifier.modifyFieldValue(ItemArmor.class, this, "field_77879_b", __getDamageReductionAmount());
 
-        this.setMaxDamage(__getMaxUses(slotType));
-        this.maxStackSize = __getMaxStackSize();
-        this.setCreativeTab(__getCreativeTab());
-    }
+    this.setMaxDamage(__getMaxUses(slotType));
+    this.maxStackSize = __getMaxStackSize();
+    this.setCreativeTab(__getCreativeTab());
+  }
 
-    @Override
-    public EntityEquipmentSlot __getSlotType() {
-        return armorType;
-    }
+  @Override
+  public EntityEquipmentSlot __getSlotType() {
+    return armorType;
+  }
 
 
-    // Native compatibility methods
+  // Native compatibility methods
 
-    @Override
-    public ItemArmor.ArmorMaterial __superGetArmorMaterial() {
-        return super.getArmorMaterial();
-    }
+  @Override
+  public ItemArmor.ArmorMaterial __superGetArmorMaterial() {
+    return super.getArmorMaterial();
+  }
 
-    @Override
-    public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false; // Use functionality defined in Item
-    }
+  @Override
+  public boolean __superGetIsRepairable(ItemStack toRepair, ItemStack repair) {
+    return false; // Use functionality defined in Item
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return HashMultimap.create();
-    }
+  @Override
+  public Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return HashMultimap.create();
+  }
 
-    // Modified Native ItemArmor methods
+  // Modified Native ItemArmor methods
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
-        return ICustomArmor.super.getArmorTexture(stack, entity, slot, type);
-    }
+  @SideOnly(Side.CLIENT)
+  @Override
+  public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+    return ICustomArmor.super.getArmorTexture(stack, entity, slot, type);
+  }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack stack, int renderPass) {
-        return ICustomArmor.super.getColorFromItemStack(stack, renderPass);
-    }
+  @Override
+  @SideOnly(Side.CLIENT)
+  public int getColorFromItemStack(ItemStack stack, int renderPass) {
+    return ICustomArmor.super.getColorFromItemStack(stack, renderPass);
+  }
 
-    @Override
-    public int getItemEnchantability() {
-        return ICustomArmor.super.getItemEnchantability();
-    }
+  @Override
+  public int getItemEnchantability() {
+    return ICustomArmor.super.getItemEnchantability();
+  }
 
-    @Override
-    public ItemArmor.ArmorMaterial getArmorMaterial() {
-        return ICustomArmor.super.getArmorMaterial();
-    }
+  @Override
+  public ItemArmor.ArmorMaterial getArmorMaterial() {
+    return ICustomArmor.super.getArmorMaterial();
+  }
 
-    @Override
-    public boolean hasColor(ItemStack stack) {
-        return ICustomArmor.super.hasColor(stack);
-    }
+  @Override
+  public boolean hasColor(ItemStack stack) {
+    return ICustomArmor.super.hasColor(stack);
+  }
 
-    @Override
-    public int getColor(ItemStack stack) {
-        return ICustomArmor.super.getColor(stack);
-    }
+  @Override
+  public int getColor(ItemStack stack) {
+    return ICustomArmor.super.getColor(stack);
+  }
 
-    @Override
-    public void removeColor(ItemStack stack) {
-        ICustomArmor.super.removeColor(stack);
-    }
+  @Override
+  public void removeColor(ItemStack stack) {
+    ICustomArmor.super.removeColor(stack);
+  }
 
-    @Override
-    public void setColor(ItemStack stack, int color) {
-        ICustomArmor.super.setColor(stack, color);
-    }
+  @Override
+  public void setColor(ItemStack stack, int color) {
+    ICustomArmor.super.setColor(stack, color);
+  }
 
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return ICustomArmor.super.getIsRepairable(toRepair, repair);
-    }
+  @Override
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    return ICustomArmor.super.getIsRepairable(toRepair, repair);
+  }
 
-    @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        return ICustomArmor.super.getItemAttributeModifiers(equipmentSlot);
-    }
+  @Override
+  public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    return ICustomArmor.super.getItemAttributeModifiers(equipmentSlot);
+  }
 }

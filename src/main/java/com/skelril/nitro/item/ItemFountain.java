@@ -18,41 +18,41 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
 
-public class ItemFountain implements IntegratedRunnable  {
+public class ItemFountain implements IntegratedRunnable {
 
-    private final ItemDropper dropper;
+  private final ItemDropper dropper;
 
-    private final Function<Integer, Integer> amplifier;
-    private final Collection<ItemStack> options;
-    private final SpawnType spawnType;
+  private final Function<Integer, Integer> amplifier;
+  private final Collection<ItemStack> options;
+  private final SpawnType spawnType;
 
-    public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options, SpawnType spawnType) {
-        this.dropper = new ItemDropper(location);
+  public ItemFountain(Location<World> location, Function<Integer, Integer> amplifier, Collection<ItemStack> options, SpawnType spawnType) {
+    this.dropper = new ItemDropper(location);
 
-        this.amplifier = amplifier;
-        this.options = options;
-        this.spawnType = spawnType;
+    this.amplifier = amplifier;
+    this.options = options;
+    this.spawnType = spawnType;
+  }
+
+  public World getExtent() {
+    return dropper.getExtent();
+  }
+
+  public Vector3d getPos() {
+    return dropper.getPos();
+  }
+
+  @Override
+  public boolean run(int times) {
+    ItemStack stack = Probability.pickOneOf(options);
+    for (int i = 0; i < amplifier.apply(i) + 1; i++) {
+      dropper.dropStacks(Collections.singletonList(stack), spawnType);
     }
+    return true;
+  }
 
-    public World getExtent() {
-        return dropper.getExtent();
-    }
+  @Override
+  public void end() {
 
-    public Vector3d getPos() {
-        return dropper.getPos();
-    }
-
-    @Override
-    public boolean run(int times) {
-        ItemStack stack = Probability.pickOneOf(options);
-        for (int i = 0; i < amplifier.apply(i) + 1; i++) {
-            dropper.dropStacks(Collections.singletonList(stack), spawnType);
-        }
-        return true;
-    }
-
-    @Override
-    public void end() {
-
-    }
+  }
 }

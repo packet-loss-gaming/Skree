@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SavedPlayerState {
-    private List<JsonElement> inventoryContents = new ArrayList<>();
+  private List<JsonElement> inventoryContents = new ArrayList<>();
 
-    public List<JsonElement> getInventoryContents() {
-        return inventoryContents;
-    }
+  public List<JsonElement> getInventoryContents() {
+    return inventoryContents;
+  }
 }

@@ -7,16 +7,16 @@
 package com.skelril.skree.service.internal.pvp;
 
 public enum PvPState {
-    ALLOWED(true),
-    DENIED(false);
+  ALLOWED(true),
+  DENIED(false);
 
-    private boolean allowsPvP;
+  private boolean allowsPvP;
 
-    PvPState(boolean allowsPvP) {
-        this.allowsPvP = allowsPvP;
-    }
+  PvPState(boolean allowsPvP) {
+    this.allowsPvP = allowsPvP;
+  }
 
-    public boolean allowByDefault() {
-        return allowsPvP;
-    }
+  public boolean allowByDefault() {
+    return allowsPvP;
+  }
 }

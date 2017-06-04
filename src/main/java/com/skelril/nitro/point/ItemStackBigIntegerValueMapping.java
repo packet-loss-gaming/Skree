@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class ItemStackBigIntegerValueMapping extends ItemStackValueMapping<BigInteger> {
-    public ItemStackBigIntegerValueMapping(List<PointValue<ItemStack, BigInteger>> pointValues) {
-        super(pointValues, BigInteger.ZERO, BigInteger.ONE, BigInteger::valueOf, BigInteger::intValue, BigInteger::subtract, BigInteger::multiply, BigInteger::divide, BigInteger::remainder);
-    }
+  public ItemStackBigIntegerValueMapping(List<PointValue<ItemStack, BigInteger>> pointValues) {
+    super(pointValues, BigInteger.ZERO, BigInteger.ONE, BigInteger::valueOf, BigInteger::intValue, BigInteger::subtract, BigInteger::multiply, BigInteger::divide, BigInteger::remainder);
+  }
 }

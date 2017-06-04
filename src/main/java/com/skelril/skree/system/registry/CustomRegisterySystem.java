@@ -14,28 +14,28 @@ import com.skelril.skree.system.registry.recipe.CustomRecipeSystem;
 
 @NModule(name = "Custom Registry System")
 public class CustomRegisterySystem {
-    private CustomItemSystem customItemSystem = new CustomItemSystem();
-    private CustomBlockSystem customBlockSystem = new CustomBlockSystem();
-    private CustomRecipeSystem customRecipeSystem = new CustomRecipeSystem();
+  private CustomItemSystem customItemSystem = new CustomItemSystem();
+  private CustomBlockSystem customBlockSystem = new CustomBlockSystem();
+  private CustomRecipeSystem customRecipeSystem = new CustomRecipeSystem();
 
-    @NModuleTrigger(trigger = "PRE_INITIALIZATION")
-    public void preInit() {
-        customItemSystem = new CustomItemSystem();
-        customItemSystem.preInit();
+  @NModuleTrigger(trigger = "PRE_INITIALIZATION")
+  public void preInit() {
+    customItemSystem = new CustomItemSystem();
+    customItemSystem.preInit();
 
-        customBlockSystem = new CustomBlockSystem();
-        customBlockSystem.preInit();
+    customBlockSystem = new CustomBlockSystem();
+    customBlockSystem.preInit();
 
-        customItemSystem.associate();
-        customBlockSystem.associate();
+    customItemSystem.associate();
+    customBlockSystem.associate();
 
-        customRecipeSystem = new CustomRecipeSystem();
-        customRecipeSystem.associate();
-    }
+    customRecipeSystem = new CustomRecipeSystem();
+    customRecipeSystem.associate();
+  }
 
-    @NModuleTrigger(trigger = "FMLInitializationEvent")
-    public void init() {
-        customItemSystem.init();
-        customBlockSystem.init();
-    }
+  @NModuleTrigger(trigger = "FMLInitializationEvent")
+  public void init() {
+    customItemSystem.init();
+    customBlockSystem.init();
+  }
 }

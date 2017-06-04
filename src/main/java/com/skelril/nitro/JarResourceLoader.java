@@ -14,37 +14,37 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class JarResourceLoader {
-    private String baseResourcePathName;
+  private String baseResourcePathName;
 
-    public JarResourceLoader(String baseResourcePathName) {
-        this.baseResourcePathName = baseResourcePathName;
+  public JarResourceLoader(String baseResourcePathName) {
+    this.baseResourcePathName = baseResourcePathName;
+  }
+
+  private FileSystem getFileSystem(URI uri) throws IOException {
+    try {
+      return FileSystems.getFileSystem(uri);
+    } catch (FileSystemNotFoundException e) {
+      return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
     }
+  }
 
-    private FileSystem getFileSystem(URI uri) throws IOException {
-        try {
-            return FileSystems.getFileSystem(uri);
-        } catch (FileSystemNotFoundException e) {
-            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
+  public void loadFromResources(Consumer<Function<String, Path>> execute) {
+    try {
+      URI uri = getClass().getResource(baseResourcePathName).toURI();
+      if (uri.getScheme().equals("jar")) {
+        try (FileSystem fileSystem = getFileSystem(uri)) {
+          Function<String, Path> providerFunction = (resourceName) -> {
+            return fileSystem.getPath(baseResourcePathName + resourceName);
+          };
+          execute.accept(providerFunction);
         }
+      } else {
+        execute.accept(Paths::get);
+      }
+    } catch (Exception e) {
+      System.err.println("Error loading: " + baseResourcePathName);
+      e.printStackTrace();
     }
-
-    public void loadFromResources(Consumer<Function<String, Path>> execute) {
-        try {
-            URI uri = getClass().getResource(baseResourcePathName).toURI();
-            if (uri.getScheme().equals("jar")) {
-                try (FileSystem fileSystem = getFileSystem(uri)) {
-                    Function<String, Path> providerFunction = (resourceName) -> {
-                        return fileSystem.getPath(baseResourcePathName + resourceName);
-                    };
-                    execute.accept(providerFunction);
-                }
-            } else {
-                execute.accept(Paths::get);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading: " + baseResourcePathName);
-            e.printStackTrace();
-        }
-    }
+  }
 
 }

@@ -16,8 +16,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
  */
 @Mod(modid = "FMLSkree", version = "1.0", name = "FML Skree")
 public class FMLSkree {
-    @Mod.EventHandler
-    public void onInit(FMLInitializationEvent event) {
-        SkreePlugin.inst().manager.trigger("FMLInitializationEvent");
-    }
+  @Mod.EventHandler
+  public void onInit(FMLInitializationEvent event) {
+    SkreePlugin.inst().manager.trigger("FMLInitializationEvent");
+  }
 }

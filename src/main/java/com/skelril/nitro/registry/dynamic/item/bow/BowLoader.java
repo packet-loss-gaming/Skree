@@ -11,17 +11,17 @@ import com.skelril.nitro.registry.dynamic.item.ItemLoader;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class BowLoader extends ItemLoader<LoadedBow, BowConfig> {
-    public BowLoader(GameIntegrator integrator, AbilityRegistry registry) {
-        super(integrator, registry);
-    }
+  public BowLoader(GameIntegrator integrator, AbilityRegistry registry) {
+    super(integrator, registry);
+  }
 
-    @Override
-    public LoadedBow constructFromConfig(BowConfig config) {
-        return new LoadedBow(config);
-    }
+  @Override
+  public LoadedBow constructFromConfig(BowConfig config) {
+    return new LoadedBow(config);
+  }
 
-    @Override
-    public Class<BowConfig> getConfigClass() {
-        return BowConfig.class;
-    }
+  @Override
+  public Class<BowConfig> getConfigClass() {
+    return BowConfig.class;
+  }
 }

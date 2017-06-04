@@ -23,33 +23,33 @@ import java.util.stream.Collectors;
 
 public class ItemDropper {
 
-    private final Location<World> location;
+  private final Location<World> location;
 
-    public ItemDropper(Location<World> location) {
-        this.location = location;
-    }
+  public ItemDropper(Location<World> location) {
+    this.location = location;
+  }
 
-    public World getExtent() {
-        return location.getExtent();
-    }
+  public World getExtent() {
+    return location.getExtent();
+  }
 
-    public Vector3d getPos() {
-        return location.getPosition();
-    }
+  public Vector3d getPos() {
+    return location.getPosition();
+  }
 
-    public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
-        Item item = (Item)  getExtent().createEntity(EntityTypes.ITEM, getPos());
-        item.offer(Keys.REPRESENTED_ITEM, snapshot);
-        getExtent().spawnEntity(item, cause);
-    }
+  public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
+    Item item = (Item) getExtent().createEntity(EntityTypes.ITEM, getPos());
+    item.offer(Keys.REPRESENTED_ITEM, snapshot);
+    getExtent().spawnEntity(item, cause);
+  }
 
-    public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
-        for (ItemStackSnapshot stack : stacks) {
-            dropItem(stack, Cause.source(SpawnCause.builder().type(type).build()).build());
-        }
+  public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
+    for (ItemStackSnapshot stack : stacks) {
+      dropItem(stack, Cause.source(SpawnCause.builder().type(type).build()).build());
     }
+  }
 
-    public void dropStacks(Collection<ItemStack> stacks, SpawnType type) {
-        dropStackSnapshots(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()), type);
-    }
+  public void dropStacks(Collection<ItemStack> stacks, SpawnType type) {
+    dropStackSnapshots(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()), type);
+  }
 }

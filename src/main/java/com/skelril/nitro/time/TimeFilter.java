@@ -8,15 +8,15 @@ package com.skelril.nitro.time;
 
 public class TimeFilter {
 
-    private final int min;
-    private final int divisible;
+  private final int min;
+  private final int divisible;
 
-    public TimeFilter(int min, int divisible) {
-        this.min = min;
-        this.divisible = divisible;
-    }
+  public TimeFilter(int min, int divisible) {
+    this.min = min;
+    this.divisible = divisible;
+  }
 
-    public boolean matchesFilter(int entry) {
-        return entry > 0 && entry % divisible == 0 || entry <= min && entry > 0;
-    }
+  public boolean matchesFilter(int entry) {
+    return entry > 0 && entry % divisible == 0 || entry <= min && entry > 0;
+  }
 }

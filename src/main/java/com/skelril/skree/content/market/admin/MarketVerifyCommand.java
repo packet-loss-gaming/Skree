@@ -35,94 +35,94 @@ import java.util.stream.Collectors;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class MarketVerifyCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
+    }
+
+    MarketService service = optService.get();
+    Task.builder().async().execute(() -> {
+      PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
+
+      List<Clause<String, BigDecimal>> profitMargins = new ArrayList<>();
+      for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
+        ItemStack output = recipe.getRecipeOutput();
+        if (output == null) {
+          continue;
         }
 
-        MarketService service = optService.get();
-        Task.builder().async().execute(() -> {
-            PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
+        Optional<BigDecimal> optResultPrice = service.getPrice(tf(output));
+        if (!optResultPrice.isPresent()) {
+          continue;
+        }
 
-            List<Clause<String, BigDecimal>> profitMargins = new ArrayList<>();
-            for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
-                ItemStack output = recipe.getRecipeOutput();
-                if (output == null) {
-                    continue;
-                }
+        String name = service.getAlias(tf(output)).orElse(output.getItem().getRegistryName().toString());
 
-                Optional<BigDecimal> optResultPrice = service.getPrice(tf(output));
-                if (!optResultPrice.isPresent()) {
-                    continue;
-                }
+        Collection<ItemStack> items = new ArrayList<>();
+        if (recipe instanceof ShapedRecipes) {
+          items.addAll(Lists.newArrayList(((ShapedRecipes) recipe).recipeItems));
+        } else if (recipe instanceof ShapelessRecipes) {
+          items.addAll(((ShapelessRecipes) recipe).recipeItems);
+        } else {
+          src.sendMessage(Text.of(TextColors.RED, "Unsupported recipe for " + name));
+          continue;
+        }
 
-                String name = service.getAlias(tf(output)).orElse(output.getItem().getRegistryName().toString());
+        items.removeAll(Collections.singleton(null));
 
-                Collection<ItemStack> items = new ArrayList<>();
-                if (recipe instanceof ShapedRecipes) {
-                    items.addAll(Lists.newArrayList(((ShapedRecipes) recipe).recipeItems));
-                } else if (recipe instanceof ShapelessRecipes) {
-                    items.addAll(((ShapelessRecipes) recipe).recipeItems);
-                } else {
-                    src.sendMessage(Text.of(TextColors.RED, "Unsupported recipe for " + name));
-                    continue;
-                }
+        BigDecimal creationCost = BigDecimal.ZERO;
+        try {
+          for (ItemStack stack : items) {
+            creationCost = creationCost.add(service.getPrice(tf(stack)).orElse(BigDecimal.ZERO));
+          }
+        } catch (Exception ex) {
+          src.sendMessage(Text.of(TextColors.RED, "Couldn't complete checks for " + name));
+          continue;
+        }
 
-                items.removeAll(Collections.singleton(null));
+        if (creationCost.equals(BigDecimal.ZERO)) {
+          src.sendMessage(Text.of(TextColors.RED, "No ingredients found on market for " + name));
+          continue;
+        }
 
-                BigDecimal creationCost = BigDecimal.ZERO;
-                try {
-                    for (ItemStack stack : items) {
-                        creationCost = creationCost.add(service.getPrice(tf(stack)).orElse(BigDecimal.ZERO));
-                    }
-                } catch (Exception ex) {
-                    src.sendMessage(Text.of(TextColors.RED, "Couldn't complete checks for " + name));
-                    continue;
-                }
+        BigDecimal sellPrice = optResultPrice.get();
+        sellPrice = sellPrice.multiply(service.getSellFactor(sellPrice));
 
-                if (creationCost.equals(BigDecimal.ZERO)) {
-                    src.sendMessage(Text.of(TextColors.RED, "No ingredients found on market for " + name));
-                    continue;
-                }
+        profitMargins.add(new Clause<>(name, sellPrice.subtract(creationCost)));
+      }
 
-                BigDecimal sellPrice = optResultPrice.get();
-                sellPrice = sellPrice.multiply(service.getSellFactor(sellPrice));
+      List<Text> result = profitMargins.stream().sorted((a, b) -> b.getValue().subtract(a.getValue()).intValue()).map(a -> {
+        boolean profitable = a.getValue().compareTo(BigDecimal.ZERO) >= 0;
+        return Text.of(
+            profitable ? TextColors.RED : TextColors.GREEN,
+            a.getKey().toUpperCase(),
+            " has a profit margin of ",
+            profitable ? "+" : "",
+            MarketImplUtil.format(a.getValue())
+        );
+      }).collect(Collectors.toList());
 
-                profitMargins.add(new Clause<>(name, sellPrice.subtract(creationCost)));
-            }
+      pagination.builder()
+          .contents(result)
+          .title(Text.of(TextColors.GOLD, "Profit Margin Report"))
+          .padding(Text.of(" "))
+          .sendTo(src);
+    }).submit(SkreePlugin.inst());
 
-            List<Text> result = profitMargins.stream().sorted((a, b) -> b.getValue().subtract(a.getValue()).intValue()).map(a -> {
-                boolean profitable = a.getValue().compareTo(BigDecimal.ZERO) >= 0;
-                return Text.of(
-                        profitable ? TextColors.RED : TextColors.GREEN,
-                        a.getKey().toUpperCase(),
-                        " has a profit margin of ",
-                        profitable ? "+" : "",
-                        MarketImplUtil.format(a.getValue())
-                );
-            }).collect(Collectors.toList());
+    src.sendMessage(Text.of(TextColors.YELLOW, "Verification in progress..."));
 
-            pagination.builder()
-                    .contents(result)
-                    .title(Text.of(TextColors.GOLD, "Profit Margin Report"))
-                    .padding(Text.of(" "))
-                    .sendTo(src);
-        }).submit(SkreePlugin.inst());
-
-        src.sendMessage(Text.of(TextColors.YELLOW, "Verification in progress..."));
-
-        return CommandResult.success();
-    }
+    return CommandResult.success();
+  }
 
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Verify items cannot be crafted for profit"))
-                .executor(new MarketVerifyCommand())
-                .build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Verify items cannot be crafted for profit"))
+        .executor(new MarketVerifyCommand())
+        .build();
+  }
 }

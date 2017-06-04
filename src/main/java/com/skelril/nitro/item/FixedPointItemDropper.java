@@ -16,16 +16,16 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class FixedPointItemDropper extends ItemDropper {
-    public FixedPointItemDropper(Location<World> location) {
-        super(location);
-    }
+  public FixedPointItemDropper(Location<World> location) {
+    super(location);
+  }
 
-    @Override
-    public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
-        Item item = (Item)  getExtent().createEntity(EntityTypes.ITEM, getPos());
-        item.offer(Keys.REPRESENTED_ITEM, snapshot);
-        item.setVelocity(new Vector3d(0, 0, 0));
-        getExtent().spawnEntity(item, cause);
-    }
+  @Override
+  public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
+    Item item = (Item) getExtent().createEntity(EntityTypes.ITEM, getPos());
+    item.offer(Keys.REPRESENTED_ITEM, snapshot);
+    item.setVelocity(new Vector3d(0, 0, 0));
+    getExtent().spawnEntity(item, cause);
+  }
 
 }

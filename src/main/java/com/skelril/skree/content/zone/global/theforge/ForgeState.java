@@ -23,44 +23,44 @@ import java.util.Map;
 
 // TODO Cleanup this mess
 class ForgeState {
-    private Map<ItemStack, Integer> results;
+  private Map<ItemStack, Integer> results;
 
-    public ForgeState() {
-        this(new HashMap<>());
-    }
+  public ForgeState() {
+    this(new HashMap<>());
+  }
 
-    public ForgeState(Map<ItemStack, Integer> results) {
-        this.results = results;
-    }
+  public ForgeState(Map<ItemStack, Integer> results) {
+    this.results = results;
+  }
 
-    public Map<ItemStack, Integer> getResults() {
-        return results;
-    }
+  public Map<ItemStack, Integer> getResults() {
+    return results;
+  }
 
-    private static Path getPersistenceFile() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        path = Files.createDirectories(path.resolve("forge"));
-        return path.resolve("resources.json");
-    }
+  private static Path getPersistenceFile() throws IOException {
+    ConfigManager service = Sponge.getGame().getConfigManager();
+    Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+    path = Files.createDirectories(path.resolve("forge"));
+    return path.resolve("resources.json");
+  }
 
-    private static Gson getGson() {
-        return new GsonBuilder().create();
-    }
+  private static Gson getGson() {
+    return new GsonBuilder().create();
+  }
 
-    public static ForgeState load() {
-        try (BufferedReader reader = Files.newBufferedReader(getPersistenceFile())) {
-            return getGson().fromJson(reader, SerializableForgeState.class).toForgeState();
-        } catch (IOException e) {
-            return new ForgeState(new HashMap<>());
-        }
+  public static ForgeState load() {
+    try (BufferedReader reader = Files.newBufferedReader(getPersistenceFile())) {
+      return getGson().fromJson(reader, SerializableForgeState.class).toForgeState();
+    } catch (IOException e) {
+      return new ForgeState(new HashMap<>());
     }
+  }
 
-    public void save() {
-        try (BufferedWriter writer = Files.newBufferedWriter(getPersistenceFile())) {
-            writer.write(getGson().toJson(new SerializableForgeState(this)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  public void save() {
+    try (BufferedWriter writer = Files.newBufferedWriter(getPersistenceFile())) {
+      writer.write(getGson().toJson(new SerializableForgeState(this)));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 }

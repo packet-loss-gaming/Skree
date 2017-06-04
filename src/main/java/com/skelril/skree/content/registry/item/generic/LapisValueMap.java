@@ -21,25 +21,25 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class LapisValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> LAPIS_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(tf(new net.minecraft.item.ItemStack(Items.DYE, 1, 4))),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.LAPIS_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> LAPIS_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(tf(new net.minecraft.item.ItemStack(Items.DYE, 1, 4))),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.LAPIS_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final LapisValueMap map = new LapisValueMap();
+  private static final LapisValueMap MAP = new LapisValueMap();
 
-    protected LapisValueMap() {
-        super(LAPIS_VALUE_MAP);
-    }
+  protected LapisValueMap() {
+    super(LAPIS_VALUE_MAP);
+  }
 
-    public static LapisValueMap inst() {
-        return map;
-    }
+  public static LapisValueMap inst() {
+    return MAP;
+  }
 }

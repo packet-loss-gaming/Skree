@@ -15,27 +15,27 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ChunkStatisticEntityCollection implements StatisticEntityCollection {
-    private Vector3i chunkPosition;
-    private Collection<Entity> entities;
+  private Vector3i chunkPosition;
+  private Collection<Entity> entities;
 
-    public ChunkStatisticEntityCollection(Vector3i chunkPosition, Collection<Entity> entities) {
-        this.chunkPosition = chunkPosition;
-        this.entities = entities;
-    }
+  public ChunkStatisticEntityCollection(Vector3i chunkPosition, Collection<Entity> entities) {
+    this.chunkPosition = chunkPosition;
+    this.entities = entities;
+  }
 
-    public static ChunkStatisticEntityCollection createFor(Chunk chunk, Predicate<Entity> predicate) {
-        return new ChunkStatisticEntityCollection(
-                chunk.getPosition(),
-                chunk.getEntities().stream().filter(predicate).collect(Collectors.toList())
-        );
-    }
+  public static ChunkStatisticEntityCollection createFor(Chunk chunk, Predicate<Entity> predicate) {
+    return new ChunkStatisticEntityCollection(
+        chunk.getPosition(),
+        chunk.getEntities().stream().filter(predicate).collect(Collectors.toList())
+    );
+  }
 
-    public Vector3i getPosition() {
-        return chunkPosition;
-    }
+  public Vector3i getPosition() {
+    return chunkPosition;
+  }
 
-    @Override
-    public Collection<Entity> getEntities() {
-        return entities;
-    }
+  @Override
+  public Collection<Entity> getEntities() {
+    return entities;
+  }
 }

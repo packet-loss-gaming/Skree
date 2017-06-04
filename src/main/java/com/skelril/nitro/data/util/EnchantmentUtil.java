@@ -20,20 +20,20 @@ import java.util.stream.Collectors;
 
 
 public class EnchantmentUtil {
-    public static List<ItemEnchantment> getEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
-        Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
-        if (results.isPresent()) {
-            List<ItemEnchantment> enchantments = results.get();
-            return enchantments.stream().filter(e -> e.getEnchantment().equals(enchantment)).collect(Collectors.toList());
-        }
-        return Lists.newArrayList();
+  public static List<ItemEnchantment> getEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
+    Optional<List<ItemEnchantment>> results = valueStore.get(Keys.ITEM_ENCHANTMENTS);
+    if (results.isPresent()) {
+      List<ItemEnchantment> enchantments = results.get();
+      return enchantments.stream().filter(e -> e.getEnchantment().equals(enchantment)).collect(Collectors.toList());
     }
+    return Lists.newArrayList();
+  }
 
-    public static Optional<ItemEnchantment> getHighestEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
-        List<ItemEnchantment> enchantments = getEnchantment(valueStore, enchantment);
-        if (!enchantments.isEmpty()) {
-            return Optional.of(enchantments.stream().sorted(Comparator.comparingInt(ItemEnchantment::getLevel)).findFirst().get());
-        }
-        return Optional.empty();
+  public static Optional<ItemEnchantment> getHighestEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
+    List<ItemEnchantment> enchantments = getEnchantment(valueStore, enchantment);
+    if (!enchantments.isEmpty()) {
+      return Optional.of(enchantments.stream().sorted(Comparator.comparingInt(ItemEnchantment::getLevel)).findFirst().get());
     }
+    return Optional.empty();
+  }
 }

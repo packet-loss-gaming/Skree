@@ -19,63 +19,63 @@ import java.util.function.Function;
 
 public class CacheBasedAllocator implements ZoneSpaceAllocator {
 
-    private final WorldResolver worldResolver;
-    private Decorator decorator;
-    private ZonePool pool;
+  private final WorldResolver worldResolver;
+  private Decorator decorator;
+  private ZonePool pool;
 
-    private Vector2i lastEnd;
+  private Vector2i lastEnd;
 
-    public CacheBasedAllocator(Decorator decorator, WorldResolver worldResolver) {
-        this.decorator = decorator;
-        this.worldResolver = worldResolver;
+  public CacheBasedAllocator(Decorator decorator, WorldResolver worldResolver) {
+    this.decorator = decorator;
+    this.worldResolver = worldResolver;
 
-        try {
-            pool = new ZonePool();
-            pool.load();
-        } catch (IOException|IllegalStateException e) {
-            pool = new ZonePool();
-        }
-
-        lastEnd = pool.getLastMarkedPoint();
+    try {
+      pool = new ZonePool();
+      pool.load();
+    } catch (IOException | IllegalStateException e) {
+      pool = new ZonePool();
     }
 
-    @Override
-    public WorldResolver getWorldResolver() {
-        return worldResolver;
+    lastEnd = pool.getLastMarkedPoint();
+  }
+
+  @Override
+  public WorldResolver getWorldResolver() {
+    return worldResolver;
+  }
+
+  @Override
+  public float getLoad() {
+    return 0;
+  }
+
+  @Override
+  public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack) {
+    Optional<ZoneBoundingBox> optBoundingBox = pool.getIfAvailable(managerName);
+
+    Vector3i origin = new Vector3i(lastEnd.getX(), 0, lastEnd.getY());
+    if (optBoundingBox.isPresent()) {
+      origin = optBoundingBox.get().getOrigin();
     }
 
-    @Override
-    public float getLoad() {
-        return 0;
+    ZoneWorldBoundingBox incompleteRegion = decorator.pasteAt(
+        worldResolver,
+        origin,
+        managerName,
+        box -> initMapper.apply(new Clause<>(new ZoneRegion(this, box), ZoneRegion.State.NEW_LOADING)),
+        callBack::accept
+    );
+
+    if (!optBoundingBox.isPresent()) {
+      pool.claimNew(managerName, incompleteRegion);
+
+      Vector3i lastMax = incompleteRegion.getMaximumPoint();
+      lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
     }
+  }
 
-    @Override
-    public <T> void regionFor(String managerName, Function<Clause<ZoneRegion, ZoneRegion.State>, T> initMapper, Consumer<T> callBack) {
-        Optional<ZoneBoundingBox> optBoundingBox = pool.getIfAvailable(managerName);
-
-        Vector3i origin = new Vector3i(lastEnd.getX(), 0, lastEnd.getY());
-        if (optBoundingBox.isPresent()) {
-            origin = optBoundingBox.get().getOrigin();
-        }
-
-        ZoneWorldBoundingBox incompleteRegion = decorator.pasteAt(
-                worldResolver,
-                origin,
-                managerName,
-                box -> initMapper.apply(new Clause<>(new ZoneRegion(this, box), ZoneRegion.State.NEW_LOADING)),
-                callBack::accept
-        );
-
-        if (!optBoundingBox.isPresent()) {
-            pool.claimNew(managerName, incompleteRegion);
-
-            Vector3i lastMax = incompleteRegion.getMaximumPoint();
-            lastEnd = new Vector2i(lastMax.getX() + 1, lastMax.getZ() + 1);
-        }
-    }
-
-    @Override
-    public void release(String managerName, ZoneWorldBoundingBox region) {
-        pool.freeToPool(managerName, region);
-    }
+  @Override
+  public void release(String managerName, ZoneWorldBoundingBox region) {
+    pool.freeToPool(managerName, region);
+  }
 }

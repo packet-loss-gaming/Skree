@@ -11,10 +11,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.function.Consumer;
 
 public class AttackOfDaveCurse implements Consumer<Player> {
-    @Override
-    public void accept(Player player) {
-        new SlapCurse().accept(player);
-        new ButterFingersCurse().accept(player);
-        new FireCurse().accept(player);
-    }
+  @Override
+  public void accept(Player player) {
+    new SlapCurse().accept(player);
+    new ButterFingersCurse().accept(player);
+    new FireCurse().accept(player);
+  }
 }

@@ -21,23 +21,23 @@ import java.util.Random;
 
 public class JurackOre extends BlockOre implements ICustomBlock {
 
-    public JurackOre() {
-        // Refers to blockMaterial
-        ReflectiveModifier.modifyFieldValue(Block.class, this, "field_149764_J", OreHelper.CUSTOM_ORE_MATERIAL);
+  public JurackOre() {
+    // Refers to blockMaterial
+    ReflectiveModifier.modifyFieldValue(Block.class, this, "field_149764_J", OreHelper.CUSTOM_ORE_MATERIAL);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(3.0F);
-        this.setResistance(5.0F);
-        this.setSoundType(SoundType.STONE);
-    }
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(3.0F);
+    this.setResistance(5.0F);
+    this.setSoundType(SoundType.STONE);
+  }
 
-    @Override
-    public String __getID() {
-        return "jurack_ore";
-    }
+  @Override
+  public String __getID() {
+    return "jurack_ore";
+  }
 
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return (Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get();
-    }
+  @Override
+  public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    return (Item) Sponge.getRegistry().getType(ItemType.class, "skree:jurack").get();
+  }
 }

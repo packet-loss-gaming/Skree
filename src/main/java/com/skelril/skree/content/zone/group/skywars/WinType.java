@@ -7,7 +7,7 @@
 package com.skelril.skree.content.zone.group.skywars;
 
 public enum WinType {
-    SOLO,
-    TEAM,
-    DRAW
+  SOLO,
+  TEAM,
+  DRAW
 }

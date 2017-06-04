@@ -32,68 +32,68 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicWand extends CustomItem implements EventAwareContent, Craftable {
 
-    @Override
-    public String __getID() {
-        return "magic_wand";
+  @Override
+  public String __getId() {
+    return "magic_wand";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.TOOLS;
+  }
+
+  @Listener
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    boolean survival = player.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) == GameModes.SURVIVAL;
+
+    Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
+
+    if (!optHeldItem.isPresent()) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
+    if (optHeldItem.get().getItem() != this) {
+      return;
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.TOOLS;
+    event.setUseBlockResult(Tristate.FALSE);
+
+    Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
+
+    if (!optLoc.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        boolean survival = player.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) == GameModes.SURVIVAL;
+    Location<World> loc = optLoc.get();
+    BlockType targetType = loc.getBlockType();
 
-        Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-
-        if (!optHeldItem.isPresent()) {
-            return;
-        }
-
-        if (optHeldItem.get().getItem() != this) {
-            return;
-        }
-
-        event.setUseBlockResult(Tristate.FALSE);
-
-        Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
-
-        if (!optLoc.isPresent()) {
-            return;
-        }
-
-        Location<World> loc = optLoc.get();
-        BlockType targetType = loc.getBlockType();
-
-        if (targetType == CustomBlockTypes.MAGIC_LADDER) {
-            MagicBlockStateHelper.startLadder(loc);
-        } else if (targetType == CustomBlockTypes.MAGIC_PLATFORM) {
-            MagicBlockStateHelper.startPlatform(loc);
-        } else {
-            return;
-        }
-
-        if (!survival) {
-            MagicBlockStateHelper.resetCounts();
-            return;
-        }
-
-        MagicBlockStateHelper.dropItems(loc, event.getCause());
+    if (targetType == CustomBlockTypes.MAGIC_LADDER) {
+      MagicBlockStateHelper.startLadder(loc);
+    } else if (targetType == CustomBlockTypes.MAGIC_PLATFORM) {
+      MagicBlockStateHelper.startPlatform(loc);
+    } else {
+      return;
     }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new net.minecraft.item.ItemStack(this),
-                newItemStack("skree:fairy_dust"),
-                new net.minecraft.item.ItemStack(Items.STICK)
-        );
+    if (!survival) {
+      MagicBlockStateHelper.resetCounts();
+      return;
     }
+
+    MagicBlockStateHelper.dropItems(loc, event.getCause());
+  }
+
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new net.minecraft.item.ItemStack(this),
+        newItemStack("skree:fairy_dust"),
+        new net.minecraft.item.ItemStack(Items.STICK)
+    );
+  }
 }

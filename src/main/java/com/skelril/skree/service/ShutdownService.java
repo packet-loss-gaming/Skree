@@ -9,15 +9,21 @@ package com.skelril.skree.service;
 import org.spongepowered.api.text.Text;
 
 public interface ShutdownService {
-    int getSecondsTilOffline();
-    boolean isShuttingDown();
+  int getSecondsTilOffline();
 
-    boolean shutdown(int seconds);
-    boolean shutdown(int seconds, long downtime);
-    boolean shutdown(int seconds, Text message);
-    boolean shutdown(int seconds, long downtime, Text message);
+  boolean isShuttingDown();
 
-    void forceShutdown();
-    void forceShutdown(Text message);
-    void cancelShutdown();
+  boolean shutdown(int seconds);
+
+  boolean shutdown(int seconds, long downtime);
+
+  boolean shutdown(int seconds, Text message);
+
+  boolean shutdown(int seconds, long downtime, Text message);
+
+  void forceShutdown();
+
+  void forceShutdown(Text message);
+
+  void cancelShutdown();
 }

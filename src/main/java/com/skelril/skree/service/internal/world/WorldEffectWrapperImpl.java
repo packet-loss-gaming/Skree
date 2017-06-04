@@ -13,45 +13,45 @@ import java.util.Collection;
 
 public class WorldEffectWrapperImpl implements WorldEffectWrapper {
 
-    protected String name;
-    protected Collection<World> worlds;
+  protected String name;
+  protected Collection<World> worlds;
 
-    public WorldEffectWrapperImpl(String name) {
-        this(name, new ArrayList<>());
-    }
+  public WorldEffectWrapperImpl(String name) {
+    this(name, new ArrayList<>());
+  }
 
-    public WorldEffectWrapperImpl(String name, Collection<World> worlds) {
-        this.name = name;
-        this.worlds = new ArrayList<>(worlds);
-    }
+  public WorldEffectWrapperImpl(String name, Collection<World> worlds) {
+    this.name = name;
+    this.worlds = new ArrayList<>(worlds);
+  }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public boolean isApplicable(World world) {
-        return worlds.contains(world);
-    }
+  @Override
+  public boolean isApplicable(World world) {
+    return worlds.contains(world);
+  }
 
-    @Override
-    public void addWorld(World world) {
-        worlds.add(world);
-    }
+  @Override
+  public void addWorld(World world) {
+    worlds.add(world);
+  }
 
-    @Override
-    public World getPrimaryWorld() {
-        return worlds.iterator().next();
-    }
+  @Override
+  public World getPrimaryWorld() {
+    return worlds.iterator().next();
+  }
 
-    @Override
-    public Collection<World> getWorlds() {
-        return worlds;
-    }
+  @Override
+  public Collection<World> getWorlds() {
+    return worlds;
+  }
 
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
 }

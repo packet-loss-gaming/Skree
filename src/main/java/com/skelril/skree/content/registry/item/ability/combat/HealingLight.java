@@ -15,14 +15,14 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public class HealingLight implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        EntityHealthUtil.heal(owner, 5);
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    EntityHealthUtil.heal(owner, 5);
 
-        ParticleGenerator.mobSpawnerFlames(target.getLocation(), 4);
+    ParticleGenerator.mobSpawnerFlames(target.getLocation(), 4);
 
-        target.damage(20, damageSource(owner));
+    target.damage(20, damageSource(owner));
 
-        notify(owner, Text.of(TextColors.YELLOW, "Your weapon glows dimly."));
-    }
+    notify(owner, Text.of(TextColors.YELLOW, "Your weapon glows dimly."));
+  }
 }

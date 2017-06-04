@@ -11,17 +11,17 @@ import com.skelril.nitro.registry.dynamic.item.ItemLoader;
 import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class SimpleLoader extends ItemLoader<LoadedSimpleItem, SimpleItemConfig> {
-    public SimpleLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
-        super(integrator, abilityRegistry);
-    }
+  public SimpleLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
+    super(integrator, abilityRegistry);
+  }
 
-    @Override
-    public LoadedSimpleItem constructFromConfig(SimpleItemConfig config) {
-        return new LoadedSimpleItem(config);
-    }
+  @Override
+  public LoadedSimpleItem constructFromConfig(SimpleItemConfig config) {
+    return new LoadedSimpleItem(config);
+  }
 
-    @Override
-    public Class<SimpleItemConfig> getConfigClass() {
-        return SimpleItemConfig.class;
-    }
+  @Override
+  public Class<SimpleItemConfig> getConfigClass() {
+    return SimpleItemConfig.class;
+  }
 }

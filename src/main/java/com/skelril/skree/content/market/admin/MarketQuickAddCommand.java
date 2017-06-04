@@ -28,62 +28,62 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class MarketQuickAddCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
+    }
+
+    Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
+      return CommandResult.empty();
+    }
+
+    MarketService service = optService.get();
+
+    Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
+    if (!held.isPresent()) {
+      src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
+      return CommandResult.empty();
+    }
+
+    ItemStack item = held.get();
+    String alias = args.<String>getOne("alias").get();
+    BigDecimal price;
+    try {
+      price = new BigDecimal(args.<String>getOne("price").get());
+    } catch (NumberFormatException ex) {
+      src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
+      return CommandResult.empty();
+    }
+
+    if (service.addItem(item)) {
+      if (service.addAlias(alias, item)) {
+        if (service.setBasePrice(alias, price)) {
+          if (service.setPrimaryAlias(alias)) {
+            src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
+            return CommandResult.success();
+          }
+          // Same error, fall through
         }
-
-        Optional<MarketService> optService = Sponge.getServiceManager().provide(MarketService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The market service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        MarketService service = optService.get();
-
-        Optional<ItemStack> held = ((Player) src).getItemInHand(HandTypes.MAIN_HAND);
-        if (!held.isPresent()) {
-            src.sendMessage(Text.of(TextColors.RED, "You are not holding an item."));
-            return CommandResult.empty();
-        }
-
-        ItemStack item = held.get();
-        String alias = args.<String>getOne("alias").get();
-        BigDecimal price;
-        try {
-            price = new BigDecimal(args.<String>getOne("price").get());
-        } catch (NumberFormatException ex) {
-            src.sendMessage(Text.of(TextColors.RED, "Invalid price specified"));
-            return CommandResult.empty();
-        }
-
-        if (service.addItem(item)) {
-            if (service.addAlias(alias, item)) {
-                if (service.setBasePrice(alias, price)) {
-                    if (service.setPrimaryAlias(alias)) {
-                        src.sendMessage(Text.of(TextColors.YELLOW, alias + " added to the market with a price of " + format(price)));
-                        return CommandResult.success();
-                    }
-                    // Same error, fall through
-                }
-                src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias"));
-                return CommandResult.empty();
-            }
-            src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
-            return CommandResult.empty();
-        }
-        src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
+        src.sendMessage(Text.of(TextColors.RED, alias + " is not a valid alias"));
         return CommandResult.empty();
+      }
+      src.sendMessage(Text.of(TextColors.RED, "Your held item is not currently tracked, or the alias is already in use."));
+      return CommandResult.empty();
     }
+    src.sendMessage(Text.of(TextColors.RED, "Your held item is already tracked."));
+    return CommandResult.empty();
+  }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Add an item to the market"))
-                .arguments(seq(string(Text.of("price")), remainingJoinedStrings(Text.of("alias"))))
-                .executor(new MarketQuickAddCommand())
-                .build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Add an item to the market"))
+        .arguments(seq(string(Text.of("price")), remainingJoinedStrings(Text.of("alias"))))
+        .executor(new MarketQuickAddCommand())
+        .build();
+  }
 }

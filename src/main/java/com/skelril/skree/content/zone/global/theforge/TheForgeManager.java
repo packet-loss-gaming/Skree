@@ -23,52 +23,52 @@ import java.util.function.Consumer;
 
 public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> implements Runnable, LocationZone<TheForgeInstance> {
 
-    public TheForgeManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new TheForgeListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneImmutableBlockListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
-        );
+  public TheForgeManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new TheForgeListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneImmutableBlockListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneGlobalHealthPrinter<>(this::getApplicableZone)
+    );
 
-        Task.builder().interval(4, TimeUnit.SECONDS).execute(this).submit(SkreePlugin.inst());
+    Task.builder().interval(4, TimeUnit.SECONDS).execute(this).submit(SkreePlugin.inst());
+  }
+
+  @Override
+  public void init(ZoneSpaceAllocator allocator, Consumer<TheForgeInstance> callback) {
+    allocator.regionFor(getSystemName(), clause -> {
+      ZoneRegion region = clause.getKey();
+
+      TheForgeInstance instance = new TheForgeInstance(region);
+      instance.init();
+
+      callback.accept(instance);
+    });
+  }
+
+  @Override
+  public String getName() {
+    return "The Forge";
+  }
+
+  @Override
+  public void run() {
+    Optional<TheForgeInstance> optInstance = getActiveZone();
+    if (!optInstance.isPresent()) {
+      return;
     }
 
-    @Override
-    public void init(ZoneSpaceAllocator allocator, Consumer<TheForgeInstance> callback) {
-        allocator.regionFor(getSystemName(), clause -> {
-            ZoneRegion region = clause.getKey();
-
-            TheForgeInstance instance = new TheForgeInstance(region);
-            instance.init();
-
-            callback.accept(instance);
-        });
-    }
-
-    @Override
-    public String getName() {
-        return "The Forge";
-    }
-
-    @Override
-    public void run() {
-        Optional<TheForgeInstance> optInstance = getActiveZone();
-        if (!optInstance.isPresent()) {
-            return;
-        }
-
-        TheForgeInstance inst = optInstance.get();
-        inst.run();
-    }
+    TheForgeInstance inst = optInstance.get();
+    inst.run();
+  }
 }

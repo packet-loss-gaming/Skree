@@ -10,18 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AbilityGroup {
-    private AbilityCooldownProfile coolDown;
-    private transient List<AbilityCluster> clusters = new ArrayList<>();
+  private AbilityCooldownProfile coolDown;
+  private transient List<AbilityCluster> clusters = new ArrayList<>();
 
-    public AbilityGroup(AbilityCooldownProfile coolDown) {
-        this.coolDown = coolDown;
-    }
+  public AbilityGroup(AbilityCooldownProfile coolDown) {
+    this.coolDown = coolDown;
+  }
 
-    public AbilityCooldownProfile getCoolDown() {
-        return coolDown;
-    }
+  public AbilityCooldownProfile getCoolDown() {
+    return coolDown;
+  }
 
-    public List<AbilityCluster> getClusters() {
-        return clusters;
-    }
+  public List<AbilityCluster> getClusters() {
+    return clusters;
+  }
 }

@@ -13,10 +13,11 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public interface RespawnService {
-    Location<World> getDefault(Player target);
+  Location<World> getDefault(Player target);
 
-    void push(Player player, Location<World> target);
+  void push(Player player, Location<World> target);
 
-    Optional<Location<World>> peek(Player player);
-    Optional<Location<World>> pop(Player player);
+  Optional<Location<World>> peek(Player player);
+
+  Optional<Location<World>> pop(Player player);
 }

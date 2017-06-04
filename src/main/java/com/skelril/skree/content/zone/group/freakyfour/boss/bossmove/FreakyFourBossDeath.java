@@ -16,14 +16,14 @@ import org.spongepowered.api.entity.living.Living;
 import java.util.Optional;
 
 public class FreakyFourBossDeath implements Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>> {
-    @Override
-    public Optional<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
-            UnbindCondition unbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> boss
-    ) {
-        FreakyFourInstance inst = boss.getDetail().getZone();
+  @Override
+  public Optional<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> apply(
+      UnbindCondition unbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>> boss
+  ) {
+    FreakyFourInstance inst = boss.getDetail().getZone();
 
-        inst.bossDied(inst.getCurrentboss().get());
+    inst.bossDied(inst.getCurrentboss().get());
 
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

@@ -17,22 +17,22 @@ import java.util.Optional;
 
 public class HealthBindInstruction<T extends Living, K extends EntityDetail> implements Instruction<BindCondition, Boss<T, K>> {
 
-    private final double health;
+  private final double health;
 
-    public HealthBindInstruction(double health) {
-        this.health = health;
-    }
+  public HealthBindInstruction(double health) {
+    this.health = health;
+  }
 
-    public double getHealth() {
-        return health;
-    }
+  public double getHealth() {
+    return health;
+  }
 
-    @Override
-    public Optional<Instruction<BindCondition, Boss<T, K>>> apply(
-            BindCondition bindCondition, Boss<T, K> bossDetail
-    ) {
-        Living targetEntity = bossDetail.getTargetEntity().get();
-        EntityHealthUtil.setMaxHealth(targetEntity, getHealth(), true);
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Instruction<BindCondition, Boss<T, K>>> apply(
+      BindCondition bindCondition, Boss<T, K> bossDetail
+  ) {
+    Living targetEntity = bossDetail.getTargetEntity().get();
+    EntityHealthUtil.setMaxHealth(targetEntity, getHealth(), true);
+    return Optional.empty();
+  }
 }

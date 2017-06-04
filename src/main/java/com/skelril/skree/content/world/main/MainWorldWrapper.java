@@ -57,161 +57,163 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable {
 
-    private ZoneWaitingLobby lobby = new ZoneWaitingLobby(() -> {
-        Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
+  private ZoneWaitingLobby lobby = new ZoneWaitingLobby(() -> {
+    Vector3i randomizedPos = new PositionRandomizer(5, 0, 5).createPosition3i(new Vector3i(122, 94, 103));
 
-        return getWorlds().iterator().next().getLocation(randomizedPos);
-    });
+    return getWorlds().iterator().next().getLocation(randomizedPos);
+  });
 
-    public MainWorldWrapper() {
-        this(new ArrayList<>());
+  public MainWorldWrapper() {
+    this(new ArrayList<>());
+  }
+
+  public MainWorldWrapper(Collection<World> worlds) {
+    super("Main", worlds);
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), lobby);
+
+    Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+  }
+
+  public ZoneWaitingLobby getLobby() {
+    return lobby;
+  }
+
+  @Override
+  public void addWorld(World world) {
+    super.addWorld(world);
+    tf(world).setAllowedSpawnTypes(false, false);
+  }
+
+  @Listener
+  public void onEntityConstruction(ConstructEntityEvent.Pre event) {
+    if (!isApplicable(event.getTransform().getExtent())) {
+      return;
     }
 
-    public MainWorldWrapper(Collection<World> worlds) {
-        super("Main", worlds);
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), lobby);
-
-        Task.builder().execute(this).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+    if (Monster.class.isAssignableFrom(event.getTargetType().getEntityClass())) {
+      event.setCancelled(true);
     }
+  }
 
-    public ZoneWaitingLobby getLobby() {
-        return lobby;
+  @Listener
+  public void onEntitySpawn(SpawnEntityEvent event) {
+    List<Entity> entities = event.getEntities();
+
+    for (Entity entity : entities) {
+      if (!isApplicable(entity)) {
+        continue;
+      }
+
+      if (entity instanceof Lightning) {
+        ((Lightning) entity).setEffect(true);
+        continue;
+      }
+
+      if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
+        event.setCancelled(true);
+        return;
+      }
     }
+  }
 
-    @Override
-    public void addWorld(World world) {
-        super.addWorld(world);
-        tf(world).setAllowedSpawnTypes(false, false);
+  private boolean check(Player player, Location<World> loc) {
+    return !player.hasPermission("skree.admin.edit.main");
+  }
+
+  @Listener
+  public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+      if (optLoc.isPresent() && isApplicable(optLoc.get())) {
+        boolean preventedFromBuilding = check(player, optLoc.get());
+
+        // Block players that are allowed to build, otherwise send the no build message
+        Text noEditMessage = Text.of(TextColors.RED, "You can't change blocks here!");
+        if (!preventedFromBuilding) {
+          if (player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.CREATIVE) {
+            preventedFromBuilding = true;
+            noEditMessage = Text.of(TextColors.RED, "You must be in creative mode to edit!");
+          }
+        }
+
+        if (preventedFromBuilding) {
+          if (event.getCause().root().equals(player)) {
+            player.sendMessage(noEditMessage);
+          }
+
+          event.setCancelled(true);
+          return;
+        }
+      }
     }
+  }
 
-    @Listener
-    public void onEntityConstruction(ConstructEntityEvent.Pre event) {
-        if (!isApplicable(event.getTransform().getExtent())) {
+  private PlayerCombatParser createFor(Cancellable event) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
+        Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
+        if (optService.isPresent()) {
+          PvPService service = optService.get();
+          if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
             return;
+          }
         }
 
-        if (Monster.class.isAssignableFrom(event.getTargetType().getEntityClass())) {
-            event.setCancelled(true);
+        if (!(indirectSource instanceof Snowball) || !lobby.contains(attacker)) {
+          attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
+          event.setCancelled(true);
         }
-    }
+      }
 
-    @Listener
-    public void onEntitySpawn(SpawnEntityEvent event) {
-        List<Entity> entities = event.getEntities();
-
-        for (Entity entity : entities) {
-            if (!isApplicable(entity)) continue;
-
-            if (entity instanceof Lightning) {
-                ((Lightning) entity).setEffect(true);
-                continue;
-            }
-
-            if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
-                event.setCancelled(true);
-                return;
-            }
+      @Override
+      public void processNonLivingAttack(DamageSource attacker, Player defender) {
+        if (attacker.getType() == DamageTypes.VOID) {
+          defender.setLocation(defender.getWorld().getSpawnLocation());
+          defender.offer(Keys.FALL_DISTANCE, 0F);
+          event.setCancelled(true);
         }
+      }
+    };
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    if (!isApplicable(event.getTargetEntity())) {
+      return;
     }
 
-    private boolean check(Player player, Location<World> loc) {
-        return !player.hasPermission("skree.admin.edit.main");
+    createFor(event).parse(event);
+  }
+
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    if (!isApplicable(projectile)) {
+      return;
     }
 
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-            if (optLoc.isPresent() && isApplicable(optLoc.get())) {
-                boolean preventedFromBuilding = check(player, optLoc.get());
+    createFor(event).parse(event);
+  }
 
-                // Block players that are allowed to build, otherwise send the no build message
-                Text noEditMessage = Text.of(TextColors.RED, "You can't change blocks here!");
-                if (!preventedFromBuilding) {
-                    if (player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.CREATIVE) {
-                        preventedFromBuilding = true;
-                        noEditMessage = Text.of(TextColors.RED, "You must be in creative mode to edit!");
-                    }
-                }
+  @Override
+  public void run() {
+    PotionEffect speedEffect = PotionEffect.builder()
+        .duration(3 * 20)
+        .amplifier(5)
+        .particles(false)
+        .potionType(PotionEffectTypes.SPEED)
+        .build();
 
-                if (preventedFromBuilding) {
-                    if (event.getCause().root().equals(player)) {
-                        player.sendMessage(noEditMessage);
-                    }
-
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
-    }
-
-    private PlayerCombatParser createFor(Cancellable event) {
-        return new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
-                Optional<PvPService> optService = Sponge.getServiceManager().provide(PvPService.class);
-                if (optService.isPresent()) {
-                    PvPService service = optService.get();
-                    if (service.getPvPState(attacker).allowByDefault() && service.getPvPState(defender).allowByDefault()) {
-                        return;
-                    }
-                }
-
-                if (!(indirectSource instanceof Snowball) || !lobby.contains(attacker)) {
-                    attacker.sendMessage(Text.of(TextColors.RED, "PvP is opt-in only in the main world!"));
-                    event.setCancelled(true);
-                }
-            }
-
-            @Override
-            public void processNonLivingAttack(DamageSource attacker, Player defender) {
-                if (attacker.getType() == DamageTypes.VOID) {
-                    defender.setLocation(defender.getWorld().getSpawnLocation());
-                    defender.offer(Keys.FALL_DISTANCE, 0F);
-                    event.setCancelled(true);
-                }
-            }
-        };
-    }
-
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        if (!isApplicable(event.getTargetEntity())) {
-            return;
+    for (World world : getWorlds()) {
+      for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
+        if (entity.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) != GameModes.SURVIVAL) {
+          continue;
         }
 
-        createFor(event).parse(event);
+        List<PotionEffect> potionEffects = entity.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
+        potionEffects.add(speedEffect);
+        entity.offer(Keys.POTION_EFFECTS, potionEffects);
+      }
     }
-
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        if (!isApplicable(projectile)) {
-            return;
-        }
-
-        createFor(event).parse(event);
-    }
-
-    @Override
-    public void run() {
-        PotionEffect speedEffect = PotionEffect.builder()
-                .duration(3 * 20)
-                .amplifier(5)
-                .particles(false)
-                .potionType(PotionEffectTypes.SPEED)
-                .build();
-
-        for (World world : getWorlds()) {
-            for (Entity entity : world.getEntities(p -> p.getType().equals(EntityTypes.PLAYER))) {
-                if (entity.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) != GameModes.SURVIVAL) {
-                    continue;
-                }
-
-                List<PotionEffect> potionEffects = entity.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>(1));
-                potionEffects.add(speedEffect);
-                entity.offer(Keys.POTION_EFFECTS, potionEffects);
-            }
-        }
-    }
+  }
 }

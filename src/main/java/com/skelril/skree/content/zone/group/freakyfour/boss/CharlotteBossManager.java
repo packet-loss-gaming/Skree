@@ -22,27 +22,27 @@ import org.spongepowered.api.entity.living.Living;
 import java.util.List;
 
 public class CharlotteBossManager extends BossManager<Living, ZoneBossDetail<FreakyFourInstance>> {
-    private CharlotteMinionManager minionManager = new CharlotteMinionManager();
-    private FreakyFourConfig config;
+  private CharlotteMinionManager minionManager = new CharlotteMinionManager();
+  private FreakyFourConfig config;
 
-    public CharlotteBossManager(FreakyFourConfig config) {
-        this.config = config;
-        handleBinds();
-        handleUnbinds();
-    }
+  public CharlotteBossManager(FreakyFourConfig config) {
+    this.config = config;
+    handleBinds();
+    handleUnbinds();
+  }
 
-    public CharlotteMinionManager getMinionManager() {
-        return minionManager;
-    }
+  public CharlotteMinionManager getMinionManager() {
+    return minionManager;
+  }
 
-    private void handleBinds() {
-        List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
-        bindProcessor.add(new NamedBindInstruction<>("Charlotte"));
-        bindProcessor.add(new HealthBindInstruction<>(config.charlotteHP));
-    }
+  private void handleBinds() {
+    List<Instruction<BindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> bindProcessor = getBindProcessor();
+    bindProcessor.add(new NamedBindInstruction<>("Charlotte"));
+    bindProcessor.add(new HealthBindInstruction<>(config.charlotteHP));
+  }
 
-    private void handleUnbinds() {
-        List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
-        unbindProcessor.add(new FreakyFourBossDeath());
-    }
+  private void handleUnbinds() {
+    List<Instruction<UnbindCondition, Boss<Living, ZoneBossDetail<FreakyFourInstance>>>> unbindProcessor = getUnbindProcessor();
+    unbindProcessor.add(new FreakyFourBossDeath());
+  }
 }

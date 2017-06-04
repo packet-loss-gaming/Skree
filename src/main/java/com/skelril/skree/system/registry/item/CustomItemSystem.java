@@ -38,134 +38,134 @@ import java.util.List;
 import java.util.Optional;
 
 public class CustomItemSystem extends AbstractCustomRegistrySystem {
-    private GameIntegrator gameIntegrator = new GameIntegrator("skree");
+  private GameIntegrator gameIntegrator = new GameIntegrator("skree");
 
-    public CustomItemSystem() {
-        super("/registry/items/");
-        LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
-        dynamicItemRegistry.registerConstant("SWORD_SPEED", "-2.4");
+  public CustomItemSystem() {
+    super("/registry/items/");
+    LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
+    dynamicItemRegistry.registerConstant("SWORD_SPEED", "-2.4");
 
-        SkreeAbilityRegistry abilityRegistry = new SkreeAbilityRegistry();
-        loadFromResources(getResource -> {
-            dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
-            dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));
-            dynamicItemRegistry.registerLoader(new BowLoader(gameIntegrator, abilityRegistry), getResource.apply("bows"));
-            dynamicItemRegistry.registerLoader(new FoodLoader(gameIntegrator, abilityRegistry), getResource.apply("food"));
-            dynamicItemRegistry.loadAll();
-        });
+    SkreeAbilityRegistry abilityRegistry = new SkreeAbilityRegistry();
+    loadFromResources(getResource -> {
+      dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
+      dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));
+      dynamicItemRegistry.registerLoader(new BowLoader(gameIntegrator, abilityRegistry), getResource.apply("bows"));
+      dynamicItemRegistry.registerLoader(new FoodLoader(gameIntegrator, abilityRegistry), getResource.apply("food"));
+      dynamicItemRegistry.loadAll();
+    });
+  }
+
+  @Override
+  public void preInit() {
+    try {
+      gameIntegrator.registerItems();
+      iterate(CustomItemSystem.class.getDeclaredMethod("register", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
     }
+  }
 
-    @Override
-    public void preInit() {
-        try {
-            gameIntegrator.registerItems();
-            iterate(CustomItemSystem.class.getDeclaredMethod("register", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
+  @Override
+  public void associate() {
+    try {
+      iterate(CustomItemSystem.class.getDeclaredMethod("registerAssociates", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  @Override
+  public void init() {
+    try {
+      gameIntegrator.registerItemRenderings();
+      iterate(CustomItemSystem.class.getDeclaredMethod("render", Object.class));
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+
+  private void iterate(Method method) {
+    method.setAccessible(true);
+    for (Field field : CustomItemTypes.class.getFields()) {
+      try {
+        Object result = field.get(null);
+        method.invoke(this, result);
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
+
+  // Invoked via reflection
+  @SuppressWarnings("unused")
+  private void register(Object item) {
+    if (item instanceof Item && item instanceof ICustomItem) {
+      ((Item) item).setUnlocalizedName("skree_" + ((ICustomItem) item).__getId());
+      ((Item) item).setRegistryName("skree:" + ((ICustomItem) item).__getId());
+
+      GameRegistry.register((Item) item);
+
+      // Add selective hooks
+      if (item instanceof EventAwareContent) {
+        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), item);
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void registerAssociates(Object item) {
+    if (item instanceof Item && item instanceof ICustomItem) {
+      // Add selective hooks
+      if (item instanceof Craftable) {
+        ((Craftable) item).registerRecipes();
+      }
+
+      if (item instanceof CookedItem) {
+        ((CookedItem) item).registerIngredients();
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
+    }
+  }
+
+  // Invoked via reflection
+  @SuppressWarnings("unused")
+  private void render(Object item) {
+    if (item instanceof Item && item instanceof ICustomItem) {
+      if (Sponge.getPlatform().getExecutionType().isClient()) {
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        ItemModelMesher mesher = renderItem.getItemModelMesher();
+
+        Optional<ItemMeshDefinition> optMeshDefinition = ((ICustomItem) item).__getCustomMeshDefinition();
+        if (optMeshDefinition.isPresent()) {
+          mesher.register((Item) item, optMeshDefinition.get());
         }
-    }
 
-    @Override
-    public void associate() {
-        try {
-            iterate(CustomItemSystem.class.getDeclaredMethod("registerAssociates", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
+        List<String> variants = ((ICustomItem) item).__getMeshDefinitions();
+        List<ResourceLocation> modelResources = new ArrayList<>();
+
+        for (int i = 0; i < variants.size(); ++i) {
+          ModelResourceLocation resourceLocation = new ModelResourceLocation(
+              "skree:" + variants.get(i),
+              "inventory"
+          );
+
+          if (!optMeshDefinition.isPresent()) {
+            mesher.register((Item) item, i, resourceLocation);
+          }
+          modelResources.add(resourceLocation);
         }
+
+        ModelBakery.registerItemVariants(
+            (Item) item,
+            modelResources.toArray(new ResourceLocation[modelResources.size()])
+        );
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid custom item!");
     }
-
-    @Override
-    public void init() {
-        try {
-            gameIntegrator.registerItemRenderings();
-            iterate(CustomItemSystem.class.getDeclaredMethod("render", Object.class));
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-
-    private void iterate(Method method) {
-        method.setAccessible(true);
-        for (Field field : CustomItemTypes.class.getFields()) {
-            try {
-                Object result = field.get(null);
-                method.invoke(this, result);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    // Invoked via reflection
-    @SuppressWarnings("unused")
-    private void register(Object item) {
-        if (item instanceof Item && item instanceof ICustomItem) {
-            ((Item) item).setUnlocalizedName("skree_" + ((ICustomItem) item).__getID());
-            ((Item) item).setRegistryName("skree:" + ((ICustomItem) item).__getID());
-
-            GameRegistry.register((Item) item);
-
-            // Add selective hooks
-            if (item instanceof EventAwareContent) {
-                Sponge.getEventManager().registerListeners(SkreePlugin.inst(), item);
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private void registerAssociates(Object item) {
-        if (item instanceof Item && item instanceof ICustomItem) {
-            // Add selective hooks
-            if (item instanceof Craftable) {
-                ((Craftable) item).registerRecipes();
-            }
-
-            if (item instanceof CookedItem) {
-                ((CookedItem) item).registerIngredients();
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
-    }
-
-    // Invoked via reflection
-    @SuppressWarnings("unused")
-    private void render(Object item) {
-        if (item instanceof Item && item instanceof ICustomItem) {
-            if (Sponge.getPlatform().getExecutionType().isClient()) {
-                RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-                ItemModelMesher mesher = renderItem.getItemModelMesher();
-
-                Optional<ItemMeshDefinition> optMeshDefinition = ((ICustomItem) item).__getCustomMeshDefinition();
-                if (optMeshDefinition.isPresent()) {
-                    mesher.register((Item) item, optMeshDefinition.get());
-                }
-
-                List<String> variants = ((ICustomItem) item).__getMeshDefinitions();
-                List<ResourceLocation> modelResources = new ArrayList<>();
-
-                for (int i = 0; i < variants.size(); ++i) {
-                    ModelResourceLocation resourceLocation = new ModelResourceLocation(
-                            "skree:" + variants.get(i),
-                            "inventory"
-                    );
-
-                    if (!optMeshDefinition.isPresent()) {
-                        mesher.register((Item) item, i, resourceLocation);
-                    }
-                    modelResources.add(resourceLocation);
-                }
-
-                ModelBakery.registerItemVariants(
-                        (Item) item,
-                        modelResources.toArray(new ResourceLocation[modelResources.size()])
-                );
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid custom item!");
-        }
-    }
+  }
 }

@@ -12,12 +12,12 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.util.List;
 
 public class ShapelessRecipeConfig extends CraftingRecipeConfig {
-    private List<ItemStackConfig> requiredItemStacks;
+  private List<ItemStackConfig> requiredItemStacks;
 
-    public void registerRecipie() {
-        GameRegistry.addShapelessRecipe(
-                craftedItem.toNSMStack(),
-                requiredItemStacks.stream().map(ItemStackConfig::toNSMStack).toArray()
-        );
-    }
+  public void registerRecipie() {
+    GameRegistry.addShapelessRecipe(
+        craftedItem.toNSMStack(),
+        requiredItemStacks.stream().map(ItemStackConfig::toNSMStack).toArray()
+    );
+  }
 }

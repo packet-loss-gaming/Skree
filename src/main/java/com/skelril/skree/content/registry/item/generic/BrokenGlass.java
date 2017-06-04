@@ -37,59 +37,59 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class BrokenGlass extends CustomItem implements CookedItem, EventAwareContent {
 
-    @Override
-    public String __getID() {
-        return "broken_glass";
+  @Override
+  public String __getId() {
+    return "broken_glass";
+  }
+
+  @Override
+  public List<String> __getMeshDefinitions() {
+    List<String> baseList = super.__getMeshDefinitions();
+    baseList.add("broken_glass_pane");
+    return baseList;
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 64;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.MATERIALS;
+  }
+
+  @Override
+  public void registerIngredients() {
+    GameRegistry.addSmelting(new ItemStack(this, 1, 0), new ItemStack(Blocks.GLASS), 0);
+    GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(Blocks.GLASS_PANE), 0);
+  }
+
+  private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {
+    Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
+    if (!optOrigin.isPresent()) {
+      return;
     }
 
-    @Override
-    public List<String> __getMeshDefinitions() {
-        List<String> baseList = super.__getMeshDefinitions();
-        baseList.add("broken_glass_pane");
-        return baseList;
+    new ItemDropper(optOrigin.get()).dropStacks(
+        Collections.singleton(tf(new ItemStack(this, 1, variant))),
+        SpawnTypes.DROPPED_ITEM
+    );
+  }
+
+  @Listener(order = Order.POST)
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
+    if (!player.get(Keys.GAME_MODE).orElse(null).equals(GameModes.SURVIVAL)) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 64;
+    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+      BlockType originalType = block.getOriginal().getState().getType();
+      if (originalType == BlockTypes.GLASS || originalType == BlockTypes.STAINED_GLASS) {
+        dropBrokenGlass(block, 0);
+      } else if (originalType == BlockTypes.GLASS_PANE || originalType == BlockTypes.STAINED_GLASS_PANE) {
+        dropBrokenGlass(block, 1);
+      }
     }
-
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.MATERIALS;
-    }
-
-    @Override
-    public void registerIngredients() {
-        GameRegistry.addSmelting(new ItemStack(this, 1, 0), new ItemStack(Blocks.GLASS), 0);
-        GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(Blocks.GLASS_PANE), 0);
-    }
-
-    private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {
-        Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
-        if (!optOrigin.isPresent()) {
-            return;
-        }
-
-        new ItemDropper(optOrigin.get()).dropStacks(
-                Collections.singleton(tf(new ItemStack(this, 1, variant))),
-                SpawnTypes.DROPPED_ITEM
-        );
-    }
-
-    @Listener(order = Order.POST)
-    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
-        if (!player.get(Keys.GAME_MODE).orElse(null).equals(GameModes.SURVIVAL)) {
-            return;
-        }
-
-        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-            BlockType originalType = block.getOriginal().getState().getType();
-            if (originalType == BlockTypes.GLASS || originalType == BlockTypes.STAINED_GLASS) {
-                dropBrokenGlass(block, 0);
-            } else if (originalType == BlockTypes.GLASS_PANE || originalType == BlockTypes.STAINED_GLASS_PANE) {
-                dropBrokenGlass(block, 1);
-            }
-        }
-    }
+  }
 }

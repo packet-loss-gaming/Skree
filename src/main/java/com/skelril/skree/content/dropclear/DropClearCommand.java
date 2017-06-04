@@ -26,59 +26,59 @@ import java.util.Optional;
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class DropClearCommand implements CommandExecutor {
-    private int maxDelay;
+  private int maxDelay;
 
-    public DropClearCommand(int maxDelay) {
-        this.maxDelay = maxDelay;
+  public DropClearCommand(int maxDelay) {
+    this.maxDelay = maxDelay;
+  }
+
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Optional<DropClearService> optService = Sponge.getServiceManager().provide(DropClearService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The drop clear service is not currently running."));
+      return CommandResult.empty();
     }
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<DropClearService> optService = Sponge.getServiceManager().provide(DropClearService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The drop clear service is not currently running."));
-            return CommandResult.empty();
-        }
+    DropClearService service = optService.get();
 
-        DropClearService service = optService.get();
+    // World resolution
+    Optional<WorldProperties> optWorldProps = args.getOne("world");
+    Optional<World> optWorld;
 
-        // World resolution
-        Optional<WorldProperties> optWorldProps = args.getOne("world");
-        Optional<World> optWorld;
-
-        if (!optWorldProps.isPresent()) {
-            if (!(src instanceof Player)) {
-                src.sendMessage(Text.of(TextColors.RED, "You are not a player and need to specify a world!"));
-                return CommandResult.empty();
-            }
-            optWorld = Optional.of(((Player) src).getWorld());
-        } else {
-            optWorld = Sponge.getServer().getWorld(optWorldProps.get().getUniqueId());
-        }
-
-        // Handled by command spec, so always provided
-        int seconds = args.<Integer>getOne("seconds").get();
-
-        World world = optWorld.get();
-        if (!world.isLoaded()) {
-            src.sendMessage(Text.of(TextColors.RED, "The specified world was not loaded!"));
-            return CommandResult.empty();
-        }
-
-        service.cleanup(world, Math.max(0, Math.min(seconds, maxDelay)));
-
-        return CommandResult.success();
+    if (!optWorldProps.isPresent()) {
+      if (!(src instanceof Player)) {
+        src.sendMessage(Text.of(TextColors.RED, "You are not a player and need to specify a world!"));
+        return CommandResult.empty();
+      }
+      optWorld = Optional.of(((Player) src).getWorld());
+    } else {
+      optWorld = Sponge.getServer().getWorld(optWorldProps.get().getUniqueId());
     }
 
-    public static CommandSpec aquireSpec(int maxDelay) {
-        return CommandSpec.builder()
-                .description(Text.of("Trigger a drop clear"))
-                .permission("skree.dropclear")
-                .arguments(
-                        seq(
-                                onlyOne(optionalWeak(integer(Text.of("seconds")), 10)),
-                                onlyOne(optional(world(Text.of("world"))))
-                        )
-                ).executor(new DropClearCommand(maxDelay)).build();
+    // Handled by command spec, so always provided
+    int seconds = args.<Integer>getOne("seconds").get();
+
+    World world = optWorld.get();
+    if (!world.isLoaded()) {
+      src.sendMessage(Text.of(TextColors.RED, "The specified world was not loaded!"));
+      return CommandResult.empty();
     }
+
+    service.cleanup(world, Math.max(0, Math.min(seconds, maxDelay)));
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec(int maxDelay) {
+    return CommandSpec.builder()
+        .description(Text.of("Trigger a drop clear"))
+        .permission("skree.dropclear")
+        .arguments(
+            seq(
+                onlyOne(optionalWeak(integer(Text.of("seconds")), 10)),
+                onlyOne(optional(world(Text.of("world"))))
+            )
+        ).executor(new DropClearCommand(maxDelay)).build();
+  }
 }

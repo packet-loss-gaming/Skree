@@ -15,11 +15,11 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public class Decimate implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        double damage = Probability.getRandom(target instanceof Player ? 3 : 10) * 50;
-        if (target.damage(damage, damageSource(owner))) {
-            notify(owner, Text.of(TextColors.YELLOW, "Your sword tears through the flesh of its victim."));
-        }
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    double damage = Probability.getRandom(target instanceof Player ? 3 : 10) * 50;
+    if (target.damage(damage, damageSource(owner))) {
+      notify(owner, Text.of(TextColors.YELLOW, "Your sword tears through the flesh of its victim."));
     }
+  }
 }

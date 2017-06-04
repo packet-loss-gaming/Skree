@@ -29,51 +29,51 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class GameModeCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The player state service is not currently running."));
-            return CommandResult.empty();
-        }
-        PlayerStateService service = optService.get();
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The player state service is not currently running."));
+      return CommandResult.empty();
+    }
+    PlayerStateService service = optService.get();
 
-        GameMode mode = args.<GameMode>getOne("mode").get();
-        Player target = args.<Player>getOne("target").get();
+    GameMode mode = args.<GameMode>getOne("mode").get();
+    Player target = args.<Player>getOne("target").get();
 
-        if (service.hasInventoryStored(target) && !args.hasAny("f")) {
-            src.sendMessage(Text.of(TextColors.RED, "Player has an omni-state stored, action denied."));
-            src.sendMessage(Text.of(TextColors.RED, "This can be overwritten using -f."));
-            return CommandResult.empty();
-        }
-
-        service.save(target, target.get(Keys.GAME_MODE).get().getId());
-        target.offer(Keys.FALL_DISTANCE, 0F);
-        target.offer(Keys.GAME_MODE, mode);
-        service.load(target, mode.getId());
-
-        target.sendMessage(Text.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
-        return CommandResult.success();
+    if (service.hasInventoryStored(target) && !args.hasAny("f")) {
+      src.sendMessage(Text.of(TextColors.RED, "Player has an omni-state stored, action denied."));
+      src.sendMessage(Text.of(TextColors.RED, "This can be overwritten using -f."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        Map<String, GameMode> map = new HashMap<>();
+    service.save(target, target.get(Keys.GAME_MODE).get().getId());
+    target.offer(Keys.FALL_DISTANCE, 0F);
+    target.offer(Keys.GAME_MODE, mode);
+    service.load(target, mode.getId());
 
-        map.put("survival", GameModes.SURVIVAL);
-        map.put("creative", GameModes.CREATIVE);
-        map.put("adventure", GameModes.ADVENTURE);
-        map.put("spectator", GameModes.SPECTATOR);
+    target.sendMessage(Text.of(TextColors.YELLOW, "Changed game mode to " + mode.getName() + '.'));
+    return CommandResult.success();
+  }
 
-        return CommandSpec.builder()
-                .description(Text.of("Change gamemode"))
-                .permission("skree.gamemode")
-                .arguments(
-                        flags().flag("f").buildWith(
-                                seq(
-                                        onlyOne(choices(Text.of("mode"), map)),
-                                        onlyOne(playerOrSource(Text.of("target")))
-                                )
-                        )
-                ).executor(new GameModeCommand()).build();
-    }
+  public static CommandSpec aquireSpec() {
+    Map<String, GameMode> map = new HashMap<>();
+
+    map.put("survival", GameModes.SURVIVAL);
+    map.put("creative", GameModes.CREATIVE);
+    map.put("adventure", GameModes.ADVENTURE);
+    map.put("spectator", GameModes.SPECTATOR);
+
+    return CommandSpec.builder()
+        .description(Text.of("Change gamemode"))
+        .permission("skree.gamemode")
+        .arguments(
+            flags().flag("f").buildWith(
+                seq(
+                    onlyOne(choices(Text.of("mode"), map)),
+                    onlyOne(playerOrSource(Text.of("target")))
+                )
+            )
+        ).executor(new GameModeCommand()).build();
+  }
 }

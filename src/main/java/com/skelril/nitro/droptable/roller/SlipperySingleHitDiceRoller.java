@@ -17,33 +17,33 @@ import java.util.function.BiFunction;
 
 public class SlipperySingleHitDiceRoller implements DiceRoller {
 
-    private final BiFunction<Integer, Double, Integer> modiFunc;
+  private final BiFunction<Integer, Double, Integer> modiFunc;
 
-    public SlipperySingleHitDiceRoller() {
-        this((a, b) -> a);
+  public SlipperySingleHitDiceRoller() {
+    this((a, b) -> a);
+  }
+
+  public SlipperySingleHitDiceRoller(BiFunction<Integer, Double, Integer> modiFunc) {
+    this.modiFunc = modiFunc;
+  }
+
+  @Override
+  public <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, double modifier) {
+    ListIterator<T> it = input.listIterator(input.size());
+
+    T cur = null;
+    while (it.hasPrevious()) {
+      cur = it.previous();
+
+      // Slip through until something which is >= the chance is hit, unless a modifier is applied
+      // this is equivalent to a 1 / chance probability
+      if (cur.getChance() <= Probability.getRandom(modiFunc.apply(cur.getChance(), modifier))) {
+        break;
+      }
+
+      cur = null;
     }
 
-    public SlipperySingleHitDiceRoller(BiFunction<Integer, Double, Integer> modiFunc) {
-        this.modiFunc = modiFunc;
-    }
-
-    @Override
-    public <T extends DropTableEntry> Collection<T> getHits(ImmutableList<T> input, double modifier) {
-        ListIterator<T> it = input.listIterator(input.size());
-
-        T cur = null;
-        while (it.hasPrevious()) {
-            cur = it.previous();
-
-            // Slip through until something which is >= the chance is hit, unless a modifier is applied
-            // this is equivalent to a 1 / chance probability
-            if (cur.getChance() <= Probability.getRandom(modiFunc.apply(cur.getChance(), modifier))) {
-                break;
-            }
-
-            cur = null;
-        }
-
-        return cur == null ? Collections.emptySet() : Collections.singleton(cur);
-    }
+    return cur == null ? Collections.emptySet() : Collections.singleton(cur);
+  }
 }

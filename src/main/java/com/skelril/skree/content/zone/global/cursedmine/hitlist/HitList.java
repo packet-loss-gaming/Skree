@@ -15,26 +15,26 @@ import java.util.concurrent.TimeUnit;
 
 public class HitList {
 
-    private Map<UUID, Long> hitList = new HashMap<>();
+  private Map<UUID, Long> hitList = new HashMap<>();
 
-    public void addPlayer(Player player) {
-        long expiryTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10);
-        hitList.put(player.getUniqueId(), expiryTime);
-    }
+  public void addPlayer(Player player) {
+    long expiryTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10);
+    hitList.put(player.getUniqueId(), expiryTime);
+  }
 
-    public void remPlayer(Player player) {
-        hitList.remove(player.getUniqueId());
-    }
+  public void remPlayer(Player player) {
+    hitList.remove(player.getUniqueId());
+  }
 
-    public boolean isOnHitList(Player player) {
-        return hitList.containsKey(player.getUniqueId());
-    }
+  public boolean isOnHitList(Player player) {
+    return hitList.containsKey(player.getUniqueId());
+  }
 
-    public void check() {
-        hitList.entrySet().removeIf(uuidLongEntry -> hasExpired(uuidLongEntry.getValue()));
-    }
+  public void check() {
+    hitList.entrySet().removeIf(uuidLongEntry -> hasExpired(uuidLongEntry.getValue()));
+  }
 
-    private boolean hasExpired(long expiryTime) {
-        return expiryTime < System.currentTimeMillis();
-    }
+  private boolean hasExpired(long expiryTime) {
+    return expiryTime < System.currentTimeMillis();
+  }
 }

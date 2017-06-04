@@ -18,19 +18,19 @@ import org.spongepowered.api.Sponge;
 @NModule(name = "Shutdown System")
 public class ShutdownSystem implements ServiceProvider<ShutdownService> {
 
-    private ShutdownService service;
+  private ShutdownService service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new ShutdownServiceImpl();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new ShutdownServiceImpl();
 
-        // Register the service & command
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ShutdownService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), ShutdownCommand.aquireSpec(), "shutdown");
-    }
+    // Register the service & command
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ShutdownService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), ShutdownCommand.aquireSpec(), "shutdown");
+  }
 
-    @Override
-    public ShutdownService getService() {
-        return service;
-    }
+  @Override
+  public ShutdownService getService() {
+    return service;
+  }
 }

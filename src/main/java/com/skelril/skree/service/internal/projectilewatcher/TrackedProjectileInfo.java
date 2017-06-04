@@ -12,9 +12,11 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Location;
 
 public interface TrackedProjectileInfo {
-    Projectile getProjectile();
-    Cause getCause();
+  Projectile getProjectile();
 
-    Location getLastLocation();
-    void updateLocation();
+  Cause getCause();
+
+  Location getLastLocation();
+
+  void updateLocation();
 }

@@ -13,28 +13,28 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 public class ChatCommandAid {
-    @Listener
-    public void onPlayerChat(MessageChannelEvent.Chat event) {
-        String rawText = event.getRawMessage().toPlain();
-        if (rawText.matches("\\./.*")) {
-            // Remove the comment
-            String rawCommand = rawText.replaceFirst("//.*", "");
-            // Replace the "./" with "/" and then trim the string
-            String command = rawCommand.replaceFirst("\\./", "/").trim();
-            // Remove the command, and the comment block, as well as its spaces
-            String message = rawText.replace(rawCommand, "").replaceFirst("// *", "").trim();
+  @Listener
+  public void onPlayerChat(MessageChannelEvent.Chat event) {
+    String rawText = event.getRawMessage().toPlain();
+    if (rawText.matches("\\./.*")) {
+      // Remove the comment
+      String rawCommand = rawText.replaceFirst("//.*", "");
+      // Replace the "./" with "/" and then trim the string
+      String command = rawCommand.replaceFirst("\\./", "/").trim();
+      // Remove the command, and the comment block, as well as its spaces
+      String message = rawText.replace(rawCommand, "").replaceFirst("// *", "").trim();
 
-            // Send a composite message of the command, a space, and then the comment text
-            event.getFormatter().setBody(Text.of(
-                    Text.of(
-                            TextColors.DARK_GREEN,
-                            TextActions.showText(Text.of("Click to type:\n", command)),
-                            TextActions.suggestCommand(command),
-                            command
-                    ),
-                    " ",
-                    message
-            ));
-        }
+      // Send a composite message of the command, a space, and then the comment text
+      event.getFormatter().setBody(Text.of(
+          Text.of(
+              TextColors.DARK_GREEN,
+              TextActions.showText(Text.of("Click to type:\n", command)),
+              TextActions.suggestCommand(command),
+              command
+          ),
+          " ",
+          message
+      ));
     }
+  }
 }

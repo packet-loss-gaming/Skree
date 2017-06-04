@@ -12,22 +12,23 @@ import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
+@Deprecated
 public class TypeCollections {
 
-    private static final ImmutableCollection<BlockType> ores = ImmutableSet.of(
-            BlockTypes.COAL_ORE,
-            BlockTypes.DIAMOND_ORE,
-            BlockTypes.EMERALD_ORE,
-            BlockTypes.REDSTONE_ORE,
-            BlockTypes.GOLD_ORE,
-            BlockTypes.IRON_ORE,
-            BlockTypes.LAPIS_ORE,
-            BlockTypes.LIT_REDSTONE_ORE,
-            BlockTypes.QUARTZ_ORE,
-            (BlockType) CustomBlockTypes.JURACK_ORE
-    );
+  private static final ImmutableCollection<BlockType> ORES = ImmutableSet.of(
+      BlockTypes.COAL_ORE,
+      BlockTypes.DIAMOND_ORE,
+      BlockTypes.EMERALD_ORE,
+      BlockTypes.REDSTONE_ORE,
+      BlockTypes.GOLD_ORE,
+      BlockTypes.IRON_ORE,
+      BlockTypes.LAPIS_ORE,
+      BlockTypes.LIT_REDSTONE_ORE,
+      BlockTypes.QUARTZ_ORE,
+      (BlockType) CustomBlockTypes.JURACK_ORE
+  );
 
-    public static ImmutableCollection<BlockType> ore() {
-        return ores;
-    }
+  public static ImmutableCollection<BlockType> ore() {
+    return ORES;
+  }
 }

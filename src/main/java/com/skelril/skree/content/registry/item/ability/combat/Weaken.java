@@ -19,26 +19,26 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.Optional;
 
 public class Weaken implements SpecialAttack {
-    @Override
-    public void run(Living owner, Living target, DamageEntityEvent event) {
-        int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 18);
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 18);
 
-        Optional<PotionEffectData> optOwnerPotionEffectData = owner.getOrCreate(PotionEffectData.class);
-        if (optOwnerPotionEffectData.isPresent()) {
-            PotionEffectData ownerPotionEffectData = optOwnerPotionEffectData.get();
-            ownerPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.STRENGTH, 1, duration));
-            owner.offer(ownerPotionEffectData);
-        }
-
-        Optional<PotionEffectData> optTargetPotionEffectData = target.getOrCreate(PotionEffectData.class);
-        if (optTargetPotionEffectData.isPresent()) {
-            PotionEffectData targetPotionEffectData = optTargetPotionEffectData.get();
-            targetPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WEAKNESS, 1, duration));
-            target.offer(targetPotionEffectData);
-        }
-
-        if (optOwnerPotionEffectData.isPresent() || optTargetPotionEffectData.isPresent()) {
-            notify(owner, Text.of(TextColors.YELLOW, "Your sword leaches strength from its victim."));
-        }
+    Optional<PotionEffectData> optOwnerPotionEffectData = owner.getOrCreate(PotionEffectData.class);
+    if (optOwnerPotionEffectData.isPresent()) {
+      PotionEffectData ownerPotionEffectData = optOwnerPotionEffectData.get();
+      ownerPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.STRENGTH, 1, duration));
+      owner.offer(ownerPotionEffectData);
     }
+
+    Optional<PotionEffectData> optTargetPotionEffectData = target.getOrCreate(PotionEffectData.class);
+    if (optTargetPotionEffectData.isPresent()) {
+      PotionEffectData targetPotionEffectData = optTargetPotionEffectData.get();
+      targetPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WEAKNESS, 1, duration));
+      target.offer(targetPotionEffectData);
+    }
+
+    if (optOwnerPotionEffectData.isPresent() || optTargetPotionEffectData.isPresent()) {
+      notify(owner, Text.of(TextColors.YELLOW, "Your sword leaches strength from its victim."));
+    }
+  }
 }

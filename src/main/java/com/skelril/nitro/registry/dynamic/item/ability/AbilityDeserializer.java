@@ -14,15 +14,15 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 public class AbilityDeserializer implements JsonDeserializer<Ability> {
-    private AbilityRegistry registry;
+  private AbilityRegistry registry;
 
-    public AbilityDeserializer(AbilityRegistry registry) {
-        this.registry = registry;
-    }
+  public AbilityDeserializer(AbilityRegistry registry) {
+    this.registry = registry;
+  }
 
-    @Override
-    public Ability deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        Class<? extends Ability> abilityClass = registry.lookupByID(json.getAsJsonObject().get("id").getAsString());
-        return context.deserialize(json, abilityClass);
-    }
+  @Override
+  public Ability deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    Class<? extends Ability> abilityClass = registry.lookupByID(json.getAsJsonObject().get("id").getAsString());
+    return context.deserialize(json, abilityClass);
+  }
 }

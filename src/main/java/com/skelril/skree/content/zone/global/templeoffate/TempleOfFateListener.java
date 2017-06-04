@@ -21,33 +21,35 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 
 public class TempleOfFateListener {
-    private final TempleOfFateManager manager;
+  private final TempleOfFateManager manager;
 
-    public TempleOfFateListener(TempleOfFateManager manager) {
-        this.manager = manager;
+  public TempleOfFateListener(TempleOfFateManager manager) {
+    this.manager = manager;
+  }
+
+  @Listener(order = Order.FIRST)
+  public void onPlayerInteractEvent(InteractBlockEvent.Secondary.MainHand event, @Root Player player) {
+    Optional<TempleOfFateInstance> optInst = manager.getApplicableZone(player);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener(order = Order.FIRST)
-    public void onPlayerInteractEvent(InteractBlockEvent.Secondary.MainHand event, @Root Player player) {
-        Optional<TempleOfFateInstance> optInst = manager.getApplicableZone(player);
-        if (!optInst.isPresent()) return;
+    TempleOfFateInstance inst = optInst.get();
 
-        TempleOfFateInstance inst = optInst.get();
+    Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
 
-        Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
-
-        if (!optLoc.isPresent()) {
-            return;
-        }
-
-        Location<World> targetBlock = optLoc.get();
-        if (targetBlock.getBlockType() == BlockTypes.CHEST) {
-            event.setUseItemResult(Tristate.FALSE);
-            event.setUseBlockResult(Tristate.FALSE);
-
-            player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully completed the Temple of Fate!"));
-            inst.rewardPlayer(player);
-        }
+    if (!optLoc.isPresent()) {
+      return;
     }
+
+    Location<World> targetBlock = optLoc.get();
+    if (targetBlock.getBlockType() == BlockTypes.CHEST) {
+      event.setUseItemResult(Tristate.FALSE);
+      event.setUseBlockResult(Tristate.FALSE);
+
+      player.sendMessage(Text.of(TextColors.YELLOW, "You have successfully completed the Temple of Fate!"));
+      inst.rewardPlayer(player);
+    }
+  }
 
 }

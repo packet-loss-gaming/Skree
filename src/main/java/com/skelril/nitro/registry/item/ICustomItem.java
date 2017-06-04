@@ -16,23 +16,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ICustomItem {
-    String __getID();
+  String __getId();
 
-    default Optional<ItemMeshDefinition> __getCustomMeshDefinition() {
-        return Optional.empty();
+  default Optional<ItemMeshDefinition> __getCustomMeshDefinition() {
+    return Optional.empty();
+  }
+
+  default List<String> __getMeshDefinitions() {
+    return Lists.newArrayList(__getId());
+  }
+
+  default void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+    List<String> variants = __getMeshDefinitions();
+    for (int i = 0; i < variants.size(); ++i) {
+      subItems.add(new ItemStack(itemIn, 1, i));
     }
+  }
 
-    default List<String> __getMeshDefinitions() {
-        return Lists.newArrayList(__getID());
-    }
+  int __getMaxStackSize();
 
-    default void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-        List<String> variants = __getMeshDefinitions();
-        for (int i = 0; i < variants.size(); ++i) {
-            subItems.add(new ItemStack(itemIn, 1, i));
-        }
-    }
-
-    int __getMaxStackSize();
-    CreativeTabs __getCreativeTab();
+  CreativeTabs __getCreativeTab();
 }

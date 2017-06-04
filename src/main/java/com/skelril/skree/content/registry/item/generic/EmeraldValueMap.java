@@ -19,25 +19,25 @@ import java.math.BigInteger;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class EmeraldValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> EMERALD_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.EMERALD)),
-                    BigInteger.ONE
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack(ItemTypes.EMERALD_BLOCK)),
-                    BigInteger.valueOf(9)
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> EMERALD_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.EMERALD)),
+          BigInteger.ONE
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack(ItemTypes.EMERALD_BLOCK)),
+          BigInteger.valueOf(9)
+      )
+  );
 
 
-    private static final EmeraldValueMap map = new EmeraldValueMap();
+  private static final EmeraldValueMap MAP = new EmeraldValueMap();
 
-    protected EmeraldValueMap() {
-        super(EMERALD_VALUE_MAP);
-    }
+  protected EmeraldValueMap() {
+    super(EMERALD_VALUE_MAP);
+  }
 
-    public static EmeraldValueMap inst() {
-        return map;
-    }
+  public static EmeraldValueMap inst() {
+    return MAP;
+  }
 }

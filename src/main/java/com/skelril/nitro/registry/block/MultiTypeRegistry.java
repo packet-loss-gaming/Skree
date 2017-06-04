@@ -10,11 +10,11 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
 public class MultiTypeRegistry {
-    public static boolean isRedstoneOre(BlockType type) {
-        return type.equals(BlockTypes.REDSTONE_ORE) || type.equals(BlockTypes.LIT_REDSTONE_ORE);
-    }
+  public static boolean isRedstoneOre(BlockType type) {
+    return type.equals(BlockTypes.REDSTONE_ORE) || type.equals(BlockTypes.LIT_REDSTONE_ORE);
+  }
 
-    public static boolean isWater(BlockType type) {
-        return type.equals(BlockTypes.WATER) || type.equals(BlockTypes.FLOWING_WATER);
-    }
+  public static boolean isWater(BlockType type) {
+    return type.equals(BlockTypes.WATER) || type.equals(BlockTypes.FLOWING_WATER);
+  }
 }

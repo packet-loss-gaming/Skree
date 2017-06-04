@@ -9,22 +9,22 @@ package com.skelril.nitro.registry.item.armor;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 public abstract class CustomLeggings extends CustomArmor {
-    public CustomLeggings() {
-        super(EntityEquipmentSlot.LEGS);
-    }
+  public CustomLeggings() {
+    super(EntityEquipmentSlot.LEGS);
+  }
 
-    @Override
-    public int __getDamageReductionAmount() {
-        return 6;
-    }
+  @Override
+  public int __getDamageReductionAmount() {
+    return 6;
+  }
 
-    @Override
-    public int __getToughness() {
-        return 2;
-    }
+  @Override
+  public int __getToughness() {
+    return 2;
+  }
 
-    @Override
-    public String __getArmorCategory() {
-        return "leggings";
-    }
+  @Override
+  public String __getArmorCategory() {
+    return "leggings";
+  }
 }

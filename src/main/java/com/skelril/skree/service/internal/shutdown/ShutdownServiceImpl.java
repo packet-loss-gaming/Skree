@@ -25,100 +25,99 @@ import java.util.concurrent.TimeUnit;
 
 public class ShutdownServiceImpl implements ShutdownService {
 
-    private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
-    private static final Text DEFAULT_REASON = Text.of("Shutting down!");
+  private static final long DEFAULT_DOWNTIME = TimeUnit.SECONDS.toMillis(30);
+  private static final Text DEFAULT_REASON = Text.of("Shutting down!");
 
-    private TimedRunnable runnable = null;
-    private String reopenDate;
+  private TimedRunnable runnable = null;
+  private String reopenDate;
 
+  @Override
+  public int getSecondsTilOffline() {
+    if (isShuttingDown()) {
+      return runnable.getTimes();
+    }
+    return -1;
+  }
 
-    @Override
-    public int getSecondsTilOffline() {
-        if (isShuttingDown()) {
-            return runnable.getTimes();
+  @Override
+  public boolean isShuttingDown() {
+    return runnable != null;
+  }
+
+  @Override
+  public boolean shutdown(int seconds) {
+    return shutdown(seconds, DEFAULT_DOWNTIME);
+  }
+
+  @Override
+  public boolean shutdown(int seconds, long downtime) {
+    return shutdown(seconds, DEFAULT_DOWNTIME, DEFAULT_REASON);
+  }
+
+  @Override
+  public boolean shutdown(int seconds, Text message) {
+    return shutdown(seconds, DEFAULT_DOWNTIME, message);
+  }
+
+  private static final TimeFilter FILTER = new TimeFilter(10, 5);
+
+  @Override
+  public boolean shutdown(int seconds, long downtime, Text message) {
+    if (seconds < 1) {
+      return false;
+    }
+
+    reopenDate = PrettyText.dateFromCur(System.currentTimeMillis() + downtime + (seconds * 1000));
+
+    if (runnable != null) {
+      runnable.setTimes(seconds);
+      return true;
+    }
+
+    IntegratedRunnable shutdown = new IntegratedRunnable() {
+      @Override
+      public boolean run(int times) {
+        if (FILTER.matchesFilter(times)) {
+          String rawMessage = "Sever shutting down in " + times + " seconds - for " + reopenDate + ".";
+          MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
+          GameChatterPlugin.inst().sendSystemMessage(rawMessage);
         }
-        return -1;
-    }
-
-    @Override
-    public boolean isShuttingDown() {
-        return runnable != null;
-    }
-
-    @Override
-    public boolean shutdown(int seconds) {
-        return shutdown(seconds, DEFAULT_DOWNTIME);
-    }
-
-    @Override
-    public boolean shutdown(int seconds, long downtime) {
-        return shutdown(seconds, DEFAULT_DOWNTIME, DEFAULT_REASON);
-    }
-
-    @Override
-    public boolean shutdown(int seconds, Text message) {
-        return shutdown(seconds, DEFAULT_DOWNTIME, message);
-    }
-
-    private static final TimeFilter filter = new TimeFilter(10, 5);
-
-    @Override
-    public boolean shutdown(int seconds, long downtime, Text message) {
-        if (seconds < 1) {
-            return false;
-        }
-
-        reopenDate = PrettyText.dateFromCur(System.currentTimeMillis() + downtime + (seconds * 1000));
-
-        if (runnable != null) {
-            runnable.setTimes(seconds);
-            return true;
-        }
-
-        IntegratedRunnable shutdown = new IntegratedRunnable() {
-            @Override
-            public boolean run(int times) {
-                if (filter.matchesFilter(times)) {
-                    String rawMessage = "Sever shutting down in " + times + " seconds - for " + reopenDate + ".";
-                    MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
-                    GameChatterPlugin.inst().sendSystemMessage(rawMessage);
-                }
-                return true;
-            }
-
-            @Override
-            public void end() {
-                String rawMessage = "Server shutting down!";
-                MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
-                GameChatterPlugin.inst().sendSystemMessage(rawMessage);
-
-                forceShutdown(message);
-            }
-        };
-
-        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
-        Task task = Task.builder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
-        runnable.setTask(task);
-
-        this.runnable = runnable;
         return true;
-    }
+      }
 
-    @Override
-    public void forceShutdown() {
-        forceShutdown(DEFAULT_REASON);
-    }
+      @Override
+      public void end() {
+        String rawMessage = "Server shutting down!";
+        MessageChannel.TO_ALL.send(Text.of(TextColors.RED, rawMessage));
+        GameChatterPlugin.inst().sendSystemMessage(rawMessage);
 
-    @Override
-    public void forceShutdown(Text message) {
-        Sponge.getServer().shutdown(message);
-    }
+        forceShutdown(message);
+      }
+    };
 
-    @Override
-    public void cancelShutdown() {
-        if (runnable != null) {
-            runnable.cancel();
-            runnable = null;
-        }
+    TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(shutdown, seconds);
+    Task task = Task.builder().execute(runnable).interval(1, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+    runnable.setTask(task);
+
+    this.runnable = runnable;
+    return true;
+  }
+
+  @Override
+  public void forceShutdown() {
+    forceShutdown(DEFAULT_REASON);
+  }
+
+  @Override
+  public void forceShutdown(Text message) {
+    Sponge.getServer().shutdown(message);
+  }
+
+  @Override
+  public void cancelShutdown() {
+    if (runnable != null) {
+      runnable.cancel();
+      runnable = null;
     }
+  }
 }

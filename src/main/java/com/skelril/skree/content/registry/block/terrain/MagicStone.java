@@ -25,32 +25,32 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class MagicStone extends Block implements ICustomBlock, Craftable {
 
-    public MagicStone() {
-        super(new Material(MapColor.STONE));
-        this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+  public MagicStone() {
+    super(new Material(MapColor.STONE));
+    this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
 
-        // Data applied for Vanilla blocks in net.minecraft.block.Block
-        this.setHardness(1.5F);
-        this.setResistance(10.0F);
-        this.setSoundType(SoundType.STONE);
-    }
+    // Data applied for Vanilla blocks in net.minecraft.block.Block
+    this.setHardness(1.5F);
+    this.setResistance(10.0F);
+    this.setSoundType(SoundType.STONE);
+  }
 
-    @Override
-    public String __getID() {
-        return "magic_stone";
-    }
+  @Override
+  public String __getID() {
+    return "magic_stone";
+  }
 
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return Item.getItemFromBlock(Blocks.COBBLESTONE);
-    }
+  @Override
+  public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    return Item.getItemFromBlock(Blocks.COBBLESTONE);
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(Blocks.STONE),
-                newItemStack("skree:fairy_dust")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(Blocks.STONE),
+        newItemStack("skree:fairy_dust")
+    );
+  }
 }

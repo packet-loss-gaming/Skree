@@ -17,50 +17,50 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class HardenedDiamondPickaxe extends CustomPickaxe implements Craftable {
-    @Override
-    public String __getType() {
-        return "hardened_diamond";
-    }
+  @Override
+  public String __getType() {
+    return "hardened_diamond";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return null;
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return null;
+  }
 
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.DIAMOND.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.DIAMOND.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.DIAMOND.getEnchantability();
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.DIAMOND.getEnchantability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.DIAMOND;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.DIAMOND;
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.DIAMOND.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.DIAMOND.getEfficienyOnProperMaterial();
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.DIAMOND.getDurability();
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.DIAMOND.getDurability();
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                " B ",
-                "   ",
-                'A', new ItemStack(Blocks.OBSIDIAN),
-                'B', new ItemStack(Items.DIAMOND_PICKAXE)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        " B ",
+        "   ",
+        'A', new ItemStack(Blocks.OBSIDIAN),
+        'B', new ItemStack(Items.DIAMOND_PICKAXE)
+    );
+  }
 }

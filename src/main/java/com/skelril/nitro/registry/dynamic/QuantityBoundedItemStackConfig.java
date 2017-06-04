@@ -13,24 +13,24 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
 
 public class QuantityBoundedItemStackConfig extends ItemStackConfig {
-    private Range quantity = new Range();
+  private Range quantity = new Range();
 
-    @Override
-    public ItemStack toNSMStack() {
-        ItemType spongeType = Sponge.getRegistry().getType(ItemType.class, id).get();
-        return new ItemStack((Item) spongeType, Probability.getRangedRandom(quantity.getMin(), quantity.getMax()), data);
+  @Override
+  public ItemStack toNSMStack() {
+    ItemType spongeType = Sponge.getRegistry().getType(ItemType.class, id).get();
+    return new ItemStack((Item) spongeType, Probability.getRangedRandom(quantity.getMin(), quantity.getMax()), data);
+  }
+
+  private static class Range {
+    private int min = 1;
+    private int max = 1;
+
+    public int getMin() {
+      return min;
     }
 
-    private static class Range {
-        private int min = 1;
-        private int max = 1;
-
-        public int getMin() {
-            return min;
-        }
-
-        public int getMax() {
-            return max;
-        }
+    public int getMax() {
+      return max;
     }
+  }
 }

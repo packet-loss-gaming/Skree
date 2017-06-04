@@ -15,16 +15,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Decorators {
-    public static final Decorator ZONE_PRIMARY_DECORATOR = new WEDecorator(getBaseWorkingDir());
+  public static final Decorator ZONE_PRIMARY_DECORATOR = new WEDecorator(getBaseWorkingDir());
 
-    private static Path getBaseWorkingDir() {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        try {
-            return Files.createDirectories(path.resolve("zones"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+  private static Path getBaseWorkingDir() {
+    ConfigManager service = Sponge.getGame().getConfigManager();
+    Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+    try {
+      return Files.createDirectories(path.resolve("zones"));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 }

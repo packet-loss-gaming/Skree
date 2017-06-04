@@ -32,77 +32,77 @@ import java.util.concurrent.TimeUnit;
 
 @NModule(name = "Market System")
 public class MarketSystem implements ServiceProvider<MarketService> {
-    private static final TimeUnit WAIT_UNIT = TimeUnit.HOURS;
-    private static final long WAIT_TIME = 2;
+  private static final TimeUnit WAIT_UNIT = TimeUnit.HOURS;
+  private static final long WAIT_TIME = 2;
 
-    private MarketService service;
-    private MarketState state;
+  private MarketService service;
+  private MarketState state;
 
-    private Path getMarketStateFile() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return path.resolve("market_state.json");
+  private Path getMarketStateFile() throws IOException {
+    ConfigManager service = Sponge.getGame().getConfigManager();
+    Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+    return path.resolve("market_state.json");
+  }
+
+  private void loadState() {
+    try {
+      Path targetFile = getMarketStateFile();
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+      if (!Files.exists(targetFile)) {
+        state = new MarketState();
+        return;
+      }
+
+      try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
+        state = gson.fromJson(reader, MarketState.class);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    private void loadState() {
-        try {
-            Path targetFile = getMarketStateFile();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private void dumpState() {
+    try {
+      Path targetFile = getMarketStateFile();
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            if (!Files.exists(targetFile)) {
-                state = new MarketState();
-                return;
-            }
-
-            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                state = gson.fromJson(reader, MarketState.class);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      try (BufferedWriter writer = Files.newBufferedWriter(targetFile)) {
+        writer.write(gson.toJson(state));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    private void dumpState() {
-        try {
-            Path targetFile = getMarketStateFile();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    service = new MarketServiceImpl();
+    loadState();
 
-            try (BufferedWriter writer = Files.newBufferedWriter(targetFile)) {
-                writer.write(gson.toJson(state));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // Register the service
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
 
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        service = new MarketServiceImpl();
-        loadState();
+    // Calculate delay
+    long elapsedTime = System.currentTimeMillis() - state.getLastUpdate();
+    long elapsedSeconds = elapsedTime / TimeUnit.SECONDS.toMillis(1);
+    long waitDuration = WAIT_UNIT.toSeconds(WAIT_TIME);
+    long remainingTime = Math.max(0, waitDuration - elapsedSeconds);
 
-        // Register the service
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
+    // Schedule an update task for every two hours
+    Task.builder().execute(() -> {
+      service.updatePrices();
+      state.setLastUpdate(System.currentTimeMillis());
+      dumpState();
 
-        // Calculate delay
-        long elapsedTime = System.currentTimeMillis() - state.getLastUpdate();
-        long elapsedSeconds = elapsedTime / TimeUnit.SECONDS.toMillis(1);
-        long waitDuration = WAIT_UNIT.toSeconds(WAIT_TIME);
-        long remainingTime = Math.max(0, waitDuration - elapsedSeconds);
+      MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, "The market has been updated"));
+      GameChatterPlugin.inst().sendSystemMessage("The market has been updated");
+    }).interval(WAIT_TIME, WAIT_UNIT).delay(remainingTime, TimeUnit.SECONDS).async().submit(SkreePlugin.inst());
+  }
 
-        // Schedule an update task for every two hours
-        Task.builder().execute(() -> {
-            service.updatePrices();
-            state.setLastUpdate(System.currentTimeMillis());
-            dumpState();
-
-            MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, "The market has been updated"));
-            GameChatterPlugin.inst().sendSystemMessage("The market has been updated");
-        }).interval(WAIT_TIME, WAIT_UNIT).delay(remainingTime, TimeUnit.SECONDS).async().submit(SkreePlugin.inst());
-    }
-
-    @Override
-    public MarketService getService() {
-        return service;
-    }
+  @Override
+  public MarketService getService() {
+    return service;
+  }
 }

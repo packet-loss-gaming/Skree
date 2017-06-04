@@ -23,28 +23,28 @@ import java.util.Optional;
 
 public class LoadWorldCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
 
-        src.sendMessage(Text.of(TextColors.YELLOW, "Loading..."));
+    src.sendMessage(Text.of(TextColors.YELLOW, "Loading..."));
 
-        Optional<World> optWorld = service.loadVanillaMapFromDisk(args.<String>getOne("world name").get());
+    Optional<World> optWorld = service.loadVanillaMapFromDisk(args.<String>getOne("world name").get());
 
-        if (optWorld.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_GREEN, "World loaded successfully."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "World failed to load."));
-        }
-
-        return CommandResult.success();
+    if (optWorld.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_GREEN, "World loaded successfully."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "World failed to load."));
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Load a world"))
-                .permission("skree.world.load")
-                .arguments(GenericArguments.string(Text.of("world name")))
-                .executor(new LoadWorldCommand()).build();
-    }
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Load a world"))
+        .permission("skree.world.load")
+        .arguments(GenericArguments.string(Text.of("world name")))
+        .executor(new LoadWorldCommand()).build();
+  }
 }

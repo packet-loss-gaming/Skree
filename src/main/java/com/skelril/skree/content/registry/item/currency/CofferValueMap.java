@@ -20,49 +20,49 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 
 public class CofferValueMap extends ItemStackBigIntegerValueMapping {
-    public static final ImmutableList<PointValue<ItemStack, BigInteger>> COFFER_VALUE_MAP = ImmutableList.of(
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) TESTRIL)),
-                    BigInteger.valueOf(TESTRIL.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) AQUIS)),
-                    BigInteger.valueOf(AQUIS.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) MARSINCO)),
-                    BigInteger.valueOf(MARSINCO.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) POSTRE)),
-                    BigInteger.valueOf(POSTRE.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) EQESTA)),
-                    BigInteger.valueOf(EQESTA.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) REDISTRAL)),
-                    BigInteger.valueOf(REDISTRAL.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) RETESRUM)),
-                    BigInteger.valueOf(RETESRUM.getCofferValue())
-            ),
-            new SimplePointValue<>(
-                    Lists.newArrayList(newItemStack((ItemType) MESARDITH)),
-                    BigInteger.valueOf(MESARDITH.getCofferValue())
-            )
-    );
+  public static final ImmutableList<PointValue<ItemStack, BigInteger>> COFFER_VALUE_MAP = ImmutableList.of(
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) TESTRIL)),
+          BigInteger.valueOf(TESTRIL.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) AQUIS)),
+          BigInteger.valueOf(AQUIS.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) MARSINCO)),
+          BigInteger.valueOf(MARSINCO.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) POSTRE)),
+          BigInteger.valueOf(POSTRE.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) EQESTA)),
+          BigInteger.valueOf(EQESTA.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) REDISTRAL)),
+          BigInteger.valueOf(REDISTRAL.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) RETESRUM)),
+          BigInteger.valueOf(RETESRUM.getCofferValue())
+      ),
+      new SimplePointValue<>(
+          Lists.newArrayList(newItemStack((ItemType) MESARDITH)),
+          BigInteger.valueOf(MESARDITH.getCofferValue())
+      )
+  );
 
 
-    private static final CofferValueMap map = new CofferValueMap();
+  private static final CofferValueMap MAP = new CofferValueMap();
 
-    protected CofferValueMap() {
-        super(COFFER_VALUE_MAP);
-    }
+  protected CofferValueMap() {
+    super(COFFER_VALUE_MAP);
+  }
 
-    public static CofferValueMap inst() {
-        return map;
-    }
+  public static CofferValueMap inst() {
+    return MAP;
+  }
 }

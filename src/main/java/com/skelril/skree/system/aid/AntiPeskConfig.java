@@ -9,9 +9,9 @@ package com.skelril.skree.system.aid;
 import java.util.List;
 
 public class AntiPeskConfig {
-    private List<String> triggeringCommandPatterns;
+  private List<String> triggeringCommandPatterns;
 
-    public List<String> getTriggeringCommandPatterns() {
-        return triggeringCommandPatterns;
-    }
+  public List<String> getTriggeringCommandPatterns() {
+    return triggeringCommandPatterns;
+  }
 }

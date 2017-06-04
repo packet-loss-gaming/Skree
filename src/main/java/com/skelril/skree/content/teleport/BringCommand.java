@@ -28,52 +28,52 @@ import static org.spongepowered.api.command.args.GenericArguments.player;
 
 public class BringCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Vector3d dest;
-        Vector3d rotation;
-        World targetExtent;
-        if (src instanceof Player) {
-            Player srcPlayer = (Player) src;
-            Location<World> loc = srcPlayer.getLocation();
-            dest = loc.getPosition();
-            rotation = srcPlayer.getRotation();
-            targetExtent = loc.getExtent();
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
-            return CommandResult.empty();
-        }
-
-        Player target = args.<Player>getOne("target").get();
-
-        Optional<Location<World>> optSafeDest = SafeTeleportHelper.getSafeDest(
-                target,
-                new Location<>(targetExtent, dest)
-        );
-
-        if (optSafeDest.isPresent()) {
-            if (!WorldEntryPermissionCheck.checkDestination((Player) src, optSafeDest.get().getExtent())) {
-                src.sendMessage(Text.of(TextColors.RED, "You do not have permission to teleport players to worlds of this type."));
-                return CommandResult.empty();
-            }
-            target.setLocationAndRotation(optSafeDest.get(), rotation);
-
-            src.sendMessage(Text.of(TextColors.YELLOW, "Player brought to you, my lord."));
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "The player could not be safely teleported here."));
-        }
-
-        return CommandResult.success();
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    Vector3d dest;
+    Vector3d rotation;
+    World targetExtent;
+    if (src instanceof Player) {
+      Player srcPlayer = (Player) src;
+      Location<World> loc = srcPlayer.getLocation();
+      dest = loc.getPosition();
+      rotation = srcPlayer.getRotation();
+      targetExtent = loc.getExtent();
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "You are not a player and teleporting other players is not currently supported!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Bring a player to your current location"))
-                .permission("skree.teleport.bring")
-                .arguments(
-                        onlyOne(
-                                player(Text.of("target"))
-                        )
-                ).executor(new BringCommand()).build();
+    Player target = args.<Player>getOne("target").get();
+
+    Optional<Location<World>> optSafeDest = SafeTeleportHelper.getSafeDest(
+        target,
+        new Location<>(targetExtent, dest)
+    );
+
+    if (optSafeDest.isPresent()) {
+      if (!WorldEntryPermissionCheck.checkDestination((Player) src, optSafeDest.get().getExtent())) {
+        src.sendMessage(Text.of(TextColors.RED, "You do not have permission to teleport players to worlds of this type."));
+        return CommandResult.empty();
+      }
+      target.setLocationAndRotation(optSafeDest.get(), rotation);
+
+      src.sendMessage(Text.of(TextColors.YELLOW, "Player brought to you, my lord."));
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "The player could not be safely teleported here."));
     }
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Bring a player to your current location"))
+        .permission("skree.teleport.bring")
+        .arguments(
+            onlyOne(
+                player(Text.of("target"))
+            )
+        ).executor(new BringCommand()).build();
+  }
 }

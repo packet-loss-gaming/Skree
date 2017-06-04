@@ -9,10 +9,10 @@ package com.skelril.nitro.registry.item;
 import net.minecraft.item.ItemStack;
 
 public interface DegradableItem {
-    default int __getMaxUses(ItemStack stack) {
-        return __getMaxUses();
-    }
+  default int __getMaxUses(ItemStack stack) {
+    return __getMaxUses();
+  }
 
-    @Deprecated
-    int __getMaxUses();
+  @Deprecated
+  int __getMaxUses();
 }

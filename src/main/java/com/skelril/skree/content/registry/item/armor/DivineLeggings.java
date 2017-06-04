@@ -15,32 +15,32 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class DivineLeggings extends CustomLeggings implements Craftable {
-    @Override
-    public int __getMaxUsesBaseModifier() {
-        return 60;
-    }
+  @Override
+  public int __getMaxUsesBaseModifier() {
+    return 60;
+  }
 
-    @Override
-    public String __getType() {
-        return "divine";
-    }
+  @Override
+  public String __getType() {
+    return "divine";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return new ItemStack(CustomItemTypes.GUARDIAN_LEGGINGS);
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return new ItemStack(CustomItemTypes.GUARDIAN_LEGGINGS);
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return 10;
-    }
+  @Override
+  public int __getEnchantability() {
+    return 10;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(CustomItemTypes.GUARDIAN_LEGGINGS),
-                newItemStack("skree:unstable_catalyst")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(CustomItemTypes.GUARDIAN_LEGGINGS),
+        newItemStack("skree:unstable_catalyst")
+    );
+  }
 }

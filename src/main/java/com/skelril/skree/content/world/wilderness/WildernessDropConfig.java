@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 public class WildernessDropConfig {
-    private List<String> multipliedBlockTypes = new ArrayList<>();
-    private Map<String, QuantityBoundedItemStackConfig> itemReplacementMapping = new HashMap<>();
+  private List<String> multipliedBlockTypes = new ArrayList<>();
+  private Map<String, QuantityBoundedItemStackConfig> itemReplacementMapping = new HashMap<>();
 
-    public boolean amplifies(BlockState state) {
-        return multipliedBlockTypes.contains(state.getId());
-    }
+  public boolean amplifies(BlockState state) {
+    return multipliedBlockTypes.contains(state.getId());
+  }
 
-    public Map<String, QuantityBoundedItemStackConfig> getItemReplacementMapping() {
-        return itemReplacementMapping;
-    }
+  public Map<String, QuantityBoundedItemStackConfig> getItemReplacementMapping() {
+    return itemReplacementMapping;
+  }
 }

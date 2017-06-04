@@ -9,5 +9,5 @@ package com.skelril.nitro.registry.dynamic.item.ability;
 import com.skelril.nitro.registry.dynamic.item.ability.grouptype.ClusterListener;
 
 public abstract class AbilityCluster {
-    public abstract ClusterListener getListenerFor(String itemID, AbilityCooldownHandler coolDownManager);
+  public abstract ClusterListener getListenerFor(String itemID, AbilityCooldownHandler coolDownManager);
 }

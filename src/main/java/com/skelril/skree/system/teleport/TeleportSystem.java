@@ -15,10 +15,10 @@ import org.spongepowered.api.Sponge;
 
 @NModule(name = "Teleport System")
 public class TeleportSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("tp").get());
-        Sponge.getCommandManager().register(SkreePlugin.inst(), TeleportCommand.aquireSpec(), "teleport", "tp");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), BringCommand.aquireSpec(), "bring", "br");
-    }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    Sponge.getCommandManager().removeMapping(Sponge.getCommandManager().get("tp").get());
+    Sponge.getCommandManager().register(SkreePlugin.inst(), TeleportCommand.aquireSpec(), "teleport", "tp");
+    Sponge.getCommandManager().register(SkreePlugin.inst(), BringCommand.aquireSpec(), "bring", "br");
+  }
 }

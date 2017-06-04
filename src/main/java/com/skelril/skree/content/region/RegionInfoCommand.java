@@ -24,82 +24,82 @@ import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class RegionInfoCommand implements CommandExecutor {
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
-            return CommandResult.empty();
-        }
-
-        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-        if (!optService.isPresent()) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
-            return CommandResult.empty();
-        }
-
-        RegionService service = optService.get();
-
-        Player player = (Player) src;
-
-        Optional<Region> optRef = service.getSelectedRegion(player);
-        if (!optRef.isPresent()) {
-            player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
-            return CommandResult.empty();
-        }
-
-        DecimalFormat countFormat = new DecimalFormat("#,###");
-        Region ref = optRef.get();
-        player.sendMessage(
-                Text.of(
-                        TextColors.GOLD,
-                        "Region information for: ",
-                        (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getName().toUpperCase()
-                )
-        );
-
-        player.sendMessage(
-                Text.of(
-                        countFormat.format(ref.getPowerLevel()),
-                        TextColors.YELLOW, " power cores"
-                )
-        );
-        player.sendMessage(
-                Text.of(
-                        countFormat.format(ref.getArea()),
-                        TextColors.YELLOW, " block area"
-                )
-        );
-        player.sendMessage(
-                Text.of(
-                        countFormat.format(ref.getMaximumArea()),
-                        TextColors.YELLOW, " block maximum area"
-                )
-        );
-        player.sendMessage(
-                Text.of(
-                        TextActions.runCommand("/region listmembers"),
-                        TextActions.showText(Text.of("List the region's members")),
-                        countFormat.format(ref.getMembers().size()),
-                        TextColors.YELLOW, " members"
-                )
-        );
-        player.sendMessage(
-                Text.of(
-                        TextActions.runCommand("/region listmarkers"),
-                        TextActions.showText(Text.of("List the region's marker block positions")),
-                        countFormat.format(ref.getPoints().size()),
-                        TextColors.YELLOW, " active markers"
-                )
-        );
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command (for now ;) )!"));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Get region information"))
-                .executor(new RegionInfoCommand())
-                .build();
+    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+    if (!optService.isPresent()) {
+      src.sendMessage(Text.of(TextColors.DARK_RED, "The region service is not currently running."));
+      return CommandResult.empty();
     }
+
+    RegionService service = optService.get();
+
+    Player player = (Player) src;
+
+    Optional<Region> optRef = service.getSelectedRegion(player);
+    if (!optRef.isPresent()) {
+      player.sendMessage(Text.of(TextColors.RED, "You do not currently have a region selected."));
+      return CommandResult.empty();
+    }
+
+    DecimalFormat countFormat = new DecimalFormat("#,###");
+    Region ref = optRef.get();
+    player.sendMessage(
+        Text.of(
+            TextColors.GOLD,
+            "Region information for: ",
+            (ref.isActive() ? TextColors.BLUE : TextColors.RED), ref.getName().toUpperCase()
+        )
+    );
+
+    player.sendMessage(
+        Text.of(
+            countFormat.format(ref.getPowerLevel()),
+            TextColors.YELLOW, " power cores"
+        )
+    );
+    player.sendMessage(
+        Text.of(
+            countFormat.format(ref.getArea()),
+            TextColors.YELLOW, " block area"
+        )
+    );
+    player.sendMessage(
+        Text.of(
+            countFormat.format(ref.getMaximumArea()),
+            TextColors.YELLOW, " block maximum area"
+        )
+    );
+    player.sendMessage(
+        Text.of(
+            TextActions.runCommand("/region listmembers"),
+            TextActions.showText(Text.of("List the region's members")),
+            countFormat.format(ref.getMembers().size()),
+            TextColors.YELLOW, " members"
+        )
+    );
+    player.sendMessage(
+        Text.of(
+            TextActions.runCommand("/region listmarkers"),
+            TextActions.showText(Text.of("List the region's marker block positions")),
+            countFormat.format(ref.getPoints().size()),
+            TextColors.YELLOW, " active markers"
+        )
+    );
+
+    return CommandResult.success();
+  }
+
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Get region information"))
+        .executor(new RegionInfoCommand())
+        .build();
+  }
 }

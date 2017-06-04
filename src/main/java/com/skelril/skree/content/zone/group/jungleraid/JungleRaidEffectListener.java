@@ -74,371 +74,388 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class JungleRaidEffectListener {
-    private final JungleRaidManager manager;
+  private final JungleRaidManager manager;
 
-    public JungleRaidEffectListener(JungleRaidManager manager) {
-        this.manager = manager;
+  public JungleRaidEffectListener(JungleRaidManager manager) {
+    this.manager = manager;
+  }
+
+  @Listener(order = Order.LATE)
+  public void onPlayerInteract(InteractBlockEvent.Primary.MainHand event, @First Player player) {
+    Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
+    if (!optBlockLoc.isPresent()) {
+      return;
     }
 
-    @Listener(order = Order.LATE)
-    public void onPlayerInteract(InteractBlockEvent.Primary.MainHand event, @First Player player) {
-        Optional<Location<World>> optBlockLoc = event.getTargetBlock().getLocation();
-        if (!optBlockLoc.isPresent()) {
-            return;
+    Location<World> blockLoc = optBlockLoc.get();
+
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(blockLoc);
+    if (!optInst.isPresent()) {
+      return;
+    }
+
+    JungleRaidInstance inst = optInst.get();
+    if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && player.getUniqueId().equals(inst.getFlagData().titan)) {
+      if (blockLoc.getBlockType() == BlockTypes.BEDROCK) {
+        return;
+      }
+
+      // TODO Convert to the Sponge API
+      ((net.minecraft.world.World) blockLoc.getExtent()).destroyBlock(
+          new BlockPos(blockLoc.getX(), blockLoc.getY(), blockLoc.getZ()),
+          true
+      );
+    }
+  }
+
+  @Listener
+  public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (!optInst.isPresent()) {
+      return;
+    }
+
+    JungleRaidInstance inst = optInst.get();
+    if (inst.isFlagEnabled(JungleRaidFlag.NO_BLOCK_BREAK)) {
+      player.sendMessage(Text.of(TextColors.RED, "You cannot break blocks by hand this game."));
+      event.setCancelled(true);
+    } else if (inst.isFlagEnabled(JungleRaidFlag.NO_MINING)) {
+      List<BlockType> unbreakableBlocks = Lists.newArrayList(BlockTypes.STONE, BlockTypes.GRASS, BlockTypes.DIRT);
+      for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+        if (unbreakableBlocks.contains(block.getOriginal().getState().getType())) {
+          player.sendMessage(Text.of(TextColors.RED, "You cannot mine this game."));
+          event.setCancelled(true);
+          return;
         }
+      }
+    }
+  }
 
-        Location<World> blockLoc = optBlockLoc.get();
+  @Listener
+  public void onBlockBurn(ChangeBlockEvent event) {
+    if (event.getCause().root() instanceof Player) {
+      return;
+    }
 
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(blockLoc);
-        if (!optInst.isPresent()) {
-            return;
-        }
+    for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+      BlockType finalType = transaction.getFinal().getState().getType();
+      if (finalType != BlockTypes.FIRE) {
+        continue;
+      }
 
+      Optional<JungleRaidInstance> optInst = manager.getApplicableZone(transaction.getOriginal().getLocation().get());
+      if (optInst.isPresent()) {
         JungleRaidInstance inst = optInst.get();
-        if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && player.getUniqueId().equals(inst.getFlagData().titan)) {
-            if (blockLoc.getBlockType() == BlockTypes.BEDROCK) {
-                return;
-            }
-
-            // TODO Convert to the Sponge API
-            ((net.minecraft.world.World) blockLoc.getExtent()).destroyBlock(
-                    new BlockPos(blockLoc.getX(), blockLoc.getY(), blockLoc.getZ()),
-                    true
-            );
+        if (inst.isFlagEnabled(JungleRaidFlag.NO_FIRE_SPREAD)) {
+          event.setCancelled(true);
         }
+        break;
+      }
+    }
+  }
+
+  @Listener
+  public void onProjectileHit(CollideEvent.Impact event, @First Entity entity) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (!optInst.isPresent()) {
-            return;
-        }
+    JungleRaidInstance inst = optInst.get();
 
-        JungleRaidInstance inst = optInst.get();
-        if (inst.isFlagEnabled(JungleRaidFlag.NO_BLOCK_BREAK)) {
-            player.sendMessage(Text.of(TextColors.RED, "You cannot break blocks by hand this game."));
-            event.setCancelled(true);
-        } else if (inst.isFlagEnabled(JungleRaidFlag.NO_MINING)) {
-            List<BlockType> unbreakableBlocks = Lists.newArrayList(BlockTypes.STONE, BlockTypes.GRASS, BlockTypes.DIRT);
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                if (unbreakableBlocks.contains(block.getOriginal().getState().getType())) {
-                    player.sendMessage(Text.of(TextColors.RED, "You cannot mine this game."));
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
+    if (inst.getState() != JungleRaidState.IN_PROGRESS) {
+      return;
     }
 
-    @Listener
-    public void onBlockBurn(ChangeBlockEvent event) {
-        if (event.getCause().root() instanceof Player) {
-            return;
-        }
+    int explosionSize = 2;
 
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            BlockType finalType = transaction.getFinal().getState().getType();
-            if (finalType != BlockTypes.FIRE) {
-                continue;
-            }
+    if (entity.getType() == EntityTypes.TIPPED_ARROW) {
+      if (inst.isFlagEnabled(JungleRaidFlag.TORMENT_ARROWS)) {
+        ProjectileSource shooter = ((Arrow) entity).getShooter();
 
-            Optional<JungleRaidInstance> optInst = manager.getApplicableZone(transaction.getOriginal().getLocation().get());
-            if (optInst.isPresent()) {
-                JungleRaidInstance inst = optInst.get();
-                if (inst.isFlagEnabled(JungleRaidFlag.NO_FIRE_SPREAD)) {
-                    event.setCancelled(true);
-                }
-                break;
+        CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(entity.getLocation().getPosition(), 16, 16, 16);
+        for (Entity e : entity.getNearbyEntities(en -> predicate.test(en.getLocation().getPosition()))) {
+          if (e.equals(shooter)) {
+            continue;
+          }
+          if (e instanceof Living && shooter instanceof Living) {
+            e.damage(1, IndirectEntityDamageSource.builder().type(
+                DamageTypes.PROJECTILE
+            ).entity(entity).proxySource((Living) shooter).build());
+
+            if (Probability.getChance(5)) {
+              EntityHealthUtil.heal((Living) shooter, 1);
             }
+          }
         }
+      }
+      if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS)) {
+        if (inst.isFlagEnabled(JungleRaidFlag.SUPER)) {
+          explosionSize = 4;
+        }
+      } else {
+        return;
+      }
+    }
+    if (entity instanceof Snowball) {
+      if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
+        if (inst.isFlagEnabled(JungleRaidFlag.SUPER)) {
+          explosionSize = 10;
+        } else {
+          explosionSize = 6;
+        }
+      } else {
+        return;
+      }
     }
 
-    @Listener
-    public void onProjectileHit(CollideEvent.Impact event, @First Entity entity) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(entity);
-        if (!optInst.isPresent()) return;
-
-        JungleRaidInstance inst = optInst.get();
-
-        if (inst.getState() != JungleRaidState.IN_PROGRESS) {
-            return;
-        }
-
-        int explosionSize = 2;
-
-        if (entity.getType() == EntityTypes.TIPPED_ARROW) {
-            if (inst.isFlagEnabled(JungleRaidFlag.TORMENT_ARROWS)) {
-                ProjectileSource shooter = ((Arrow) entity).getShooter();
-
-                CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(entity.getLocation().getPosition(), 16, 16, 16);
-                for (Entity e : entity.getNearbyEntities(en -> predicate.test(en.getLocation().getPosition()))) {
-                    if (e.equals(shooter)) continue;
-                    if (e instanceof Living && shooter instanceof Living) {
-                        e.damage(1, IndirectEntityDamageSource.builder().type(
-                                DamageTypes.PROJECTILE
-                        ).entity(entity).proxySource((Living) shooter).build());
-
-                        if (Probability.getChance(5)) {
-                            EntityHealthUtil.heal((Living) shooter, 1);
-                        }
-                    }
-                }
-            }
-            if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS)) {
-                if (inst.isFlagEnabled(JungleRaidFlag.SUPER)) explosionSize = 4;
-            } else return;
-        }
-        if (entity instanceof Snowball) {
-            if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
-                if (inst.isFlagEnabled(JungleRaidFlag.SUPER)) explosionSize = 10;
-                else explosionSize = 6;
-            } else return;
-        }
-
-        if (entity instanceof ThrownPotion) {
-            return;
-        }
-
-        entity.getLocation().getExtent().triggerExplosion(
-                Explosion.builder()
-                        .radius(explosionSize)
-                        .location(entity.getLocation())
-                        .shouldDamageEntities(true)
-                        .shouldBreakBlocks(true)
-                        .build(),
-                Cause.source(SkreePlugin.container()).build()
-        );
+    if (entity instanceof ThrownPotion) {
+      return;
     }
 
+    entity.getLocation().getExtent().triggerExplosion(
+        Explosion.builder()
+            .radius(explosionSize)
+            .location(entity.getLocation())
+            .shouldDamageEntities(true)
+            .shouldBreakBlocks(true)
+            .build(),
+        Cause.source(SkreePlugin.container()).build()
+    );
+  }
 
-    @Listener
-    public void onPlayerInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (!optInst.isPresent()) {
-            return;
-        }
 
-        JungleRaidInstance inst = optInst.get();
-
-        Optional<ItemStack> optStack = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (!optStack.isPresent()) {
-            return;
-        }
-
-        ItemStack stack = optStack.get();
-        if (stack.getItem() == ItemTypes.COMPASS) {
-            event.setUseBlockResult(Tristate.FALSE);
-
-            if (inst.getState() == JungleRaidState.IN_PROGRESS && inst.isFlagEnabled(JungleRaidFlag.ENHANCED_COMPASS)) {
-                Set<Text> resultSet = new HashSet<>();
-                for (Player aPlayer : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
-
-                    // Check validity
-                    if (player.equals(aPlayer)) continue;
-
-                    // Check team
-                    if (inst.isFriendlyFire(player, aPlayer)) continue;
-
-                    TextColor color = tf(player).canEntityBeSeen(tf(aPlayer)) ? TextColors.DARK_RED : TextColors.RED;
-
-                    resultSet.add(Text.of(color, aPlayer.getName(), " - ", player.getLocation().getPosition().distance(aPlayer.getLocation().getPosition())));
-                }
-
-                if (resultSet.isEmpty()) {
-                    player.sendMessage(Text.of(TextColors.RED, "No players found."));
-                }
-
-                player.sendMessage(Text.of(TextColors.YELLOW, "Player - Distance"));
-                player.sendMessages(resultSet);
-            } else if (inst.getState() == JungleRaidState.INITIALIZE) {
-                player.setLocation(inst.getRandomLocation());
-            }
-        }
+  @Listener
+  public void onPlayerInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
-        return new PlayerCombatParser() {
-            @Override
-            public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
-                final boolean isDamageEntityEvent = event instanceof DamageEntityEvent;
+    JungleRaidInstance inst = optInst.get();
 
-                // Do Death Touch before anything else
-                if (inst.isFlagEnabled(JungleRaidFlag.DEATH_TOUCH) && isDamageEntityEvent) {
-                    ((DamageEntityEvent) event).setBaseDamage(Math.pow(defender.get(Keys.MAX_HEALTH).orElse(20D), 3));
-                    return;
-                }
-
-                Optional<JungleRaidClass> optClass = inst.getClass(attacker);
-                if (optClass.isPresent()) {
-                    JungleRaidClass jrClass = optClass.get();
-                    if (jrClass == JungleRaidClass.SNIPER) {
-                        Optional<ItemStack> optHeld = attacker.getItemInHand(HandTypes.MAIN_HAND);
-                        boolean hasWoodenSword = optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.WOODEN_SWORD;
-
-                        if (indirectSource != null || !hasWoodenSword) {
-                            double distSq = attacker.getLocation().getPosition().distanceSquared(
-                                    defender.getLocation().getPosition()
-                            );
-                            double targetDistSq = Math.pow(70, 2);
-                            double ratio = Math.min(distSq, targetDistSq) / targetDistSq;
-
-                            if (isDamageEntityEvent) {
-                                // Handle damage modification
-                                ((DamageEntityEvent) event).setBaseDamage(
-                                        ((DamageEntityEvent) event).getBaseDamage() * ratio
-                                );
-                            } else {
-                                // Disable the arrow fire in the Impact event
-                                if (ratio < .7 && indirectSource != null) {
-                                    indirectSource.offer(Keys.FIRE_TICKS, 0);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan) && isDamageEntityEvent) {
-                    ((DamageEntityEvent) event).setBaseDamage(((DamageEntityEvent) event).getBaseDamage() * 2);
-                }
-            }
-
-            @Override
-            public void processNonLivingAttack(DamageSource attacker, Player defender) {
-                if (!(event instanceof DamageEntityEvent)) {
-                    return;
-                }
-
-                if (attacker.getType() == DamageTypes.FALL) {
-                    BlockType belowType = defender.getLocation().add(0, -1, 0).getBlockType();
-                    if (inst.isFlagEnabled(JungleRaidFlag.TRAMPOLINE)) {
-                        Vector3d oldVel = defender.getVelocity();
-                        Vector3d newVel = new Vector3d(oldVel.getX(), 0, oldVel.getZ());
-                        defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
-                        event.setCancelled(true);
-                    } else if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2) {
-                        if (Probability.getChance(2)) {
-                            Vector3d oldVel = defender.getVelocity();
-                            Vector3d newVel = new Vector3d(
-                                    oldVel.getX() > 0 ? -.5 : .5,
-                                    0,
-                                    oldVel.getZ() > 0 ? -.5 : .5
-                            );
-                            defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
-                        }
-                        event.setCancelled(true);
-                    }
-                } else if (attacker.getType() == DamageTypes.CUSTOM) {
-                    if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
-                        ((DamageEntityEvent) event).setBaseDamage(Math.min(((DamageEntityEvent) event).getBaseDamage(), 2));
-                    }
-                }
-            }
-        };
+    Optional<ItemStack> optStack = player.getItemInHand(HandTypes.MAIN_HAND);
+    if (!optStack.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerCombat(DamageEntityEvent event) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
+    ItemStack stack = optStack.get();
+    if (stack.getItem() == ItemTypes.COMPASS) {
+      event.setUseBlockResult(Tristate.FALSE);
 
-        if (!optInst.isPresent()) {
-            return;
+      if (inst.getState() == JungleRaidState.IN_PROGRESS && inst.isFlagEnabled(JungleRaidFlag.ENHANCED_COMPASS)) {
+        Set<Text> resultSet = new HashSet<>();
+        for (Player aPlayer : inst.getPlayers(PlayerClassifier.PARTICIPANT)) {
+
+          // Check validity
+          if (player.equals(aPlayer)) {
+            continue;
+          }
+
+          // Check team
+          if (inst.isFriendlyFire(player, aPlayer)) {
+            continue;
+          }
+
+          TextColor color = tf(player).canEntityBeSeen(tf(aPlayer)) ? TextColors.DARK_RED : TextColors.RED;
+
+          resultSet.add(Text.of(color, aPlayer.getName(), " - ", player.getLocation().getPosition().distance(aPlayer.getLocation().getPosition())));
         }
 
-        JungleRaidInstance inst = optInst.get();
+        if (resultSet.isEmpty()) {
+          player.sendMessage(Text.of(TextColors.RED, "No players found."));
+        }
 
-        createFor(event, inst).parse(event);
+        player.sendMessage(Text.of(TextColors.YELLOW, "Player - Distance"));
+        player.sendMessages(resultSet);
+      } else if (inst.getState() == JungleRaidState.INITIALIZE) {
+        player.setLocation(inst.getRandomLocation());
+      }
     }
+  }
 
-    @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(projectile);
-        if (!optInst.isPresent()) {
-            return;
+  private PlayerCombatParser createFor(Cancellable event, JungleRaidInstance inst) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPvP(Player attacker, Player defender, @Nullable Entity indirectSource) {
+        final boolean isDamageEntityEvent = event instanceof DamageEntityEvent;
+
+        // Do Death Touch before anything else
+        if (inst.isFlagEnabled(JungleRaidFlag.DEATH_TOUCH) && isDamageEntityEvent) {
+          ((DamageEntityEvent) event).setBaseDamage(Math.pow(defender.get(Keys.MAX_HEALTH).orElse(20D), 3));
+          return;
         }
 
-        JungleRaidInstance inst = optInst.get();
+        Optional<JungleRaidClass> optClass = inst.getClass(attacker);
+        if (optClass.isPresent()) {
+          JungleRaidClass jrClass = optClass.get();
+          if (jrClass == JungleRaidClass.SNIPER) {
+            Optional<ItemStack> optHeld = attacker.getItemInHand(HandTypes.MAIN_HAND);
+            boolean hasWoodenSword = optHeld.isPresent() && optHeld.get().getItem() == ItemTypes.WOODEN_SWORD;
 
-        createFor(event, inst).parse(event);
-    }
+            if (indirectSource != null || !hasWoodenSword) {
+              double distSq = attacker.getLocation().getPosition().distanceSquared(
+                  defender.getLocation().getPosition()
+              );
+              double targetDistSq = Math.pow(70, 2);
+              double ratio = Math.min(distSq, targetDistSq) / targetDistSq;
 
-
-    private void handleLoss(JungleRaidInstance inst, Player player) {
-        FlagEffectData data = inst.getFlagData();
-
-        boolean isTitanEnabled = inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE);
-        boolean isTitan = player.getUniqueId().equals(data.titan);
-
-        // Normal Jungle Raid fireworks and stuff
-        Color killerColor = Color.WHITE;
-        Color teamColor = inst.getTeamColor(player).orElse(Color.WHITE);
-        Optional<Player> optKiller = inst.getLastAttacker(player);
-        if (optKiller.isPresent()) {
-            Player killer = optKiller.get();
-            killerColor = inst.getTeamColor(killer).orElse(Color.WHITE);
-            if (isTitanEnabled) {
-                if (isTitan) {
-                    data.titan = killer.getUniqueId();
-
-                    ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
-                    teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
-                    teamHood.offer(Keys.COLOR, Color.BLACK);
-                    // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-                    tf(killer).inventory.armorInventory[3] = tf(teamHood);
-                } else if (killer.getUniqueId().equals(data.titan)) {
-                    killerColor = Color.BLACK;
-                }
-            }
-        }
-
-        if (isTitan && data.titan.equals(player.getUniqueId())) {
-            data.titan = null;
-        }
-
-        if (!inst.isFlagEnabled(JungleRaidFlag.DEATH_ROCKETS)) {
-            return;
-        }
-
-        Location<World> playerLoc = player.getLocation();
-
-        Color finalKillerColor = killerColor;
-        for (int i = 0; i < 12; i++) {
-            Task.builder().delayTicks(i * 4).execute(() -> {
-                Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
-                FireworkEffect fireworkEffect = FireworkEffect.builder()
-                        .flicker(Probability.getChance(2))
-                        .trail(Probability.getChance(2))
-                        .color(teamColor)
-                        .fade(finalKillerColor)
-                        .shape(FireworkShapes.CREEPER)
-                        .build();
-                firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
-                firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-                inst.getRegion().getExtent().spawnEntity(
-                        firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+              if (isDamageEntityEvent) {
+                // Handle damage modification
+                ((DamageEntityEvent) event).setBaseDamage(
+                    ((DamageEntityEvent) event).getBaseDamage() * ratio
                 );
-            }).submit(SkreePlugin.inst());
+              } else {
+                // Disable the arrow fire in the Impact event
+                if (ratio < .7 && indirectSource != null) {
+                  indirectSource.offer(Keys.FIRE_TICKS, 0);
+                }
+              }
+            }
+          }
         }
+
+        if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && attacker.getUniqueId().equals(inst.getFlagData().titan) && isDamageEntityEvent) {
+          ((DamageEntityEvent) event).setBaseDamage(((DamageEntityEvent) event).getBaseDamage() * 2);
+        }
+      }
+
+      @Override
+      public void processNonLivingAttack(DamageSource attacker, Player defender) {
+        if (!(event instanceof DamageEntityEvent)) {
+          return;
+        }
+
+        if (attacker.getType() == DamageTypes.FALL) {
+          BlockType belowType = defender.getLocation().add(0, -1, 0).getBlockType();
+          if (inst.isFlagEnabled(JungleRaidFlag.TRAMPOLINE)) {
+            Vector3d oldVel = defender.getVelocity();
+            Vector3d newVel = new Vector3d(oldVel.getX(), 0, oldVel.getZ());
+            defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
+            event.setCancelled(true);
+          } else if (belowType == BlockTypes.LEAVES || belowType == BlockTypes.LEAVES2) {
+            if (Probability.getChance(2)) {
+              Vector3d oldVel = defender.getVelocity();
+              Vector3d newVel = new Vector3d(
+                  oldVel.getX() > 0 ? -.5 : .5,
+                  0,
+                  oldVel.getZ() > 0 ? -.5 : .5
+              );
+              defender.setVelocity(new Vector3d(0, .1, 0).mul(((DamageEntityEvent) event).getBaseDamage()).add(newVel));
+            }
+            event.setCancelled(true);
+          }
+        } else if (attacker.getType() == DamageTypes.CUSTOM) {
+          if (inst.isFlagEnabled(JungleRaidFlag.EXPLOSIVE_ARROWS) || inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
+            ((DamageEntityEvent) event).setBaseDamage(Math.min(((DamageEntityEvent) event).getBaseDamage(), 2));
+          }
+        }
+      }
+    };
+  }
+
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
+
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onClientLeave(ClientConnectionEvent.Disconnect event) {
-        Player player = event.getTargetEntity();
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            JungleRaidInstance inst = optInst.get();
+    JungleRaidInstance inst = optInst.get();
 
-            handleLoss(inst, player);
-        }
+    createFor(event, inst).parse(event);
+  }
+
+  @Listener
+  public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(projectile);
+    if (!optInst.isPresent()) {
+      return;
     }
 
-    @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
-        if (optInst.isPresent()) {
-            JungleRaidInstance inst = optInst.get();
+    JungleRaidInstance inst = optInst.get();
 
-            handleLoss(inst, player);
+    createFor(event, inst).parse(event);
+  }
+
+
+  private void handleLoss(JungleRaidInstance inst, Player player) {
+    FlagEffectData data = inst.getFlagData();
+
+    boolean isTitanEnabled = inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE);
+    boolean isTitan = player.getUniqueId().equals(data.titan);
+
+    // Normal Jungle Raid fireworks and stuff
+    Color killerColor = Color.WHITE;
+    Color teamColor = inst.getTeamColor(player).orElse(Color.WHITE);
+    Optional<Player> optKiller = inst.getLastAttacker(player);
+    if (optKiller.isPresent()) {
+      Player killer = optKiller.get();
+      killerColor = inst.getTeamColor(killer).orElse(Color.WHITE);
+      if (isTitanEnabled) {
+        if (isTitan) {
+          data.titan = killer.getUniqueId();
+
+          ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
+          teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
+          teamHood.offer(Keys.COLOR, Color.BLACK);
+          // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
+          tf(killer).inventory.armorInventory[3] = tf(teamHood);
+        } else if (killer.getUniqueId().equals(data.titan)) {
+          killerColor = Color.BLACK;
         }
+      }
     }
+
+    if (isTitan && data.titan.equals(player.getUniqueId())) {
+      data.titan = null;
+    }
+
+    if (!inst.isFlagEnabled(JungleRaidFlag.DEATH_ROCKETS)) {
+      return;
+    }
+
+    Location<World> playerLoc = player.getLocation();
+
+    Color finalKillerColor = killerColor;
+    for (int i = 0; i < 12; i++) {
+      Task.builder().delayTicks(i * 4).execute(() -> {
+        Firework firework = (Firework) inst.getRegion().getExtent().createEntity(EntityTypes.FIREWORK, playerLoc.getPosition());
+        FireworkEffect fireworkEffect = FireworkEffect.builder()
+            .flicker(Probability.getChance(2))
+            .trail(Probability.getChance(2))
+            .color(teamColor)
+            .fade(finalKillerColor)
+            .shape(FireworkShapes.CREEPER)
+            .build();
+        firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+        firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
+        inst.getRegion().getExtent().spawnEntity(
+            firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+        );
+      }).submit(SkreePlugin.inst());
+    }
+  }
+
+  @Listener
+  public void onClientLeave(ClientConnectionEvent.Disconnect event) {
+    Player player = event.getTargetEntity();
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      JungleRaidInstance inst = optInst.get();
+
+      handleLoss(inst, player);
+    }
+  }
+
+  @Listener
+  public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
+    Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
+    if (optInst.isPresent()) {
+      JungleRaidInstance inst = optInst.get();
+
+      handleLoss(inst, player);
+    }
+  }
 }

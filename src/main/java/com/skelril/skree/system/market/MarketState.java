@@ -7,13 +7,13 @@
 package com.skelril.skree.system.market;
 
 public class MarketState {
-    private long lastUpdate;
+  private long lastUpdate;
 
-    public long getLastUpdate() {
-        return lastUpdate;
-    }
+  public long getLastUpdate() {
+    return lastUpdate;
+  }
 
-    public void setLastUpdate(long lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
+  public void setLastUpdate(long lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
 }

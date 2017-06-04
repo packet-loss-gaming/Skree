@@ -12,29 +12,29 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CondensedCofferItem extends CofferItem implements Craftable {
 
-    private CofferItem parent;
+  private CofferItem parent;
 
-    public CondensedCofferItem(String ID, CofferItem parent) {
-        super(ID, parent.getCofferValue() * 9);
-        this.parent = parent;
-    }
+  public CondensedCofferItem(String id, CofferItem parent) {
+    super(id, parent.getCofferValue() * 9);
+    this.parent = parent;
+  }
 
-    public CofferItem getParent() {
-        return parent;
-    }
+  public CofferItem getParent() {
+    return parent;
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                "AAA",
-                "AAA",
-                'A', new ItemStack(parent)
-        );
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(parent, 9),
-                new ItemStack(this)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        "AAA",
+        "AAA",
+        'A', new ItemStack(parent)
+    );
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(parent, 9),
+        new ItemStack(this)
+    );
+  }
 }

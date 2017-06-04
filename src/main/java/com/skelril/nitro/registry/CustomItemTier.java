@@ -7,43 +7,43 @@
 package com.skelril.nitro.registry;
 
 public class CustomItemTier extends ItemTier {
-    private final int harvesetLevel;
-    private final int durability;
-    private final float properMaterialEfficieny;
-    private final float damage;
-    private final int enchantability;
+  private final int harvesetLevel;
+  private final int durability;
+  private final float properMaterialEfficieny;
+  private final float damage;
+  private final int enchantability;
 
-    public CustomItemTier(String tierName, int harestLevel, int durability, float properMaterialEfficieny, float damage, int enchantability) {
-        super(tierName);
-        this.harvesetLevel = harestLevel;
-        this.durability = durability;
-        this.properMaterialEfficieny = properMaterialEfficieny;
-        this.damage = damage;
-        this.enchantability = enchantability;
-    }
+  public CustomItemTier(String tierName, int harestLevel, int durability, float properMaterialEfficieny, float damage, int enchantability) {
+    super(tierName);
+    this.harvesetLevel = harestLevel;
+    this.durability = durability;
+    this.properMaterialEfficieny = properMaterialEfficieny;
+    this.damage = damage;
+    this.enchantability = enchantability;
+  }
 
-    @Override
-    public int getHarvestLevel() {
-        return harvesetLevel;
-    }
+  @Override
+  public int getHarvestLevel() {
+    return harvesetLevel;
+  }
 
-    @Override
-    public int getDurability() {
-        return durability;
-    }
+  @Override
+  public int getDurability() {
+    return durability;
+  }
 
-    @Override
-    public float getEfficienyOnProperMaterial() {
-        return properMaterialEfficieny;
-    }
+  @Override
+  public float getEfficienyOnProperMaterial() {
+    return properMaterialEfficieny;
+  }
 
-    @Override
-    public float getDamage() {
-        return damage;
-    }
+  @Override
+  public float getDamage() {
+    return damage;
+  }
 
-    @Override
-    public int getEnchantability() {
-        return enchantability;
-    }
+  @Override
+  public int getEnchantability() {
+    return enchantability;
+  }
 }

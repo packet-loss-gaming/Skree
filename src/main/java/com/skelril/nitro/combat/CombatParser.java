@@ -9,5 +9,5 @@ package com.skelril.nitro.combat;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 public interface CombatParser {
-    void parse(DamageEntityEvent event);
+  void parse(DamageEntityEvent event);
 }

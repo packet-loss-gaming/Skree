@@ -20,19 +20,19 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ZoneCreatureDropBlocker<T> extends ZoneApplicableListener<T> {
-    public ZoneCreatureDropBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
-        super(applicabilityFunct);
+  public ZoneCreatureDropBlocker(Function<Location<World>, Optional<T>> applicabilityFunct) {
+    super(applicabilityFunct);
+  }
+
+  @Listener
+  public void onEntityDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
+    Entity entity = spawnCause.getEntity();
+    if (!Creature.class.isAssignableFrom(entity.getType().getEntityClass())) {
+      return;
     }
 
-    @Listener
-    public void onEntityDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
-        Entity entity = spawnCause.getEntity();
-        if (!Creature.class.isAssignableFrom(entity.getType().getEntityClass())) {
-            return;
-        }
-
-        if (isApplicable(entity.getLocation())) {
-            event.setCancelled(true);
-        }
+    if (isApplicable(entity.getLocation())) {
+      event.setCancelled(true);
     }
+  }
 }

@@ -23,59 +23,59 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class AntiPeskListener {
-    private AntiPeskConfig config;
+  private AntiPeskConfig config;
 
-    public AntiPeskListener(AntiPeskConfig config) {
-        this.config = config;
+  public AntiPeskListener(AntiPeskConfig config) {
+    this.config = config;
+  }
+
+  @Listener
+  public void onCommandSend(SendCommandEvent event) {
+    String command = event.getCommand();
+    String arguments = event.getArguments();
+    if (arguments.length() > 0) {
+      command += " " + arguments;
     }
 
-    @Listener
-    public void onCommandSend(SendCommandEvent event) {
-        String command = event.getCommand();
-        String arguments = event.getArguments();
-        if (arguments.length() > 0) {
-            command += " " + arguments;
-        }
-
-        for (String pattern : config.getTriggeringCommandPatterns()) {
-            if (Pattern.matches(pattern, command.toLowerCase())) {
-                event.getCause().first(Player.class).ifPresent(this::punish);
-                event.setCancelled(true);
-            }
-        }
+    for (String pattern : config.getTriggeringCommandPatterns()) {
+      if (Pattern.matches(pattern, command.toLowerCase())) {
+        event.getCause().first(Player.class).ifPresent(this::punish);
+        event.setCancelled(true);
+      }
     }
+  }
 
-    private void punish(Player player) {
-        player.sendMessage(Text.of(TextColors.RED, "Command forbidden..."));
-        player.sendMessage(Text.of(TextColors.RED, "... prepare to hate your life ..."));
+  private void punish(Player player) {
+    player.sendMessage(Text.of(TextColors.RED, "Command forbidden..."));
+    player.sendMessage(Text.of(TextColors.RED, "... prepare to hate your life ..."));
 
 
-        IntegratedRunnable integratedRunnable = new IntegratedRunnable() {
-            @Override
-            public boolean run(int times) {
-                player.setVelocity(new Vector3d(
-                        Probability.getRangedRandom(-3.0, 3.0),
-                        Probability.getRangedRandom(-3.0, 3.0),
-                        Probability.getRangedRandom(-3.0, 3.0)
-                ));
-                return true;
-            }
+    IntegratedRunnable integratedRunnable = new IntegratedRunnable() {
+      @Override
+      public boolean run(int times) {
+        player.setVelocity(new Vector3d(
+            Probability.getRangedRandom(-3.0, 3.0),
+            Probability.getRangedRandom(-3.0, 3.0),
+            Probability.getRangedRandom(-3.0, 3.0)
+        ));
+        return true;
+      }
 
-            @Override
-            public void end() {
-                player.kick(Text.of("How about you don't do that again, K?"));
-            }
-        };
-        TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(integratedRunnable, 12);
+      @Override
+      public void end() {
+        player.kick(Text.of("How about you don't do that again, K?"));
+      }
+    };
+    TimedRunnable<IntegratedRunnable> runnable = new TimedRunnable<>(integratedRunnable, 12);
 
-        Task task = Task.builder().execute(
-                runnable
-        ).interval(
-                1, TimeUnit.SECONDS
-        ).delay(
-                5, TimeUnit.SECONDS
-        ).submit(SkreePlugin.inst());
+    Task task = Task.builder().execute(
+        runnable
+    ).interval(
+        1, TimeUnit.SECONDS
+    ).delay(
+        5, TimeUnit.SECONDS
+    ).submit(SkreePlugin.inst());
 
-        runnable.setTask(task);
-    }
+    runnable.setTask(task);
+  }
 }

@@ -24,29 +24,29 @@ import java.util.Optional;
 @NModule(name = "Region System")
 public class RegionSystem implements ServiceProvider<RegionService> {
 
-    private RegionServiceImpl service;
+  private RegionServiceImpl service;
 
-    @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
-    public void init() {
-        service = new RegionServiceImpl();
+  @NModuleTrigger(trigger = "SERVER_STARTED", dependencies = {"World System"})
+  public void init() {
+    service = new RegionServiceImpl();
 
-        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-        if (optWorldService.isPresent()) {
-            for (World world : optWorldService.get().getEffectWrapper(BuildWorldWrapper.class).get().getWorlds()) {
-                RegionManager manager = new RegionManager(world.getName());
-                manager.load();
-                service.addManager(world, manager);
-            }
-        }
-
-        // Register the service & command
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), RegionService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), RegionCommand.aquireSpec(), "region", "rg");
+    Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+    if (optWorldService.isPresent()) {
+      for (World world : optWorldService.get().getEffectWrapper(BuildWorldWrapper.class).get().getWorlds()) {
+        RegionManager manager = new RegionManager(world.getName());
+        manager.load();
+        service.addManager(world, manager);
+      }
     }
 
-    @Override
-    public RegionService getService() {
-        return service;
-    }
+    // Register the service & command
+    Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), RegionService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), RegionCommand.aquireSpec(), "region", "rg");
+  }
+
+  @Override
+  public RegionService getService() {
+    return service;
+  }
 }

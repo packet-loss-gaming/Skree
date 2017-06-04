@@ -27,39 +27,39 @@ import java.util.Optional;
 
 public class AntiJumpListener {
 
-    private static final double UPWARDS_VELOCITY = .1;
-    private static final double RADIUS = 2;
-    private static final double LEAP_DISTANCE = 1.2;
+  private static final double UPWARDS_VELOCITY = .1;
+  private static final double RADIUS = 2;
+  private static final double LEAP_DISTANCE = 1.2;
 
-    @Listener(order = Order.POST)
-    @IsCancelled(value = Tristate.TRUE)
-    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player) {
-        final Location<World> playerLoc = player.getLocation();
+  @Listener(order = Order.POST)
+  @IsCancelled(value = Tristate.TRUE)
+  public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player) {
+    final Location<World> playerLoc = player.getLocation();
 
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            Optional<Location<World>> optLoc = transaction.getOriginal().getLocation();
-            if (!optLoc.isPresent()) {
-                continue;
+    for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+      Optional<Location<World>> optLoc = transaction.getOriginal().getLocation();
+      if (!optLoc.isPresent()) {
+        continue;
+      }
+
+      Location<World> blockLoc = optLoc.get();
+
+      final int blockY = blockLoc.getBlockY();
+
+      if (Math.abs(player.getVelocity().getY()) > UPWARDS_VELOCITY && playerLoc.getY() > blockY) {
+        Task.builder().execute(() -> {
+          Vector3d position = player.getLocation().getPosition();
+          if (position.getY() >= (blockY + LEAP_DISTANCE)) {
+
+            if (playerLoc.getPosition().distanceSquared(blockLoc.getPosition()) > Math.pow(RADIUS, 2)) {
+              return;
             }
 
-            Location<World> blockLoc = optLoc.get();
-
-            final int blockY = blockLoc.getBlockY();
-
-            if (Math.abs(player.getVelocity().getY()) > UPWARDS_VELOCITY && playerLoc.getY() > blockY) {
-                Task.builder().execute(() -> {
-                    Vector3d position = player.getLocation().getPosition();
-                    if (position.getY() >= (blockY + LEAP_DISTANCE)) {
-
-                        if (playerLoc.getPosition().distanceSquared(blockLoc.getPosition()) > Math.pow(RADIUS, 2)) {
-                            return;
-                        }
-
-                        player.sendMessage(Text.of(TextColors.RED, "Hack jumping detected."));
-                        player.setLocation(playerLoc.setPosition(new Vector3d(position.getX(), blockY, position.getZ())));
-                    }
-                }).delayTicks(4).submit(SkreePlugin.inst());
-            }
-        }
+            player.sendMessage(Text.of(TextColors.RED, "Hack jumping detected."));
+            player.setLocation(playerLoc.setPosition(new Vector3d(position.getX(), blockY, position.getZ())));
+          }
+        }).delayTicks(4).submit(SkreePlugin.inst());
+      }
     }
+  }
 }

@@ -11,18 +11,18 @@ import net.minecraft.creativetab.CreativeTabs;
 
 public class PhantomClock extends CustomItem {
 
-    @Override
-    public String __getID() {
-        return "phantom_clock";
-    }
+  @Override
+  public String __getId() {
+    return "phantom_clock";
+  }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
-    }
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.TOOLS;
-    }
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.TOOLS;
+  }
 }

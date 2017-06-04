@@ -195,14 +195,14 @@ import org.spongepowered.api.text.Text;
     }
  */
 public class MarketCommand {
-    public static CommandSpec aquireSpec() {
-        return CommandSpec.builder()
-                .description(Text.of("Manipulate the market"))
-                .child(MarketBuyCommand.aquireSpec(), "buy", "b")
-                .child(MarketSellCommand.aquireSpec(), "sell", "s")
-                .child(MarketListCommand.aquireSpec(), "list", "l")
-                .child(MarketLookupCommand.aquireSpec(), "lookup", "value", "info", "pc")
-                .child(MarketAdminCommand.aquireSpec(), "admin")
-                .build();
-    }
+  public static CommandSpec aquireSpec() {
+    return CommandSpec.builder()
+        .description(Text.of("Manipulate the market"))
+        .child(MarketBuyCommand.aquireSpec(), "buy", "b")
+        .child(MarketSellCommand.aquireSpec(), "sell", "s")
+        .child(MarketListCommand.aquireSpec(), "list", "l")
+        .child(MarketLookupCommand.aquireSpec(), "lookup", "value", "info", "pc")
+        .child(MarketAdminCommand.aquireSpec(), "admin")
+        .build();
+  }
 }

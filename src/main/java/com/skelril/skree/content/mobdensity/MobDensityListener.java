@@ -19,22 +19,22 @@ import java.util.stream.Collectors;
 
 public class MobDensityListener {
 
-    private long lastActivation = 0;
+  private long lastActivation = 0;
 
-    @Listener
-    public void onEntityCollide(CollideEntityEvent event) {
-        boolean canActivate = System.currentTimeMillis() - lastActivation >= TimeUnit.MILLISECONDS.toMillis(500);
-        if (!canActivate) {
-            return;
-        }
-
-        List<Entity> entities = event.getEntities().stream().filter(e -> e instanceof Animal).collect(Collectors.toList());
-        if (entities.size() <= 5) {
-            return;
-        }
-
-        lastActivation = System.currentTimeMillis();
-
-        Probability.pickOneOf(entities).damage(1, DamageSources.GENERIC);
+  @Listener
+  public void onEntityCollide(CollideEntityEvent event) {
+    boolean canActivate = System.currentTimeMillis() - lastActivation >= TimeUnit.MILLISECONDS.toMillis(500);
+    if (!canActivate) {
+      return;
     }
+
+    List<Entity> entities = event.getEntities().stream().filter(e -> e instanceof Animal).collect(Collectors.toList());
+    if (entities.size() <= 5) {
+      return;
+    }
+
+    lastActivation = System.currentTimeMillis();
+
+    Probability.pickOneOf(entities).damage(1, DamageSources.GENERIC);
+  }
 }

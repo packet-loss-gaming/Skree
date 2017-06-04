@@ -7,7 +7,7 @@
 package com.skelril.skree.service.internal.region;
 
 public enum RegionErrorStatus {
-    NONE,
-    REGION_TOO_LARGE,
-    INTERSECT
+  NONE,
+  REGION_TOO_LARGE,
+  INTERSECT
 }

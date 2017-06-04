@@ -15,32 +15,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SkreeAbilityRegistry implements AbilityRegistry {
-    private Map<String, Class<? extends Ability>> registry = new HashMap<>();
+  private Map<String, Class<? extends Ability>> registry = new HashMap<>();
 
-    public SkreeAbilityRegistry() {
-        registerAbility("agility", Agility.class);
-        registerAbility("coin_toss", CoinToss.class);
-        registerAbility("confuse", Confuse.class);
-        registerAbility("creature_impact", CreatureImpact.class);
-        registerAbility("curse", Curse.class);
-        registerAbility("decimate", Decimate.class);
-        registerAbility("doom_blade", DoomBlade.class);
-        registerAbility("evil_focus", EvilFocus.class);
-        registerAbility("fear_blaze", FearBlaze.class);
-        registerAbility("healing_light", HealingLight.class);
-        registerAbility("life_leech", LifeLeech.class);
-        registerAbility("regen", Regen.class);
-        registerAbility("soul_smite", SoulSmite.class);
-        registerAbility("weaken", Weaken.class);
-    }
+  public SkreeAbilityRegistry() {
+    registerAbility("agility", Agility.class);
+    registerAbility("coin_toss", CoinToss.class);
+    registerAbility("confuse", Confuse.class);
+    registerAbility("creature_impact", CreatureImpact.class);
+    registerAbility("curse", Curse.class);
+    registerAbility("decimate", Decimate.class);
+    registerAbility("doom_blade", DoomBlade.class);
+    registerAbility("evil_focus", EvilFocus.class);
+    registerAbility("fear_blaze", FearBlaze.class);
+    registerAbility("healing_light", HealingLight.class);
+    registerAbility("life_leech", LifeLeech.class);
+    registerAbility("regen", Regen.class);
+    registerAbility("soul_smite", SoulSmite.class);
+    registerAbility("weaken", Weaken.class);
+  }
 
-    @Override
-    public Class<? extends Ability> lookupByID(String id) {
-        return registry.get(id);
-    }
+  @Override
+  public Class<? extends Ability> lookupByID(String id) {
+    return registry.get(id);
+  }
 
-    @Override
-    public void registerAbility(String id, Class<? extends Ability> abilityClass) {
-        registry.put(id, abilityClass);
-    }
+  @Override
+  public void registerAbility(String id, Class<? extends Ability> abilityClass) {
+    registry.put(id, abilityClass);
+  }
 }

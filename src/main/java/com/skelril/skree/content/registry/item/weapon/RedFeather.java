@@ -30,123 +30,123 @@ import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class RedFeather extends CustomItem implements ICustomItem, DegradableItem, EventAwareContent {
 
-    @Override
-    public String __getID() {
-        return "red_feather";
+  @Override
+  public String __getId() {
+    return "red_feather";
+  }
+
+  @Override
+  public int __getMaxStackSize() {
+    return 1;
+  }
+
+  @Override
+  public CreativeTabs __getCreativeTab() {
+    return CreativeTabs.COMBAT;
+  }
+
+  @Override
+  public int __getMaxUses() {
+    return 10000;
+  }
+
+  @Listener(order = Order.LATE)
+  public void onEntityDamage(DamageEntityEvent event, @Getter(value = "getTargetEntity") Player player, @First DamageSource dmgSrc) {
+    if (!isBlockable(dmgSrc)) {
+      return;
     }
 
-    @Override
-    public int __getMaxStackSize() {
-        return 1;
+    Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
+    if (!optFeatherDetail.isPresent()) {
+      return;
     }
 
-    @Override
-    public CreativeTabs __getCreativeTab() {
-        return CreativeTabs.COMBAT;
+    Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>> featherDetail = optFeatherDetail.get();
+
+    int redQ = featherDetail.getValue().getValue().getKey();
+    final double dmg = event.getBaseDamage();
+    final int k = (dmg > 80 ? 16 : dmg > 40 ? 8 : dmg > 20 ? 4 : 2);
+
+    final double blockable = redQ * k;
+    final double blocked = blockable - (blockable - dmg);
+
+    event.setBaseDamage(Math.max(0, dmg - blocked));
+
+    redQ = (int) ((blockable - blocked) / k);
+    updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
+    tf(player).inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
+  }
+
+  public boolean isBlockable(DamageSource source) {
+    return source.getType() != WildernessTeleportCommand.DAMAGE_TYPE;
+  }
+
+  public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {
+    return getHighestPoweredFeather(tf(player));
+  }
+
+  public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(EntityPlayer player) {
+    net.minecraft.item.ItemStack[] itemStacks = player.inventory.mainInventory;
+
+    int index = -1;
+    ItemStack stack = null;
+    Clause<Integer, Long> details = new Clause<>(0, 0L);
+
+    for (int i = 0; i < itemStacks.length; ++i) {
+      ItemStack curStack = tf(itemStacks[i]);
+      Clause<Integer, Long> powerCooldown = getFeatherPower(curStack);
+      if (powerCooldown.getValue() > System.currentTimeMillis()) {
+        return Optional.empty();
+      }
+
+      if (powerCooldown.getKey() > details.getKey()) {
+        index = i;
+        details = powerCooldown;
+        stack = curStack;
+      }
     }
 
-    @Override
-    public int __getMaxUses() {
-        return 10000;
-    }
+    return index != -1 ? Optional.of(new Clause<>(index, new Clause<>(stack, details))) : Optional.empty();
+  }
 
-    @Listener(order = Order.LATE)
-    public void onEntityDamage(DamageEntityEvent event, @Getter(value = "getTargetEntity") Player player, @First DamageSource dmgSrc) {
-        if (!isBlockable(dmgSrc)) {
-            return;
-        }
+  public Clause<Integer, Long> getFeatherPower(net.minecraft.item.ItemStack stack) {
+    if (stack != null && stack.getItem() == this) {
+      long coolDown = 0;
 
-        Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
-        if (!optFeatherDetail.isPresent()) {
-            return;
-        }
+      if (stack.getTagCompound() == null) {
+        stack.setTagCompound(new NBTTagCompound());
+      }
 
-        Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>> featherDetail = optFeatherDetail.get();
-
-        int redQ = featherDetail.getValue().getValue().getKey();
-        final double dmg = event.getBaseDamage();
-        final int k = (dmg > 80 ? 16 : dmg > 40 ? 8 : dmg > 20 ? 4 : 2);
-
-        final double blockable = redQ * k;
-        final double blocked = blockable - (blockable - dmg);
-
-        event.setBaseDamage(Math.max(0, dmg - blocked));
-
-        redQ = (int) ((blockable - blocked) / k);
-        updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
-        tf(player).inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
-    }
-
-    public boolean isBlockable(DamageSource source) {
-        return source.getType() != WildernessTeleportCommand.DAMAGE_TYPE;
-    }
-
-    public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {
-        return getHighestPoweredFeather(tf(player));
-    }
-
-    public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(EntityPlayer player) {
-        net.minecraft.item.ItemStack[] itemStacks = player.inventory.mainInventory;
-
-        int index = -1;
-        ItemStack stack = null;
-        Clause<Integer, Long> details = new Clause<>(0, 0L);
-
-        for (int i = 0; i < itemStacks.length; ++i) {
-            ItemStack curStack = tf(itemStacks[i]);
-            Clause<Integer, Long> powerCooldown = getFeatherPower(curStack);
-            if (powerCooldown.getValue() > System.currentTimeMillis()) {
-                return Optional.empty();
-            }
-
-            if (powerCooldown.getKey() > details.getKey()) {
-                index = i;
-                details = powerCooldown;
-                stack = curStack;
-            }
-        }
-
-        return index != -1 ? Optional.of(new Clause<>(index, new Clause<>(stack, details))) : Optional.empty();
-    }
-
-    public Clause<Integer, Long> getFeatherPower(net.minecraft.item.ItemStack stack) {
-        if (stack != null && stack.getItem() == this) {
-            long coolDown = 0;
-
-            if (stack.getTagCompound() == null) {
-                stack.setTagCompound(new NBTTagCompound());
-            }
-
-            if (stack.getTagCompound().hasKey("skree_feather_data")) {
-                NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
-                coolDown = tag.getLong("cool_down");
-            }
-
-            return new Clause<>((__getMaxUses() - stack.getItemDamage()) - 1, coolDown);
-        }
-        return new Clause<>(0, 0L);
-    }
-
-    public Clause<Integer, Long> getFeatherPower(ItemStack stack) {
-        return getFeatherPower(tf(stack));
-    }
-
-    public void updateFeatherPower(net.minecraft.item.ItemStack stack, int newPower, long coolDown) {
-        stack.setItemDamage(__getMaxUses() - (newPower + 1));
-
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
-        }
-
-        if (!stack.getTagCompound().hasKey("skree_feather_data")) {
-            stack.getTagCompound().setTag("skree_feather_data", new NBTTagCompound());
-        }
-
+      if (stack.getTagCompound().hasKey("skree_feather_data")) {
         NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
-        tag.setLong("cool_down", System.currentTimeMillis() + coolDown);
+        coolDown = tag.getLong("cool_down");
+      }
+
+      return new Clause<>((__getMaxUses() - stack.getItemDamage()) - 1, coolDown);
+    }
+    return new Clause<>(0, 0L);
+  }
+
+  public Clause<Integer, Long> getFeatherPower(ItemStack stack) {
+    return getFeatherPower(tf(stack));
+  }
+
+  public void updateFeatherPower(net.minecraft.item.ItemStack stack, int newPower, long coolDown) {
+    stack.setItemDamage(__getMaxUses() - (newPower + 1));
+
+    if (stack.getTagCompound() == null) {
+      stack.setTagCompound(new NBTTagCompound());
     }
 
-    public void updateFeatherPower(ItemStack stack, int newPower, long coolDown) {
-        updateFeatherPower(tf(stack), newPower, coolDown);
+    if (!stack.getTagCompound().hasKey("skree_feather_data")) {
+      stack.getTagCompound().setTag("skree_feather_data", new NBTTagCompound());
     }
+
+    NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_feather_data");
+    tag.setLong("cool_down", System.currentTimeMillis() + coolDown);
+  }
+
+  public void updateFeatherPower(ItemStack stack, int newPower, long coolDown) {
+    updateFeatherPower(tf(stack), newPower, coolDown);
+  }
 }

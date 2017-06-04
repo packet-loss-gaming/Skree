@@ -18,50 +18,50 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class CrystalPickaxe extends CustomPickaxe implements Craftable {
-    @Override
-    public String __getType() {
-        return "crystal";
-    }
+  @Override
+  public String __getType() {
+    return "crystal";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return (ItemStack) (Object) newItemStack("skree:sea_crystal");
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return (ItemStack) (Object) newItemStack("skree:sea_crystal");
+  }
 
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.CRYSTAL.getDamage() + ItemToolTypes.PICKAXE.getBaseDamage();
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.CRYSTAL.getEnchantability();
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.CRYSTAL.getEnchantability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.CRYSTAL;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.CRYSTAL;
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.CRYSTAL.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.CRYSTAL.getEfficienyOnProperMaterial();
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.CRYSTAL.getDurability();
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.CRYSTAL.getDurability();
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addRecipe(
-                new ItemStack(this),
-                "AAA",
-                " B ",
-                " B ",
-                'A', newItemStack("skree:sea_crystal"),
-                'B', new ItemStack(Items.STICK)
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addRecipe(
+        new ItemStack(this),
+        "AAA",
+        " B ",
+        " B ",
+        'A', newItemStack("skree:sea_crystal"),
+        'B', new ItemStack(Items.STICK)
+    );
+  }
 }

@@ -8,7 +8,7 @@ package com.skelril.nitro.time;
 
 public interface IntegratedRunnable {
 
-    boolean run(int times);
+  boolean run(int times);
 
-    void end();
+  void end();
 }

@@ -28,59 +28,59 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class SummonWandererCommand implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @Override
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of("You must be a player to use this command!"));
-            return CommandResult.empty();
-        }
-
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-
-        World world = ((Player) src).getWorld();
-        Optional<WorldEffectWrapper> optWrapper = service.getEffectWrapperFor(world);
-        if (!optWrapper.isPresent()) {
-            src.sendMessage(Text.of("This command can only be used in the Wilderness."));
-            return CommandResult.empty();
-        }
-
-        WorldEffectWrapper wrapper = optWrapper.get();
-        if (!(wrapper instanceof WildernessWorldWrapper)) {
-            src.sendMessage(Text.of("This command can only be used in the Wilderness."));
-            return CommandResult.empty();
-        }
-
-        Location<World> targetLocation = ((Player) src).getLocation();
-        int playerWildernessLevel = ((WildernessWorldWrapper) wrapper).getLevel(targetLocation).get();
-        int targetLevel = args.<Integer>getOne("target level").orElse(playerWildernessLevel);
-
-        if (targetLevel < 1) {
-            src.sendMessage(Text.of("The target level must be at least 1."));
-            return CommandResult.empty();
-        }
-
-        String wanderer = args.<String>getOne("wanderer").get();
-        ((WildernessWorldWrapper) wrapper).getWanderingMobManager().summon(wanderer, targetLevel, targetLocation);
-
-        return CommandResult.success();
+    if (!(src instanceof Player)) {
+      src.sendMessage(Text.of("You must be a player to use this command!"));
+      return CommandResult.empty();
     }
 
-    private static Collection<String> supportedWanderers() {
-        WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
-        WildernessWorldWrapper wrapper = service.getEffectWrapper(WildernessWorldWrapper.class).get();
-        return wrapper.getWanderingMobManager().getSupportedWanderers();
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+
+    World world = ((Player) src).getWorld();
+    Optional<WorldEffectWrapper> optWrapper = service.getEffectWrapperFor(world);
+    if (!optWrapper.isPresent()) {
+      src.sendMessage(Text.of("This command can only be used in the Wilderness."));
+      return CommandResult.empty();
     }
 
-    public static CommandSpec aquireSpec() {
-        SummonWandererCommand command = new SummonWandererCommand();
-
-        return CommandSpec.builder()
-                .description(Text.of("Summons a wandering boss"))
-                .permission("skree.world.wilderness.wanderer")
-                .arguments(choices(
-                        Text.of("wanderer"), SummonWandererCommand::supportedWanderers, Function.identity()),
-                        optional(integer(Text.of("target level"))))
-                .executor(command).build();
+    WorldEffectWrapper wrapper = optWrapper.get();
+    if (!(wrapper instanceof WildernessWorldWrapper)) {
+      src.sendMessage(Text.of("This command can only be used in the Wilderness."));
+      return CommandResult.empty();
     }
+
+    Location<World> targetLocation = ((Player) src).getLocation();
+    int playerWildernessLevel = ((WildernessWorldWrapper) wrapper).getLevel(targetLocation).get();
+    int targetLevel = args.<Integer>getOne("target level").orElse(playerWildernessLevel);
+
+    if (targetLevel < 1) {
+      src.sendMessage(Text.of("The target level must be at least 1."));
+      return CommandResult.empty();
+    }
+
+    String wanderer = args.<String>getOne("wanderer").get();
+    ((WildernessWorldWrapper) wrapper).getWanderingMobManager().summon(wanderer, targetLevel, targetLocation);
+
+    return CommandResult.success();
+  }
+
+  private static Collection<String> supportedWanderers() {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+    WildernessWorldWrapper wrapper = service.getEffectWrapper(WildernessWorldWrapper.class).get();
+    return wrapper.getWanderingMobManager().getSupportedWanderers();
+  }
+
+  public static CommandSpec aquireSpec() {
+    SummonWandererCommand command = new SummonWandererCommand();
+
+    return CommandSpec.builder()
+        .description(Text.of("Summons a wandering boss"))
+        .permission("skree.world.wilderness.wanderer")
+        .arguments(choices(
+            Text.of("wanderer"), SummonWandererCommand::supportedWanderers, Function.identity()),
+            optional(integer(Text.of("target level"))))
+        .executor(command).build();
+  }
 }

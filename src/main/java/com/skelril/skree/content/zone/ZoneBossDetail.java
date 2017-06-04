@@ -10,13 +10,13 @@ import com.skelril.openboss.EntityDetail;
 import com.skelril.skree.service.internal.zone.Zone;
 
 public class ZoneBossDetail<T extends Zone> implements EntityDetail {
-    public final T zone;
+  public final T zone;
 
-    public ZoneBossDetail(T zone) {
-        this.zone = zone;
-    }
+  public ZoneBossDetail(T zone) {
+    this.zone = zone;
+  }
 
-    public T getZone() {
-        return zone;
-    }
+  public T getZone() {
+    return zone;
+  }
 }

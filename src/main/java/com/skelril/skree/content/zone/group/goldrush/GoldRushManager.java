@@ -22,63 +22,63 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GoldRushManager extends GroupZoneManager<GoldRushInstance> implements Runnable, LocationZone<GoldRushInstance> {
-    public GoldRushManager() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new GoldRushListener(this)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZonePvPListener<>(this::getApplicableZone)
-        );
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new ZoneTransitionalOrbListener<>(this::getApplicableZone)
-        );
+  public GoldRushManager() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new GoldRushListener(this)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneNaturalSpawnBlocker<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZonePvPListener<>(this::getApplicableZone)
+    );
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new ZoneTransitionalOrbListener<>(this::getApplicableZone)
+    );
 
-        Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+    Task.builder().intervalTicks(20).execute(this).submit(SkreePlugin.inst());
+  }
+
+  @Override
+  public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<GoldRushInstance>> callback) {
+    allocator.regionFor(getSystemName(), clause -> {
+      ZoneRegion region = clause.getKey();
+
+      GoldRushInstance instance = new GoldRushInstance(region);
+      instance.init();
+      zones.add(instance);
+
+      callback.accept(Optional.of(instance));
+    });
+  }
+
+  @Override
+  public String getName() {
+    return "Gold Rush";
+  }
+
+  @Override
+  public void run() {
+    Iterator<GoldRushInstance> it = zones.iterator();
+    while (it.hasNext()) {
+      GoldRushInstance next = it.next();
+      if (next.isActive()) {
+        next.run();
+        continue;
+      }
+      next.forceEnd();
+
+      Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
+      if (optAllocator.isPresent()) {
+        optAllocator.get().release(getSystemName(), next.getRegion());
+      }
+
+      it.remove();
     }
-
-    @Override
-    public void discover(ZoneSpaceAllocator allocator, Consumer<Optional<GoldRushInstance>> callback) {
-        allocator.regionFor(getSystemName(), clause -> {
-            ZoneRegion region = clause.getKey();
-
-            GoldRushInstance instance = new GoldRushInstance(region);
-            instance.init();
-            zones.add(instance);
-
-            callback.accept(Optional.of(instance));
-        });
-    }
-
-    @Override
-    public String getName() {
-        return "Gold Rush";
-    }
-
-    @Override
-    public void run() {
-        Iterator<GoldRushInstance> it = zones.iterator();
-        while (it.hasNext()) {
-            GoldRushInstance next = it.next();
-            if (next.isActive()) {
-                next.run();
-                continue;
-            }
-            next.forceEnd();
-
-            Optional<ZoneSpaceAllocator> optAllocator = next.getRegion().getAllocator();
-            if (optAllocator.isPresent()) {
-                optAllocator.get().release(getSystemName(), next.getRegion());
-            }
-
-            it.remove();
-        }
-    }
+  }
 
 }

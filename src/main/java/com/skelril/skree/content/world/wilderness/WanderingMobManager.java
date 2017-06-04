@@ -22,57 +22,57 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WanderingMobManager {
-    private Map<String, WanderingBoss<? extends Entity>> wanderers = new HashMap<>();
+  private Map<String, WanderingBoss<? extends Entity>> wanderers = new HashMap<>();
 
-    public WanderingMobManager(Map<String, WanderingBoss<? extends Entity>> wanderers) {
-        this.wanderers = wanderers;
+  public WanderingMobManager(Map<String, WanderingBoss<? extends Entity>> wanderers) {
+    this.wanderers = wanderers;
+  }
+
+  public Collection<String> getSupportedWanderers() {
+    return wanderers.keySet();
+  }
+
+  public Collection<String> getSupportedWanderersOfType(EntityType entityType) {
+    return wanderers.entrySet().stream().filter((entry) -> {
+      WanderingBoss<? extends Entity> wanderer = entry.getValue();
+      return wanderer.getEntityType() == entityType;
+    }).map(Map.Entry::getKey).collect(Collectors.toList());
+  }
+
+  public boolean chanceBind(String wandererType, int level, Entity targetEntity) {
+    WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
+    if (wanderer == null) {
+      return false;
     }
 
-    public Collection<String> getSupportedWanderers() {
-        return wanderers.keySet();
+    return Probability.getChance(wanderer.getSpawnChance()) && bind(wanderer, level, targetEntity);
+  }
+
+  public boolean bind(String wandererType, int level, Entity targetEntity) {
+    WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
+    if (wanderer == null) {
+      return false;
     }
 
-    public Collection<String> getSupportedWanderersOfType(EntityType entityType) {
-        return wanderers.entrySet().stream().filter((entry) -> {
-            WanderingBoss<? extends Entity> wanderer = entry.getValue();
-            return wanderer.getEntityType() == entityType;
-        }).map(Map.Entry::getKey).collect(Collectors.toList());
+    return bind(wanderer, level, targetEntity);
+  }
+
+  public boolean summon(String wandererType, int level, Location<World> location) {
+    WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
+    if (wanderer == null) {
+      return false;
     }
 
-    public boolean chanceBind(String wandererType, int level, Entity targetEntity) {
-        WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
-        if (wanderer == null) {
-            return false;
-        }
-
-        return Probability.getChance(wanderer.getSpawnChance()) && bind(wanderer, level, targetEntity);
+    Entity entity = wanderer.createEntity(location);
+    boolean spawned = location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    if (!spawned) {
+      return false;
     }
 
-    public boolean bind(String wandererType, int level, Entity targetEntity) {
-        WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
-        if (wanderer == null) {
-            return false;
-        }
+    return wanderer.apply(entity, new WildernessBossDetail(level));
+  }
 
-        return bind(wanderer, level, targetEntity);
-    }
-
-    public boolean summon(String wandererType, int level, Location<World> location) {
-        WanderingBoss<? extends Entity> wanderer = wanderers.get(wandererType);
-        if (wanderer == null) {
-            return false;
-        }
-
-        Entity entity = wanderer.createEntity(location);
-        boolean spawned = location.getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-        if (!spawned) {
-            return false;
-        }
-
-        return wanderer.apply(entity, new WildernessBossDetail(level));
-    }
-
-    private boolean bind(WanderingBoss<? extends Entity> wanderer, int level, Entity targetEntity) {
-        return wanderer.apply(targetEntity, new WildernessBossDetail(level));
-    }
+  private boolean bind(WanderingBoss<? extends Entity> wanderer, int level, Entity targetEntity) {
+    return wanderer.apply(targetEntity, new WildernessBossDetail(level));
+  }
 }

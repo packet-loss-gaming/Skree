@@ -16,147 +16,152 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ZoneServiceImpl implements ZoneService {
-    private Map<String, ZoneManager<?>> managers = new HashMap<>();
-    private Map<Player, WeakReference<? extends Zone>> previousZone = new WeakHashMap<>();
+  private Map<String, ZoneManager<?>> managers = new HashMap<>();
+  private Map<Player, WeakReference<? extends Zone>> previousZone = new WeakHashMap<>();
 
-    private List<ZoneSpaceAllocator> allocator;
+  private List<ZoneSpaceAllocator> allocator;
 
-    public ZoneServiceImpl(ZoneSpaceAllocator allocator) {
-        this(Collections.singletonList(allocator));
+  public ZoneServiceImpl(ZoneSpaceAllocator allocator) {
+    this(Collections.singletonList(allocator));
+  }
+
+  public ZoneServiceImpl(List<ZoneSpaceAllocator> allocator) {
+    this.allocator = allocator;
+  }
+
+  private ZoneSpaceAllocator pickAllocator() {
+    allocator.sort((a1, a2) -> {
+      if (a1.getLoad() == a2.getLoad()) {
+        return 0;
+      }
+      return a1.getLoad() < a2.getLoad() ? -1 : 1;
+    });
+    return allocator.get(0);
+  }
+
+  @Override
+  public void registerManager(ZoneManager<?> manager) {
+    managers.put(manager.getSystemName(), manager);
+  }
+
+  @Override
+  public Set<String> getManagerNames() {
+    return managers.keySet();
+  }
+
+  @Override
+  public Optional<Integer> getMaxGroupSize(String managerName) {
+    return managers.get(ZoneService.mangleManagerName(managerName)).getMaxGroupSize();
+  }
+
+  @Override
+  public void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
+    ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
+    if (manager != null) {
+      requestZone(manager, player, preProcessCallback, callback);
+    } else {
+      callback.accept(Optional.empty());
+    }
+  }
+
+  @Override
+  public void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
+    ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
+    if (manager != null) {
+      requestZone(manager, players, preProcessCallback, callback);
+    } else {
+      callback.accept(Optional.empty());
+    }
+  }
+
+  private Clause<Player, ZoneStatus> addToZone(Zone zone, Player player) {
+    // Add player
+    Clause<Player, ZoneStatus> result = zone.add(player);
+
+    // Create a weak reference so that we don't have to handle
+    // cleaning up zones
+    if (result.getValue() == ZoneStatus.ADDED) {
+      previousZone.put(player, new WeakReference<>(zone));
     }
 
-    public ZoneServiceImpl(List<ZoneSpaceAllocator> allocator) {
-        this.allocator = allocator;
+    return result;
+  }
+
+
+  @Override
+  public <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager) {
+    return manager.getMaxGroupSize();
+  }
+
+  @Override
+  public <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
+    manager.discover(pickAllocator(), optZone -> {
+      if (optZone.isPresent()) {
+        preProcessCallback.run();
+        callback.accept(Optional.of(addToZone(optZone.get(), player)));
+        return;
+      }
+      preProcessCallback.run();
+      callback.accept(Optional.of(new Clause<>(player, ZoneStatus.CREATION_FAILED)));
+    });
+  }
+
+  @Override
+  public <T extends Zone> void requestZone(
+      ZoneManager<T> manager,
+      Collection<Player> players,
+      Runnable preProcessCallback,
+      Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback
+  ) {
+    Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
+    if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
+      preProcessCallback.run();
+      callback.accept(Optional.of(players.stream().map(player ->
+          new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList()
+      )));
+      return;
     }
 
-    private ZoneSpaceAllocator pickAllocator() {
-        allocator.sort((a1, a2) -> {
-            if (a1.getLoad() == a2.getLoad()) {
-                return 0;
-            }
-            return a1.getLoad() < a2.getLoad() ? -1 : 1;
-        });
-        return allocator.get(0);
+    manager.discover(pickAllocator(), optZone -> {
+      if (optZone.isPresent()) {
+        preProcessCallback.run();
+        callback.accept(Optional.of(players.stream().map(player ->
+            addToZone(optZone.get(), player)).collect(Collectors.toList()
+        )));
+        return;
+      }
+      preProcessCallback.run();
+      callback.accept(Optional.of(players.stream().map(player ->
+          new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList()
+      )));
+    });
+  }
+
+  private Clause<Zone, ZoneStatus> getPreviousZone(Player player) {
+    WeakReference<? extends Zone> zoneRef = previousZone.get(player);
+    if (zoneRef == null) {
+      return new Clause<>(null, ZoneStatus.REF_LOST);
     }
 
-    @Override
-    public void registerManager(ZoneManager<?> manager) {
-        managers.put(manager.getSystemName(), manager);
+    Zone zone = zoneRef.get();
+    if (zone == null || !zone.isActive()) {
+      return new Clause<>(null, ZoneStatus.DESPAWNED);
     }
 
-    @Override
-    public Set<String> getManagerNames() {
-        return managers.keySet();
+    return new Clause<>(zone, ZoneStatus.EXIST_AND_ACTIVE);
+  }
+
+  @Override
+  public Clause<Player, ZoneStatus> rejoin(Player player) {
+    Clause<Zone, ZoneStatus> previous = getPreviousZone(player);
+    if (previous.getValue() == ZoneStatus.EXIST_AND_ACTIVE) {
+      return previous.getKey().add(player);
     }
+    return new Clause<>(player, previous.getValue());
+  }
 
-    @Override
-    public Optional<Integer> getMaxGroupSize(String managerName) {
-        return managers.get(ZoneService.mangleManagerName(managerName)).getMaxGroupSize();
-    }
-
-    @Override
-    public void requestZone(String managerName, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
-        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
-        if (manager != null) {
-            requestZone(manager, player, preProcessCallback, callback);
-        } else {
-            callback.accept(Optional.empty());
-        }
-    }
-
-    @Override
-    public void requestZone(String managerName, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
-        ZoneManager<?> manager = managers.get(ZoneService.mangleManagerName(managerName));
-        if (manager != null) {
-            requestZone(manager, players, preProcessCallback, callback);
-        } else {
-            callback.accept(Optional.empty());
-        }
-    }
-
-    private Clause<Player, ZoneStatus> addToZone(Zone zone, Player player) {
-        // Add player
-        Clause<Player, ZoneStatus> result = zone.add(player);
-
-        // Create a weak reference so that we don't have to handle
-        // cleaning up zones
-        if (result.getValue() == ZoneStatus.ADDED) {
-            previousZone.put(player, new WeakReference<>(zone));
-        }
-
-        return result;
-    }
-
-
-    @Override
-    public <T extends Zone> Optional<Integer> getMaxGroupSize(ZoneManager<T> manager) {
-        return manager.getMaxGroupSize();
-    }
-
-    @Override
-    public <T extends Zone> void requestZone(ZoneManager<T> manager, Player player, Runnable preProcessCallback, Consumer<Optional<Clause<Player, ZoneStatus>>> callback) {
-        manager.discover(pickAllocator(), optZone -> {
-            if (optZone.isPresent()) {
-                preProcessCallback.run();
-                callback.accept(Optional.of(addToZone(optZone.get(), player)));
-                return;
-            }
-            preProcessCallback.run();
-            callback.accept(Optional.of(new Clause<>(player, ZoneStatus.CREATION_FAILED)));
-        });
-    }
-
-    @Override
-    public <T extends Zone> void requestZone(ZoneManager<T> manager, Collection<Player> players, Runnable preProcessCallback, Consumer<Optional<Collection<Clause<Player, ZoneStatus>>>> callback) {
-        Optional<Integer> optMaxGroupSize = getMaxGroupSize(manager);
-        if (optMaxGroupSize.isPresent() && optMaxGroupSize.get() < players.size()) {
-            preProcessCallback.run();
-            callback.accept(Optional.of(players.stream().map(player ->
-                    new Clause<>(player, ZoneStatus.MAX_GROUP_SIZE_EXCEEDED)).collect(Collectors.toList()
-            )));
-            return;
-        }
-
-        manager.discover(pickAllocator(), optZone -> {
-            if (optZone.isPresent()) {
-                preProcessCallback.run();
-                callback.accept(Optional.of(players.stream().map(player ->
-                        addToZone(optZone.get(), player)).collect(Collectors.toList()
-                )));
-                return;
-            }
-            preProcessCallback.run();
-            callback.accept(Optional.of(players.stream().map(player ->
-                    new Clause<>(player, ZoneStatus.CREATION_FAILED)).collect(Collectors.toList()
-            )));
-        });
-    }
-
-    private Clause<Zone, ZoneStatus> getPreviousZone(Player player) {
-        WeakReference<? extends Zone> zoneRef = previousZone.get(player);
-        if (zoneRef == null) {
-            return new Clause<>(null, ZoneStatus.REF_LOST);
-        }
-
-        Zone zone = zoneRef.get();
-        if (zone == null || !zone.isActive()) {
-            return new Clause<>(null, ZoneStatus.DESPAWNED);
-        }
-
-        return new Clause<>(zone, ZoneStatus.EXIST_AND_ACTIVE);
-    }
-
-    @Override
-    public Clause<Player, ZoneStatus> rejoin(Player player) {
-        Clause<Zone, ZoneStatus> previous = getPreviousZone(player);
-        if (previous.getValue() == ZoneStatus.EXIST_AND_ACTIVE) {
-            return previous.getKey().add(player);
-        }
-        return new Clause<>(player, previous.getValue());
-    }
-
-    @Override
-    public Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players) {
-        return players.stream().map(this::rejoin).collect(Collectors.toList());
-    }
+  @Override
+  public Collection<Clause<Player, ZoneStatus>> rejoin(Collection<Player> players) {
+    return players.stream().map(this::rejoin).collect(Collectors.toList());
+  }
 }

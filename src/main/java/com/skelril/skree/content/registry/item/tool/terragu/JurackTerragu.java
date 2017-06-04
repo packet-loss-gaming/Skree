@@ -19,64 +19,64 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
 public class JurackTerragu extends CustomTerragu implements Craftable {
-    @Override
-    public String __getType() {
-        return "jurack";
-    }
+  @Override
+  public String __getType() {
+    return "jurack";
+  }
 
-    @Override
-    public ItemStack __getRepairItemStack() {
-        return null;
-    }
+  @Override
+  public ItemStack __getRepairItemStack() {
+    return null;
+  }
 
-    @Override
-    public double __getHitPower() {
-        return ItemTiers.JURACK.getDamage();
-    }
+  @Override
+  public double __getHitPower() {
+    return ItemTiers.JURACK.getDamage();
+  }
 
-    @Override
-    public int __getEnchantability() {
-        return ItemTiers.JURACK.getEnchantability();
-    }
+  @Override
+  public int __getEnchantability() {
+    return ItemTiers.JURACK.getEnchantability();
+  }
 
-    @Override
-    public ItemTier __getHarvestTier() {
-        return ItemTiers.JURACK;
-    }
+  @Override
+  public ItemTier __getHarvestTier() {
+    return ItemTiers.JURACK;
+  }
 
-    @Override
-    public float __getSpecializedSpeed() {
-        return ItemTiers.JURACK.getEfficienyOnProperMaterial();
-    }
+  @Override
+  public float __getSpecializedSpeed() {
+    return ItemTiers.JURACK.getEfficienyOnProperMaterial();
+  }
 
-    @Override
-    public int __getMaxUses() {
-        return ItemTiers.JURACK.getDurability() * 10;
-    }
+  @Override
+  public int __getMaxUses() {
+    return ItemTiers.JURACK.getDurability() * 10;
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Primary.MainHand event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Primary.MainHand event) {
+    super.process(event);
+  }
 
-    @Listener
-    public void process(InteractBlockEvent.Secondary.MainHand event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(InteractBlockEvent.Secondary.MainHand event) {
+    super.process(event);
+  }
 
-    @Listener
-    public void process(ChangeBlockEvent.Break event) {
-        super.process(event);
-    }
+  @Listener
+  public void process(ChangeBlockEvent.Break event) {
+    super.process(event);
+  }
 
-    @Override
-    public void registerRecipes() {
-        GameRegistry.addShapelessRecipe(
-                new ItemStack(this),
-                new ItemStack(CustomItemTypes.JURACK_PICKAXE),
-                new ItemStack(CustomItemTypes.JURACK_AXE),
-                new ItemStack(CustomItemTypes.JURACK_SHOVEL),
-                newItemStack("skree:unstable_catalyst")
-        );
-    }
+  @Override
+  public void registerRecipes() {
+    GameRegistry.addShapelessRecipe(
+        new ItemStack(this),
+        new ItemStack(CustomItemTypes.JURACK_PICKAXE),
+        new ItemStack(CustomItemTypes.JURACK_AXE),
+        new ItemStack(CustomItemTypes.JURACK_SHOVEL),
+        newItemStack("skree:unstable_catalyst")
+    );
+  }
 }

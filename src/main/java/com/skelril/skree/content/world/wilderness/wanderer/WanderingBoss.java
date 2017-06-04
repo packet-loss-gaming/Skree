@@ -13,25 +13,26 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public interface WanderingBoss<T extends Entity> {
-    EntityType getEntityType();
+  EntityType getEntityType();
 
-    default Entity createEntity(Location<World> location) {
-        return location.getExtent().createEntity(getEntityType(), location.getPosition());
+  default Entity createEntity(Location<World> location) {
+    return location.getExtent().createEntity(getEntityType(), location.getPosition());
+  }
+
+  default int getSpawnChance() {
+    return 100;
+  }
+
+  void bind(T entity, WildernessBossDetail detail);
+
+  default boolean apply(Entity entity, WildernessBossDetail detail) {
+    if (!getEntityType().getEntityClass().isInstance(entity)) {
+      return false;
     }
 
-    default int getSpawnChance() {
-        return 100;
-    }
-
-    void bind(T entity, WildernessBossDetail detail);
-    default boolean apply(Entity entity, WildernessBossDetail detail) {
-        if (!getEntityType().getEntityClass().isInstance(entity)) {
-            return false;
-        }
-
-        // Verified through the entity type check above
-        // noinspection unchecked
-        bind((T) entity, detail);
-        return true;
-    }
+    // Verified through the entity type check above
+    // noinspection unchecked
+    bind((T) entity, detail);
+    return true;
+  }
 }

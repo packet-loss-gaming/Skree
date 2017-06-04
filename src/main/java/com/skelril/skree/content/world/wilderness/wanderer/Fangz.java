@@ -36,85 +36,87 @@ import java.util.Optional;
 import static com.skelril.nitro.entity.EntityHealthUtil.setMaxHealth;
 
 public class Fangz implements WanderingBoss<Spider> {
-    private final BossManager<Spider, WildernessBossDetail> bossManager = new BossManager<>();
+  private final BossManager<Spider, WildernessBossDetail> bossManager = new BossManager<>();
 
-    public Fangz() {
-        setupFangz();
-    }
+  public Fangz() {
+    setupFangz();
+  }
 
-    @Override
-    public EntityType getEntityType() {
-        return EntityTypes.SPIDER;
-    }
+  @Override
+  public EntityType getEntityType() {
+    return EntityTypes.SPIDER;
+  }
 
-    @Override
-    public void bind(Spider entity, WildernessBossDetail detail) {
-        bossManager.bind(new Boss<>(entity, detail));
-    }
+  @Override
+  public void bind(Spider entity, WildernessBossDetail detail) {
+    bossManager.bind(new Boss<>(entity, detail));
+  }
 
-    private void setupFangz() {
-        Sponge.getEventManager().registerListeners(
-                SkreePlugin.inst(),
-                new BossListener<>(bossManager, Spider.class)
-        );
+  private void setupFangz() {
+    Sponge.getEventManager().registerListeners(
+        SkreePlugin.inst(),
+        new BossListener<>(bossManager, Spider.class)
+    );
 
-        List<Instruction<BindCondition, Boss<Spider, WildernessBossDetail>>> bindProcessor = bossManager.getBindProcessor();
-        bindProcessor.add((condition, boss) -> {
-            Optional<Spider> optBossEnt = boss.getTargetEntity();
-            if (optBossEnt.isPresent()) {
-                Spider bossEnt = optBossEnt.get();
-                bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Fangz"));
-                double bossHealth = 20 * 50 * boss.getDetail().getLevel();
-                setMaxHealth(bossEnt, bossHealth, true);
-            }
-            return Optional.empty();
-        });
+    List<Instruction<BindCondition, Boss<Spider, WildernessBossDetail>>> bindProcessor = bossManager.getBindProcessor();
+    bindProcessor.add((condition, boss) -> {
+      Optional<Spider> optBossEnt = boss.getTargetEntity();
+      if (optBossEnt.isPresent()) {
+        Spider bossEnt = optBossEnt.get();
+        bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Fangz"));
+        double bossHealth = 20 * 50 * boss.getDetail().getLevel();
+        setMaxHealth(bossEnt, bossHealth, true);
+      }
+      return Optional.empty();
+    });
 
-        List<Instruction<UnbindCondition, Boss<Spider, WildernessBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
-        unbindProcessor.add((condition, boss) -> {
-            Optional<Spider> optBossEnt = boss.getTargetEntity();
-            if (optBossEnt.isPresent()) {
-                Spider bossEnt = optBossEnt.get();
-                CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(bossEnt.getLocation().getPosition(), 3, 2, 3);
-                for (Entity aEntity : bossEnt.getNearbyEntities((entity) -> predicate.test(entity.getLocation().getPosition()))) {
-                    Optional<PotionEffectData> optPotionEffects = aEntity.getOrCreate(PotionEffectData.class);
-                    if (!optPotionEffects.isPresent()) {
-                        continue;
-                    }
+    List<Instruction<UnbindCondition, Boss<Spider, WildernessBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
+    unbindProcessor.add((condition, boss) -> {
+      Optional<Spider> optBossEnt = boss.getTargetEntity();
+      if (optBossEnt.isPresent()) {
+        Spider bossEnt = optBossEnt.get();
+        CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(bossEnt.getLocation().getPosition(), 3, 2, 3);
+        for (Entity aEntity : bossEnt.getNearbyEntities((entity) -> predicate.test(entity.getLocation().getPosition()))) {
+          Optional<PotionEffectData> optPotionEffects = aEntity.getOrCreate(PotionEffectData.class);
+          if (!optPotionEffects.isPresent()) {
+            continue;
+          }
 
-                    PotionEffectData potionEffects = optPotionEffects.get();
-                    potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, 20 * 30));
-                    potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 2, 20 * 30));
-                    aEntity.offer(potionEffects);
-                }
-            }
-            return Optional.empty();
-        });
+          PotionEffectData potionEffects = optPotionEffects.get();
+          potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, 20 * 30));
+          potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 2, 20 * 30));
+          aEntity.offer(potionEffects);
+        }
+      }
+      return Optional.empty();
+    });
 
-        List<Instruction<DamageCondition, Boss<Spider, WildernessBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
-        damageProcessor.add((condition, boss) -> {
-            Optional<Spider> optBossEnt = boss.getTargetEntity();
-            if (optBossEnt.isPresent()) {
-                Spider bossEnt = optBossEnt.get();
-                Entity eToHit = condition.getAttacked();
-                if (!(eToHit instanceof Living)) return Optional.empty();
-                Living toHit = (Living) eToHit;
+    List<Instruction<DamageCondition, Boss<Spider, WildernessBossDetail>>> damageProcessor = bossManager.getDamageProcessor();
+    damageProcessor.add((condition, boss) -> {
+      Optional<Spider> optBossEnt = boss.getTargetEntity();
+      if (optBossEnt.isPresent()) {
+        Spider bossEnt = optBossEnt.get();
+        Entity eToHit = condition.getAttacked();
+        if (!(eToHit instanceof Living)) {
+          return Optional.empty();
+        }
+        Living toHit = (Living) eToHit;
 
-                DamageEntityEvent event = condition.getEvent();
-                event.setBaseDamage(event.getBaseDamage() * 2);
-                EntityHealthUtil.heal(bossEnt, event.getBaseDamage());
+        DamageEntityEvent event = condition.getEvent();
+        event.setBaseDamage(event.getBaseDamage() * 2);
+        EntityHealthUtil.heal(bossEnt, event.getBaseDamage());
 
-                Optional<PotionEffectData> optPotionEffects = toHit.getOrCreate(PotionEffectData.class);
-                if (!optPotionEffects.isPresent()) {
-                    return Optional.empty();
-                }
+        Optional<PotionEffectData> optPotionEffects = toHit.getOrCreate(PotionEffectData.class);
+        if (!optPotionEffects.isPresent()) {
+          return Optional.empty();
+        }
 
-                PotionEffectData potionEffects = optPotionEffects.get();
-                potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 1, 20 * 15));
-                potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 1, 20 * 15));
-                toHit.offer(potionEffects);
-            }
-            return Optional.empty();
-        });
-    }
+        PotionEffectData potionEffects = optPotionEffects.get();
+        potionEffects.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 1, 20 * 15));
+        potionEffects.addElement(PotionEffect.of(PotionEffectTypes.POISON, 1, 20 * 15));
+        toHit.offer(potionEffects);
+      }
+      return Optional.empty();
+    });
+  }
 }

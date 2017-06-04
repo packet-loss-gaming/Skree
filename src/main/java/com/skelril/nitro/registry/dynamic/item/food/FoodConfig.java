@@ -9,24 +9,24 @@ package com.skelril.nitro.registry.dynamic.item.food;
 import com.skelril.nitro.registry.dynamic.item.ItemConfig;
 
 public class FoodConfig extends ItemConfig {
-    private int maxStackSize;
-    private int hungerRestored;
-    private float saturationModifier;
-    private float probabilityOfFoodPoisoning;
+  private int maxStackSize;
+  private int hungerRestored;
+  private float saturationModifier;
+  private float probabilityOfFoodPoisoning;
 
-    public int getMaxStackSize() {
-        return maxStackSize;
-    }
+  public int getMaxStackSize() {
+    return maxStackSize;
+  }
 
-    public int getHungerRestored() {
-        return hungerRestored;
-    }
+  public int getHungerRestored() {
+    return hungerRestored;
+  }
 
-    public float getSaturationModifier() {
-        return saturationModifier;
-    }
+  public float getSaturationModifier() {
+    return saturationModifier;
+  }
 
-    public float getProbabilityOfFoodPoisoning() {
-        return probabilityOfFoodPoisoning;
-    }
+  public float getProbabilityOfFoodPoisoning() {
+    return probabilityOfFoodPoisoning;
+  }
 }

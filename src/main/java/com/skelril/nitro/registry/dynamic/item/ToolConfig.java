@@ -7,14 +7,14 @@
 package com.skelril.nitro.registry.dynamic.item;
 
 public class ToolConfig extends DamageableItemConfig {
-    private double hitPower;
-    private double attackSpeed;
+  private double hitPower;
+  private double attackSpeed;
 
-    public double getHitPower() {
-        return hitPower;
-    }
+  public double getHitPower() {
+    return hitPower;
+  }
 
-    public double getAttackSpeed() {
-        return attackSpeed;
-    }
+  public double getAttackSpeed() {
+    return attackSpeed;
+  }
 }

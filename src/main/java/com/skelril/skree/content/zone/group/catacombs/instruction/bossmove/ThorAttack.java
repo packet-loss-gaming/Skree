@@ -28,21 +28,21 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ThorAttack implements Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>> {
-    @Override
-    public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
-            DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
-    ) {
-        Living bossEnt = zombieCatacombsBossDetailBoss.getTargetEntity().get();
-        Entity toHit = damageCondition.getAttacked();
-        toHit.setVelocity(EntityDirectionUtil.getFacingVector(bossEnt).mul(2));
+  @Override
+  public Optional<Instruction<DamageCondition, Boss<Zombie, CatacombsBossDetail>>> apply(
+      DamageCondition damageCondition, Boss<Zombie, CatacombsBossDetail> zombieCatacombsBossDetailBoss
+  ) {
+    Living bossEnt = zombieCatacombsBossDetailBoss.getTargetEntity().get();
+    Entity toHit = damageCondition.getAttacked();
+    toHit.setVelocity(EntityDirectionUtil.getFacingVector(bossEnt).mul(2));
 
-        Task.builder().execute(() -> {
-            Location<World> targetLoc = toHit.getLocation();
-            Task.builder().execute(() -> {
-                Lightning lightning = (Lightning) toHit.getWorld().createEntity(EntityTypes.LIGHTNING, targetLoc.getPosition());
-                toHit.getWorld().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
-            }).delay(750, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
-        }).delay(1500, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
-        return Optional.empty();
-    }
+    Task.builder().execute(() -> {
+      Location<World> targetLoc = toHit.getLocation();
+      Task.builder().execute(() -> {
+        Lightning lightning = (Lightning) toHit.getWorld().createEntity(EntityTypes.LIGHTNING, targetLoc.getPosition());
+        toHit.getWorld().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+      }).delay(750, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
+    }).delay(1500, TimeUnit.MILLISECONDS).submit(SkreePlugin.inst());
+    return Optional.empty();
+  }
 }

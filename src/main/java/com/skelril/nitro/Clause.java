@@ -9,7 +9,7 @@ package com.skelril.nitro;
 import java.util.AbstractMap;
 
 public class Clause<Subject, Status> extends AbstractMap.SimpleEntry<Subject, Status> {
-    public Clause(Subject key, Status value) {
-        super(key, value);
-    }
+  public Clause(Subject key, Status value) {
+    super(key, value);
+  }
 }

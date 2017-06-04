@@ -16,15 +16,15 @@ import org.spongepowered.api.text.Text;
 import java.util.Optional;
 
 public class NamedBindInstruction<T extends Boss<? extends Living, ?>> implements Instruction<BindCondition, T> {
-    private final String name;
+  private final String name;
 
-    public NamedBindInstruction(String name) {
-        this.name = name;
-    }
+  public NamedBindInstruction(String name) {
+    this.name = name;
+  }
 
-    @Override
-    public Optional<Instruction<BindCondition, T>> apply(BindCondition bindCondition, T t) {
-        t.getTargetEntity().get().offer(Keys.DISPLAY_NAME, Text.of(name));
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Instruction<BindCondition, T>> apply(BindCondition bindCondition, T t) {
+    t.getTargetEntity().get().offer(Keys.DISPLAY_NAME, Text.of(name));
+    return Optional.empty();
+  }
 }

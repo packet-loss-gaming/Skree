@@ -19,15 +19,15 @@ import java.util.Set;
 
 @NModule(name = "Item Restriction System")
 public class ItemRestrictionSystem {
-    @NModuleTrigger(trigger = "SERVER_STARTED")
-    public void init() {
-        try {
-            ItemRestrictionConfig config = ConfigLoader.loadConfig("item_restriction.json", ItemRestrictionConfig.class);
-            Set<String> blockedItems = config.getBlockedItems();
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemCraftBlockingListener(blockedItems));
-            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemInteractBlockingListener(blockedItems));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  @NModuleTrigger(trigger = "SERVER_STARTED")
+  public void init() {
+    try {
+      ItemRestrictionConfig config = ConfigLoader.loadConfig("item_restriction.json", ItemRestrictionConfig.class);
+      Set<String> blockedItems = config.getBlockedItems();
+      Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemCraftBlockingListener(blockedItems));
+      Sponge.getEventManager().registerListeners(SkreePlugin.inst(), new ItemInteractBlockingListener(blockedItems));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 }
