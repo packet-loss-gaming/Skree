@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.CollideEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
@@ -39,13 +40,7 @@ public class PointOfContactClusterListener implements ClusterListener {
     }
 
     @Listener
-    public void onBlockCollide(CollideEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        Projectile projectile = optProjectile.get();
+    public void onBlockCollide(CollideEvent.Impact event, @First Projectile projectile) {
         ProjectileSource source = projectile.getShooter();
         if (!(source instanceof Living)) {
             return;

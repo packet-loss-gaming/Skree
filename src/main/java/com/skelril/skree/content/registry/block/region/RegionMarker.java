@@ -29,6 +29,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -82,72 +83,74 @@ public class RegionMarker extends Block implements ICustomBlock, EventAwareConte
     }
 
     @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                if (!block.isValid()) {
-                    continue;
-                }
+    public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
+        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+        if (!optService.isPresent()) {
+            return;
+        }
 
-                if (block.getFinal().getState().getType() == this) {
-                    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-                    if (optService.isPresent()) {
-                        RegionService service = optService.get();
-                        Optional<Location<World>> optLoc = block.getFinal().getLocation();
-                        if (optLoc.isPresent()) {
-                            Optional<Region> optRef = service.getSelectedRegion(player);
-                            if (optRef.isPresent()) {
-                                Location<World> loc = optLoc.get();
-                                Region ref = optRef.get();
-                                if (ref.getWorldName().equals(loc.getExtent().getName())) {
-                                    if (ref.isMember(player)) {
-                                        RegionErrorStatus status = ref.addPoint(new RegionPoint(loc.getPosition()));
-                                        if (status == RegionErrorStatus.NONE) {
-                                            player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
-                                            continue;
-                                        } else if (status == RegionErrorStatus.INTERSECT) {
-                                            player.sendMessage(Text.of(TextColors.RED, "No two regions can occupy the same space!"));
-                                        } else if (status == RegionErrorStatus.REGION_TOO_LARGE) {
-                                            player.sendMessage(Text.of(TextColors.RED, "You do not have enough power to expand your region!"));
-                                        }
-                                    }
-                                }
+        RegionService service = optService.get();
+
+        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+            if (!block.isValid()) {
+                continue;
+            }
+
+            if (block.getFinal().getState().getType() != this) {
+                continue;
+            }
+
+            Optional<Location<World>> optLoc = block.getFinal().getLocation();
+            if (optLoc.isPresent()) {
+                Optional<Region> optRef = service.getSelectedRegion(player);
+                if (optRef.isPresent()) {
+                    Location<World> loc = optLoc.get();
+                    Region ref = optRef.get();
+                    if (ref.getWorldName().equals(loc.getExtent().getName())) {
+                        if (ref.isMember(player)) {
+                            RegionErrorStatus status = ref.addPoint(new RegionPoint(loc.getPosition()));
+                            if (status == RegionErrorStatus.NONE) {
+                                player.sendMessage(Text.of(TextColors.YELLOW, "Region marker added!"));
+                                continue;
+                            } else if (status == RegionErrorStatus.INTERSECT) {
+                                player.sendMessage(Text.of(TextColors.RED, "No two regions can occupy the same space!"));
+                            } else if (status == RegionErrorStatus.REGION_TOO_LARGE) {
+                                player.sendMessage(Text.of(TextColors.RED, "You do not have enough power to expand your region!"));
                             }
                         }
                     }
-                    block.setValid(false);
                 }
             }
+            block.setValid(false);
         }
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                if (!block.isValid()) {
-                    continue;
-                }
+    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
+        Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
+        if (!optService.isPresent()) {
+            return;
+        }
 
-                if (block.getOriginal().getState().getType() == this) {
-                    Optional<RegionService> optService = Sponge.getServiceManager().provide(RegionService.class);
-                    if (optService.isPresent()) {
-                        RegionService service = optService.get();
-                        Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-                        if (optLoc.isPresent()) {
-                            Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
-                            if (optRef.isPresent()) {
-                                Region ref = optRef.get();
-                                if (ref.isMember(player)) {
-                                    ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
-                                    player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
-                                }
-                            }
-                        }
+        RegionService service = optService.get();
+
+        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+            if (!block.isValid()) {
+                continue;
+            }
+
+            if (block.getOriginal().getState().getType() != this) {
+                continue;
+            }
+
+            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            if (optLoc.isPresent()) {
+                Optional<Region> optRef = service.getMarkedRegion(optLoc.get());
+                if (optRef.isPresent()) {
+                    Region ref = optRef.get();
+                    if (ref.isMember(player)) {
+                        ref.remPoint(new RegionPoint(optLoc.get().getPosition()));
+                        player.sendMessage(Text.of(TextColors.YELLOW, "Region marker deleted!"));
                     }
                 }
             }

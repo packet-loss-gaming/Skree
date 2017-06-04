@@ -15,13 +15,13 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class AntiRailDupeListener {
     private static final List<BlockType> railBlocks = new ArrayList<>();
@@ -34,12 +34,7 @@ public class AntiRailDupeListener {
     }
 
     @Listener
-    public void onPistonMove(ChangeBlockEvent event) {
-        Optional<Piston> optPiston = event.getCause().get(NamedCause.SOURCE, Piston.class);
-        if (!optPiston.isPresent()) {
-            return;
-        }
-
+    public void onPistonMove(ChangeBlockEvent event, @Named(value = NamedCause.SOURCE) Piston piston) {
         event.getTransactions().stream().map(Transaction::getFinal).forEach(block -> {
             BlockType finalType = block.getState().getType();
             if (railBlocks.contains(finalType)) {

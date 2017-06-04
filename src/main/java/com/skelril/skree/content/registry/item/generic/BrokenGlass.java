@@ -18,14 +18,14 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -67,23 +67,19 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
 
     private void dropBrokenGlass(Transaction<BlockSnapshot> block, int variant) {
         Optional<Location<World>> optOrigin = block.getOriginal().getLocation();
-        if (optOrigin.isPresent()) {
-            new ItemDropper(optOrigin.get()).dropStacks(
-                    Collections.singleton(tf(new ItemStack(this, 1, variant))),
-                    SpawnTypes.DROPPED_ITEM
-            );
+        if (!optOrigin.isPresent()) {
+            return;
         }
+
+        new ItemDropper(optOrigin.get()).dropStacks(
+                Collections.singleton(tf(new ItemStack(this, 1, variant))),
+                SpawnTypes.DROPPED_ITEM
+        );
     }
 
     @Listener(order = Order.POST)
-    public void onBlockBreak(ChangeBlockEvent.Break event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Value<GameMode> valGameMode = optPlayer.get().getGameModeData().type();
-            if (valGameMode.exists() && !valGameMode.get().equals(GameModes.SURVIVAL)) {
-                return;
-            }
-        } else {
+    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
+        if (!player.get(Keys.GAME_MODE).orElse(null).equals(GameModes.SURVIVAL)) {
             return;
         }
 

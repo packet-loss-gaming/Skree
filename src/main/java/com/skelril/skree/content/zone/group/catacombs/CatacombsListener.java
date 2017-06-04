@@ -11,11 +11,12 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -35,13 +36,7 @@ public class CatacombsListener {
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<CatacombsInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) {
             return;
@@ -55,31 +50,29 @@ public class CatacombsListener {
 
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
-            ItemStack held = optHeldItem.get();
-            if (held.getItem() == CustomItemTypes.PHANTOM_CLOCK) {
-                Task.builder().execute(() -> {
-                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                    inst.setUsedPhantomClock(true);
-
-                    inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-                            Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
-                    );
-                }).delayTicks(1).submit(SkreePlugin.inst());
-
-                event.setUseBlockResult(Tristate.FALSE);
-            }
-        }
-    }
-
-    @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
+        if (!optHeldItem.isPresent()) {
             return;
         }
 
-        Player player = (Player) entity;
+        ItemStack held = optHeldItem.get();
+        if (held.getItem() != CustomItemTypes.PHANTOM_CLOCK) {
+            return;
+        }
+
+        Task.builder().execute(() -> {
+            tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+            inst.setUsedPhantomClock(true);
+
+            inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                    Text.of(TextColors.GOLD, "A Phantom Clock has been used to increase wave speed!")
+            );
+        }).delayTicks(1).submit(SkreePlugin.inst());
+
+        event.setUseBlockResult(Tristate.FALSE);
+    }
+
+    @Listener
+    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
         Optional<CatacombsInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             String deathMessage;

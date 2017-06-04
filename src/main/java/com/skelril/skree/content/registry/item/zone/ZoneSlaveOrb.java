@@ -20,6 +20,7 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -83,28 +84,26 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-            if (optItemStack.isPresent()) {
-                org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
-                if (isZoneSlaveItem(itemStack)) {
-                    if (!isAttuned(itemStack)) {
-                        Task.builder().execute(() -> {
-                            if (notifyGroupOwner(itemStack, player, true)) {
-                                attune(itemStack);
-                                player.setItemInHand(HandTypes.MAIN_HAND, itemStack);
-                                player.sendMessage(Text.of(TextColors.GOLD, "You've accepted your group invite."));
-                            }
-                        }).delayTicks(1).submit(SkreePlugin.inst());
-                    } else {
-                        player.sendMessage(Text.of(TextColors.RED, "You've already accepted your group invite."));
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (!optItemStack.isPresent()) {
+            return;
+        }
+
+        org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
+        if (isZoneSlaveItem(itemStack)) {
+            if (!isAttuned(itemStack)) {
+                Task.builder().execute(() -> {
+                    if (notifyGroupOwner(itemStack, player, true)) {
+                        attune(itemStack);
+                        player.setItemInHand(HandTypes.MAIN_HAND, itemStack);
+                        player.sendMessage(Text.of(TextColors.GOLD, "You've accepted your group invite."));
                     }
-                    event.setUseBlockResult(Tristate.FALSE);
-                }
+                }).delayTicks(1).submit(SkreePlugin.inst());
+            } else {
+                player.sendMessage(Text.of(TextColors.RED, "You've already accepted your group invite."));
             }
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 

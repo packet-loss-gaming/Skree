@@ -18,6 +18,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -47,13 +48,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent() /* && optClickedPosition.isPresent() */) {

@@ -15,6 +15,7 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -57,13 +58,8 @@ public class ZonePvPListener<T> extends ZoneApplicableListener<T> {
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        if (!isApplicable(optProjectile.get())) {
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        if (!isApplicable(projectile)) {
             return;
         }
 

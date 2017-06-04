@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.World;
 
@@ -39,15 +40,20 @@ public class InstanceWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Listener
-    public void onLogin(ClientConnectionEvent.Join event) {
-        Player player = event.getTargetEntity();
-        if (isApplicable(player)) {
-            Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-            if (optWorldService.isPresent()) {
-                Collection<World> worlds = optWorldService.get().getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
-                player.setLocation(worlds.iterator().next().getSpawnLocation());
-            }
+    public void onLogin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+        if (!isApplicable(player)) {
+            return;
         }
+
+        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+        if (!optWorldService.isPresent()) {
+            return;
+        }
+
+        WorldService worldService = optWorldService.get();
+
+        Collection<World> worlds = worldService.getEffectWrapper(MainWorldWrapper.class).get().getWorlds();
+        player.setLocation(worlds.iterator().next().getSpawnLocation());
     }
 
     @Listener

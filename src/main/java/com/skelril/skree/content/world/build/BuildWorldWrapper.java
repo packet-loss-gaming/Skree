@@ -29,6 +29,7 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -60,7 +61,6 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
     @Listener
     public void onEntityConstruction(ConstructEntityEvent.Pre event) {
-
         if (!isApplicable(event.getTransform().getExtent())) {
             return;
         }
@@ -128,13 +128,8 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        if (!isApplicable(optProjectile.get())) {
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        if (!isApplicable(projectile)) {
             return;
         }
 

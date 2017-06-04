@@ -23,6 +23,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.scheduler.Task;
@@ -68,57 +69,55 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
     }
 
     @Listener
-    public void onLeftClick(InteractBlockEvent.Primary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onLeftClick(InteractBlockEvent.Primary.MainHand event, @First Player player) {
         Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
-            org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
-            if (held.getItem() == this) {
-                Location<World> destination = player.getLocation();
-                if (!WorldEntryPermissionCheck.checkDestination(player, destination.getExtent())) {
-                    player.sendMessage(Text.of(TextColors.RED, "You do not have permission to create a teleporter to this location."));
-                    return;
-                }
-
-                setDestination(held, destination);
-                player.setItemInHand(HandTypes.MAIN_HAND, held);
-                event.setCancelled(true);
-            }
+        if (!optHeldItem.isPresent()) {
+            return;
         }
+
+        org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
+        if (held.getItem() != this) {
+            return;
+        }
+
+        Location<World> destination = player.getLocation();
+        if (!WorldEntryPermissionCheck.checkDestination(player, destination.getExtent())) {
+            player.sendMessage(Text.of(TextColors.RED, "You do not have permission to create a teleporter to this location."));
+            return;
+        }
+
+        setDestination(held, destination);
+        player.setItemInHand(HandTypes.MAIN_HAND, held);
+        event.setCancelled(true);
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<org.spongepowered.api.item.inventory.ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
-            org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
-            if (held.getItem() == this) {
-                Optional<Location<World>> optDestination = getDestination(held);
-                if (optDestination.isPresent()) {
-                    Inventory result = player.getInventory().query((ItemType) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
-                    if (result.size() > 0) {
-                        Task.builder().execute(() -> {
-                            result.poll(1);
-                            player.setLocation(optDestination.get());
-                        }).delayTicks(1).submit(SkreePlugin.inst());
+        if (!optHeldItem.isPresent()) {
+            return;
+        }
 
-                        event.setUseBlockResult(Tristate.FALSE);
-                    }
-                }
-            }
+        org.spongepowered.api.item.inventory.ItemStack held = optHeldItem.get();
+        if (held.getItem() != this) {
+            return;
+        }
+
+        Optional<Location<World>> optDestination = getDestination(held);
+        if (!optDestination.isPresent()) {
+            return;
+        }
+
+        Inventory result = player.getInventory().query((ItemType) Sponge.getRegistry().getType(ItemType.class, "skree:ender_focus").get());
+        if (result.size() > 0) {
+            Task.builder().execute(() -> {
+                result.poll(1);
+                player.setLocation(optDestination.get());
+            }).delayTicks(1).submit(SkreePlugin.inst());
+
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 

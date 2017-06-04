@@ -11,6 +11,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
+import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -24,17 +25,14 @@ public class ZoneInventoryProtector<T> extends ZoneApplicableListener<T> {
     }
 
     @Listener
-    public void onItemSpawn(DropItemEvent.Destruct event) {
-        Optional<EntitySpawnCause> optSpawnCause = event.getCause().get(NamedCause.SOURCE, EntitySpawnCause.class);
-        if (optSpawnCause.isPresent()) {
-            Entity entity = optSpawnCause.get().getEntity();
-            if (entity.getType() != EntityTypes.PLAYER) {
-                return;
-            }
+    public void onItemSpawn(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
+        Entity entity = spawnCause.getEntity();
+        if (entity.getType() != EntityTypes.PLAYER) {
+            return;
+        }
 
-            if (isApplicable(entity.getLocation())) {
-                event.setCancelled(true);
-            }
+        if (isApplicable(entity.getLocation())) {
+            event.setCancelled(true);
         }
     }
 }

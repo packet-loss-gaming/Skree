@@ -6,10 +6,10 @@
 
 package com.skelril.skree.content.zone.group.shnugglesprime;
 
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
@@ -23,13 +23,7 @@ public class ShnugglesPrimeListener {
     }
 
     @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) entity;
+    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
         Optional<ShnugglesPrimeInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             ShnugglesPrimeInstance inst = optInst.get();

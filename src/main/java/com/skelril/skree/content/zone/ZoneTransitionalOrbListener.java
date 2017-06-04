@@ -16,6 +16,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
@@ -32,27 +33,27 @@ public class ZoneTransitionalOrbListener<T extends Zone> extends ZoneApplicableL
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-            if (optItemStack.isPresent()) {
-                ItemStack itemStack = tf(optItemStack.get());
-                if (itemStack.getItem() == CustomItemTypes.ZONE_TRANSITIONAL_ORB) {
-                    Optional<T> optInst = getApplicable(player);
-                    if (optInst.isPresent()) {
-                        Clause<Player, ZoneStatus> status = optInst.get().remove(player);
-                        if (status.getValue() == ZoneStatus.REMOVED) {
-                            Task.builder().execute(() -> {
-                                tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
-                                tf(player).inventoryContainer.detectAndSendChanges();
-                            }).delayTicks(1).submit(SkreePlugin.inst());
-                        }
-                        event.setUseBlockResult(Tristate.FALSE);
-                    }
-                }
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (!optItemStack.isPresent()) {
+            return;
+        }
+
+        ItemStack itemStack = tf(optItemStack.get());
+        if (itemStack.getItem() != CustomItemTypes.ZONE_TRANSITIONAL_ORB) {
+            return;
+        }
+
+        Optional<T> optInst = getApplicable(player);
+        if (optInst.isPresent()) {
+            Clause<Player, ZoneStatus> status = optInst.get().remove(player);
+            if (status.getValue() == ZoneStatus.REMOVED) {
+                Task.builder().execute(() -> {
+                    tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);
+                    tf(player).inventoryContainer.detectAndSendChanges();
+                }).delayTicks(1).submit(SkreePlugin.inst());
             }
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 }

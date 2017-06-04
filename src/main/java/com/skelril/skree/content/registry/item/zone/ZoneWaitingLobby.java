@@ -19,6 +19,7 @@ import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -116,15 +117,11 @@ public class ZoneWaitingLobby {
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            BlockType type = event.getTargetBlock().getState().getType();
+    public void onBlockInteract(InteractBlockEvent event, @First Player player) {
+        BlockType type = event.getTargetBlock().getState().getType();
 
-            if (type == BlockTypes.SNOW_LAYER && contains(player)) {
-                player.getInventory().offer(newItemStack(ItemTypes.SNOWBALL, 16));
-            }
+        if (type == BlockTypes.SNOW_LAYER && contains(player)) {
+            player.getInventory().offer(newItemStack(ItemTypes.SNOWBALL, 16));
         }
     }
 

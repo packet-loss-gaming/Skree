@@ -30,7 +30,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -41,6 +40,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
@@ -160,71 +161,71 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-            if (optItemStack.isPresent()) {
-                ItemStack itemStack = tf(optItemStack.get());
-                if (isZoneMasterItem(itemStack)) {
-                    if (isAttuned(itemStack)) {
-                        if (isInInstanceWorld(player)) {
-                            player.sendMessage(Text.of(TextColors.RED, "You cannot start an instance from within an instance."));
-                            event.setCancelled(true);
-                            return;
-                        }
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (!optItemStack.isPresent()) {
+            return;
+        }
 
-                        Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
-                        if (optService.isPresent()) {
-                            Task.builder().execute(() -> {
-                                ZoneService service = optService.get();
-                                List<Player> group = new ArrayList<>();
-                                group.add(player);
-                                for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
-                                    ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
-                                    for (ItemStack aStack : itemStacks) {
-                                        if (!hasSameZoneID(itemStack, aStack)) {
-                                            continue;
-                                        }
+        ItemStack itemStack = tf(optItemStack.get());
+        if (!isZoneMasterItem(itemStack)) {
+            return;
+        }
 
-                                        if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
-                                            Optional<Player> optZoneOwner = getGroupOwner(aStack);
-                                            if (optZoneOwner.isPresent()) {
-                                                group.add(aPlayer);
-                                                break;
-                                            }
-                                        }
-                                    }
+        if (isAttuned(itemStack)) {
+            if (isInInstanceWorld(player)) {
+                player.sendMessage(Text.of(TextColors.RED, "You cannot start an instance from within an instance."));
+                event.setCancelled(true);
+                return;
+            }
+
+            Optional<ZoneService> optService = Sponge.getServiceManager().provide(ZoneService.class);
+            if (optService.isPresent()) {
+                Task.builder().execute(() -> {
+                    ZoneService service = optService.get();
+                    List<Player> group = new ArrayList<>();
+                    group.add(player);
+                    for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
+                        ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
+                        for (ItemStack aStack : itemStacks) {
+                            if (!hasSameZoneID(itemStack, aStack)) {
+                                continue;
+                            }
+
+                            if (isAttuned(aStack) && isZoneSlaveItem(aStack)) {
+                                Optional<Player> optZoneOwner = getGroupOwner(aStack);
+                                if (optZoneOwner.isPresent()) {
+                                    group.add(aPlayer);
+                                    break;
                                 }
-
-                                for (int i = group.size() - 1; i >= 0; --i) {
-                                    purgeZoneItems(group.get(i), itemStack);
-                                    // createLightningStrike(group.get(i)); SpongeCommon/420
-                                    saveLocation(group.get(i));
-                                    getMainWorldWrapper().getLobby().add(group.get(i));
-                                }
-
-                                service.requestZone(getZone(itemStack).get(), group,
-                                        () -> {
-                                            getMainWorldWrapper().getLobby().remove(group);
-                                        },
-                                        result -> {
-                                            if (result.isPresent()) {
-                                                result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
-                                                    player.setLocation(getRespawnLocation(player));
-                                                    player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
-                                                });
-                                            }
-                                        }
-                                );
-                            }).delayTicks(1).submit(SkreePlugin.inst());
+                            }
                         }
                     }
-                    event.setUseBlockResult(Tristate.FALSE);
-                }
+
+                    for (int i = group.size() - 1; i >= 0; --i) {
+                        purgeZoneItems(group.get(i), itemStack);
+                        // createLightningStrike(group.get(i)); SpongeCommon/420
+                        saveLocation(group.get(i));
+                        getMainWorldWrapper().getLobby().add(group.get(i));
+                    }
+
+                    service.requestZone(getZone(itemStack).get(), group,
+                            () -> {
+                                getMainWorldWrapper().getLobby().remove(group);
+                            },
+                            result -> {
+                                if (result.isPresent()) {
+                                    result.get().stream().filter(entry -> entry.getValue() != ZoneStatus.ADDED).forEach(entry -> {
+                                        player.setLocation(getRespawnLocation(player));
+                                        player.sendMessage(Text.of(TextColors.RED, "You could not be added to the zone."));
+                                    });
+                                }
+                            }
+                    );
+                }).delayTicks(1).submit(SkreePlugin.inst());
             }
         }
+        event.setUseBlockResult(Tristate.FALSE);
     }
 
     private void saveLocation(Player player) {
@@ -267,30 +268,26 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     }
 
     @Listener
-    public void onEntityInteract(InteractEntityEvent.Primary event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        Entity targetEntity = event.getTargetEntity();
-        if (optPlayer.isPresent() && targetEntity instanceof Player) {
-            Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-            if (optItemStack.isPresent()) {
-                org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
-                if (this.equals(itemStack.getItem()) && isAttuned(itemStack)) {
-                    Player targetPlayer = (Player) targetEntity;
-                    if (playerAlreadyHasInvite(itemStack, targetPlayer)) {
-                        player.sendMessage(
-                                Text.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
-                        );
-                    } else {
-                        org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
-                        tf(targetPlayer).inventory.addItemStackToInventory(tf(newStack));
-                        player.sendMessage(
-                                Text.of(TextColors.GOLD, targetPlayer.getName() + " has been given invite.")
-                        );
-                    }
-                    event.setCancelled(true);
-                }
+    public void onEntityInteract(InteractEntityEvent.Primary event, @First Player player, @Getter("getTargetEntity") Player targetPlayer) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (optItemStack.isPresent()) {
+            return;
+        }
+
+        org.spongepowered.api.item.inventory.ItemStack itemStack = optItemStack.get();
+        if (this.equals(itemStack.getItem()) && isAttuned(itemStack)) {
+            if (playerAlreadyHasInvite(itemStack, targetPlayer)) {
+                player.sendMessage(
+                        Text.of(TextColors.RED, targetPlayer.getName() + " already has an invite.")
+                );
+            } else {
+                org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
+                tf(targetPlayer).inventory.addItemStackToInventory(tf(newStack));
+                player.sendMessage(
+                        Text.of(TextColors.GOLD, targetPlayer.getName() + " has been given invite.")
+                );
             }
+            event.setCancelled(true);
         }
     }
 

@@ -8,7 +8,6 @@ package com.skelril.skree.content.zone.group.jungleraid;
 
 import com.skelril.nitro.combat.PlayerCombatParser;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Cancellable;
@@ -19,6 +18,8 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -35,13 +36,7 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (!optPlayer.isPresent()) {
-            return;
-        }
-        Player player = optPlayer.get();
-
+    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) {
             return;
@@ -116,7 +111,6 @@ public class JungleRaidListener {
     @Listener
     public void onPlayerCombat(DamageEntityEvent event) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
-
         if (!optInst.isPresent()) {
             return;
         }
@@ -127,14 +121,8 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(optProjectile.get());
-
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        Optional<JungleRaidInstance> optInst = manager.getApplicableZone(projectile);
         if (!optInst.isPresent()) {
             return;
         }
@@ -156,13 +144,7 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onPlayerTeleport(MoveEntityEvent.Teleport event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-        Player player = (Player) entity;
-
+    public void onPlayerTeleport(MoveEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
         if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             JungleRaidInstance inst = optInst.get();
@@ -173,13 +155,7 @@ public class JungleRaidListener {
     }
 
     @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) entity;
+    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
         Optional<JungleRaidInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             JungleRaidInstance inst = optInst.get();

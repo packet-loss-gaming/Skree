@@ -39,6 +39,7 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -85,7 +86,6 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
 
     @Listener
     public void onEntityConstruction(ConstructEntityEvent.Pre event) {
-
         if (!isApplicable(event.getTransform().getExtent())) {
             return;
         }
@@ -119,32 +119,28 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     }
 
     @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-                if (optLoc.isPresent() && isApplicable(optLoc.get())) {
-                    boolean preventedFromBuilding = check(player, optLoc.get());
+    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            if (optLoc.isPresent() && isApplicable(optLoc.get())) {
+                boolean preventedFromBuilding = check(player, optLoc.get());
 
-                    // Block players that are allowed to build, otherwise send the no build message
-                    Text noEditMessage = Text.of(TextColors.RED, "You can't change blocks here!");
-                    if (!preventedFromBuilding) {
-                        if (player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.CREATIVE) {
-                            preventedFromBuilding = true;
-                            noEditMessage = Text.of(TextColors.RED, "You must be in creative mode to edit!");
-                        }
+                // Block players that are allowed to build, otherwise send the no build message
+                Text noEditMessage = Text.of(TextColors.RED, "You can't change blocks here!");
+                if (!preventedFromBuilding) {
+                    if (player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL) != GameModes.CREATIVE) {
+                        preventedFromBuilding = true;
+                        noEditMessage = Text.of(TextColors.RED, "You must be in creative mode to edit!");
+                    }
+                }
+
+                if (preventedFromBuilding) {
+                    if (event.getCause().root().equals(player)) {
+                        player.sendMessage(noEditMessage);
                     }
 
-                    if (preventedFromBuilding) {
-                        if (event.getCause().root().equals(player)) {
-                            player.sendMessage(noEditMessage);
-                        }
-
-                        event.setCancelled(true);
-                        return;
-                    }
+                    event.setCancelled(true);
+                    return;
                 }
             }
         }
@@ -189,13 +185,8 @@ public class MainWorldWrapper extends WorldEffectWrapperImpl implements Runnable
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        if (!isApplicable(optProjectile.get())) {
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        if (!isApplicable(projectile)) {
             return;
         }
 

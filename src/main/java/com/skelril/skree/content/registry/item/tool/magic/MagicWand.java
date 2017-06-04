@@ -20,6 +20,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
@@ -47,45 +48,44 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         boolean survival = player.get(Keys.GAME_MODE).orElse(GameModes.CREATIVE) == GameModes.SURVIVAL;
 
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
-            if (optHeldItem.get().getItem() == this) {
-                event.setUseBlockResult(Tristate.FALSE);
-
-                Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
-
-                if (!optLoc.isPresent()) {
-                    return;
-                }
-
-                Location<World> loc = optLoc.get();
-                BlockType targetType = loc.getBlockType();
-
-                if (targetType == CustomBlockTypes.MAGIC_LADDER) {
-                    MagicBlockStateHelper.startLadder(loc);
-                } else if (targetType == CustomBlockTypes.MAGIC_PLATFORM) {
-                    MagicBlockStateHelper.startPlatform(loc);
-                } else {
-                    return;
-                }
-
-                if (!survival) {
-                    MagicBlockStateHelper.resetCounts();
-                    return;
-                }
-
-                MagicBlockStateHelper.dropItems(loc, event.getCause());
-            }
+        if (!optHeldItem.isPresent()) {
+            return;
         }
+
+        if (optHeldItem.get().getItem() != this) {
+            return;
+        }
+
+        event.setUseBlockResult(Tristate.FALSE);
+
+        Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
+
+        if (!optLoc.isPresent()) {
+            return;
+        }
+
+        Location<World> loc = optLoc.get();
+        BlockType targetType = loc.getBlockType();
+
+        if (targetType == CustomBlockTypes.MAGIC_LADDER) {
+            MagicBlockStateHelper.startLadder(loc);
+        } else if (targetType == CustomBlockTypes.MAGIC_PLATFORM) {
+            MagicBlockStateHelper.startPlatform(loc);
+        } else {
+            return;
+        }
+
+        if (!survival) {
+            MagicBlockStateHelper.resetCounts();
+            return;
+        }
+
+        MagicBlockStateHelper.dropItems(loc, event.getCause());
     }
 
     @Override

@@ -80,6 +80,8 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
@@ -445,13 +447,8 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        Optional<Integer> optLevel = getLevel(optProjectile.get().getLocation());
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        Optional<Integer> optLevel = getLevel(projectile.getLocation());
         if (!optLevel.isPresent()) {
             return;
         }
@@ -550,14 +547,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     private Set<Location<World>> markedOrePoints = new HashSet<>();
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event) {
-        Optional<Entity> optSrcEnt = event.getCause().get(NamedCause.SOURCE, Entity.class);
-        if (!optSrcEnt.isPresent()) {
-            return;
-        }
-
-        Entity srcEnt = optSrcEnt.get();
-
+    public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Entity srcEnt) {
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
         for (Transaction<BlockSnapshot> block : transactions) {
             BlockSnapshot original = block.getOriginal();
@@ -624,59 +614,54 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event) {
-        Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
+    public void onBlockPlace(ChangeBlockEvent.Place event, @Named(NamedCause.SOURCE) Player player) {
+        for (Transaction<BlockSnapshot> block :  event.getTransactions()) {
+            Optional<Location<World>> optLoc = block.getFinal().getLocation();
 
-            for (Transaction<BlockSnapshot> block :  event.getTransactions()) {
-                Optional<Location<World>> optLoc = block.getFinal().getLocation();
+            if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
+                continue;
+            }
 
-                if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
+            Location<World> loc = optLoc.get();
+            BlockState finalState = block.getFinal().getState();
+            if (config.getDropAmplificationConfig().amplifies(finalState)) {
+                // Allow creative mode players to still place blocks
+                if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
                     continue;
                 }
 
-                Location<World> loc = optLoc.get();
-                BlockState finalState = block.getFinal().getState();
-                if (config.getDropAmplificationConfig().amplifies(finalState)) {
-                    // Allow creative mode players to still place blocks
-                    if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
-                        continue;
-                    }
-
-                    BlockType originalType = block.getOriginal().getState().getType();
-                    if (ore().contains(originalType)) {
-                        continue;
-                    }
-
-                    try {
-                        Vector3d origin = loc.getPosition();
-                        World world = loc.getExtent();
-                        for (int i = 0; i < 40; ++i) {
-                            ParticleEffect effect = ParticleEffect.builder().type(
-                                    ParticleTypes.MAGIC_CRITICAL_HIT
-                            ).velocity(
-                                    new Vector3d(
-                                            Probability.getRangedRandom(-1, 1),
-                                            Probability.getRangedRandom(-.7, .7),
-                                            Probability.getRangedRandom(-1, 1)
-                                    )
-                            ).quantity(1).build();
-
-                            world.spawnParticles(effect, origin.add(.5, .5, .5));
-                        }
-                    } catch (Exception ex) {
-                        player.sendMessage(
-                            /* ChatTypes.SYSTEM, */
-                                Text.of(
-                                        TextColors.RED,
-                                        "You find yourself unable to place that block."
-                                )
-                        );
-                    }
-
-                    block.setValid(false);
+                BlockType originalType = block.getOriginal().getState().getType();
+                if (ore().contains(originalType)) {
+                    continue;
                 }
+
+                try {
+                    Vector3d origin = loc.getPosition();
+                    World world = loc.getExtent();
+                    for (int i = 0; i < 40; ++i) {
+                        ParticleEffect effect = ParticleEffect.builder().type(
+                                ParticleTypes.MAGIC_CRITICAL_HIT
+                        ).velocity(
+                                new Vector3d(
+                                        Probability.getRangedRandom(-1, 1),
+                                        Probability.getRangedRandom(-.7, .7),
+                                        Probability.getRangedRandom(-1, 1)
+                                )
+                        ).quantity(1).build();
+
+                        world.spawnParticles(effect, origin.add(.5, .5, .5));
+                    }
+                } catch (Exception ex) {
+                    player.sendMessage(
+                        /* ChatTypes.SYSTEM, */
+                            Text.of(
+                                    TextColors.RED,
+                                    "You find yourself unable to place that block."
+                            )
+                    );
+                }
+
+                block.setValid(false);
             }
         }
     }
@@ -692,13 +677,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
     }
 
     @Listener
-    public void onItemDrop(DropItemEvent.Destruct event) {
-        Optional<BlockSpawnCause> optSpawnCause = event.getCause().get(NamedCause.SOURCE, BlockSpawnCause.class);
-        if (!optSpawnCause.isPresent()) {
-            return;
-        }
-
-        BlockSpawnCause spawnCause = optSpawnCause.get();
+    public void onItemDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause) {
         BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
 
         Optional<Location<World>> optLocation = blockSnapshot.getLocation();

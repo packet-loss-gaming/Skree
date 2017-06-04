@@ -9,6 +9,7 @@ package com.skelril.skree.content.zone;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -21,9 +22,8 @@ public class ZoneImmutableBlockListener<T> extends ZoneApplicableListener<T> {
     }
 
     @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> player = event.getCause().first(Player.class);
-        if (player.isPresent() && isApplicable(player.get())) {
+    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+        if (isApplicable(player)) {
             event.setCancelled(true);
         }
     }

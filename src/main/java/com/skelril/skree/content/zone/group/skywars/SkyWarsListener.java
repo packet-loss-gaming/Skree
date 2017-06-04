@@ -29,6 +29,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -50,13 +51,7 @@ public class SkyWarsListener {
     }
 
     @Listener
-    public void onInteract(InteractBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onInteract(InteractBlockEvent event, @First Player player) {
         Optional<SkyWarsInstance> optInst = manager.getApplicableZone(player);
         if (!optInst.isPresent()) {
             return;
@@ -206,13 +201,8 @@ public class SkyWarsListener {
     }
 
     @Listener
-    public void onPlayerCombat(CollideEntityEvent.Impact event) {
-        Optional<Projectile> optProjectile = event.getCause().first(Projectile.class);
-        if (!optProjectile.isPresent()) {
-            return;
-        }
-
-        Optional<SkyWarsInstance> optInst = manager.getApplicableZone(optProjectile.get());
+    public void onPlayerCombat(CollideEntityEvent.Impact event, @First Projectile projectile) {
+        Optional<SkyWarsInstance> optInst = manager.getApplicableZone(projectile);
 
         if (!optInst.isPresent()) {
             return;

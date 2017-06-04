@@ -8,6 +8,7 @@ package com.skelril.skree.content.itemrestriction;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -23,11 +24,8 @@ public class ItemCraftBlockingListener {
     }
 
     @Listener
+    @Exclude(value = ChangeInventoryEvent.Held.class)
     public void onItemCraft(ChangeInventoryEvent event) {
-        if (event instanceof ChangeInventoryEvent.Held) {
-            return;
-        }
-
         event.getTransactions().forEach((t) -> {
             if (blockedItems.contains(t.getFinal().getType().getId())) {
                 Optional<Player> optPlayer = event.getCause().first(Player.class);

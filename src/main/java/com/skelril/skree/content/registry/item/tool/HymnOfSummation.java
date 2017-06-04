@@ -18,6 +18,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -46,43 +47,41 @@ public class HymnOfSummation extends CustomItem implements EventAwareContent {
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (optHeldItem.isPresent()) {
-            ItemStack held = optHeldItem.get();
-            if (held.getItem() == this) {
-                net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
-                Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
-                        CoalValueMap.inst(),
-                        IronValueMap.inst(),
-                        GoldValueMap.inst(),
-                        RedstoneValueMap.inst(),
-                        LapisValueMap.inst(),
-                        DiamondValueMap.inst(),
-                        EmeraldValueMap.inst(),
-                        CofferValueMap.inst()
-                )).execute((ItemStack[]) (Object[]) pInv);
+            return;
+        }
 
-                if (optCompacted.isPresent()) {
-                    Task.builder().execute(() -> {
-                        ItemStack[] nInv = optCompacted.get();
-                        for (int i = 0; i < pInv.length; ++i) {
-                            pInv[i] = tf(nInv[i]);
-                        }
-                        tf(player).inventoryContainer.detectAndSendChanges();
-                        player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
-                    }).delayTicks(1).submit(SkreePlugin.inst());
+        ItemStack held = optHeldItem.get();
+        if (held.getItem() != this) {
+            return;
+        }
 
-                    event.setUseBlockResult(Tristate.FALSE);
+        net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
+        Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
+                CoalValueMap.inst(),
+                IronValueMap.inst(),
+                GoldValueMap.inst(),
+                RedstoneValueMap.inst(),
+                LapisValueMap.inst(),
+                DiamondValueMap.inst(),
+                EmeraldValueMap.inst(),
+                CofferValueMap.inst()
+        )).execute((ItemStack[]) (Object[]) pInv);
+
+        if (optCompacted.isPresent()) {
+            Task.builder().execute(() -> {
+                ItemStack[] nInv = optCompacted.get();
+                for (int i = 0; i < pInv.length; ++i) {
+                    pInv[i] = tf(nInv[i]);
                 }
-            }
+                tf(player).inventoryContainer.detectAndSendChanges();
+                player.sendMessage(Text.of(TextColors.GOLD, "The hymn glows brightly..."));
+            }).delayTicks(1).submit(SkreePlugin.inst());
+
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 }

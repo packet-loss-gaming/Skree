@@ -24,6 +24,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -60,19 +61,19 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
     }
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-            if (optItemStack.isPresent()) {
-                ItemStack itemStack = tf(optItemStack.get());
-                if (itemStack.getItem() == this) {
-                    if (rejoinInstance(player)) {
-                        event.setUseBlockResult(Tristate.FALSE);
-                    }
-                }
-            }
+    public void onBlockInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+        Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (!optItemStack.isPresent()) {
+            return;
+        }
+
+        ItemStack itemStack = tf(optItemStack.get());
+        if (itemStack.getItem() != this) {
+            return;
+        }
+
+        if (rejoinInstance(player)) {
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 

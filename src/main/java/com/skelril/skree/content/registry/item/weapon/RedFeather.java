@@ -15,12 +15,13 @@ import com.skelril.skree.content.world.wilderness.WildernessTeleportCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
@@ -50,36 +51,30 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     }
 
     @Listener(order = Order.LATE)
-    public void onEntityDamage(DamageEntityEvent event) {
-        Entity target = event.getTargetEntity();
-        if (target instanceof Player) {
-            EntityPlayer player = tf((Player) target);
-
-            Optional<DamageSource> optDmgSrc  = event.getCause().first(DamageSource.class);
-            if (!optDmgSrc.isPresent() || !isBlockable(optDmgSrc.get())) {
-                return;
-            }
-
-            Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
-            if (!optFeatherDetail.isPresent()) {
-                return;
-            }
-
-            Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>> featherDetail = optFeatherDetail.get();
-
-            int redQ = featherDetail.getValue().getValue().getKey();
-            final double dmg = event.getBaseDamage();
-            final int k = (dmg > 80 ? 16 : dmg > 40 ? 8 : dmg > 20 ? 4 : 2);
-
-            final double blockable = redQ * k;
-            final double blocked = blockable - (blockable - dmg);
-
-            event.setBaseDamage(Math.max(0, dmg - blocked));
-
-            redQ = (int) ((blockable - blocked) / k);
-            updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
-            player.inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
+    public void onEntityDamage(DamageEntityEvent event, @Getter(value = "getTargetEntity") Player player, @First DamageSource dmgSrc) {
+        if (!isBlockable(dmgSrc)) {
+            return;
         }
+
+        Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> optFeatherDetail = getHighestPoweredFeather(player);
+        if (!optFeatherDetail.isPresent()) {
+            return;
+        }
+
+        Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>> featherDetail = optFeatherDetail.get();
+
+        int redQ = featherDetail.getValue().getValue().getKey();
+        final double dmg = event.getBaseDamage();
+        final int k = (dmg > 80 ? 16 : dmg > 40 ? 8 : dmg > 20 ? 4 : 2);
+
+        final double blockable = redQ * k;
+        final double blocked = blockable - (blockable - dmg);
+
+        event.setBaseDamage(Math.max(0, dmg - blocked));
+
+        redQ = (int) ((blockable - blocked) / k);
+        updateFeatherPower(featherDetail.getValue().getKey(), redQ, (long) blocked * 75);
+        tf(player).inventory.mainInventory[featherDetail.getKey()] = tf(featherDetail.getValue().getKey());
     }
 
     public boolean isBlockable(DamageSource source) {

@@ -20,6 +20,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -62,44 +63,41 @@ public class SkullOfTheFallen extends CustomItem implements EventAwareContent, C
     }
 
     @Listener
-    public void onRightClick(InteractBlockEvent.Secondary.MainHand event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-
-        if (!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-
-
+    public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
         Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
 
-        if (optHeldItem.isPresent()) {
-            if (this.equals(optHeldItem.get().getItem())) {
-                Location<World> pLoc = player.getLocation();
+        if (!optHeldItem.isPresent()) {
+            return;
+        }
 
-                Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
-                if (optWorldService.isPresent()) {
-                    WorldService worldService = optWorldService.get();
-                    WildernessWorldWrapper wrapper = worldService.getEffectWrapper(WildernessWorldWrapper.class).get();
-                    Optional<Integer> optLevel = wrapper.getLevel(pLoc);
-                    if (optLevel.isPresent()) {
-                        int level = optLevel.get();
+        if (this != optHeldItem.get().getItem()) {
+            return;
+        }
 
-                        DecimalFormat df = new DecimalFormat("#,###.##");
+        Location<World> pLoc = player.getLocation();
 
-                        player.sendMessages(
-                            Text.of(TextColors.YELLOW, "Wilderness level: " + level),
-                            Text.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
-                            Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
-                            Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
-                            Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(wrapper.getDropTier(level)))),
-                            Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(wrapper.getDropTier(level))))
-                        );
-                    } else {
-                        player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));
-                    }
-                    event.setUseBlockResult(Tristate.FALSE);
-                }
+        Optional<WorldService> optWorldService = Sponge.getServiceManager().provide(WorldService.class);
+        if (optWorldService.isPresent()) {
+            WorldService worldService = optWorldService.get();
+            WildernessWorldWrapper wrapper = worldService.getEffectWrapper(WildernessWorldWrapper.class).get();
+            Optional<Integer> optLevel = wrapper.getLevel(pLoc);
+            if (optLevel.isPresent()) {
+                int level = optLevel.get();
+
+                DecimalFormat df = new DecimalFormat("#,###.##");
+
+                player.sendMessages(
+                    Text.of(TextColors.YELLOW, "Wilderness level: " + level),
+                    Text.of(TextColors.YELLOW, "PvP Enabled: " + (wrapper.allowsPvP(level) ? "Yes" : "No")),
+                    Text.of(TextColors.YELLOW, "Mob damage: +" + df.format(wrapper.getDamageMod(level))),
+                    Text.of(TextColors.YELLOW, "Mob health: x" + df.format(wrapper.getHealthMod(level))),
+                    Text.of(TextColors.YELLOW, "Ore modifier: x" + df.format(wrapper.getOreMod(wrapper.getDropTier(level)))),
+                    Text.of(TextColors.YELLOW, "Drop modifier: x" + df.format(level * wrapper.getDropMod(wrapper.getDropTier(level))))
+                );
+            } else {
+                player.sendMessage(Text.of(TextColors.RED, "You're not in a Wilderness world!"));
             }
+            event.setUseBlockResult(Tristate.FALSE);
         }
     }
 }

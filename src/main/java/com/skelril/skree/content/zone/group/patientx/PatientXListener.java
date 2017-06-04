@@ -28,6 +28,8 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -56,12 +58,14 @@ public class PatientXListener {
         }
 
         Optional<PluginContainer> optPluginContainer = event.getCause().first(PluginContainer.class);
-        if (!optPluginContainer.isPresent()) {
-            for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-                if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
-                    event.setCancelled(true);
-                    break;
-                }
+        if (optPluginContainer.isPresent()) {
+            return;
+        }
+
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            if (manager.getApplicableZone(transaction.getOriginal().getLocation().get()).isPresent()) {
+                event.setCancelled(true);
+                break;
             }
         }
     }
@@ -92,8 +96,7 @@ public class PatientXListener {
     }
 
     @Listener
-    public void onProjectileHit(CollideEvent.Impact event) {
-        Entity entity = event.getCause().first(Entity.class).get();
+    public void onProjectileHit(CollideEvent.Impact event, @First Entity entity) {
         Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
         if (!optInst.isPresent()) return;
 
@@ -112,17 +115,14 @@ public class PatientXListener {
     }
 
     @Listener
-    public void onEntityDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        Optional<PatientXInstance> optInst = manager.getApplicableZone(entity);
+    public void onEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Zombie zombie) {
+        Optional<PatientXInstance> optInst = manager.getApplicableZone(zombie);
         if (!optInst.isPresent()) return;
 
-        PatientXInstance inst = optInst.get();
-
-        if (entity instanceof Zombie && ((EntityZombie) entity).isChild()) {
+        if ( ((EntityZombie) zombie).isChild()) {
             if (Probability.getChance(10)) {
                 Task.builder().execute(() -> {
-                    new ItemDropper(entity.getLocation()).dropStacks(
+                    new ItemDropper(zombie.getLocation()).dropStacks(
                             Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
                             SpawnTypes.DROPPED_ITEM
                     );
@@ -132,13 +132,7 @@ public class PatientXListener {
     }
 
     @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) entity;
+    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
         Optional<PatientXInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             PatientXInstance inst = optInst.get();

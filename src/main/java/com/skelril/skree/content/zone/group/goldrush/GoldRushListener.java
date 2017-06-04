@@ -25,7 +25,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -35,6 +34,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -316,13 +316,7 @@ public class GoldRushListener {
     }
 
     @Listener
-    public void onPlayerTeleport(MoveEntityEvent.Teleport event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-        Player player = (Player) entity;
-
+    public void onPlayerTeleport(MoveEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(event.getFromTransform().getLocation());
         if (optInst.isPresent() && !manager.getApplicableZone(event.getToTransform().getLocation()).isPresent()) {
             GoldRushInstance inst = optInst.get();
@@ -344,13 +338,7 @@ public class GoldRushListener {
     }
 
     @Listener
-    public void onPlayerDeath(DestructEntityEvent.Death event) {
-        Entity entity = event.getTargetEntity();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player) entity;
+    public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
         Optional<GoldRushInstance> optInst = manager.getApplicableZone(player);
         if (optInst.isPresent()) {
             GoldRushInstance inst = optInst.get();

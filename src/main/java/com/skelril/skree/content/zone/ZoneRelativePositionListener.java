@@ -11,6 +11,7 @@ import com.skelril.skree.service.internal.zone.Zone;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -25,12 +26,7 @@ public class ZoneRelativePositionListener<T extends Zone> extends ZoneApplicable
 
 
     @Listener
-    public void onBlockInteract(InteractBlockEvent.Secondary event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (!optPlayer.isPresent()) {
-            return;
-        }
-
+    public void onBlockInteract(InteractBlockEvent.Secondary event, @First Player player) {
         Optional<Location<World>> optLocation = event.getTargetBlock().getLocation();
         if (!optLocation.isPresent()) {
             return;
@@ -49,7 +45,6 @@ public class ZoneRelativePositionListener<T extends Zone> extends ZoneApplicable
 
         Vector3i offset = clickedPoint.sub(minPoint);
 
-        Player player = optPlayer.get();
         player.sendMessage(Text.of("Offset: ", offset));
     }
 }

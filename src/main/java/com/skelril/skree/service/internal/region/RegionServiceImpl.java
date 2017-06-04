@@ -18,6 +18,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -133,60 +134,48 @@ public class RegionServiceImpl implements RegionService {
     }
 
     @Listener
-    public void onInteract(InteractBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
+    public void onInteract(InteractBlockEvent event, @First Player player) {
+        Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
+        if (!optLoc.isPresent()) {
+            return;
+        }
 
-            Optional<Location<World>> optLoc = event.getTargetBlock().getLocation();
-            if (optLoc.isPresent()) {
-                if (check(player, optLoc.get())) {
-                    event.setCancelled(true);
-                    if (event.getCause().root().equals(player)) {
-                        player.sendMessage(Text.of(TextColors.RED, "You can't interact with blocks here!"));
-                        player.sendMessage(Text.of(TextColors.RED, "[Debug] ", optLoc.get(), " [Cause ", event.getCause(), "]"));
-                    }
-                    return;
-                }
+        if (check(player, optLoc.get())) {
+            event.setCancelled(true);
+            if (event.getCause().root().equals(player)) {
+                player.sendMessage(Text.of(TextColors.RED, "You can't interact with blocks here!"));
+                player.sendMessage(Text.of(TextColors.RED, "[Debug] ", optLoc.get(), " [Cause ", event.getCause(), "]"));
             }
         }
     }
 
     @Listener
-    public void onInteract(InteractEntityEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
+    public void onInteract(InteractEntityEvent event, @First Player player) {
+        Entity target = event.getTargetEntity();
 
-            Entity target = event.getTargetEntity();
+        if (target.getType() != EntityTypes.PLAYER && check(player, target.getLocation())) {
+            event.setCancelled(true);
+            if (event.getCause().root().equals(player)) {
+                player.sendMessage(Text.of(TextColors.RED, "You can't interact with entities here!"));
+            }
+        }
+    }
 
-            if (target.getType() != EntityTypes.PLAYER && check(player, target.getLocation())) {
+    @Listener
+    public void onBlockChange(ChangeBlockEvent event, @First Player player) {
+        for (Transaction<BlockSnapshot> block : event.getTransactions()) {
+            Optional<Location<World>> optLoc = block.getOriginal().getLocation();
+            if (!optLoc.isPresent()) {
+                continue;
+            }
+
+            if (check(player, optLoc.get())) {
                 event.setCancelled(true);
                 if (event.getCause().root().equals(player)) {
-                    player.sendMessage(Text.of(TextColors.RED, "You can't interact with entities here!"));
+                    player.sendMessage(Text.of(TextColors.RED, "You can't change blocks here!"));
+                    player.sendMessage(Text.of(TextColors.RED, "[Debug] ", optLoc.get(), " [Cause ", event.getCause(), "]"));
                 }
-                return;
-            }
-        }
-    }
-
-    @Listener
-    public void onBlockChange(ChangeBlockEvent event) {
-        Optional<Player> optPlayer = event.getCause().first(Player.class);
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
-            for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-                Optional<Location<World>> optLoc = block.getOriginal().getLocation();
-                if (optLoc.isPresent()) {
-                    if (check(player, optLoc.get())) {
-                        event.setCancelled(true);
-                        if (event.getCause().root().equals(player)) {
-                            player.sendMessage(Text.of(TextColors.RED, "You can't change blocks here!"));
-                            player.sendMessage(Text.of(TextColors.RED, "[Debug] ", optLoc.get(), " [Cause ", event.getCause(), "]"));
-                        }
-                        return;
-                    }
-                }
+                break;
             }
         }
     }
