@@ -37,11 +37,15 @@ public class ItemDropper {
         return location.getPosition();
     }
 
+    public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
+        Item item = (Item)  getExtent().createEntity(EntityTypes.ITEM, getPos());
+        item.offer(Keys.REPRESENTED_ITEM, snapshot);
+        getExtent().spawnEntity(item, cause);
+    }
+
     public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
         for (ItemStackSnapshot stack : stacks) {
-            Item item = (Item)  getExtent().createEntity(EntityTypes.ITEM, getPos());
-            item.offer(Keys.REPRESENTED_ITEM, stack);
-            getExtent().spawnEntity(item, Cause.source(SpawnCause.builder().type(type).build()).build());
+            dropItem(stack, Cause.source(SpawnCause.builder().type(type).build()).build());
         }
     }
 
