@@ -49,6 +49,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
     // Data applied for Vanilla blocks in net.minecraft.block.Block
     this.setLightLevel(0.3F);
+    this.setResistance(6000000.0F);
   }
 
   @Override
