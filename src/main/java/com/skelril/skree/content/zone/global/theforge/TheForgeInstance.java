@@ -194,7 +194,9 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
         state.save();
     }
 
-    private static final List<EntityType> possibleMobs = Lists.newArrayList(EntityTypes.SKELETON, EntityTypes.ZOMBIE);
+    private static final List<EntityType> possibleMobs = Lists.newArrayList(
+            EntityTypes.SKELETON, EntityTypes.ZOMBIE, EntityTypes.CREEPER, EntityTypes.SPIDER
+    );
 
     private static Cause getSpawnCause() {
         return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
