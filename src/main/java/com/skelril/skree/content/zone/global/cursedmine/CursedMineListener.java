@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.zone.global.cursedmine;
 
+import com.google.common.collect.Lists;
 import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.modifier.Modifiers;
@@ -41,6 +42,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -237,28 +239,18 @@ public class CursedMineListener {
         }
     }
 
-    private boolean isRedstoneTransition(BlockType originalType, BlockType finalType) {
-        if (originalType == BlockTypes.REDSTONE_ORE && finalType == BlockTypes.LIT_REDSTONE_ORE) {
-            return true;
-        }
-
-        if (originalType == BlockTypes.LIT_REDSTONE_ORE && finalType == BlockTypes.REDSTONE_ORE) {
-            return true;
-        }
-
-        return false;
+    private boolean isCausedbyFire(ChangeBlockEvent event) {
+        Optional<LocatableBlock> optLocatableBlock = event.getCause().get(NamedCause.SOURCE, LocatableBlock.class);
+        return optLocatableBlock.filter(locatableBlock -> locatableBlock.getBlockState().getType() == BlockTypes.FIRE).isPresent();
     }
 
     @Listener
     public void onBlockBurn(ChangeBlockEvent event) {
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            BlockType originalType = transaction.getOriginal().getState().getType();
-            BlockType finalType = transaction.getFinal().getState().getType();
-            if (originalType != BlockTypes.PLANKS && originalType != BlockTypes.OAK_STAIRS && finalType != BlockTypes.FIRE) {
-                continue;
-            }
+        boolean isCausedByFire = isCausedbyFire(event);
 
-            if (isRedstoneTransition(originalType, finalType)) {
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            BlockType finalType = transaction.getFinal().getState().getType();
+            if (!isCausedByFire && finalType != BlockTypes.FIRE) {
                 continue;
             }
 
@@ -273,17 +265,36 @@ public class CursedMineListener {
         }
     }
 
+    private boolean isRedstoneTransition(BlockType originalType, BlockType finalType) {
+        List<BlockType> redstoneOres = Lists.newArrayList(BlockTypes.REDSTONE_ORE, BlockTypes.LIT_REDSTONE_ORE);
+
+        return redstoneOres.contains(originalType) && redstoneOres.contains(finalType);
+    }
+
     @Listener
     public void onBlockPlace(ChangeBlockEvent.Place event) {
         Optional<Player> optPlayer = event.getCause().get(NamedCause.SOURCE, Player.class);
 
-        if (optPlayer.isPresent()) {
-            Player player = optPlayer.get();
+        if (!optPlayer.isPresent()) {
+            return;
+        }
+        Player player = optPlayer.get();
 
-            Optional<CursedMineInstance> optInst = manager.getApplicableZone(player);
-            if (optInst.isPresent()) {
-                event.setCancelled(true);
+        Optional<CursedMineInstance> optInst = manager.getApplicableZone(player);
+        if (!optInst.isPresent()) {
+            return;
+        }
+
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            BlockType originalType = transaction.getFinal().getState().getType();
+            BlockType finalType = transaction.getFinal().getState().getType();
+
+            if (isRedstoneTransition(originalType, finalType)) {
+                continue;
             }
+
+            event.setCancelled(true);
+            break;
         }
     }
 
