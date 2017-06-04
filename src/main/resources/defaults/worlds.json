@@ -5,7 +5,7 @@
       "name": "build",
       "dimension": "minecraft:overworld",
       "generator": "default",
-      "usesMapFeatures": false,
+      "uses_map_features": false,
       "modifiers": [
         "skree:no_ore"
       ]
@@ -15,7 +15,7 @@
       "name": "barrier",
       "dimension": "minecraft:overworld",
       "generator": "flat",
-      "usesMapFeatures": false,
+      "uses_map_features": false,
       "modifiers": [
         "skree:barrier"
       ]
@@ -25,7 +25,7 @@
       "name": "void",
       "dimension": "minecraft:overworld",
       "generator": "flat",
-      "usesMapFeatures": false,
+      "uses_map_features": false,
       "modifiers": [
         "skree:void"
       ]
@@ -35,7 +35,7 @@
       "name": "wilderness",
       "dimension": "minecraft:overworld",
       "generator": "default",
-      "usesMapFeatures": true,
+      "uses_map_features": true,
       "modifiers": [
         "skree:wilderness"
       ]
@@ -45,7 +45,7 @@
       "name": "wilderness_nether",
       "dimension": "minecraft:nether",
       "generator": "nether",
-      "usesMapFeatures": true,
+      "uses_map_features": true,
       "modifiers": []
     }
   ],

@@ -1,6 +1,6 @@
 {
-  "dropAmplification": {
-    "multipliedBlockTypes": [
+  "drop_amplification": {
+    "multiplied_block_types": [
       "minecraft:redstone_ore",
       "minecraft:lit_redstone_ore",
       "minecraft:iron_ore",
@@ -12,7 +12,7 @@
       "minecraft:quartz_ore",
       "skree:jurack_ore"
     ],
-    "itemReplacementMapping": {
+    "item_replacement_mapping": {
       "minecraft:redstone": {
         "id": "skree:red_shard"
       }

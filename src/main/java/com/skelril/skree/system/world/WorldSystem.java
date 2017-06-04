@@ -8,9 +8,6 @@ package com.skelril.skree.system.world;
 
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.skelril.nitro.JarResourceLoader;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
@@ -25,20 +22,17 @@ import com.skelril.skree.content.world.wilderness.*;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import com.skelril.skree.service.internal.world.WorldServiceImpl;
+import com.skelril.skree.system.ConfigLoader;
 import com.skelril.skree.system.ServiceProvider;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -48,87 +42,30 @@ public class WorldSystem implements ServiceProvider<WorldService> {
     private WorldService service;
     private WorldSystemConfig config;
 
-    private Path getWorldConfiguration() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return path.resolve("worlds.json");
-    }
-
-    private void loadConfiguration() {
-        // Insert ugly configuration code
-        try {
-            Path targetFile = getWorldConfiguration();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-            if (!Files.exists(targetFile)) {
-                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
-                    try {
-                        Files.copy(getResource.apply("worlds.json"), targetFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-
-            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                config = gson.fromJson(reader, WorldSystemConfig.class);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Path getWildernessConfiguration() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return path.resolve("wilderness.json");
-    }
-
-    private WildernessConfig loadWildernessConfiguration() {
-        // Insert ugly configuration code
-        try {
-            Path targetFile = getWildernessConfiguration();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-            if (!Files.exists(targetFile)) {
-                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
-                    try {
-                        Files.copy(getResource.apply("wilderness.json"), targetFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-
-            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                return gson.fromJson(reader, WildernessConfig.class);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @NModuleTrigger(trigger = "SERVER_STARTED")
     public void init() {
         service = new WorldServiceImpl();
 
-        // Register the service & command
-        Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
-        Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
-        Sponge.getCommandManager().register(SkreePlugin.inst(), LoadWorldCommand.aquireSpec(), "loadworld");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessMetaCommand.aquireSpec(), "wmeta");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), SummonWandererCommand.aquireSpec(), "wanderer");
-        Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessTeleportCommand.aquireSpec(), "wtp");
+        try {
+            config = ConfigLoader.loadConfig("worlds.json", WorldSystemConfig.class);
 
-        loadConfiguration();
+            // Register the service & command
+            Sponge.getEventManager().registerListeners(SkreePlugin.inst(), service);
+            Sponge.getServiceManager().setProvider(SkreePlugin.inst(), WorldService.class, service);
+            Sponge.getCommandManager().register(SkreePlugin.inst(), LoadWorldCommand.aquireSpec(), "loadworld");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), SetSpawnCommand.aquireSpec(), "setspawn");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), WorldCommand.aquireSpec(), "world");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), WorldListCommand.aquireSpec(), "worlds");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessMetaCommand.aquireSpec(), "wmeta");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), SummonWandererCommand.aquireSpec(), "wanderer");
+            Sponge.getCommandManager().register(SkreePlugin.inst(), WildernessTeleportCommand.aquireSpec(), "wtp");
 
-        initArchetypes();
-        initWrappers();
-        initWorlds();
+            initArchetypes();
+            initWrappers();
+            initWorlds();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void buildArchetype(ArchetypeConfig archetypeConfig) throws Throwable {
@@ -177,12 +114,12 @@ public class WorldSystem implements ServiceProvider<WorldService> {
         }
     }
 
-    private void initWrappers() {
+    private void initWrappers() throws IOException {
         List<WorldEffectWrapper> wrappers = Lists.newArrayList(
                 new MainWorldWrapper(),
                 new BuildWorldWrapper(),
                 new InstanceWorldWrapper(),
-                new WildernessWorldWrapper(loadWildernessConfiguration())
+                new WildernessWorldWrapper(ConfigLoader.loadConfig("wilderness.json", WildernessConfig.class))
         );
 
         for (WorldEffectWrapper wrapper : wrappers) {

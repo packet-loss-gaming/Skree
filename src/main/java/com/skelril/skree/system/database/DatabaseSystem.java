@@ -6,35 +6,22 @@
 
 package com.skelril.skree.system.database;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.skelril.nitro.JarResourceLoader;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.service.DatabaseService;
 import com.skelril.skree.service.internal.database.DatabaseServiceImpl;
+import com.skelril.skree.system.ConfigLoader;
 import com.skelril.skree.system.ServiceProvider;
 import org.flywaydb.core.Flyway;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @NModule(name = "Database System")
 public class DatabaseSystem implements ServiceProvider<DatabaseService> {
-
     private DatabaseService service;
-
-    private Path getDatabaseFile() throws IOException {
-        ConfigManager service = Sponge.getGame().getConfigManager();
-        Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
-        return path.resolve("database.json");
-    }
 
     private void setupHandle(String database, String username, String password) {
         SQLHandle.setDatabase(database);
@@ -57,35 +44,15 @@ public class DatabaseSystem implements ServiceProvider<DatabaseService> {
             e.printStackTrace();
         }
 
-        // Insert ugly configuration code
         try {
-            Path targetFile = getDatabaseFile();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            DatabaseConfig config = ConfigLoader.loadConfig("database.json", DatabaseConfig.class);
 
-            if (!Files.exists(targetFile)) {
-                new JarResourceLoader("/defaults/").loadFromResources((getResource) -> {
-                    try {
-                        Files.copy(getResource.apply("database.json"), targetFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+            String database = config.getDatabase();
+            String username = config.getUsername();
+            String password = config.getPassword();
 
-            try (BufferedReader reader = Files.newBufferedReader(targetFile)) {
-                DatabaseConfig config = gson.fromJson(reader, DatabaseConfig.class);
-
-                if (config == null || config.getDatabase().isEmpty()) {
-                    return;
-                }
-
-                String database = config.getDatabase();
-                String username = config.getUsername();
-                String password = config.getPassword();
-
-                setupHandle(database, username, password);
-                runMigrations(database, username, password);
-            }
+            setupHandle(database, username, password);
+            runMigrations(database, username, password);
         } catch (IOException e) {
             e.printStackTrace();
         }

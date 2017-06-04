@@ -1,5 +1,5 @@
 {
-  "triggeringCommandPatterns": [
+  "triggering_command_patterns": [
     "op\\ .*"
   ]
 }
