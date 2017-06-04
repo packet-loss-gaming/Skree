@@ -30,8 +30,6 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -71,17 +69,7 @@ public class CursedMineListener {
             }
         }
     }
-
-    @Listener
-    public void onItemSpawn(SpawnEntityEvent event, @Root BlockSpawnCause spawnCause) {
-        // SpongeCommon/#771
-        for (Entity entity : event.getEntities()) {
-            if (entity instanceof Item && manager.getApplicableZone(entity).isPresent()) {
-                entity.remove();
-            }
-        }
-    }
-
+    
     private static Set<BlockType> cursedOres = new HashSet<>();
 
     static {
