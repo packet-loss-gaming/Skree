@@ -10,7 +10,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
-import com.skelril.nitro.item.ItemDropper;
+import com.skelril.nitro.item.FixedPointItemDropper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LegacyZoneBase;
@@ -52,7 +52,7 @@ import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPA
 public class TheForgeInstance extends LegacyZoneBase implements Runnable {
     private ForgeState state;
 
-    private Location<World> dropPoint;
+    private Location<World> centralDropPoint;
 
     public TheForgeInstance(ZoneRegion region) {
         super(region);
@@ -60,7 +60,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
     private void setUp() {
         Vector3d centerPoint = getRegion().getCenter();
-        dropPoint = new Location<>(
+        centralDropPoint = new Location<>(
                 getRegion().getExtent(),
                 new Vector3d(
                         centerPoint.getX(),
@@ -179,8 +179,17 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
         return produce;
     }
 
+    private final List<Vector3d> pointAdjustments = Lists.newArrayList(
+            new Vector3d(-.5, 0, 0),
+            new Vector3d(.5, 0, 0),
+            new Vector3d(0, 0, -.5),
+            new Vector3d(0, 0, .5)
+    );
+
     private void dropResults() {
-        new ItemDropper(dropPoint).dropStacks(getProduce(), SpawnTypes.PLUGIN);
+        Location<World> targetDropPoint = centralDropPoint.add(Probability.pickOneOf(pointAdjustments));
+
+        new FixedPointItemDropper(targetDropPoint).dropStacks(getProduce(), SpawnTypes.PLUGIN);
 
         state.save();
     }
