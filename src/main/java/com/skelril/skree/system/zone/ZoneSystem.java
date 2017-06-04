@@ -17,6 +17,7 @@ import com.skelril.skree.content.zone.global.cursedmine.CursedMineManager;
 import com.skelril.skree.content.zone.global.templeoffate.TempleOfFateManager;
 import com.skelril.skree.content.zone.global.theforge.TheForgeManager;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
+import com.skelril.skree.content.zone.group.desmiredungeon.DesmireDungeonManager;
 import com.skelril.skree.content.zone.group.freakyfour.FreakyFourManager;
 import com.skelril.skree.content.zone.group.goldrush.GoldRushManager;
 import com.skelril.skree.content.zone.group.jungleraid.JungleRaidManager;
@@ -55,6 +56,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
             service.registerManager(new TheForgeManager());
 
             service.registerManager(new CatacombsManager());
+            service.registerManager(new DesmireDungeonManager());
             service.registerManager(new FreakyFourManager());
             service.registerManager(new GoldRushManager());
             service.registerManager(new JungleRaidManager());
