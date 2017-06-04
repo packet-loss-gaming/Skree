@@ -7,7 +7,6 @@
 package com.skelril.skree.content.zone.global.cursedmine;
 
 import com.google.common.collect.Lists;
-import com.skelril.nitro.data.util.EnchantmentUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.zone.global.cursedmine.hitlist.HitList;
@@ -19,7 +18,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -36,7 +34,6 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -83,15 +80,6 @@ public class CursedMineListener {
                 entity.remove();
             }
         }
-    }
-
-    private boolean hasSilkTouch(ItemStack stack) {
-        Optional<ItemEnchantment> optSilkTouch = EnchantmentUtil.getHighestEnchantment(
-                stack,
-                Enchantments.SILK_TOUCH
-        );
-
-        return optSilkTouch.isPresent();
     }
 
     private static Set<BlockType> cursedOres = new HashSet<>();
