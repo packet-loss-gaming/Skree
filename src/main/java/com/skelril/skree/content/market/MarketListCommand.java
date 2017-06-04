@@ -21,6 +21,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,7 +77,7 @@ public class MarketListCommand implements CommandExecutor {
 
         List<Text> result = prices.stream()
                 .filter(a -> filter.isEmpty() || a.getName().startsWith(filter))
-                .sorted((a, b) -> a.getCurrentValue().compareTo(b.getCurrentValue()))
+                .sorted(Comparator.comparing(ItemDescriptor::getCurrentValue))
                 .map(a -> createLine(a, service))
                 .collect(Collectors.toList());
 

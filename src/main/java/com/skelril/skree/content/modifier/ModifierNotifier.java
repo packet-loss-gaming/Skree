@@ -18,7 +18,10 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ModifierNotifier {
@@ -39,7 +42,7 @@ public class ModifierNotifier {
         }
         if (messages.isEmpty()) return;
 
-        Collections.sort(messages, String.CASE_INSENSITIVE_ORDER);
+        messages.sort(String.CASE_INSENSITIVE_ORDER);
         messages.add(0, "\n\nThe following donation perks are enabled:");
 
         Player player = event.getTargetEntity();

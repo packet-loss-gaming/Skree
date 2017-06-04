@@ -13,6 +13,7 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.item.Enchantment;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class EnchantmentUtil {
     public static Optional<ItemEnchantment> getHighestEnchantment(CompositeValueStore<?, ?> valueStore, Enchantment enchantment) {
         List<ItemEnchantment> enchantments = getEnchantment(valueStore, enchantment);
         if (!enchantments.isEmpty()) {
-            return Optional.of(enchantments.stream().sorted((a, b) -> a.getLevel() - b.getLevel()).findFirst().get());
+            return Optional.of(enchantments.stream().sorted(Comparator.comparingInt(ItemEnchantment::getLevel)).findFirst().get());
         }
         return Optional.empty();
     }

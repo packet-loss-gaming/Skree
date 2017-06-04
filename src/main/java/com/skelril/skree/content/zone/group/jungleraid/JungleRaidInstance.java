@@ -665,13 +665,7 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
         if (optService.isPresent()) {
             PlayerStateService service = optService.get();
-            if (service.hasInventoryStored(player)) {
-                try {
-                    service.loadInventory(player);
-                } catch (InventoryStorageStateException e) {
-                    e.printStackTrace();
-                }
-            }
+            service.loadInventoryIfStored(player);
         }
     }
 

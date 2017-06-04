@@ -178,10 +178,10 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
                 return Optional.empty();
             }
 
-            return Optional.of((Instruction<DamagedCondition, Boss<Zombie, ZoneBossDetail<PatientXInstance>>>) (damagedCondition, zombieZoneBossDetailBoss) -> {
+            return Optional.of((damagedCondition, zombieZoneBossDetailBoss) -> {
                 PatientXInstance inst = boss.getDetail().getZone();
                 if (optDamageSource.isPresent() && optDamageSource.get() instanceof EntityDamageSource) {
-                    if (optDamageSource.isPresent() && optDamageSource.get() instanceof IndirectEntityDamageSource) {
+                    if (optDamageSource.get() instanceof IndirectEntityDamageSource) {
                         Task.builder().execute(() -> {
                             VelocityEntitySpawner.sendRadial(
                                     EntityTypes.SNOWBALL,

@@ -404,13 +404,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         Optional<PlayerStateService> optService = Sponge.getServiceManager().provide(PlayerStateService.class);
         if (optService.isPresent()) {
             PlayerStateService service = optService.get();
-            if (service.hasInventoryStored(player)) {
-                try {
-                    service.loadInventory(player);
-                } catch (InventoryStorageStateException e) {
-                    e.printStackTrace();
-                }
-            }
+            service.loadInventoryIfStored(player);
         }
     }
 
@@ -661,13 +655,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         Optional<PlayerStateService> optInvService = Sponge.getServiceManager().provide(PlayerStateService.class);
         if (optInvService.isPresent()) {
             PlayerStateService invService = optInvService.get();
-            if (invService.hasInventoryStored(player)) {
-                try {
-                    invService.loadInventory(player);
-                } catch (InventoryStorageStateException e) {
-                    e.printStackTrace();
-                }
-            }
+            invService.loadInventoryIfStored(player);
         }
 
         returned.forEach(i -> player.getInventory().offer(i));

@@ -13,6 +13,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class DropTableImpl implements DropTable {
         this.roller = roller;
 
         // First sort possible, then apply
-        possible.sort((a, b) -> a.getChance() - b.getChance());
+        possible.sort(Comparator.comparingInt(DropTableEntry::getChance));
         Validate.isTrue(!possible.isEmpty() && possible.get(0).getChance() > 0);
 
         this.possible = ImmutableList.copyOf(possible);

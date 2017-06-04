@@ -78,10 +78,7 @@ public class RedFeather extends CustomItem implements ICustomItem, DegradableIte
     }
 
     public boolean isBlockable(DamageSource source) {
-        if (source.getType() == WildernessTeleportCommand.DAMAGE_TYPE) {
-            return false;
-        }
-        return true;
+        return source.getType() != WildernessTeleportCommand.DAMAGE_TYPE;
     }
 
     public Optional<Clause<Integer, Clause<ItemStack, Clause<Integer, Long>>>> getHighestPoweredFeather(Player player) {

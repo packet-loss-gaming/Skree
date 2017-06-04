@@ -62,7 +62,7 @@ public class NitroModuleManager {
     }
 
     private boolean handle(String initPhase, NitroModule module) {
-        if (module.getReferenceCount(initPhase).orElseGet(() -> 0) > 0) {
+        if (module.getReferenceCount(initPhase).orElse(0) > 0) {
             return false;
         }
 

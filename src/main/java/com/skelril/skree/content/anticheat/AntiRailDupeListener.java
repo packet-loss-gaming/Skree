@@ -34,7 +34,7 @@ public class AntiRailDupeListener {
     }
 
     @Listener
-    public void onPistonMove(ChangeBlockEvent event, @Named(value = NamedCause.SOURCE) Piston piston) {
+    public void onPistonMove(ChangeBlockEvent event, @Named(NamedCause.SOURCE) Piston piston) {
         event.getTransactions().stream().map(Transaction::getFinal).forEach(block -> {
             BlockType finalType = block.getState().getType();
             if (railBlocks.contains(finalType)) {

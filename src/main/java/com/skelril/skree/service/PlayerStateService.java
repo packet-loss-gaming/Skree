@@ -16,6 +16,16 @@ public interface PlayerStateService {
     void loadInventory(Player player) throws InventoryStorageStateException;
     void releaseInventory(Player player) throws InventoryStorageStateException;
 
+    default void loadInventoryIfStored(Player player) {
+        if (hasInventoryStored(player)) {
+            try {
+                loadInventory(player);
+            } catch (InventoryStorageStateException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Deprecated // Temporary function
     void save(Player player, String saveName);
     @Deprecated // Temporary function

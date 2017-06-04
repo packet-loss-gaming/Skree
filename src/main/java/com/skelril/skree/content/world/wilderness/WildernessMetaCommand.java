@@ -20,6 +20,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public class WildernessMetaCommand implements CommandExecutor {
         WildernessWorldWrapper wrapper = service.getEffectWrapper(WildernessWorldWrapper.class).get();
 
         List<Text> result = wrapper.getMetaInformation().stream()
-                .sorted((a, b) -> a.getKey().getName().compareTo(b.getKey().getName()))
+                .sorted(Comparator.comparing(a -> a.getKey().getName()))
                 .map(this::createLine)
                 .collect(Collectors.toList());
 
