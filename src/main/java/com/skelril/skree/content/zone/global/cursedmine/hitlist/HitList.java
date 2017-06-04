@@ -9,7 +9,6 @@ package com.skelril.skree.content.zone.global.cursedmine.hitlist;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -32,10 +31,7 @@ public class HitList {
     }
 
     public void check() {
-        Iterator<Map.Entry<UUID, Long>> it = hitList.entrySet().iterator();
-        while (it.hasNext()) {
-            if (hasExpired(it.next().getValue())) it.remove();
-        }
+        hitList.entrySet().removeIf(uuidLongEntry -> hasExpired(uuidLongEntry.getValue()));
     }
 
     private boolean hasExpired(long expiryTime) {
