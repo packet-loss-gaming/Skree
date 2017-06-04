@@ -58,7 +58,7 @@ public class LoaderRegistry {
             try {
                 Files.walk(path).forEach(subPath -> {
                     String filename = subPath.getFileName().toString();
-                    if (filename.endsWith(".json")) {
+                    if (filename.endsWith(".json.peb")) {
                         try {
                             String fileContent = Joiner.on('\n').join(Files.readAllLines(subPath));
                             loader.load(renderTemplate(fileContent));
