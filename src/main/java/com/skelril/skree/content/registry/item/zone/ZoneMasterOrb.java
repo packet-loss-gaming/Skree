@@ -270,7 +270,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     @Listener
     public void onEntityInteract(InteractEntityEvent.Primary event, @First Player player, @Getter("getTargetEntity") Player targetPlayer) {
         Optional<org.spongepowered.api.item.inventory.ItemStack> optItemStack = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (optItemStack.isPresent()) {
+        if (!optItemStack.isPresent()) {
             return;
         }
 
