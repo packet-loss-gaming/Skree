@@ -222,6 +222,10 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
   @Override
   public void run() {
+    if (isEmpty()) {
+      return;
+    }
+
     killPlayersInLava();
     runOreCheck();
     dropResults();
