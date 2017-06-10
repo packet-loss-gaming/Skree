@@ -82,7 +82,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
   private void setUp() {
     Vector3i min = getRegion().getMinimumPoint();
-    this.entryPoint = new Location<>(getRegion().getExtent(), min.getX() + 17.5, min.getY() + 1, min.getZ() + 58.5);
+    this.entryPoint = new Location<>(getRegion().getExtent(), min.getX() + 17.5, min.getY() + 2, min.getZ() + 58.5);
 
     Task.builder().execute(this::checkedSpawnWave).delay(5, TimeUnit.SECONDS).submit(SkreePlugin.inst());
   }
