@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.zone;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -22,8 +22,8 @@ public class ZoneImmutableBlockListener<T> extends ZoneApplicableListener<T> {
   }
 
   @Listener
-  public void onBlockChange(ChangeBlockEvent event, @First Player player) {
-    if (isApplicable(player)) {
+  public void onBlockChange(ChangeBlockEvent event, @First Entity entity) {
+    if (isApplicable(entity)) {
       event.setCancelled(true);
     }
   }
