@@ -64,6 +64,7 @@ public class Fangz implements WanderingBoss<Spider> {
       if (optBossEnt.isPresent()) {
         Spider bossEnt = optBossEnt.get();
         bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Fangz"));
+        bossEnt.offer(Keys.CUSTOM_NAME_VISIBLE, true);
         double bossHealth = 20 * 50 * boss.getDetail().getLevel();
         setMaxHealth(bossEnt, bossHealth, true);
       }

@@ -68,6 +68,7 @@ public class GraveDigger extends SkeletonArcherWanderer {
       if (optBossEnt.isPresent()) {
         Skeleton bossEnt = optBossEnt.get();
         bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Grave Digger"));
+        bossEnt.offer(Keys.CUSTOM_NAME_VISIBLE, true);
         double bossHealth = 20 * 43 * boss.getDetail().getLevel();
         setMaxHealth(bossEnt, bossHealth, true);
       }

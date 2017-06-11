@@ -64,6 +64,7 @@ public class StormBringer extends SkeletonArcherWanderer {
       if (optBossEnt.isPresent()) {
         Skeleton bossEnt = optBossEnt.get();
         bossEnt.offer(Keys.DISPLAY_NAME, Text.of("Storm Bringer"));
+        bossEnt.offer(Keys.CUSTOM_NAME_VISIBLE, true);
         double bossHealth = 20 * 30 * boss.getDetail().getLevel();
         setMaxHealth(bossEnt, bossHealth, true);
       }
