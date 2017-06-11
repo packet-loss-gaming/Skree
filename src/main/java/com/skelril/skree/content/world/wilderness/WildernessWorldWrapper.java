@@ -50,8 +50,6 @@ import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.*;
@@ -112,7 +110,6 @@ import java.util.function.Supplier;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
-import static com.skelril.skree.content.registry.TypeCollections.ore;
 import static com.skelril.skree.content.registry.block.CustomBlockTypes.GRAVE_STONE;
 import static com.skelril.skree.content.registry.item.CustomItemTypes.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -581,7 +578,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
       // Prevent item dupe glitch by removing the position before subsequent breaks
       markedOrePoints.remove(loc);
-      if (config.getDropAmplificationConfig().amplifies(state)) {
+      if (config.getDropAmplificationConfig().amplifies(state) && !original.getCreator().isPresent()) {
         markedOrePoints.add(loc);
       }
 
@@ -619,59 +616,6 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             }
           }
         }).submit(SkreePlugin.inst());
-      }
-    }
-  }
-
-  @Listener
-  public void onBlockPlace(ChangeBlockEvent.Place event, @Named(NamedCause.SOURCE) Player player) {
-    for (Transaction<BlockSnapshot> block : event.getTransactions()) {
-      Optional<Location<World>> optLoc = block.getFinal().getLocation();
-
-      if (!optLoc.isPresent() || !isApplicable(optLoc.get())) {
-        continue;
-      }
-
-      Location<World> loc = optLoc.get();
-      BlockState finalState = block.getFinal().getState();
-      if (config.getDropAmplificationConfig().amplifies(finalState)) {
-        // Allow creative mode players to still place blocks
-        if (player.getGameModeData().type().get().equals(GameModes.CREATIVE)) {
-          continue;
-        }
-
-        BlockType originalType = block.getOriginal().getState().getType();
-        if (ore().contains(originalType)) {
-          continue;
-        }
-
-        try {
-          Vector3d origin = loc.getPosition();
-          World world = loc.getExtent();
-          for (int i = 0; i < 40; ++i) {
-            ParticleEffect effect = ParticleEffect.builder().type(
-                ParticleTypes.MAGIC_CRITICAL_HIT
-            ).velocity(
-                new Vector3d(
-                    Probability.getRangedRandom(-1, 1),
-                    Probability.getRangedRandom(-.7, .7),
-                    Probability.getRangedRandom(-1, 1)
-                )
-            ).quantity(1).build();
-
-            world.spawnParticles(effect, origin.add(.5, .5, .5));
-          }
-        } catch (Exception ex) {
-          player.sendMessage(
-              /* ChatTypes.SYSTEM, */
-              Text.of(
-                  TextColors.RED,
-                  "You find yourself unable to place that block."
-              )
-          );
-        }
-
-        block.setValid(false);
       }
     }
   }
