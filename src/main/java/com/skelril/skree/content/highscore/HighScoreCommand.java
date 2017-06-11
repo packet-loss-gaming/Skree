@@ -107,6 +107,7 @@ public class HighScoreCommand implements CommandExecutor {
     } else {
       List<Text> result = choices.keySet().stream()
           .map(this::createScoreTypeLine)
+          .sorted()
           .collect(Collectors.toList());
 
       pagination.builder()
