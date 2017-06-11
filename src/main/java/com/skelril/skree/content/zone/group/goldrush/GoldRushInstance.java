@@ -684,6 +684,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
     optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.GOLD_RUSH_ROBBERIES, 1));
+    optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.GOLD_RUSH_LOOT_VALUE, total.toBigInteger().intValue()));
 
     remove(player);
     return true;

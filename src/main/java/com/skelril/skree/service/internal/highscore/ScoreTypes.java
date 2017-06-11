@@ -13,4 +13,5 @@ public class ScoreTypes {
   public static final ScoreType JUNGLE_RAID_WINS = new ScoreType(3, true, ScoreType.Order.DESC);
   public static final ScoreType GOLD_RUSH_ROBBERIES = new ScoreType(4, true, ScoreType.Order.DESC);
   public static final ScoreType HIGHEST_CATACOMB_WAVE = new ScoreType(5, false, ScoreType.Order.DESC);
+  public static final ScoreType GOLD_RUSH_LOOT_VALUE = new ScoreType(6, false, ScoreType.Order.DESC);
 }
