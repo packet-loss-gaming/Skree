@@ -23,6 +23,11 @@ import javax.annotation.Generated;
 public class Tables {
 
 	/**
+	 * The table mc_db.high_scores
+	 */
+	public static final HighScores HIGH_SCORES = com.skelril.skree.db.schema.tables.HighScores.HIGH_SCORES;
+
+	/**
 	 * The table mc_db.item_aliases
 	 */
 	public static final ItemAliases ITEM_ALIASES = com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
@@ -56,6 +61,11 @@ public class Tables {
 	 * The table mc_db.region_points
 	 */
 	public static final RegionPoints REGION_POINTS = com.skelril.skree.db.schema.tables.RegionPoints.REGION_POINTS;
+
+	/**
+	 * The table mc_db.schema_version
+	 */
+	public static final SchemaVersion SCHEMA_VERSION = com.skelril.skree.db.schema.tables.SchemaVersion.SCHEMA_VERSION;
 
 	/**
 	 * The table mc_db.worlds

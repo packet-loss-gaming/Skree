@@ -17,9 +17,11 @@ import com.skelril.skree.content.modifier.Modifiers;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.generic.PrizeBox;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.highscore.ScoreTypes;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.*;
 import net.minecraft.inventory.IInventory;
@@ -679,6 +681,9 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
     returned.forEach(i -> player.getInventory().offer(i));
     MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.source(this).build());
+
+    Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+    optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.GOLD_RUSH_ROBBERIES, 1));
 
     remove(player);
     return true;

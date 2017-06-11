@@ -13,7 +13,9 @@ import com.skelril.nitro.Clause;
 import com.skelril.nitro.entity.SafeTeleportHelper;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.highscore.ScoreTypes;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.Zone;
@@ -259,7 +261,13 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
 
   @Override
   public void forceEnd() {
-    remove(getPlayers(PARTICIPANT));
+    if (state == JungleRaidState.DONE) {
+      Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+      for (Player player : getPlayers(PARTICIPANT)) {
+        remove(player);
+        optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.JUNGLE_RAID_WINS, 1));
+      }
+    }
     remove();
   }
 

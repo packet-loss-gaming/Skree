@@ -20,8 +20,11 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.content.zone.group.catacombs.instruction.CatacombsHealthInstruction;
 import com.skelril.skree.content.zone.group.catacombs.instruction.bossmove.*;
+import com.skelril.skree.service.HighScoreService;
+import com.skelril.skree.service.internal.highscore.ScoreTypes;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityTypes;
@@ -38,6 +41,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
@@ -157,6 +161,15 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
               .fadeOut(20)
               .build()
       );
+    }
+
+    Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+    if (optHighScores.isPresent()) {
+      HighScoreService highScores = optHighScores.get();
+
+      for (Player player : getPlayers(PARTICIPANT)) {
+        highScores.update(player, ScoreTypes.HIGHEST_CATACOMB_WAVE, wave);
+      }
     }
   }
 

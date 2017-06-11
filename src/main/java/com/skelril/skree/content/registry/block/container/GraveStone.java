@@ -29,9 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
@@ -151,36 +149,31 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
     }
   }
 
-  public void createGraveFromDeath(DestructEntityEvent.Death event) {
-    Entity target = event.getTargetEntity();
-    if (target instanceof Player) {
-      Player player = (Player) target;
+  public void createGraveFromDeath(Player player) {
+    List<ItemStack> items = new ArrayList<>();
 
-      List<ItemStack> items = new ArrayList<>();
+    Optional<ItemStack> optStack;
+    do {
+      optStack = player.getInventory().poll();
+    } while (optStack.isPresent() && items.add(optStack.get()));
 
-      Optional<ItemStack> optStack;
-      do {
-        optStack = player.getInventory().poll();
-      } while (optStack.isPresent() && items.add(optStack.get()));
-
-      Iterator<ItemStack> it = items.iterator();
-      Optional<RespawnQueueService> optService = Sponge.getServiceManager().provide(RespawnQueueService.class);
-      if (optService.isPresent()) {
-        RespawnQueueService service = optService.get();
-        while (it.hasNext()) {
-          if (it.next().getItem() == CustomItemTypes.NETHER_BOWL) {
-            it.remove();
-            ItemStack stack = tf(new net.minecraft.item.ItemStack(CustomItemTypes.NETHER_BOWL));
-            CustomItemTypes.NETHER_BOWL.setDestination(stack, player.getLocation());
-            service.enque(player, stack);
-            break;
-          }
+    Iterator<ItemStack> it = items.iterator();
+    Optional<RespawnQueueService> optService = Sponge.getServiceManager().provide(RespawnQueueService.class);
+    if (optService.isPresent()) {
+      RespawnQueueService service = optService.get();
+      while (it.hasNext()) {
+        if (it.next().getItem() == CustomItemTypes.NETHER_BOWL) {
+          it.remove();
+          ItemStack stack = tf(new net.minecraft.item.ItemStack(CustomItemTypes.NETHER_BOWL));
+          CustomItemTypes.NETHER_BOWL.setDestination(stack, player.getLocation());
+          service.enque(player, stack);
+          break;
         }
       }
-
-      Task.builder().execute(() -> {
-        createGraveDropExcess(items, target.getLocation());
-      }).delayTicks(1).submit(SkreePlugin.inst());
     }
+
+    Task.builder().execute(() -> {
+      createGraveDropExcess(items, player.getLocation());
+    }).delayTicks(1).submit(SkreePlugin.inst());
   }
 }

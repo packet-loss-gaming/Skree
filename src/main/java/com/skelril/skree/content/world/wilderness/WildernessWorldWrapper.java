@@ -34,9 +34,11 @@ import com.skelril.skree.content.world.wilderness.wanderer.Fangz;
 import com.skelril.skree.content.world.wilderness.wanderer.GraveDigger;
 import com.skelril.skree.content.world.wilderness.wanderer.StormBringer;
 import com.skelril.skree.content.world.wilderness.wanderer.WanderingBoss;
+import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.ModifierService;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.WorldService;
+import com.skelril.skree.service.internal.highscore.ScoreTypes;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
@@ -534,6 +536,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
           for (int i = 0; i < times; ++i) {
             dropper.dropStacks(drops, SpawnTypes.DROPPED_ITEM);
           }
+
+          Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+          optHighScores.ifPresent(highScoreService -> highScoreService.update((Player) srcEntity, ScoreTypes.WILDERNESS_MOB_KILLS, 1));
         }
       }
 
@@ -548,7 +553,14 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         );
       }
     }
-    GRAVE_STONE.createGraveFromDeath(event);
+
+    if (entity instanceof Player) {
+      Player player = (Player) entity;
+      GRAVE_STONE.createGraveFromDeath(player);
+
+      Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+      optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.WILDERNESS_DEATHS, 1));
+    }
   }
 
   private Set<Location<World>> markedOrePoints = new HashSet<>();
@@ -580,6 +592,10 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
       markedOrePoints.remove(loc);
       if (config.getDropAmplificationConfig().amplifies(state) && !original.getCreator().isPresent()) {
         markedOrePoints.add(loc);
+        if (srcEnt instanceof Player) {
+          Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+          optHighScores.ifPresent(highScoreService -> highScoreService.update((Player) srcEnt, ScoreTypes.WILDERNESS_ORES_MINED, 1));
+        }
       }
 
       if (srcEnt instanceof Player && type.equals(BlockTypes.STONE) && Probability.getChance(Math.max(12, 250 - level))) {

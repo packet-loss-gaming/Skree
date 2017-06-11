@@ -15,6 +15,7 @@ import com.skelril.skree.system.antihack.AntiHackSystem;
 import com.skelril.skree.system.arrowfishing.ArrowFishingSystem;
 import com.skelril.skree.system.database.DatabaseSystem;
 import com.skelril.skree.system.dropclear.DropClearSystem;
+import com.skelril.skree.system.highscore.HighScoreSystem;
 import com.skelril.skree.system.itemrestriction.ItemRestrictionSystem;
 import com.skelril.skree.system.maintenance.MaintenanceSystem;
 import com.skelril.skree.system.market.MarketSystem;
@@ -83,6 +84,7 @@ public class SkreePlugin {
         CustomRegisterySystem.class,
         DatabaseSystem.class,
         DropClearSystem.class,
+        HighScoreSystem.class,
         ItemRestrictionSystem.class,
         MaintenanceSystem.class,
         MarketSystem.class,

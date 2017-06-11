@@ -32,6 +32,7 @@ public class Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	public static final Identity<HighScoresRecord, Integer> IDENTITY_HIGH_SCORES = Identities0.IDENTITY_HIGH_SCORES;
 	public static final Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = Identities0.IDENTITY_ITEM_ALIASES;
 	public static final Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = Identities0.IDENTITY_ITEM_DATA;
 	public static final Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = Identities0.IDENTITY_MODIFIERS;
@@ -45,6 +46,8 @@ public class Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final UniqueKey<HighScoresRecord> KEY_HIGH_SCORES_PRIMARY = UniqueKeys0.KEY_HIGH_SCORES_PRIMARY;
+	public static final UniqueKey<HighScoresRecord> KEY_HIGH_SCORES_PLAYER_SCORE = UniqueKeys0.KEY_HIGH_SCORES_PLAYER_SCORE;
 	public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_PRIMARY = UniqueKeys0.KEY_ITEM_ALIASES_PRIMARY;
 	public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_ALIAS_UNIQUE = UniqueKeys0.KEY_ITEM_ALIASES_ALIAS_UNIQUE;
 	public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY = UniqueKeys0.KEY_ITEM_DATA_PRIMARY;
@@ -61,6 +64,7 @@ public class Keys {
 	public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_REGION_PLAYER = UniqueKeys0.KEY_REGION_MEMBERS_REGION_PLAYER;
 	public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_PRIMARY = UniqueKeys0.KEY_REGION_POINTS_PRIMARY;
 	public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_X_Y_Z = UniqueKeys0.KEY_REGION_POINTS_X_Y_Z;
+	public static final UniqueKey<SchemaVersionRecord> KEY_SCHEMA_VERSION_PRIMARY = UniqueKeys0.KEY_SCHEMA_VERSION_PRIMARY;
 	public static final UniqueKey<WorldsRecord> KEY_WORLDS_PRIMARY = UniqueKeys0.KEY_WORLDS_PRIMARY;
 	public static final UniqueKey<WorldsRecord> KEY_WORLDS_NAME = UniqueKeys0.KEY_WORLDS_NAME;
 
@@ -68,6 +72,7 @@ public class Keys {
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final ForeignKey<HighScoresRecord, PlayersRecord> FK_HIGH_SCORE_PLAYER = ForeignKeys0.FK_HIGH_SCORE_PLAYER;
 	public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = ForeignKeys0.ITEM_ALIASES_IBFK_1;
 	public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = ForeignKeys0.ITEM_DATA_IBFK_1;
 	public static final ForeignKey<RegionsRecord, WorldsRecord> FK_WORLD_ID = ForeignKeys0.FK_WORLD_ID;
@@ -80,6 +85,7 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	private static class Identities0 extends AbstractKeys {
+		public static Identity<HighScoresRecord, Integer> IDENTITY_HIGH_SCORES = createIdentity(HighScores.HIGH_SCORES, HighScores.HIGH_SCORES.ID);
 		public static Identity<ItemAliasesRecord, Integer> IDENTITY_ITEM_ALIASES = createIdentity(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
 		public static Identity<ItemDataRecord, Integer> IDENTITY_ITEM_DATA = createIdentity(ItemData.ITEM_DATA, ItemData.ITEM_DATA.ID);
 		public static Identity<ModifiersRecord, Integer> IDENTITY_MODIFIERS = createIdentity(Modifiers.MODIFIERS, Modifiers.MODIFIERS.ID);
@@ -91,6 +97,8 @@ public class Keys {
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
+		public static final UniqueKey<HighScoresRecord> KEY_HIGH_SCORES_PRIMARY = createUniqueKey(HighScores.HIGH_SCORES, HighScores.HIGH_SCORES.ID);
+		public static final UniqueKey<HighScoresRecord> KEY_HIGH_SCORES_PLAYER_SCORE = createUniqueKey(HighScores.HIGH_SCORES, HighScores.HIGH_SCORES.SCORE_TYPE_ID, HighScores.HIGH_SCORES.PLAYER_ID);
 		public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_PRIMARY = createUniqueKey(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ID);
 		public static final UniqueKey<ItemAliasesRecord> KEY_ITEM_ALIASES_ALIAS_UNIQUE = createUniqueKey(ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ALIAS);
 		public static final UniqueKey<ItemDataRecord> KEY_ITEM_DATA_PRIMARY = createUniqueKey(ItemData.ITEM_DATA, ItemData.ITEM_DATA.ID);
@@ -107,11 +115,13 @@ public class Keys {
 		public static final UniqueKey<RegionMembersRecord> KEY_REGION_MEMBERS_REGION_PLAYER = createUniqueKey(RegionMembers.REGION_MEMBERS, RegionMembers.REGION_MEMBERS.REGION_ID, RegionMembers.REGION_MEMBERS.PLAYER_ID);
 		public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_PRIMARY = createUniqueKey(RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.ID);
 		public static final UniqueKey<RegionPointsRecord> KEY_REGION_POINTS_X_Y_Z = createUniqueKey(RegionPoints.REGION_POINTS, RegionPoints.REGION_POINTS.X, RegionPoints.REGION_POINTS.Y, RegionPoints.REGION_POINTS.Z, RegionPoints.REGION_POINTS.REGION_ID);
+		public static final UniqueKey<SchemaVersionRecord> KEY_SCHEMA_VERSION_PRIMARY = createUniqueKey(SchemaVersion.SCHEMA_VERSION, SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK);
 		public static final UniqueKey<WorldsRecord> KEY_WORLDS_PRIMARY = createUniqueKey(Worlds.WORLDS, Worlds.WORLDS.ID);
 		public static final UniqueKey<WorldsRecord> KEY_WORLDS_NAME = createUniqueKey(Worlds.WORLDS, Worlds.WORLDS.NAME);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
+		public static final ForeignKey<HighScoresRecord, PlayersRecord> FK_HIGH_SCORE_PLAYER = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_PLAYERS_PRIMARY, HighScores.HIGH_SCORES, HighScores.HIGH_SCORES.PLAYER_ID);
 		public static final ForeignKey<ItemAliasesRecord, ItemDataRecord> ITEM_ALIASES_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_DATA_PRIMARY, ItemAliases.ITEM_ALIASES, ItemAliases.ITEM_ALIASES.ITEM_ID);
 		public static final ForeignKey<ItemDataRecord, ItemAliasesRecord> ITEM_DATA_IBFK_1 = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_ITEM_ALIASES_PRIMARY, ItemData.ITEM_DATA, ItemData.ITEM_DATA.PRIMARY_ALIAS);
 		public static final ForeignKey<RegionsRecord, WorldsRecord> FK_WORLD_ID = createForeignKey(com.skelril.skree.db.schema.Keys.KEY_WORLDS_PRIMARY, Regions.REGIONS, Regions.REGIONS.WORLD_ID);

@@ -27,7 +27,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class McDb extends SchemaImpl {
 
-	private static final long serialVersionUID = 312772327;
+	private static final long serialVersionUID = 1887319091;
 
 	/**
 	 * The reference instance of <code>mc_db</code>
@@ -50,6 +50,7 @@ public class McDb extends SchemaImpl {
 
 	private final List<Table<?>> getTables0() {
 		return Arrays.<Table<?>>asList(
+			HighScores.HIGH_SCORES,
 			ItemAliases.ITEM_ALIASES,
 			ItemData.ITEM_DATA,
 			Modifiers.MODIFIERS,
@@ -57,6 +58,7 @@ public class McDb extends SchemaImpl {
 			Regions.REGIONS,
 			RegionMembers.REGION_MEMBERS,
 			RegionPoints.REGION_POINTS,
+			SchemaVersion.SCHEMA_VERSION,
 			Worlds.WORLDS);
 	}
 }
