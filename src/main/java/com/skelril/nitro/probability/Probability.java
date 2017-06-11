@@ -40,6 +40,14 @@ public class Probability {
     return highestValue == 0 ? 1 : highestValue < 0 ? (r.nextInt(highestValue * -1) + 1) * -1 : r.nextInt(highestValue) + 1;
   }
 
+  public static int getCompoundRandom(int highestValue, int times) {
+    int value = highestValue;
+    for (int i = 0; i < times; ++i) {
+      value = Probability.getRandom(value);
+    }
+    return value;
+  }
+
   public static int getRangedRandom(int lowestValue, int highestValue) {
     if (lowestValue == highestValue) {
       return lowestValue;
@@ -55,6 +63,14 @@ public class Probability {
       return (r.nextDouble() * (highestValue * -1)) * -1;
     }
     return (r.nextDouble() * (highestValue - 1)) + 1;
+  }
+
+  public static double getCompoundRandom(double highestValue, int times) {
+    double value = highestValue;
+    for (int i = 0; i < times; ++i) {
+      value = Probability.getRandom(value);
+    }
+    return value;
   }
 
   public static double getRangedRandom(double lowestValue, double highestValue) {

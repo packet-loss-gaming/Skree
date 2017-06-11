@@ -357,7 +357,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
             dEvent.setDamage(modifier.getFirst(), (a) -> 0D);
           }
 
-          dEvent.setBaseDamage(1);
+          dEvent.setBaseDamage(Probability.getCompoundRandom(getDamageMod(level), 3));
         } else {
           dEvent.setBaseDamage(dEvent.getBaseDamage() + getDamageMod(level));
         }
