@@ -12,6 +12,9 @@ import com.skelril.nitro.item.ItemDropper;
 import com.skelril.skree.service.PvPService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HorseVariants;
 import org.spongepowered.api.entity.Entity;
@@ -23,6 +26,8 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
@@ -30,9 +35,12 @@ import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Named;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -44,13 +52,15 @@ import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class BuildWorldWrapper extends WorldEffectWrapperImpl {
+  private BuildConfig config;
 
-  public BuildWorldWrapper() {
-    this(new ArrayList<>());
+  public BuildWorldWrapper(BuildConfig config) {
+    this(config, new ArrayList<>());
   }
 
-  public BuildWorldWrapper(Collection<World> worlds) {
+  public BuildWorldWrapper(BuildConfig config, Collection<World> worlds) {
     super("Build", worlds);
+    this.config = config;
   }
 
   @Override
@@ -100,7 +110,6 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
   }
 
-
   private PlayerCombatParser createFor(Cancellable event) {
     return new PlayerCombatParser() {
       @Override
@@ -136,5 +145,55 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     createFor(event).parse(event);
+  }
+
+  private List<Location<World>> markedOrePoints = new ArrayList<>();
+
+  @Listener
+  public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Entity srcEnt) {
+    if (!isApplicable(srcEnt)) {
+      return;
+    }
+
+    List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+    for (Transaction<BlockSnapshot> block : transactions) {
+      BlockSnapshot original = block.getOriginal();
+      if (original.getCreator().isPresent()) {
+        continue;
+      }
+
+      Optional<Location<World>> optLoc = original.getLocation();
+
+      if (!optLoc.isPresent()) {
+        continue;
+      }
+
+      Location<World> loc = optLoc.get();
+
+      BlockState state = original.getState();
+
+      // Prevent item dupe glitch by removing the position before subsequent breaks
+      markedOrePoints.remove(loc);
+      if (config.getDropModification().blocks(state)) {
+        markedOrePoints.add(loc);
+      }
+    }
+  }
+
+  @Listener
+  public void onItemDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause) {
+    BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
+
+    Optional<Location<World>> optLocation = blockSnapshot.getLocation();
+    if (!optLocation.isPresent()) {
+      return;
+    }
+
+    Location<World> loc = optLocation.get();
+    if (!markedOrePoints.remove(loc)) {
+      return;
+    }
+
+    event.getEntities().clear();
   }
 }

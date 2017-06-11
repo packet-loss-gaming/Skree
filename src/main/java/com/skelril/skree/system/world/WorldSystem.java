@@ -15,6 +15,7 @@ import com.skelril.skree.content.world.LoadWorldCommand;
 import com.skelril.skree.content.world.SetSpawnCommand;
 import com.skelril.skree.content.world.WorldCommand;
 import com.skelril.skree.content.world.WorldListCommand;
+import com.skelril.skree.content.world.build.BuildConfig;
 import com.skelril.skree.content.world.build.BuildWorldWrapper;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.world.main.MainWorldWrapper;
@@ -117,7 +118,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
   private void initWrappers() throws IOException {
     List<WorldEffectWrapper> wrappers = Lists.newArrayList(
         new MainWorldWrapper(),
-        new BuildWorldWrapper(),
+        new BuildWorldWrapper(ConfigLoader.loadConfig("build.json", BuildConfig.class)),
         new InstanceWorldWrapper(),
         new WildernessWorldWrapper(ConfigLoader.loadConfig("wilderness.json", WildernessConfig.class))
     );
