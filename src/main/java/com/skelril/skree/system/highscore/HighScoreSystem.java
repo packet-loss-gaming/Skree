@@ -9,6 +9,7 @@ package com.skelril.skree.system.highscore;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.skree.SkreePlugin;
+import com.skelril.skree.content.highscore.HighScoreCommand;
 import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.internal.highscore.HighScoreServiceImpl;
 import com.skelril.skree.system.ServiceProvider;
@@ -22,6 +23,7 @@ public class HighScoreSystem implements ServiceProvider<HighScoreService> {
   public void init() {
     service = new HighScoreServiceImpl();
     Sponge.getServiceManager().setProvider(SkreePlugin.inst(), HighScoreService.class, service);
+    Sponge.getCommandManager().register(SkreePlugin.inst(), HighScoreCommand.aquireSpec(), "highscores", "highscore");
   }
 
   @Override

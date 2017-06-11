@@ -6,11 +6,14 @@
 
 package com.skelril.skree.service.internal.highscore;
 
+import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.HighScoreService;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -33,5 +36,10 @@ public class HighScoreServiceImpl implements HighScoreService {
   @Override
   public void update(Player player, ScoreType scoreType, int value) {
     highScoreUpdates.add(new HighScoreUpdate(player.getUniqueId(), scoreType, value));
+  }
+
+  @Override
+  public List<Clause<Optional<GameProfile>, Integer>> getTop(ScoreType scoreType, int amt) {
+    return HighScoreDatabaseUtil.getTop(scoreType, amt);
   }
 }

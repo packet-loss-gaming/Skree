@@ -6,15 +6,24 @@
 
 package com.skelril.skree.service.internal.highscore;
 
+import com.google.common.collect.Lists;
+import com.skelril.nitro.Clause;
 import com.skelril.skree.db.SQLHandle;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.profile.GameProfile;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.skelril.skree.db.schema.Tables.PLAYERS;
 import static com.skelril.skree.db.schema.tables.HighScores.HIGH_SCORES;
@@ -36,6 +45,31 @@ class HighScoreDatabaseUtil {
     }
     return Optional.empty();
   }
+
+  private static Optional<GameProfile> getProfile(String uuid) {
+    try {
+      return Optional.of(Sponge.getServer().getGameProfileManager().get(UUID.fromString(uuid)).get());
+    } catch (InterruptedException | ExecutionException e) {
+      return Optional.empty();
+    }
+  }
+
+  public static List<Clause<Optional<GameProfile>, Integer>> getTop(ScoreType scoreType, int count) {
+    try (Connection con = SQLHandle.getConnection()) {
+      DSLContext create = DSL.using(con);
+      Result<Record2<String, Integer>> results = create.select(PLAYERS.UUID, HIGH_SCORES.VALUE).from(HIGH_SCORES).join(PLAYERS).on(PLAYERS.ID.equal(HIGH_SCORES.PLAYER_ID)).where(
+          HIGH_SCORES.SCORE_TYPE_ID.equal(scoreType.getId())
+      ).orderBy(scoreType.getOrder() == ScoreType.Order.ASC ? HIGH_SCORES.VALUE.asc() : HIGH_SCORES.VALUE.desc()).limit(count).fetch();
+
+      return results.stream().map(
+          record -> new Clause<>(getProfile(record.getValue(PLAYERS.UUID)), record.getValue(HIGH_SCORES.VALUE))
+      ).collect(Collectors.toList());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return Lists.newArrayList();
+  }
+
 
   public static void incrementalUpdate(UUID playerId, ScoreType scoreType, int amt) {
     try (Connection con = SQLHandle.getConnection()) {

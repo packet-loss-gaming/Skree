@@ -6,6 +6,8 @@
 
 package com.skelril.skree.service.internal.highscore;
 
+import java.text.DecimalFormat;
+
 public class ScoreType {
   private int id;
   private boolean incremental;
@@ -27,6 +29,11 @@ public class ScoreType {
 
   public Order getOrder() {
     return order;
+  }
+
+  public String format(int score) {
+    DecimalFormat df = new DecimalFormat("#,###");
+    return df.format(score);
   }
 
   public enum Order {
