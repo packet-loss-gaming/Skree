@@ -52,6 +52,8 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.*;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
@@ -358,6 +360,12 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
           }
 
           dEvent.setBaseDamage(Probability.getCompoundRandom(getDamageMod(level), 3));
+
+          if (Probability.getChance(5)) {
+            List<PotionEffect> potionEffects = defender.getOrElse(Keys.POTION_EFFECTS, new ArrayList<>());
+            potionEffects.add(PotionEffect.of(PotionEffectTypes.POISON, 2, 30 * 20));
+            defender.offer(Keys.POTION_EFFECTS, potionEffects);
+          }
         } else {
           dEvent.setBaseDamage(dEvent.getBaseDamage() + getDamageMod(level));
         }
