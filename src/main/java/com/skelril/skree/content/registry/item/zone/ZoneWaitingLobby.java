@@ -83,7 +83,7 @@ public class ZoneWaitingLobby {
       List<Map.Entry<Player, Integer>> results = Lists.newArrayList(localCounts.entrySet());
       results.sort((a, b) -> b.getValue() - a.getValue());
 
-      endMessage.add(Text.of(TextColors.GOLD, "Top Snowball Fight ScoreTypes: "));
+      endMessage.add(Text.of(TextColors.GOLD, "Top Snowball Fight Scores: "));
       for (int i = 0; i < Math.min(results.size(), 3); ++i) {
         Map.Entry<Player, Integer> playerScore = results.get(i);
         endMessage.add(Text.of(TextColors.YELLOW, i + 1, ") ", playerScore.getKey().getName(), " - ", playerScore.getValue()));
