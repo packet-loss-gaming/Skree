@@ -82,8 +82,12 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
   }
 
   private Optional<ItemStack> getResultingItemStack(ItemStackSnapshot snapshot) {
+    if (!config.isCompatibleWith(snapshot.createStack())) {
+      return Optional.empty();
+    }
+
     net.minecraft.item.ItemStack result = FurnaceRecipes.instance().getSmeltingResult(tf(snapshot.createStack()));
-    if (result == null || !config.isCompatibleWith(tf(result))) {
+    if (result == null) {
       return Optional.empty();
     }
 
