@@ -11,6 +11,7 @@ import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
@@ -31,6 +32,36 @@ public class TheForgeListener {
     this.manager = manager;
   }
 
+  private PlayerCombatParser createCombatParser(Event event) {
+    return new PlayerCombatParser() {
+      @Override
+      public void processPlayerAttack(Player attacker, Living defender) {
+        if (!(event instanceof DamageEntityEvent)) {
+          return;
+        }
+
+        if (attacker.getLocation().getY() != attacker.getLocation().getBlockY()) {
+          DamageEntityEvent dEvent = (DamageEntityEvent) event;
+          dEvent.setBaseDamage(Probability.getCompoundRandom(dEvent.getBaseDamage(), 4));
+        }
+      }
+
+      @Override
+      public void processMonsterAttack(Living attacker, Player defender) {
+        if (!(event instanceof DamageEntityEvent)) {
+          return;
+        }
+
+        if (Probability.getChance(5)) {
+          DamageEntityEvent dEvent = (DamageEntityEvent) event;
+          for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : dEvent.getModifiers()) {
+            dEvent.setDamage(modifier.getFirst(), (a) -> 0D);
+          }
+        }
+      }
+    };
+  }
+
   @Listener
   public void onPlayerCombat(DamageEntityEvent event) {
     Optional<TheForgeInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
@@ -38,14 +69,7 @@ public class TheForgeListener {
       return;
     }
 
-    new PlayerCombatParser() {
-      @Override
-      public void processPlayerAttack(Player attacker, Living defender) {
-        if (attacker.getLocation().getY() != attacker.getLocation().getBlockY()) {
-          event.setBaseDamage(Probability.getCompoundRandom(event.getBaseDamage(), 4));
-        }
-      }
-    }.parse(event);
+    createCombatParser(event).parse(event);
   }
 
   @Listener
@@ -55,19 +79,7 @@ public class TheForgeListener {
       return;
     }
 
-    new PlayerCombatParser() {
-      @Override
-      public void processMonsterAttack(Living attacker, Player defender) {
-        if (!(event instanceof DamageEntityEvent)) {
-          return;
-        }
-
-        DamageEntityEvent dEvent = (DamageEntityEvent) event;
-        for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : dEvent.getModifiers()) {
-          dEvent.setDamage(modifier.getFirst(), (a) -> Math.floor(a * .5));
-        }
-      }
-    }.parse(event);
+    createCombatParser(event).parse(event);
   }
 
   @Listener
