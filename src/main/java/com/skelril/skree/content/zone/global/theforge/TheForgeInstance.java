@@ -50,12 +50,14 @@ import static com.skelril.skree.content.modifier.Modifiers.TRIPLE_FACTORY_PRODUC
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class TheForgeInstance extends LegacyZoneBase implements Runnable {
+  private final TheForgeConfig config;
   private ForgeState state;
 
   private Location<World> centralDropPoint;
 
-  public TheForgeInstance(ZoneRegion region) {
+  public TheForgeInstance(ZoneRegion region, TheForgeConfig config) {
     super(region);
+    this.config = config;
   }
 
   private void setUp() {
@@ -81,7 +83,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
   private Optional<ItemStack> getResultingItemStack(ItemStackSnapshot snapshot) {
     net.minecraft.item.ItemStack result = FurnaceRecipes.instance().getSmeltingResult(tf(snapshot.createStack()));
-    if (result == null) {
+    if (result == null || !config.isCompatibleWith(tf(result))) {
       return Optional.empty();
     }
 

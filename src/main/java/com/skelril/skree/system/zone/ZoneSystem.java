@@ -15,6 +15,7 @@ import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.content.zone.ZoneMeCommand;
 import com.skelril.skree.content.zone.global.cursedmine.CursedMineManager;
 import com.skelril.skree.content.zone.global.templeoffate.TempleOfFateManager;
+import com.skelril.skree.content.zone.global.theforge.TheForgeConfig;
 import com.skelril.skree.content.zone.global.theforge.TheForgeManager;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsManager;
 import com.skelril.skree.content.zone.group.desmiredungeon.DesmireDungeonManager;
@@ -35,7 +36,10 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
+import java.io.IOException;
 import java.util.Optional;
+
+import static com.skelril.skree.system.ConfigLoader.loadConfig;
 
 @NModule(name = "Zone System")
 public class ZoneSystem implements ServiceProvider<ZoneService> {
@@ -53,7 +57,11 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
 
       service.registerManager(new CursedMineManager());
       service.registerManager(new TempleOfFateManager());
-      service.registerManager(new TheForgeManager());
+      try {
+        service.registerManager(new TheForgeManager(loadConfig("zone/the_forge.json", TheForgeConfig.class)));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
 
       service.registerManager(new CatacombsManager());
       service.registerManager(new DesmireDungeonManager());

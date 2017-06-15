@@ -23,7 +23,11 @@ import java.util.function.Consumer;
 
 public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> implements Runnable, LocationZone<TheForgeInstance> {
 
-  public TheForgeManager() {
+  private final TheForgeConfig config;
+
+  public TheForgeManager(TheForgeConfig config) {
+    this.config = config;
+
     Sponge.getEventManager().registerListeners(
         SkreePlugin.inst(),
         new TheForgeListener(this)
@@ -49,7 +53,7 @@ public class TheForgeManager extends GlobalZoneManager<TheForgeInstance> impleme
     allocator.regionFor(getSystemName(), clause -> {
       ZoneRegion region = clause.getKey();
 
-      TheForgeInstance instance = new TheForgeInstance(region);
+      TheForgeInstance instance = new TheForgeInstance(region, config);
       instance.init();
 
       callback.accept(instance);
