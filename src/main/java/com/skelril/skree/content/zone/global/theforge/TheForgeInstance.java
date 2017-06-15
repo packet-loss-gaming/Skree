@@ -215,7 +215,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
     List<Entity> entities = new ArrayList<>();
 
-    for (int i = Probability.getRandom(getPlayers(PARTICIPANT).size() * 5); i > 0; --i) {
+    for (int i = Probability.getRandom(getPlayers(PARTICIPANT).size() * 15); i > 0; --i) {
       Entity e = getRegion().getExtent().createEntity(Probability.pickOneOf(POSSIBLE_MOBS), getRandomEntryPoint().getPosition());
       if (e instanceof Skeleton) {
         ((Skeleton) e).setItemInHand(HandTypes.MAIN_HAND, newItemStack(ItemTypes.BOW));
