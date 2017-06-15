@@ -7,20 +7,22 @@
 package com.skelril.skree.content.zone.global.theforge;
 
 import com.skelril.nitro.combat.PlayerCombatParser;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
+import com.skelril.nitro.probability.Probability;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Tuple;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class TheForgeListener {
   private final TheForgeManager manager;
@@ -29,11 +31,21 @@ public class TheForgeListener {
     this.manager = manager;
   }
 
-  // Poor man's flight check
-  private boolean isFlying(Player player) {
-    BlockType blockBelow = player.getLocation().add(0, -1, 0).getBlockType();
-    BlockType blockBelowBelow = player.getLocation().add(0, -2, 0).getBlockType();
-    return blockBelow == BlockTypes.AIR && blockBelowBelow == BlockTypes.AIR;
+  @Listener
+  public void onPlayerCombat(DamageEntityEvent event) {
+    Optional<TheForgeInstance> optInst = manager.getApplicableZone(event.getTargetEntity());
+    if (!optInst.isPresent()) {
+      return;
+    }
+
+    new PlayerCombatParser() {
+      @Override
+      public void processPlayerAttack(Player attacker, Living defender) {
+        if (attacker.getLocation().getY() != attacker.getLocation().getBlockY()) {
+          event.setBaseDamage(Probability.getCompoundRandom(event.getBaseDamage(), 4));
+        }
+      }
+    }.parse(event);
   }
 
   @Listener
@@ -51,8 +63,8 @@ public class TheForgeListener {
         }
 
         DamageEntityEvent dEvent = (DamageEntityEvent) event;
-        if (isFlying(defender)) {
-          dEvent.setBaseDamage(dEvent.getBaseDamage() * 3);
+        for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : dEvent.getModifiers()) {
+          dEvent.setDamage(modifier.getFirst(), (a) -> Math.floor(a * .5));
         }
       }
     }.parse(event);
