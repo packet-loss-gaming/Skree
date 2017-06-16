@@ -32,7 +32,7 @@ public class TheForgeListener {
     this.manager = manager;
   }
 
-  private PlayerCombatParser createCombatParser(Event event) {
+  private PlayerCombatParser createCombatParser(Event event, TheForgeInstance inst) {
     return new PlayerCombatParser() {
       @Override
       public void processPlayerAttack(Player attacker, Living defender) {
@@ -49,6 +49,11 @@ public class TheForgeListener {
       @Override
       public void processMonsterAttack(Living attacker, Player defender) {
         if (!(event instanceof DamageEntityEvent)) {
+          return;
+        }
+
+        if (inst.isInvunerable(defender)) {
+          ((DamageEntityEvent) event).setCancelled(true);
           return;
         }
 
@@ -69,7 +74,7 @@ public class TheForgeListener {
       return;
     }
 
-    createCombatParser(event).parse(event);
+    createCombatParser(event, optInst.get()).parse(event);
   }
 
   @Listener
@@ -79,7 +84,7 @@ public class TheForgeListener {
       return;
     }
 
-    createCombatParser(event).parse(event);
+    createCombatParser(event, optInst.get()).parse(event);
   }
 
   @Listener

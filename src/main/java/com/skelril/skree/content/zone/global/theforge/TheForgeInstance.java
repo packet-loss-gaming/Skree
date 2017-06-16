@@ -35,13 +35,12 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
@@ -54,6 +53,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
   private ForgeState state;
 
   private Location<World> centralDropPoint;
+  private Set<UUID> invunerablePlayers = new HashSet<>();
 
   public TheForgeInstance(ZoneRegion region, TheForgeConfig config) {
     super(region);
@@ -79,6 +79,10 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
     remove();
     setUp();
     return true;
+  }
+
+  public boolean isInvunerable(Player player) {
+    return invunerablePlayers.contains(player.getUniqueId());
   }
 
   private Optional<ItemStack> getResultingItemStack(ItemStackSnapshot snapshot) {
@@ -266,7 +270,11 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
   @Override
   public Clause<Player, ZoneStatus> add(Player player) {
-    player.offer(Keys.INVULNERABILITY_TICKS, 20 * 3);
+    invunerablePlayers.add(player.getUniqueId());
+    Task.builder().execute(() -> {
+      invunerablePlayers.remove(player.getUniqueId());
+    }).delay(3, TimeUnit.SECONDS).submit(SkreePlugin.inst());
+
     player.setLocation(getRandomEntryPoint());
 
     return new Clause<>(player, ZoneStatus.ADDED);
