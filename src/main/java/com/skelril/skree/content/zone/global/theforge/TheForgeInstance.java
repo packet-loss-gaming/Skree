@@ -266,6 +266,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
 
   @Override
   public Clause<Player, ZoneStatus> add(Player player) {
+    player.offer(Keys.INVULNERABILITY_TICKS, 20 * 3);
     player.setLocation(getRandomEntryPoint());
 
     return new Clause<>(player, ZoneStatus.ADDED);
