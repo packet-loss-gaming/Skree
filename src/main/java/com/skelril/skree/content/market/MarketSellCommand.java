@@ -21,6 +21,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -84,11 +85,18 @@ public class MarketSellCommand implements CommandExecutor {
 
     List<Clause<ItemStack, Integer>> transactions = MarketImplUtil.removeAtPos(player, changes.getValue());
 
-    if (!service.logTransactionByStack(player.getUniqueId(), transactions)) {
-      // TODO Auto reporting
-      // Not critical, continue
-      src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
-    }
+    Task.builder().execute(() -> {
+      if (!service.logTransactionByStack(player.getUniqueId(), transactions)) {
+        // TODO Auto reporting
+        // Not critical, continue
+        src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to log transactions, please report this!"));
+      }
+
+      // Process new stocks
+      for (Clause<ItemStack, Integer> transaction : transactions) {
+        service.setStock(transaction.getKey(), service.getStock(transaction.getKey()).orElse(0) + -(transaction.getValue()));
+      }
+    }).async().submit(SkreePlugin.inst());
 
     BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
     if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
@@ -97,10 +105,6 @@ public class MarketSellCommand implements CommandExecutor {
       return CommandResult.empty();
     }
 
-    // Process new stocks
-    for (Clause<ItemStack, Integer> transaction : transactions) {
-      service.setStock(transaction.getKey(), service.getStock(transaction.getKey()).orElse(0) + -(transaction.getValue()));
-    }
 
     player.sendMessage(Text.of(TextColors.YELLOW, "Item(s) sold for: ", TextColors.WHITE, MarketImplUtil.format(changes.getKey()), TextColors.YELLOW, "!"));
 
