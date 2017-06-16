@@ -13,18 +13,29 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class HighScoreServiceImpl implements HighScoreService {
-  private LinkedBlockingDeque<HighScoreUpdate> highScoreUpdates = new LinkedBlockingDeque<>();
+  private Lock highScoreLock = new ReentrantLock();
+  private List<HighScoreUpdate> highScoreUpdates = new ArrayList<>();
 
   public HighScoreServiceImpl() {
     Task.builder().execute(() -> {
-      while (!highScoreUpdates.isEmpty()) {
-        highScoreUpdates.poll().process();
+      highScoreLock.lock();
+
+      List<HighScoreUpdate> scoresToUpdate;
+      try {
+        scoresToUpdate = highScoreUpdates;
+        highScoreUpdates = new ArrayList<>();
+      } finally {
+        highScoreLock.unlock();
       }
+
+      scoresToUpdate.forEach(HighScoreUpdate::process);
     }).intervalTicks(20).async().submit(SkreePlugin.inst());
   }
 
@@ -33,9 +44,18 @@ public class HighScoreServiceImpl implements HighScoreService {
     return HighScoreDatabaseUtil.get(player.getUniqueId(), scoreType);
   }
 
+  private void queueUpdate(HighScoreUpdate update) {
+    highScoreLock.lock();
+    try {
+      highScoreUpdates.add(update);
+    } finally {
+      highScoreLock.unlock();
+    }
+  }
+
   @Override
   public void update(Player player, ScoreType scoreType, int value) {
-    highScoreUpdates.add(new HighScoreUpdate(player.getUniqueId(), scoreType, value));
+    queueUpdate(new HighScoreUpdate(player.getUniqueId(), scoreType, value));
   }
 
   @Override
