@@ -11,12 +11,15 @@ import com.skelril.nitro.Clause;
 import com.skelril.skree.service.RespawnService;
 import com.skelril.skree.service.internal.zone.*;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.arrow.Arrow;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -53,9 +56,19 @@ public abstract class LegacyZoneBase implements Zone {
     return region;
   }
 
+  public Collection<GameMode> getParticipantGameModes() {
+    return Lists.newArrayList(GameModes.SURVIVAL);
+  }
+
   @Override
   public Collection<Player> getPlayers(PlayerClassifier classifier) {
-    return Sponge.getServer().getOnlinePlayers().stream().filter(this::contains).collect(Collectors.toList());
+    return Sponge.getServer().getOnlinePlayers().stream().filter(this::contains).filter((player) -> {
+      if (classifier == PlayerClassifier.PARTICIPANT) {
+        GameMode playerGameMode = player.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
+        return getParticipantGameModes().contains(playerGameMode);
+      }
+      return true;
+    }).collect(Collectors.toList());
   }
 
   public Collection<Entity> getContained() {
