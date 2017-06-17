@@ -23,7 +23,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.CollideEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -34,11 +34,9 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.explosion.Explosion;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
@@ -89,8 +87,8 @@ public class PatientXListener {
       double ratio = event.getBaseDamage() / 49;
 
       // Nullify all modifiers
-      for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-        event.setDamage(modifier.getFirst(), (a) -> 0D);
+      for (DamageFunction modifier : event.getModifiers()) {
+        event.setDamage(modifier.getModifier(), (a) -> 0D);
       }
 
       event.setBaseDamage(ratio * inst.getDifficulty());

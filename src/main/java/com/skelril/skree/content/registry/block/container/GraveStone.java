@@ -6,6 +6,7 @@
 
 package com.skelril.skree.content.registry.block.container;
 
+import com.skelril.nitro.item.ItemDropper;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
@@ -17,7 +18,6 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
@@ -30,6 +30,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
@@ -81,8 +82,9 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
   }
 
   @Override
-  public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-    return this.getDefaultState().withProperty(FACING_PROP, placer.getHorizontalFacing());
+  public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, net.minecraft.item.ItemStack stack) {
+    state = state.withProperty(FACING_PROP, placer.getHorizontalFacing());
+    worldIn.setBlockState(pos, state);
   }
 
   @Override
@@ -141,12 +143,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
   public void createGraveDropExcess(List<ItemStack> items, Location<org.spongepowered.api.world.World> pos) {
     List<ItemStack> excess = createGrave(items, pos);
-    World world = (World) pos.getExtent();
-    for (ItemStack stack : excess) {
-      world.spawnEntityInWorld(
-          new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), tf(stack))
-      );
-    }
+    new ItemDropper(pos).dropStacks(excess, SpawnTypes.PLUGIN);
   }
 
   public void createGraveFromDeath(Player player) {

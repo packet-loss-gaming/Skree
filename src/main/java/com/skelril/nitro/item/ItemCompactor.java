@@ -32,7 +32,7 @@ public class ItemCompactor {
       for (int k = 0; k < valueMappings.size(); ++k) {
         Optional<BigInteger> value = valueMappings.get(k).getValue(stack);
         if (value.isPresent()) {
-          output[i] = null;
+          output[i] = ItemStack.empty();
           countBuckets[k] += input[i].getQuantity();
           pointBuckets[k] = pointBuckets[k].add(value.get());
           break;
@@ -62,7 +62,7 @@ public class ItemCompactor {
           break;
         }
 
-        if (output[i] == null) {
+        if (output[i] == ItemStack.empty()) {
           output[i] = collectedStacks.poll();
         }
       }

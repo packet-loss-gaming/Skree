@@ -32,7 +32,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
@@ -46,7 +46,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -160,8 +159,8 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
       DamageEntityEvent event = condition.getEvent();
 
       // Nullify all modifiers
-      for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : event.getModifiers()) {
-        event.setDamage(modifier.getFirst(), (a) -> a);
+      for (DamageFunction modifier : event.getModifiers()) {
+        event.setDamage(modifier.getModifier(), (a) -> a);
       }
 
       event.setBaseDamage(inst.getDifficulty() * config.baseBossHit);

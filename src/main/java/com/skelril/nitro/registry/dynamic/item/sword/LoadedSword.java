@@ -44,8 +44,8 @@ class LoadedSword extends ItemSword {
     Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
     if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", config.getHitPower() - 1, 0));
-      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", config.getAttackSpeed(), 0));
+      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", config.getHitPower() - 1, 0));
+      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", config.getAttackSpeed(), 0));
     }
 
     return multimap;

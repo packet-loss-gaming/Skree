@@ -11,6 +11,7 @@ import com.skelril.skree.service.ZoneService;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -30,31 +31,31 @@ public class ZoneItemUtil {
   }
 
   public static void purgeZoneItems(EntityPlayer player, @Nullable ItemStack activating) {
-    ItemStack[] itemStacks = player.inventory.mainInventory;
-    for (int i = 0; i < itemStacks.length; ++i) {
-      if (isZoneItem(itemStacks[i])) {
-        if (isZoneMasterItem(itemStacks[i])) {
+    NonNullList<ItemStack> itemStacks = player.inventory.mainInventory;
+    for (int i = 0; i < itemStacks.size(); ++i) {
+      if (isZoneItem(itemStacks.get(i))) {
+        if (isZoneMasterItem(itemStacks.get(i))) {
           // Check to see if this is the activating item, if so remove it
-          if (activating != null && hasSameZoneID(itemStacks[i], activating)) {
-            itemStacks[i] = null;
+          if (activating != null && hasSameZoneID(itemStacks.get(i), activating)) {
+            itemStacks.set(i, ItemStack.EMPTY);
             continue;
           }
 
           // Close groups for master orbs carried by other players
-          if (isAttuned(itemStacks[i])) {
-            rescindGroupInvite(itemStacks[i]);
+          if (isAttuned(itemStacks.get(i))) {
+            rescindGroupInvite(itemStacks.get(i));
             ItemStack reset = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
-            setMasterToZone(reset, getZone(itemStacks[i]).get());
-            itemStacks[i] = reset;
+            setMasterToZone(reset, getZone(itemStacks.get(i)).get());
+            itemStacks.set(i, reset);
           }
 
           continue;
-        } else if (isZoneSlaveItem(itemStacks[i])) {
-          if (activating == null || !hasSameZoneID(itemStacks[i], activating)) {
-            notifyGroupOwner(itemStacks[i], (Player) player, false);
+        } else if (isZoneSlaveItem(itemStacks.get(i))) {
+          if (activating == null || !hasSameZoneID(itemStacks.get(i), activating)) {
+            notifyGroupOwner(itemStacks.get(i), (Player) player, false);
           }
         }
-        itemStacks[i] = null;
+        itemStacks.set(i, ItemStack.EMPTY);
       }
     }
     player.inventoryContainer.detectAndSendChanges();
@@ -84,7 +85,7 @@ public class ZoneItemUtil {
   }
 
   private static boolean incrementCount(ItemStack slaveStack, Player player) {
-    ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+    NonNullList<ItemStack> itemStacks = tf(player).inventory.mainInventory;
     for (ItemStack itemStack : itemStacks) {
       if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
         incrementCount(itemStack);
@@ -95,7 +96,7 @@ public class ZoneItemUtil {
   }
 
   private static boolean decrementCount(ItemStack slaveStack, Player player) {
-    ItemStack[] itemStacks = tf(player).inventory.mainInventory;
+    NonNullList<ItemStack> itemStacks = tf(player).inventory.mainInventory;
     for (ItemStack itemStack : itemStacks) {
       if (isZoneMasterItem(itemStack) && hasSameZoneID(slaveStack, itemStack)) {
         decrementCount(itemStack);
@@ -118,15 +119,15 @@ public class ZoneItemUtil {
   public static void rescindGroupInvite(ItemStack stack) {
     Optional<String> zone = getZone(stack);
     for (Player aPlayer : Sponge.getServer().getOnlinePlayers()) {
-      ItemStack[] itemStacks = tf(aPlayer).inventory.mainInventory;
-      for (int i = 0; i < itemStacks.length; ++i) {
-        if (hasSameZoneID(stack, itemStacks[i]) && isZoneSlaveItem(stack)) {
+      NonNullList<ItemStack> itemStacks = tf(aPlayer).inventory.mainInventory;
+      for (int i = 0; i < itemStacks.size(); ++i) {
+        if (hasSameZoneID(stack, itemStacks.get(i)) && isZoneSlaveItem(stack)) {
           if (!zone.isPresent()) {
             aPlayer.sendMessage(Text.of(TextColors.RED, "A group you were invited to has been destroyed."));
           } else {
             aPlayer.sendMessage(Text.of(TextColors.RED, "A " + zone.get() + " group you were invited to has been destroyed."));
           }
-          itemStacks[i] = null;
+          itemStacks.set(i, null);
         }
       }
       tf(aPlayer).inventoryContainer.detectAndSendChanges();
@@ -139,7 +140,7 @@ public class ZoneItemUtil {
 
   public static boolean playerAlreadyHasInvite(ItemStack stack, Player target) {
     UUID zoneID = getZoneID(stack).orElseThrow(() -> new IllegalArgumentException("Illegal zone ItemStack"));
-    ItemStack[] inv = tf(target).inventory.mainInventory;
+    NonNullList<ItemStack> inv = tf(target).inventory.mainInventory;
     for (ItemStack aStack : inv) {
       Optional<UUID> optZoneID = getZoneID(aStack);
       if (optZoneID.isPresent()) {

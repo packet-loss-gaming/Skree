@@ -79,7 +79,7 @@ public class JungleRaidEffectProcessor {
       teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
       teamHood.offer(Keys.COLOR, Color.BLACK);
       // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-      tf(player).inventory.armorInventory[3] = tf(teamHood);
+      tf(player).inventory.armorInventory.set(3, tf(teamHood));
     }
 
     for (Player player : players) {

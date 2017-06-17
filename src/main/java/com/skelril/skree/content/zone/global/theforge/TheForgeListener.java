@@ -13,17 +13,15 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Tuple;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 public class TheForgeListener {
   private final TheForgeManager manager;
@@ -59,8 +57,8 @@ public class TheForgeListener {
 
         if (Probability.getChance(5)) {
           DamageEntityEvent dEvent = (DamageEntityEvent) event;
-          for (Tuple<DamageModifier, Function<? super Double, Double>> modifier : dEvent.getModifiers()) {
-            dEvent.setDamage(modifier.getFirst(), (a) -> 0D);
+          for (DamageFunction modifier : dEvent.getModifiers()) {
+            dEvent.setDamage(modifier.getModifier(), (a) -> 0D);
           }
         }
       }

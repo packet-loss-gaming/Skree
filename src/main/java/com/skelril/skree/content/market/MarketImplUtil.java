@@ -16,6 +16,7 @@ import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.MarketService;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -91,15 +92,15 @@ public class MarketImplUtil {
         break;
       case EVERYTHING:
         min = 0;
-        max = playerEnt.inventory.mainInventory.length;
+        max = playerEnt.inventory.mainInventory.size();
         break;
       default:
         throw new IllegalArgumentException("Invalid query mode provided!");
     }
 
     for (int i = min; i < max; ++i) {
-      net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory[i];
-      if (stack == null) {
+      net.minecraft.item.ItemStack stack = playerEnt.inventory.mainInventory.get(i);
+      if (stack == net.minecraft.item.ItemStack.EMPTY) {
         continue;
       }
 
@@ -119,7 +120,7 @@ public class MarketImplUtil {
         BigDecimal unitPrice = optPrice.get().multiply(new BigDecimal(percentageSale));
         unitPrice = unitPrice.multiply(service.getSellFactor(unitPrice));
 
-        totalPrice = totalPrice.add(unitPrice.multiply(new BigDecimal(stack.stackSize)));
+        totalPrice = totalPrice.add(unitPrice.multiply(new BigDecimal(stack.getCount())));
         ints.add(i);
       }
     }
@@ -129,44 +130,44 @@ public class MarketImplUtil {
 
   public static List<Clause<ItemStack, Integer>> removeAtPos(Player player, List<Integer> ints) {
     EntityPlayer playerEnt = tf(player);
-    net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+    NonNullList<net.minecraft.item.ItemStack> mainInv = playerEnt.inventory.mainInventory;
     List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(ints.size());
     for (int i : ints) {
       Clause<ItemStack, Integer> existingTransaction = null;
       for (Clause<ItemStack, Integer> transaction : transactions) {
-        if (ItemComparisonUtil.isSimilar(transaction.getKey(), tf(mainInv[i]))) {
+        if (ItemComparisonUtil.isSimilar(transaction.getKey(), tf(mainInv.get(i)))) {
           existingTransaction = transaction;
           break;
         }
       }
 
       if (existingTransaction != null) {
-        existingTransaction.setValue(existingTransaction.getValue() + -(mainInv[i].stackSize));
+        existingTransaction.setValue(existingTransaction.getValue() + -(mainInv.get(i).getCount()));
       } else {
-        transactions.add(new Clause<>(tf(mainInv[i]), -(mainInv[i].stackSize)));
+        transactions.add(new Clause<>(tf(mainInv.get(i)), -(mainInv.get(i).getCount())));
       }
 
-      mainInv[i] = null;
+      mainInv.set(i, net.minecraft.item.ItemStack.EMPTY);
     }
     return transactions;
   }
 
   public static boolean setBalanceTo(Player player, BigDecimal decimal, Cause cause) {
     EntityPlayer playerEnt = tf(player);
-    net.minecraft.item.ItemStack[] mainInv = playerEnt.inventory.mainInventory;
+    NonNullList<net.minecraft.item.ItemStack> mainInv = playerEnt.inventory.mainInventory;
 
     Collection<ItemStack> results = CofferValueMap.inst().satisfy(decimal.toBigInteger());
     Iterator<ItemStack> resultIt = results.iterator();
 
     // Loop through replacing empty slots and the old coffers with the new balance
-    for (int i = 0; i < mainInv.length; ++i) {
-      Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(mainInv[i])));
+    for (int i = 0; i < mainInv.size(); ++i) {
+      Optional<BigInteger> value = CofferValueMap.inst().getValue(Lists.newArrayList(tf(mainInv.get(i))));
       if (value.isPresent()) {
-        mainInv[i] = null;
+        mainInv.set(i, net.minecraft.item.ItemStack.EMPTY);
       }
 
-      if (mainInv[i] == null && resultIt.hasNext()) {
-        mainInv[i] = tf(resultIt.next());
+      if (mainInv.get(i) == net.minecraft.item.ItemStack.EMPTY && resultIt.hasNext()) {
+        mainInv.set(i, tf(resultIt.next()));
         resultIt.remove();
       }
     }

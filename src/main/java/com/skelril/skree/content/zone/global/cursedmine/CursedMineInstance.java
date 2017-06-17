@@ -65,7 +65,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
 
 public class CursedMineInstance extends LegacyZoneBase implements Runnable {
@@ -436,7 +435,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
           case 4:
             player.sendMessage(Text.of(TextColors.RED, "Simon says pick up sticks."));
             List<ItemStack> sticks = new ArrayList<>();
-            for (int i = 0; i < tf(player).inventory.mainInventory.length * 1.5; i++) {
+            for (int i = 0; i < player.getInventory().size() * 1.5; i++) {
               sticks.add(newItemStack(ItemTypes.STICK, 64));
             }
             new ItemDropper(player.getLocation()).dropStacks(sticks, SpawnTypes.DROPPED_ITEM);

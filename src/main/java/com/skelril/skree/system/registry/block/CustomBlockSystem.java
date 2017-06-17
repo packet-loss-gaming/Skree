@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 
@@ -68,8 +69,14 @@ public class CustomBlockSystem {
   private void register(Object block) {
     if (block instanceof Block && block instanceof ICustomBlock) {
       ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+      ((Block) block).setRegistryName("skree:" + ((ICustomBlock) block).__getID());
 
-      GameRegistry.registerBlock((Block) block, ((ICustomBlock) block).__getID());
+      GameRegistry.register((Block) block);
+
+      ItemBlock itemBlock = new ItemBlock((Block) block);
+      itemBlock.setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+      itemBlock.setRegistryName("skree:" + ((ICustomBlock) block).__getID());
+      GameRegistry.register(itemBlock);
 
       // Add selective hooks
       if (block instanceof EventAwareContent) {

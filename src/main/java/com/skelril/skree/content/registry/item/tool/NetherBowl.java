@@ -78,9 +78,10 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, net.minecraft.world.World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(net.minecraft.world.World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+    ItemStack itemStackIn = playerIn.getHeldItem(handIn);
     if (getDestination(itemStackIn).isPresent()) {
-      playerIn.setActiveHand(hand);
+      playerIn.setActiveHand(handIn);
       return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
     } else {
       return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);

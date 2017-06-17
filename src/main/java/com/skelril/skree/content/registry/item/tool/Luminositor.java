@@ -61,7 +61,7 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
         }
 
         Location<World> targetBlockLoc = optTargetBlockLoc.get();
-        Vector3i targPos = targetBlockLoc.getBlockPosition().add(dir.toVector3d().toInt());
+        Vector3i targPos = targetBlockLoc.getBlockPosition().add(dir.asBlockOffset());
         Location<World> trueTargBlock = new Location<>(targetBlockLoc.getExtent(), targPos);
 
         int lightLevel = LightLevelUtil.getMaxLightLevel(trueTargBlock).get();

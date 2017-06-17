@@ -14,6 +14,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -86,7 +88,7 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
 
   Multimap<String, AttributeModifier> __superGetItemAttributeModifiers(EntityEquipmentSlot equipmentSlot);
 
-  int __superGetHarvestLevel(ItemStack stack, String toolClass);
+  int __superGetHarvestLevel(ItemStack stack, String toolClass, @Nullable EntityPlayer player, @Nullable IBlockState blockState);
 
   Set<String> __superGetToolClasses(ItemStack stack);
 
@@ -161,8 +163,8 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
     Multimap<String, AttributeModifier> multimap = __superGetItemAttributeModifiers(equipmentSlot);
 
     if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", __getHitPower(), 0));
-      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", __getAttackSpeed(), 0));
+      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", __getHitPower(), 0));
+      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", __getAttackSpeed(), 0));
     }
 
     return multimap;
@@ -170,8 +172,8 @@ public interface ICustomTool extends ICustomItem, DegradableItem {
 
   // Modified Forge ItemTool methods
 
-  default int getHarvestLevel(ItemStack stack, String toolClass) {
-    int level = __superGetHarvestLevel(stack, toolClass);
+  default int getHarvestLevel(ItemStack stack, String toolClass, @Nullable EntityPlayer player, @Nullable IBlockState blockState) {
+    int level = __superGetHarvestLevel(stack, toolClass, player, blockState);
     if (level == -1 && toolClass != null && toolClass.equals(__getToolClass())) {
       return __getHarvestTier().getHarvestLevel();
     } else {

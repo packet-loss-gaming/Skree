@@ -143,7 +143,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
     Location<World> starting = state.getLocation().get();
     int i;
     for (i = 0; i < maxDist; ++i) {
-      starting = starting.add(dir.toVector3d());
+      starting = starting.add(dir.asOffset());
       if (starting.getBlockType() != state.getState().getType()) {
         break;
       }

@@ -14,6 +14,7 @@ import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.currency.CofferValueMap;
 import com.skelril.skree.content.registry.item.generic.*;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -59,7 +60,8 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
       return;
     }
 
-    net.minecraft.item.ItemStack[] pInv = tf(player).inventory.mainInventory;
+    NonNullList<net.minecraft.item.ItemStack> pInv = tf(player).inventory.mainInventory;
+    //noinspection SuspiciousToArrayCall
     Optional<ItemStack[]> optCompacted = new ItemCompactor(ImmutableList.of(
         CoalValueMap.inst(),
         IronValueMap.inst(),
@@ -69,13 +71,13 @@ public class ScrollOfSummation extends CustomItem implements EventAwareContent {
         DiamondValueMap.inst(),
         EmeraldValueMap.inst(),
         CofferValueMap.inst()
-    )).execute((ItemStack[]) (Object[]) pInv);
+    )).execute(pInv.toArray(new ItemStack[pInv.size()]));
 
     if (optCompacted.isPresent()) {
       Task.builder().execute(() -> {
         ItemStack[] nInv = optCompacted.get();
-        for (int i = 0; i < pInv.length; ++i) {
-          pInv[i] = tf(nInv[i]);
+        for (int i = 0; i < pInv.size(); ++i) {
+          pInv.set(i, tf(nInv[i]));
         }
         tf(player).inventoryContainer.detectAndSendChanges();
         tf(player).inventory.decrStackSize(tf(player).inventory.currentItem, 1);

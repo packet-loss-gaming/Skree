@@ -7,6 +7,7 @@
 package com.skelril.skree.system.world;
 
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
@@ -36,6 +37,7 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @NModule(name = "World System")
 public class WorldSystem implements ServiceProvider<WorldService> {
@@ -80,13 +82,15 @@ public class WorldSystem implements ServiceProvider<WorldService> {
 
     String dimensionName = archetypeConfig.getDimension();
     DimensionType dimension = registry.getType(DimensionType.class, dimensionName).orElseThrow((Supplier<Throwable>) () -> {
-      return new RuntimeException("No dimension type: " + dimensionName);
+      List<String> valid = registry.getAllOf(DimensionType.class).stream().map(DimensionType::getId).collect(Collectors.toList());
+      return new RuntimeException("No dimension type: " + dimensionName + "; Valid dimension types: " + Joiner.on(", ").join(valid));
     });
     archeTypeBuilder.dimension(dimension);
 
     String generatorName = archetypeConfig.getGenerator();
     GeneratorType generator = registry.getType(GeneratorType.class, generatorName).orElseThrow((Supplier<Throwable>) () -> {
-      return new RuntimeException("No generator type: " + generatorName);
+      List<String> valid = registry.getAllOf(GeneratorType.class).stream().map(GeneratorType::getId).collect(Collectors.toList());
+      return new RuntimeException("No generator type: " + generatorName + "; Valid generator types: " + Joiner.on(", ").join(valid));
     });
     archeTypeBuilder.generator(generator);
 
