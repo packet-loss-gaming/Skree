@@ -75,7 +75,7 @@ class HighScoreDatabaseUtil {
     try (Connection con = SQLHandle.getConnection()) {
       DSLContext create = DSL.using(con);
       create.insertInto(HIGH_SCORES).columns(HIGH_SCORES.PLAYER_ID, HIGH_SCORES.SCORE_TYPE_ID, HIGH_SCORES.VALUE)
-          .values(create.select(PLAYERS.ID).from(PLAYERS).where(PLAYERS.UUID.equal(playerId.toString())).fetchOne().value1(), scoreType.getId(), amt)
+          .values(create.select(PLAYERS.ID).from(PLAYERS).where(PLAYERS.UUID.equal(playerId.toString())).asField(), DSL.val(scoreType.getId()), DSL.value(amt))
           .onDuplicateKeyUpdate()
           .set(HIGH_SCORES.VALUE, HIGH_SCORES.VALUE.add(amt))
           .execute();
@@ -88,7 +88,7 @@ class HighScoreDatabaseUtil {
     try (Connection con = SQLHandle.getConnection()) {
       DSLContext create = DSL.using(con);
       create.insertInto(HIGH_SCORES).columns(HIGH_SCORES.PLAYER_ID, HIGH_SCORES.SCORE_TYPE_ID, HIGH_SCORES.VALUE)
-          .values(create.select(PLAYERS.ID).from(PLAYERS).where(PLAYERS.UUID.equal(playerId.toString())).fetchOne().value1(), scoreType.getId(), value)
+          .values(create.select(PLAYERS.ID).from(PLAYERS).where(PLAYERS.UUID.equal(playerId.toString())).asField(), DSL.val(scoreType.getId()), DSL.value(value))
           .onDuplicateKeyUpdate()
           .set(HIGH_SCORES.VALUE, value)
           .execute();
