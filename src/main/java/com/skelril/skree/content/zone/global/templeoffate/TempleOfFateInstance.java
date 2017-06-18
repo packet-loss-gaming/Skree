@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 import static com.skelril.skree.service.internal.zone.PlayerClassifier.PARTICIPANT;
@@ -122,13 +123,7 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
   }
 
   private void outOfBoundsCheck() {
-    for (Player player : getPlayers(PARTICIPANT)) {
-      if (contains(player)) {
-        continue;
-      }
-
-      remove(player);
-    }
+    getPlayers(PARTICIPANT).stream().filter(p -> !contains(p)).collect(Collectors.toList()).forEach(this::remove);
   }
 
   private void feedPlayers() {
