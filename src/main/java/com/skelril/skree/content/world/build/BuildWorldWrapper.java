@@ -15,10 +15,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.HorseVariants;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.animal.Horse;
+import org.spongepowered.api.entity.living.animal.SkeletonHorse;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Egg;
@@ -103,7 +101,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
         return;
       }
 
-      if (entity instanceof Monster || (entity instanceof Horse && entity.get(Keys.HORSE_VARIANT).get().equals(HorseVariants.SKELETON_HORSE))) {
+      if (entity instanceof Monster || (entity instanceof SkeletonHorse)) {
         event.setCancelled(true);
         return;
       }
