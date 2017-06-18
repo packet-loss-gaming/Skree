@@ -147,6 +147,7 @@ public class WorldSystem implements ServiceProvider<WorldService> {
       return new RuntimeException("No world archetype: " + archetypeName);
     });
     optTargetWorld = service.loadWorld(worldName, archetype);
+    service.registerWorld(worldName);
     return optTargetWorld.get();
   }
 
