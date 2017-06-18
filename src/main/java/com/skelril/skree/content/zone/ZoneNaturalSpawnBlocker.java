@@ -6,8 +6,11 @@
 
 package com.skelril.skree.content.zone;
 
+import com.google.common.collect.Lists;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.ExperienceOrb;
+import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
@@ -18,6 +21,7 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -26,22 +30,32 @@ public class ZoneNaturalSpawnBlocker<T> extends ZoneApplicableListener<T> {
     super(applicabilityFunct);
   }
 
+  private static List<Class<? extends Entity>> LEGAL_ENTITY_CLASSES = Lists.newArrayList(
+      ExperienceOrb.class, PrimedTNT.class, Projectile.class, Item.class
+  );
+
+  private static boolean isLegalSpawn(Entity entity) {
+    boolean legalSpawn = false;
+
+    for (Class<? extends Entity> clazz : LEGAL_ENTITY_CLASSES) {
+      if (clazz.isInstance(entity)) {
+        legalSpawn = true;
+      }
+    }
+
+    return legalSpawn;
+  }
+
   @Listener
   public void onEntitySpawn(SpawnEntityEvent event, @First SpawnCause spawnCause) {
     for (Entity entity : event.getEntities()) {
       if (isApplicable(entity)) {
         SpawnType spawnType = spawnCause.getType();
-        if (spawnType == SpawnTypes.CUSTOM || spawnType == SpawnTypes.WORLD_SPAWNER) {
-          /* SpongeCommon/679 */
-          if (entity.getType() != EntityTypes.EXPERIENCE_ORB && entity.getType() != EntityTypes.PRIMED_TNT && !(entity instanceof Projectile)) {
-            event.setCancelled(true);
-          }
-        }
 
-        /* SpongeCommon/584 */
-        if (spawnType == SpawnTypes.DROPPED_ITEM && entity.getType() == EntityTypes.ZOMBIE) {
+        if (spawnType != SpawnTypes.PLUGIN && !isLegalSpawn(entity)) {
           event.setCancelled(true);
         }
+
         break;
       }
     }
