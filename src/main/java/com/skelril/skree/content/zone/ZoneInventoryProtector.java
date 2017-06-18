@@ -6,13 +6,13 @@
 
 package com.skelril.skree.content.zone;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
+import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
-import org.spongepowered.api.event.filter.cause.Named;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -25,14 +25,19 @@ public class ZoneInventoryProtector<T> extends ZoneApplicableListener<T> {
   }
 
   @Listener
-  public void onItemSpawn(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
-    Entity entity = spawnCause.getEntity();
-    if (entity.getType() != EntityTypes.PLAYER) {
+  public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player player) {
+    if (!isApplicable(player)) {
       return;
     }
 
-    if (isApplicable(entity.getLocation())) {
-      event.setCancelled(true);
+    PlayerStateService service = Sponge.getServiceManager().provideUnchecked(PlayerStateService.class);
+    try {
+      service.storeInventory(player);
+      service.releaseInventory(player);
+
+      player.getInventory().clear();
+    } catch (InventoryStorageStateException e) {
+      e.printStackTrace();
     }
   }
 }
