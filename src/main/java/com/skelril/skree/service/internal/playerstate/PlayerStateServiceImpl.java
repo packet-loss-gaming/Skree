@@ -9,6 +9,7 @@ package com.skelril.skree.service.internal.playerstate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.skelril.nitro.entity.EntityHealthUtil;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.PlayerStateService;
 import org.spongepowered.api.Sponge;
@@ -211,7 +212,7 @@ public class PlayerStateServiceImpl implements PlayerStateService {
   @Listener(order = Order.LAST)
   public void onPlayerLogin(ClientConnectionEvent.Join event) {
     Player player = event.getTargetEntity();
-    if (hasReleasedInventoryStored(player)) {
+    if (hasReleasedInventoryStored(player) && EntityHealthUtil.getHealth(player) > 0) {
       try {
         loadInventory(player);
       } catch (InventoryStorageStateException e) {
