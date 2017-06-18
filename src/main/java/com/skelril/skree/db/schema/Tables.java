@@ -48,6 +48,11 @@ public class Tables {
 	public static final Players PLAYERS = com.skelril.skree.db.schema.tables.Players.PLAYERS;
 
 	/**
+	 * The table mc_db.portals
+	 */
+	public static final Portals PORTALS = com.skelril.skree.db.schema.tables.Portals.PORTALS;
+
+	/**
 	 * The table mc_db.regions
 	 */
 	public static final Regions REGIONS = com.skelril.skree.db.schema.tables.Regions.REGIONS;

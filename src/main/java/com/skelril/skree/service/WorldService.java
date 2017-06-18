@@ -7,6 +7,8 @@
 package com.skelril.skree.service;
 
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 
@@ -27,4 +29,6 @@ public interface WorldService {
   Optional<World> loadVanillaMapFromDisk(String name);
 
   void registerWorld(String name);
+
+  Location<World> getWorldEntryPoint(Player player, World world);
 }

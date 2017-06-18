@@ -16,7 +16,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -59,7 +58,7 @@ public class WorldCommand implements CommandExecutor {
       return CommandResult.empty();
     }
 
-    Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Entity) src, optWorld.get().getSpawnLocation());
+    Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Player) src, service.getWorldEntryPoint((Player) src, world));
     if (optLoc.isPresent()) {
       src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
     } else if (args.hasAny("f")) {

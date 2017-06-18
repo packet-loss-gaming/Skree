@@ -6,6 +6,8 @@
 
 package com.skelril.skree.service.internal.world;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -38,6 +40,11 @@ public class WorldEffectWrapperImpl implements WorldEffectWrapper {
   @Override
   public void addWorld(World world) {
     worlds.add(world);
+  }
+
+  @Override
+  public Location<World> getPlayerEntryPoint(Player player, World world) {
+    return world.getSpawnLocation();
   }
 
   @Override

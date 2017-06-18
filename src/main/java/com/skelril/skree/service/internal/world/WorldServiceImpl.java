@@ -86,6 +86,12 @@ public class WorldServiceImpl implements WorldService {
     }
   }
 
+  @Override
+  public Location<World> getWorldEntryPoint(Player player, World world) {
+    Optional<WorldEffectWrapper> optWrapper = getEffectWrapperFor(world);
+    return optWrapper.map(wrapper -> wrapper.getPlayerEntryPoint(player, world)).orElseGet(world::getSpawnLocation);
+  }
+
   private Map<UUID, Long> lastPlayerLogin = new HashMap<>();
 
   @Listener(order = Order.PRE)

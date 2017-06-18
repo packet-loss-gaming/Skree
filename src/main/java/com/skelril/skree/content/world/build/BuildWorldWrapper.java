@@ -9,13 +9,16 @@ package com.skelril.skree.content.world.build;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.combat.PlayerCombatParser;
 import com.skelril.nitro.item.ItemDropper;
+import com.skelril.skree.content.world.main.MainWorldWrapper;
 import com.skelril.skree.service.PvPService;
+import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapperImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.animal.SkeletonHorse;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
@@ -28,10 +31,8 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.event.entity.CollideEntityEvent;
-import org.spongepowered.api.event.entity.ConstructEntityEvent;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.*;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
@@ -65,6 +66,11 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
   public void addWorld(World world) {
     super.addWorld(world);
     tf(world).setAllowedSpawnTypes(false, true);
+  }
+
+  @Override
+  public Location<World> getPlayerEntryPoint(Player player, World world) {
+    return PortalWrapper.getPreviousPortal(player, world).orElse(super.getPlayerEntryPoint(player, world));
   }
 
   @Listener
@@ -193,5 +199,21 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
     }
 
     event.getEntities().clear();
+  }
+
+  private Location<World> getExitDestination() {
+    WorldService service = Sponge.getServiceManager().provideUnchecked(WorldService.class);
+    return service.getEffectWrapper(MainWorldWrapper.class).get().getPrimaryWorld().getSpawnLocation();
+  }
+
+  @Listener
+  public void onPlayerPortal(MoveEntityEvent.Teleport.Portal event, @Getter(value = "getTargetEntity") Player player) {
+    Location<World> fromLocation = event.getFromTransform().getLocation();
+    if (isApplicable(fromLocation)) {
+      PortalWrapper.writePortalUpdate(player, fromLocation);
+
+      event.setUsePortalAgent(false);
+      event.setToTransform(new Transform<>(getExitDestination()));
+    }
   }
 }
