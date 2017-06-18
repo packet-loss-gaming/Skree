@@ -58,11 +58,18 @@ public class WorldCommand implements CommandExecutor {
       return CommandResult.empty();
     }
 
-    Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Player) src, service.getWorldEntryPoint((Player) src, world));
+    Location<World> targetLocation;
+    if (args.hasAny("s")) {
+      targetLocation = world.getSpawnLocation();
+    } else {
+      targetLocation = service.getWorldEntryPoint((Player) src, world);
+    }
+
+    Optional<Location<World>> optLoc = SafeTeleportHelper.teleport((Player) src, targetLocation);
     if (optLoc.isPresent()) {
       src.sendMessage(Text.of(TextColors.YELLOW, "Entered world: " + world.getName() + " successfully!"));
     } else if (args.hasAny("f")) {
-      ((Player) src).setLocation(optWorld.get().getSpawnLocation());
+      ((Player) src).setLocation(targetLocation);
       src.sendMessage(Text.of(TextColors.YELLOW, "Force entered world: " + world.getName() + " successfully!"));
     } else {
       src.sendMessage(Text.of(TextColors.YELLOW, "Failed to enter " + world.getName() + " please report this!"));
@@ -74,7 +81,7 @@ public class WorldCommand implements CommandExecutor {
   public static CommandSpec aquireSpec() {
     return CommandSpec.builder()
         .description(Text.of("Teleport to a different world"))
-        .arguments(flags().flag("f").buildWith(optional(onlyOne(world(Text.of("world"))))))
+        .arguments(flags().flag("f").flag("s").buildWith(optional(onlyOne(world(Text.of("world"))))))
         .executor(new WorldCommand()).build();
   }
 }
