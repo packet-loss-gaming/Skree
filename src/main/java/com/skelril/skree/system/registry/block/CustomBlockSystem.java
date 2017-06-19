@@ -12,6 +12,8 @@ import com.skelril.nitro.registry.item.CookedItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
+import com.skelril.skree.content.registry.block.container.GraveStone;
+import com.skelril.skree.content.registry.block.container.GraveStoneTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
@@ -81,6 +83,10 @@ public class CustomBlockSystem {
       // Add selective hooks
       if (block instanceof EventAwareContent) {
         Sponge.getEventManager().registerListeners(SkreePlugin.inst(), block);
+      }
+
+      if (block instanceof GraveStone) {
+        GameRegistry.registerTileEntity(GraveStoneTileEntity.class, "skree:grave_stone_ent");
       }
     } else {
       throw new IllegalArgumentException("Invalid custom item!");
