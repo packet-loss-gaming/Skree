@@ -56,7 +56,12 @@ class PortalWrapper {
           )
           .fetchOne();
 
-      return Optional.of(new Location<>(world, result.get(PORTALS.X) + .5, result.get(PORTALS.Y), result.get(PORTALS.Z) + .5));
+      return result == null ? Optional.empty() : Optional.of(new Location<>(
+          world,
+          result.get(PORTALS.X) + .5,
+          result.get(PORTALS.Y),
+          result.get(PORTALS.Z) + .5)
+      );
     } catch (SQLException e) {
       e.printStackTrace();
     }
