@@ -32,7 +32,7 @@ public class UndeadMinionRetaliation implements Instruction<DamagedCondition, Bo
   }
 
   public int quantity(CatacombsBossDetail detail) {
-    return activate(detail) ? Probability.getRangedRandom(3, 17) : 0;
+    return activate(detail) ? Probability.getRandom((int) (detail.getWave() * 1.5)) : 0;
   }
 
   @Override
