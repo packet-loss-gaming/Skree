@@ -87,7 +87,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
   @Override
   public void registerRecipes() {
     GameRegistry.addRecipe(
-        new ItemStack(this),
+        new ItemStack(this, 3),
         "BBB",
         "BAB",
         "BBB",
