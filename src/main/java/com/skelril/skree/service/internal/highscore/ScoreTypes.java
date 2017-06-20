@@ -14,4 +14,5 @@ public class ScoreTypes {
   public static final ScoreType GOLD_RUSH_ROBBERIES = new ScoreType(4, true, ScoreType.Order.DESC);
   public static final ScoreType HIGHEST_CATACOMB_WAVE = new ScoreType(5, false, ScoreType.Order.DESC);
   public static final ScoreType GOLD_RUSH_LOOT_VALUE = new ScoreType(6, false, ScoreType.Order.DESC);
+  public static final ScoreType FASTEST_TEMPLE_OF_FATE_RUN = new TimeBasedScoreType(7, false, ScoreType.Order.ASC);
 }

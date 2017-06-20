@@ -15,7 +15,9 @@ import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
 import com.skelril.skree.content.zone.LegacyZoneBase;
+import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.PlayerStateService;
+import com.skelril.skree.service.internal.highscore.ScoreTypes;
 import com.skelril.skree.service.internal.playerstate.InventoryStorageStateException;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
 import com.skelril.skree.service.internal.zone.ZoneRegion;
@@ -27,10 +29,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
@@ -41,7 +41,7 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
   private Location<World> startingPoint;
   private DropTable dropTable;
 
-  private List<Player> participants = new ArrayList<>();
+  private Map<Player, Long> participants = new HashMap<>();
 
   public TempleOfFateInstance(ZoneRegion region) {
     super(region);
@@ -95,12 +95,17 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
   }
 
   public void rewardPlayer(Player player) {
-    boolean participated = participants.contains(player);
+    boolean participated = participants.containsKey(player);
+    long startTime = participants.get(player);
 
     remove(player);
     if (!participated) {
       return;
     }
+
+    int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+    Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
+    optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.FASTEST_TEMPLE_OF_FATE_RUN, seconds));
 
     for (ItemStack stack : dropTable.getDrops(1)) {
       player.getInventory().offer(stack);
@@ -162,7 +167,7 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
       }
     }
 
-    participants.add(player);
+    participants.put(player, System.currentTimeMillis());
 
     return new Clause<>(player, ZoneStatus.ADDED);
   }
@@ -179,7 +184,7 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
   @Override
   public Collection<Player> getPlayers(PlayerClassifier classifier) {
     if (classifier == PARTICIPANT) {
-      return participants;
+      return participants.keySet();
     }
     return super.getPlayers(classifier);
   }
