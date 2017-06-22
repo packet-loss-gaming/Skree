@@ -247,7 +247,7 @@ public class GoldRushListener {
             chestInv.setInventorySlotContents(i, tf(it.next()));
             continue;
           }
-          chestInv.setInventorySlotContents(i, null);
+          chestInv.setInventorySlotContents(i, ItemStack.EMPTY);
         }
       }
     }
@@ -277,7 +277,7 @@ public class GoldRushListener {
 
           for (int i = 0; i < chestInv.getSizeInventory(); ++i) {
             ItemStack stack = chestInv.getStackInSlot(i);
-            if (stack == null) {
+            if (stack == ItemStack.EMPTY) {
               continue;
             }
 
@@ -286,7 +286,7 @@ public class GoldRushListener {
             } else {
               toReturn.add(tf(stack));
             }
-            chestInv.setInventorySlotContents(i, null);
+            chestInv.setInventorySlotContents(i, ItemStack.EMPTY);
           }
 
           BigDecimal value = BigDecimal.ZERO;
