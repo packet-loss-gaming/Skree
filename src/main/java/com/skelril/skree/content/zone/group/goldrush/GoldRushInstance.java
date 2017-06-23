@@ -94,7 +94,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
   private BigDecimal multiplier = BigDecimal.ONE;
   private BigDecimal lootSplit = BigDecimal.ZERO;
   private boolean foundPhantomHymn = false;
-  private BlockType floodBlockType = BlockTypes.WATER;
+  private BlockType floodBlockType = BlockTypes.FLOWING_WATER;
   protected Map<UUID, BigDecimal> cofferRisk = new HashMap<>();
   private boolean keysTriggered = false;
   private boolean checkingKeys = true;
