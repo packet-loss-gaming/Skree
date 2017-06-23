@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
@@ -106,9 +105,7 @@ public class PrizeBox extends CustomItem {
     NBTTagCompound tag = stack.getTagCompound().getCompoundTag("skree_held_prize_data");
 
     if (tag != null) {
-      ItemStack returned = new ItemStack(Blocks.AIR);
-      returned.deserializeNBT(tag);
-      return Optional.of(tf(returned));
+      return Optional.of(tf(new ItemStack(tag)));
     }
     return Optional.empty();
   }
