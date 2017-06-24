@@ -284,6 +284,9 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
       } else {
         org.spongepowered.api.item.inventory.ItemStack newStack = createForMaster(itemStack, player);
         tf(targetPlayer).inventory.addItemStackToInventory(tf(newStack));
+        targetPlayer.sendMessage(
+            Text.of(TextColors.GOLD, player.getName() + " has invited you to " + getZone(itemStack).get() + ".")
+        );
         player.sendMessage(
             Text.of(TextColors.GOLD, targetPlayer.getName() + " has been given invite.")
         );
