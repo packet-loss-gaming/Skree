@@ -294,8 +294,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
       int playerCount = inst.getPlayers(PlayerClassifier.PARTICIPANT).size();
 
       Collection<ItemStack> drops = DROP_TABLE.getDrops(
-          Math.min(7000, playerCount * 1500),
-          1
+          Math.min(7000, playerCount * 1500)
       );
 
       Optional<Giant> optEnt = boss.getTargetEntity();

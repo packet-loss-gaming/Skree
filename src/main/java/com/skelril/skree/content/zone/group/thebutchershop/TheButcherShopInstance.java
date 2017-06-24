@@ -122,7 +122,7 @@ public class TheButcherShopInstance extends LegacyZoneBase implements Runnable {
 
   @Override
   public Clause<Player, ZoneStatus> remove(Player player) {
-    dropTable.getDrops(wave * 3, wave).forEach((drop) -> player.getInventory().offer(drop));
+    dropTable.getDrops(wave * 3).forEach((drop) -> player.getInventory().offer(drop));
     return super.remove(player);
   }
 

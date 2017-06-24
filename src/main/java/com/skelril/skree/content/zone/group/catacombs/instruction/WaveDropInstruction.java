@@ -38,7 +38,7 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
   private static final DropTable FOOD_DROP_TABLE;
 
   static {
-    SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller();
+    SlipperySingleHitDiceRoller slipRoller = new SlipperySingleHitDiceRoller((a, b) -> (int) (a + b));
     DROP_TABLE = new MasterDropTable(
         slipRoller,
         Lists.newArrayList(
@@ -150,11 +150,9 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
     drops.addAll(FOOD_DROP_TABLE.getDrops(1, .5 * modifier));
 
     Optional<Zombie> optEnt = boss.getTargetEntity();
-    if (optEnt.isPresent()) {
-      Task.builder().execute(() -> {
-        new ItemDropper(optEnt.get().getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
-      }).delayTicks(1).submit(SkreePlugin.inst());
-    }
+    optEnt.ifPresent(zombie -> Task.builder().execute(() -> {
+      new ItemDropper(zombie.getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+    }).delayTicks(1).submit(SkreePlugin.inst()));
 
     return Optional.empty();
   }
