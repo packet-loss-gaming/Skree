@@ -25,6 +25,7 @@ import com.skelril.skree.content.zone.group.jungleraid.JungleRaidManager;
 import com.skelril.skree.content.zone.group.patientx.PatientXManager;
 import com.skelril.skree.content.zone.group.shnugglesprime.ShnugglesPrimeManager;
 import com.skelril.skree.content.zone.group.skywars.SkyWarsManager;
+import com.skelril.skree.content.zone.group.thebutchershop.TheButcherShopManager;
 import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.zone.WorldResolver;
@@ -71,6 +72,7 @@ public class ZoneSystem implements ServiceProvider<ZoneService> {
       service.registerManager(new PatientXManager());
       service.registerManager(new ShnugglesPrimeManager());
       service.registerManager(new SkyWarsManager());
+      service.registerManager(new TheButcherShopManager());
 
       Sponge.getServiceManager().setProvider(SkreePlugin.inst(), ZoneService.class, service);
       Sponge.getCommandManager().register(SkreePlugin.inst(), ZoneMeCommand.aquireSpec(), "zoneme");

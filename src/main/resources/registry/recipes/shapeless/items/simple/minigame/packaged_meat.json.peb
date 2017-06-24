@@ -1,0 +1,12 @@
+{
+  "crafted_item": {
+    "id": "skree:packaged_meat",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:unpackaged_meat",
+      "data": 0
+    }
+  ]
+}
