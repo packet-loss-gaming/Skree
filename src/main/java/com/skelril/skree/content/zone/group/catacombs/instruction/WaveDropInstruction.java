@@ -45,7 +45,7 @@ public class WaveDropInstruction implements Instruction<UnbindCondition, Boss<Zo
             new DropTableImpl(
                 slipRoller,
                 Lists.newArrayList(
-                    new DropTableEntryImpl(new CofferResolver(50), 12)
+                    new DropTableEntryImpl(new CofferResolver(50), 7)
                 )
             ),
             new DropTableImpl(
