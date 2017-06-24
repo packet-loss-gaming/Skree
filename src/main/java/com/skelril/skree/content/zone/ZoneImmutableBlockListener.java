@@ -6,6 +6,8 @@
 
 package com.skelril.skree.content.zone;
 
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -24,7 +26,12 @@ public class ZoneImmutableBlockListener<T> extends ZoneApplicableListener<T> {
   @Listener
   public void onBlockChange(ChangeBlockEvent event, @First Entity entity) {
     if (isApplicable(entity)) {
-      event.setCancelled(true);
+      for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+        if (transaction.getOriginal().getState().getType() != transaction.getFinal().getState().getType()) {
+          event.setCancelled(true);
+          break;
+        }
+      }
     }
   }
 }
