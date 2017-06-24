@@ -14,6 +14,7 @@ import com.skelril.nitro.droptable.DropTableImpl;
 import com.skelril.nitro.droptable.MasterDropTable;
 import com.skelril.nitro.droptable.resolver.SimpleDropResolver;
 import com.skelril.nitro.droptable.roller.SlipperySingleHitDiceRoller;
+import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.zone.LegacyZoneBase;
 import com.skelril.skree.service.HighScoreService;
 import com.skelril.skree.service.PlayerStateService;
@@ -107,7 +108,7 @@ public class TempleOfFateInstance extends LegacyZoneBase implements Runnable {
     Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
     optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.FASTEST_TEMPLE_OF_FATE_RUN, seconds));
 
-    for (ItemStack stack : dropTable.getDrops(1)) {
+    for (ItemStack stack : dropTable.getDrops(Probability.getRandom(3))) {
       player.getInventory().offer(stack);
     }
   }
