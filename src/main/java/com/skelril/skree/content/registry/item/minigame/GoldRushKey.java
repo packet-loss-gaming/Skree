@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.item.minigame;
 
 import com.skelril.nitro.registry.item.CustomItem;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,11 @@ public class GoldRushKey extends CustomItem {
     baseList.add("gold_rush_red_key");
     baseList.add("gold_rush_blue_key");
     return baseList;
+  }
+
+  @Override
+  public String getUnlocalizedName(ItemStack stack) {
+    return stack.getMetadata() == 1 ? "item.skree_gold_rush_blue_key" : "item.skree_gold_rush_red_key";
   }
 
   @Override
