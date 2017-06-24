@@ -18,16 +18,7 @@ import org.spongepowered.api.world.gen.PopulatorTypes;
 
 import java.util.Random;
 
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
-
 public class MagicMushroomPopulator implements Populator {
-
-  private final int mushroomCount;
-
-  public MagicMushroomPopulator(int mushroomCount) {
-    this.mushroomCount = mushroomCount;
-  }
-
   @Override
   public PopulatorType getType() {
     return PopulatorTypes.MUSHROOM;
@@ -36,25 +27,26 @@ public class MagicMushroomPopulator implements Populator {
   @Override
   public void populate(World world, Extent volume, Random random) {
     Vector3i min = volume.getBlockMin();
-    Vector3i chunkPos = new Vector3i(min.getX(), min.getY(), min.getZ());
+    Vector3i size = volume.getBlockSize();
+    BlockPos chunkPos = new BlockPos(min.getX(), min.getY(), min.getZ());
 
-    for (int i = 0; i < mushroomCount; ++i) {
-      int x = random.nextInt(16) + 8;
-      int z = random.nextInt(16) + 8;
+    for (int i = 0; i < 64; ++i) {
+      int x = random.nextInt(size.getX());
+      int z = random.nextInt(size.getZ());
       int y = random.nextInt(40);
-      generate(tf(world), random, tf(chunkPos.add(x, y, z)));
+
+      BlockPos targetBlock = chunkPos.add(x, y, z);
+      BlockPos targetBaseBlock = targetBlock.add(0, -1, 0);
+
+      generate((net.minecraft.world.World) world, random, targetBlock, targetBaseBlock);
     }
   }
 
-  private boolean generate(net.minecraft.world.World worldIn, Random rand, BlockPos position) {
-    for (int i = 0; i < 64; ++i) {
-      BlockPos blockpos1 = position.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
-      BlockPos blockpos2 = blockpos1.add(0, -1, 0);
-
-      if (worldIn.getBlockState(blockpos2).getBlock() == BlockTypes.STONE && worldIn.isAirBlock(blockpos1) && (!worldIn.provider.hasNoSky() || blockpos1.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, blockpos1, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState())) {
-        worldIn.setBlockState(blockpos2, CustomBlockTypes.MAGIC_STONE.getDefaultState(), 2);
-        worldIn.setBlockState(blockpos1, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState(), 2);
-      }
+  private boolean generate(net.minecraft.world.World worldIn, Random rand, BlockPos targetBlock, BlockPos targetBaseBlock) {
+    boolean baseIsStone = worldIn.getBlockState(targetBaseBlock).getBlock() == BlockTypes.STONE;
+    if (baseIsStone && worldIn.isAirBlock(targetBlock) && (!worldIn.provider.hasNoSky() || targetBlock.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, targetBlock, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState())) {
+      worldIn.setBlockState(targetBaseBlock, CustomBlockTypes.MAGIC_STONE.getDefaultState(), 2);
+      worldIn.setBlockState(targetBlock, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState(), 2);
     }
 
     return true;
