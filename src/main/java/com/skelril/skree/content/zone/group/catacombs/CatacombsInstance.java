@@ -80,6 +80,10 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
   @Override
   public Clause<Player, ZoneStatus> add(Player player) {
+    if (wave > 0) {
+      return new Clause<>(player, ZoneStatus.NO_REJOIN);
+    }
+
     player.setLocation(entryPoint);
     return new Clause<>(player, ZoneStatus.ADDED);
   }
