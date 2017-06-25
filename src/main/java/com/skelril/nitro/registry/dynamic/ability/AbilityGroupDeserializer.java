@@ -7,6 +7,7 @@
 package com.skelril.nitro.registry.dynamic.ability;
 
 import com.google.gson.*;
+import com.skelril.nitro.registry.dynamic.ability.grouptype.DefensiveCluster;
 import com.skelril.nitro.registry.dynamic.ability.grouptype.MeleeAttackCluster;
 import com.skelril.nitro.registry.dynamic.ability.grouptype.PointOfContactCluster;
 
@@ -18,6 +19,7 @@ public class AbilityGroupDeserializer implements JsonDeserializer<AbilityGroup> 
   private static final Map<String, Class<? extends AbilityCluster>> CLUSTER_MAPPING = new HashMap<>();
 
   static {
+    CLUSTER_MAPPING.put("defensive", DefensiveCluster.class);
     CLUSTER_MAPPING.put("melee_attacks", MeleeAttackCluster.class);
     CLUSTER_MAPPING.put("point_of_contact", PointOfContactCluster.class);
   }

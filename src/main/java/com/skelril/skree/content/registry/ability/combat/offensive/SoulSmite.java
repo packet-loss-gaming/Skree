@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability.combat;
+package com.skelril.skree.content.registry.ability.combat.offensive;
 
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
 import com.skelril.skree.SkreePlugin;

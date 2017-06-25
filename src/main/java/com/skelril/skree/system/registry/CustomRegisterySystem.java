@@ -9,7 +9,7 @@ package com.skelril.skree.system.registry;
 import com.skelril.nitro.module.NModule;
 import com.skelril.nitro.module.NModuleTrigger;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
-import com.skelril.skree.content.registry.item.ability.SkreeAbilityRegistry;
+import com.skelril.skree.content.registry.ability.SkreeAbilityRegistry;
 import com.skelril.skree.system.registry.block.CustomBlockSystem;
 import com.skelril.skree.system.registry.item.CustomItemSystem;
 import com.skelril.skree.system.registry.recipe.CustomRecipeSystem;

@@ -4,12 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability;
+package com.skelril.skree.content.registry.ability;
 
 import com.skelril.nitro.registry.dynamic.ability.Ability;
 import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
-import com.skelril.skree.content.registry.item.ability.combat.*;
-import com.skelril.skree.content.registry.item.ability.misc.CreatureImpact;
+import com.skelril.skree.content.registry.ability.combat.defensive.PowerBurst;
+import com.skelril.skree.content.registry.ability.combat.offensive.*;
+import com.skelril.skree.content.registry.ability.misc.CreatureImpact;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,11 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
   private Map<String, Class<? extends Ability>> registry = new HashMap<>();
 
   public SkreeAbilityRegistry() {
+    registerOffensiveAbilties();
+    registerDefensiveAbilities();
+  }
+
+  private void registerOffensiveAbilties() {
     registerAbility("agility", Agility.class);
     registerAbility("coin_toss", CoinToss.class);
     registerAbility("confuse", Confuse.class);
@@ -32,6 +38,10 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
     registerAbility("regen", Regen.class);
     registerAbility("soul_smite", SoulSmite.class);
     registerAbility("weaken", Weaken.class);
+  }
+
+  private void registerDefensiveAbilities() {
+    registerAbility("power_burst", PowerBurst.class);
   }
 
   @Override

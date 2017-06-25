@@ -15,6 +15,7 @@ public class AbilityEnabledGsonBuilder {
     return parentBuilder
         .registerTypeAdapter(Ability.class, abilityDeserializer)
         .registerTypeAdapter(SpecialAttack.class, abilityDeserializer)
+        .registerTypeAdapter(DefensiveAbility.class, abilityDeserializer)
         .registerTypeAdapter(PointOfContact.class, abilityDeserializer)
         .registerTypeAdapter(AbilityGroup.class, new AbilityGroupDeserializer());
   }

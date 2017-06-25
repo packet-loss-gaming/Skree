@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability.combat;
+package com.skelril.skree.content.registry.ability.combat.offensive;
 
 import com.skelril.nitro.entity.EntityHealthUtil;
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
@@ -18,21 +18,21 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
-public class Curse implements SpecialAttack {
+public class Regen implements SpecialAttack {
   @Override
   public void run(Living owner, Living target, DamageEntityEvent event) {
-    Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
+    Optional<PotionEffectData> optPotionEffectData = owner.getOrCreate(PotionEffectData.class);
     if (!optPotionEffectData.isPresent()) {
       return;
     }
 
     PotionEffectData potionEffectData = optPotionEffectData.get();
 
-    int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 24);
-    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WITHER, 2, duration));
+    int duration = (int) (EntityHealthUtil.getHealth(target) * 10);
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.REGENERATION, 2, duration));
 
-    target.offer(potionEffectData);
+    owner.offer(potionEffectData);
 
-    notify(owner, Text.of(TextColors.YELLOW, "Your weapon curses its victim."));
+    notify(owner, Text.of(TextColors.YELLOW, "You gain a healing aura."));
   }
 }

@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability.combat;
+package com.skelril.skree.content.registry.ability.combat.offensive;
 
 import com.skelril.nitro.entity.EntityHealthUtil;
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
@@ -18,7 +18,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
-public class Weaken implements SpecialAttack {
+public class Agility implements SpecialAttack {
   @Override
   public void run(Living owner, Living target, DamageEntityEvent event) {
     int duration = (int) Math.min(20 * 60 * 5, EntityHealthUtil.getHealth(owner) * 18);
@@ -26,19 +26,19 @@ public class Weaken implements SpecialAttack {
     Optional<PotionEffectData> optOwnerPotionEffectData = owner.getOrCreate(PotionEffectData.class);
     if (optOwnerPotionEffectData.isPresent()) {
       PotionEffectData ownerPotionEffectData = optOwnerPotionEffectData.get();
-      ownerPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.STRENGTH, 1, duration));
+      ownerPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.SPEED, 2, duration));
       owner.offer(ownerPotionEffectData);
     }
 
     Optional<PotionEffectData> optTargetPotionEffectData = target.getOrCreate(PotionEffectData.class);
     if (optTargetPotionEffectData.isPresent()) {
       PotionEffectData targetPotionEffectData = optTargetPotionEffectData.get();
-      targetPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WEAKNESS, 1, duration));
+      targetPotionEffectData.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, duration));
       target.offer(targetPotionEffectData);
     }
 
     if (optOwnerPotionEffectData.isPresent() || optTargetPotionEffectData.isPresent()) {
-      notify(owner, Text.of(TextColors.YELLOW, "Your sword leaches strength from its victim."));
+      notify(owner, Text.of(TextColors.YELLOW, "You gain a agile advantage over your opponent."));
     }
   }
 }

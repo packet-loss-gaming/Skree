@@ -4,11 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability.combat;
+package com.skelril.skree.content.registry.ability.combat.offensive;
 
 import com.skelril.nitro.entity.EntityHealthUtil;
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -19,22 +18,22 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
-public class FearBlaze implements SpecialAttack {
+public class Confuse implements SpecialAttack {
   @Override
   public void run(Living owner, Living target, DamageEntityEvent event) {
-    int duration = (int) (EntityHealthUtil.getHealth(owner) * 20);
-
     Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
-    if (optPotionEffectData.isPresent()) {
-      PotionEffectData potionEffectData = optPotionEffectData.get();
-
-      potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, duration));
-
-      target.offer(potionEffectData);
+    if (!optPotionEffectData.isPresent()) {
+      return;
     }
 
-    target.offer(Keys.FIRE_TICKS, duration);
+    PotionEffectData potionEffectData = optPotionEffectData.get();
 
-    notify(owner, Text.of(TextColors.YELLOW, "Your sword releases a deadly blaze."));
+    int duration = (int) Math.min(1200, EntityHealthUtil.getHealth(owner) * 18);
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.NAUSEA, 1, duration));
+
+    target.offer(potionEffectData);
+
+    notify(owner, Text.of(TextColors.YELLOW, "Your sword confuses its victim."));
+
   }
 }

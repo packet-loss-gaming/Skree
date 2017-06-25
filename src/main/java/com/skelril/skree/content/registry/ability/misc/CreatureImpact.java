@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.skree.content.registry.item.ability.misc;
+package com.skelril.skree.content.registry.ability.misc;
 
 import com.skelril.nitro.particle.ParticleGenerator;
 import com.skelril.nitro.registry.dynamic.ability.PointOfContact;
