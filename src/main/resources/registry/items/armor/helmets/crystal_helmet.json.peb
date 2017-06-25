@@ -1,0 +1,10 @@
+{
+  "id": "crystal_helmet",
+  "set_name": "crystal",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:sea_crystal",
+    "data": 0
+  },
+  "enchantability": 10
+}

@@ -1,0 +1,10 @@
+{
+  "id": "wraith_boots",
+  "set_name": "wraith",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:tormentor_boots",
+    "data": 0
+  },
+  "enchantability": 10
+}

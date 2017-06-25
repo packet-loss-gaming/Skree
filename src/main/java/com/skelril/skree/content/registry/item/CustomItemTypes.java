@@ -6,7 +6,6 @@
 
 package com.skelril.skree.content.registry.item;
 
-import com.skelril.skree.content.registry.item.armor.*;
 import com.skelril.skree.content.registry.item.currency.CofferItem;
 import com.skelril.skree.content.registry.item.currency.CondensedCofferItem;
 import com.skelril.skree.content.registry.item.generic.BrokenGlass;
@@ -51,37 +50,6 @@ public class CustomItemTypes {
   public static final CondensedCofferItem REDISTRAL = new CondensedCofferItem("redistral", EQESTA);
   public static final CondensedCofferItem RETESRUM = new CondensedCofferItem("retesrum", REDISTRAL);
   public static final CondensedCofferItem MESARDITH = new CondensedCofferItem("mesardith", RETESRUM);
-
-  /* Armors */
-  public static final JurackHelmet JURACK_HELMET = new JurackHelmet();
-  public static final JurackChestplate JURACK_CHESTPLATE = new JurackChestplate();
-  public static final JurackLeggings JURACK_LEGGINGS = new JurackLeggings();
-  public static final JurackBoots JURACK_BOOTS = new JurackBoots();
-
-  public static final CrystalHelmet CRYSTAL_HELMET = new CrystalHelmet();
-  public static final CrystalChestplate CRYSTAL_CHESTPLATE = new CrystalChestplate();
-  public static final CrystalLeggings CRYSTAL_LEGGINGS = new CrystalLeggings();
-  public static final CrystalBoots CRYSTAL_BOOTS = new CrystalBoots();
-
-  public static final GuardianHelmet GUARDIAN_HELMET = new GuardianHelmet();
-  public static final GuardianChestplate GUARDIAN_CHESTPLATE = new GuardianChestplate();
-  public static final GuardianLeggings GUARDIAN_LEGGINGS = new GuardianLeggings();
-  public static final GuardianBoots GUARDIAN_BOOTS = new GuardianBoots();
-
-  public static final DivineHelmet DIVINE_HELMET = new DivineHelmet();
-  public static final DivineChestplate DIVINE_CHESTPLATE = new DivineChestplate();
-  public static final DivineLeggings DIVINE_LEGGINGS = new DivineLeggings();
-  public static final DivineBoots DIVINE_BOOTS = new DivineBoots();
-
-  public static final TormentorHelmet TORMENTOR_HELMET = new TormentorHelmet();
-  public static final TormentorChestplate TORMENTOR_CHESTPLATE = new TormentorChestplate();
-  public static final TormentorLeggings TORMENTOR_LEGGINGS = new TormentorLeggings();
-  public static final TormentorBoots TORMENTOR_BOOTS = new TormentorBoots();
-
-  public static final WraithHelmet WRAITH_HELMET = new WraithHelmet();
-  public static final WraithChestplate WRAITH_CHESTPLATE = new WraithChestplate();
-  public static final WraithLeggings WRAITH_LEGGINGS = new WraithLeggings();
-  public static final WraithBoots WRAITH_BOOTS = new WraithBoots();
 
   /* Combat Items */
   public static final RedFeather RED_FEATHER = new RedFeather();

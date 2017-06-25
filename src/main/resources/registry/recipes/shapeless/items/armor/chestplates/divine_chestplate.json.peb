@@ -1,0 +1,16 @@
+{
+  "crafted_item": {
+    "id": "skree:divine_chestplate",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:unstable_catalyst",
+      "data": 0
+    },
+    {
+      "id": "skree:guardian_chestplate",
+      "data": 0
+    }
+  ]
+}

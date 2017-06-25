@@ -9,6 +9,10 @@ package com.skelril.skree.system.registry.item;
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.dynamic.LoaderRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
+import com.skelril.nitro.registry.dynamic.item.armor.BootsLoader;
+import com.skelril.nitro.registry.dynamic.item.armor.ChestplateLoader;
+import com.skelril.nitro.registry.dynamic.item.armor.HelmetLoader;
+import com.skelril.nitro.registry.dynamic.item.armor.LeggingsLoader;
 import com.skelril.nitro.registry.dynamic.item.bow.BowLoader;
 import com.skelril.nitro.registry.dynamic.item.food.FoodLoader;
 import com.skelril.nitro.registry.dynamic.item.simple.SimpleLoader;
@@ -51,6 +55,10 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
       dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));
       dynamicItemRegistry.registerLoader(new BowLoader(gameIntegrator, abilityRegistry), getResource.apply("bows"));
       dynamicItemRegistry.registerLoader(new FoodLoader(gameIntegrator, abilityRegistry), getResource.apply("food"));
+      dynamicItemRegistry.registerLoader(new HelmetLoader(gameIntegrator, abilityRegistry), getResource.apply("armor/helmets"));
+      dynamicItemRegistry.registerLoader(new ChestplateLoader(gameIntegrator, abilityRegistry), getResource.apply("armor/chestplates"));
+      dynamicItemRegistry.registerLoader(new LeggingsLoader(gameIntegrator, abilityRegistry), getResource.apply("armor/leggings"));
+      dynamicItemRegistry.registerLoader(new BootsLoader(gameIntegrator, abilityRegistry), getResource.apply("armor/boots"));
       dynamicItemRegistry.loadAll();
     });
   }

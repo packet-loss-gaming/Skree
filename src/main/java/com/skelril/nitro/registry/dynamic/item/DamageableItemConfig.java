@@ -6,23 +6,10 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
-import com.skelril.nitro.registry.dynamic.ItemStackConfig;
-import net.minecraft.item.ItemStack;
-
-public class DamageableItemConfig extends ItemConfig {
+public class DamageableItemConfig extends RepairableItemConfig {
   private int maxUses;
-  private ItemStackConfig repairItemStack;
 
   public int getMaxUses() {
     return maxUses;
-  }
-
-  public ItemStackConfig getRepairItemStackConfig() {
-    return repairItemStack;
-  }
-
-  public ItemStack getRepairItemStack() {
-    ItemStackConfig repairItemStack = getRepairItemStackConfig();
-    return repairItemStack != null ? repairItemStack.toNSMStack() : null;
   }
 }

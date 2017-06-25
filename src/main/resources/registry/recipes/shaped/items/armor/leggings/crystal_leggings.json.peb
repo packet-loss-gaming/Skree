@@ -1,0 +1,17 @@
+{
+  "crafted_item": {
+    "id": "skree:crystal_leggings",
+    "data": 0
+  },
+  "crafting_rows": [
+    "AAA",
+    "A A",
+    "A A"
+  ],
+  "mapped_item_stacks": {
+    "A": {
+      "id": "skree:sea_crystal",
+      "data": 0
+    }
+  }
+}

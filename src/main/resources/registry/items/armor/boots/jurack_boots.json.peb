@@ -1,0 +1,10 @@
+{
+  "id": "jurack_boots",
+  "set_name": "jurack",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:jurack",
+    "data": 0
+  },
+  "enchantability": 10
+}

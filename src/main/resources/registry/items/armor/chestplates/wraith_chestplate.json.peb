@@ -1,0 +1,10 @@
+{
+  "id": "wraith_chestplate",
+  "set_name": "wraith",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:tormentor_chestplate",
+    "data": 0
+  },
+  "enchantability": 10
+}

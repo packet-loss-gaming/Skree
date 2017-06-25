@@ -1,0 +1,16 @@
+{
+  "crafted_item": {
+    "id": "skree:wraith_boots",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:unstable_catalyst",
+      "data": 0
+    },
+    {
+      "id": "skree:tormentor_boots",
+      "data": 0
+    }
+  ]
+}

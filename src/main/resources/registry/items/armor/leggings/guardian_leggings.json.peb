@@ -1,0 +1,10 @@
+{
+  "id": "guardian_leggings",
+  "set_name": "guardian",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:holy_ingot",
+    "data": 0
+  },
+  "enchantability": 10
+}

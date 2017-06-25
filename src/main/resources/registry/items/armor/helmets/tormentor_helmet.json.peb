@@ -1,0 +1,10 @@
+{
+  "id": "tormentor_helmet",
+  "set_name": "tormentor",
+  "max_uses_base_modifier": 60,
+  "repair_item_stack": {
+    "id": "skree:demonic_ingot",
+    "data": 0
+  },
+  "enchantability": 10
+}

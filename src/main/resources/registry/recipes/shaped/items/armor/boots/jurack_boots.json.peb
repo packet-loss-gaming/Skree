@@ -1,0 +1,17 @@
+{
+  "crafted_item": {
+    "id": "skree:jurack_boots",
+    "data": 0
+  },
+  "crafting_rows": [
+    "   ",
+    "A A",
+    "A A"
+  ],
+  "mapped_item_stacks": {
+    "A": {
+      "id": "skree:jurack",
+      "data": 0
+    }
+  }
+}

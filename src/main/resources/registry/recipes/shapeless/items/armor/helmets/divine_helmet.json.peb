@@ -1,0 +1,16 @@
+{
+  "crafted_item": {
+    "id": "skree:divine_helmet",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:unstable_catalyst",
+      "data": 0
+    },
+    {
+      "id": "skree:guardian_helmet",
+      "data": 0
+    }
+  ]
+}
