@@ -53,7 +53,7 @@ public class GameIntegrator {
 
     GameRegistry.register(item);
 
-    Predicate<Living> applicabilityTest = config.getApplicabilityTest();
+    Predicate<Living> applicabilityTest = config.getApplicabilityTest(id);
     registerAbilities(applicabilityTest, config.getAbilityGroups());
   }
 

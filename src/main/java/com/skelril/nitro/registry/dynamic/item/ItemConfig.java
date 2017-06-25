@@ -37,7 +37,7 @@ public abstract class ItemConfig {
     return enchantability;
   }
 
-  public Predicate<Living> getApplicabilityTest() {
-    return new HeldItemApplicabilityTest(id);
+  public Predicate<Living> getApplicabilityTest(String fullId) {
+    return new HeldItemApplicabilityTest(fullId);
   }
 }
