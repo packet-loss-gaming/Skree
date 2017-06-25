@@ -18,12 +18,12 @@ import java.util.function.Predicate;
 public class PointOfContactCluster extends AbilityCluster {
   private List<PointOfContact> pointOfContact;
 
-  public List<PointOfContact> getPointOfContactAbilties() {
+  public List<PointOfContact> getPointOfContactAbilities() {
     return pointOfContact;
   }
 
   public PointOfContact getNextAbilityToRun() {
-    return Probability.pickOneOf(getPointOfContactAbilties());
+    return Probability.pickOneOf(getPointOfContactAbilities());
   }
 
   @Override
