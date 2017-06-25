@@ -31,7 +31,7 @@ class LoadedArmor extends ItemArmor {
   }
 
   private void setMaxDamage() {
-    int armorAdjustment = MAX_DAMAGE_ARRAY[getEquipmentSlot().getIndex()];
+    int armorAdjustment = MAX_DAMAGE_ARRAY[armorType.getIndex()];
     int baseModifier = config.getMaxUsesBaseModifier();
 
     this.setMaxDamage(armorAdjustment * baseModifier);
@@ -57,7 +57,7 @@ class LoadedArmor extends ItemArmor {
   public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
     Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
-    if (equipmentSlot == getEquipmentSlot()) {
+    if (equipmentSlot == armorType) {
       multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", config.getDamageReducationAmount(), 0));
       multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", config.getToughness(), 0));
     }

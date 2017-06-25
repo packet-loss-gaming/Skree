@@ -6,9 +6,9 @@
 
 package com.skelril.nitro.registry.dynamic.item.food;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class FoodLoader extends ItemLoader<LoadedFood, FoodConfig> {
   public FoodLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {

@@ -6,9 +6,9 @@
 
 package com.skelril.nitro.registry.dynamic.item.sword;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class SwordLoader extends ItemLoader<LoadedSword, SwordConfig> {
   public SwordLoader(GameIntegrator integrator, AbilityRegistry registry) {

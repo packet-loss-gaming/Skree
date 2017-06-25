@@ -6,7 +6,7 @@
 
 package com.skelril.skree.content.registry.item.ability.combat;
 
-import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
+import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
 import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;

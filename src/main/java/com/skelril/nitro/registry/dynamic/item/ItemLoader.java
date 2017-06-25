@@ -8,7 +8,8 @@ package com.skelril.nitro.registry.dynamic.item;
 
 import com.google.gson.GsonBuilder;
 import com.skelril.nitro.registry.dynamic.Loader;
-import com.skelril.nitro.registry.dynamic.item.ability.*;
+import com.skelril.nitro.registry.dynamic.ability.AbilityEnabledGsonBuilder;
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import net.minecraft.item.Item;
 
 public abstract class ItemLoader<ResultType extends Item, ConfigType extends ItemConfig> implements Loader<ConfigType> {
@@ -26,13 +27,7 @@ public abstract class ItemLoader<ResultType extends Item, ConfigType extends Ite
   public GsonBuilder getGsonBuilder() {
     GsonBuilder parentBuilder = Loader.super.getGsonBuilder();
 
-    AbilityDeserializer abilityDeserializer = new AbilityDeserializer(abilityRegistry);
-
-    return parentBuilder
-        .registerTypeAdapter(Ability.class, abilityDeserializer)
-        .registerTypeAdapter(SpecialAttack.class, abilityDeserializer)
-        .registerTypeAdapter(PointOfContact.class, abilityDeserializer)
-        .registerTypeAdapter(AbilityGroup.class, new AbilityGroupDeserializer());
+    return AbilityEnabledGsonBuilder.getGsonBuilder(parentBuilder, abilityRegistry);
   }
 
   @Override

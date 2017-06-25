@@ -7,7 +7,7 @@
 package com.skelril.skree.content.registry.item.ability.misc;
 
 import com.skelril.nitro.particle.ParticleGenerator;
-import com.skelril.nitro.registry.dynamic.item.ability.PointOfContact;
+import com.skelril.nitro.registry.dynamic.ability.PointOfContact;
 import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;

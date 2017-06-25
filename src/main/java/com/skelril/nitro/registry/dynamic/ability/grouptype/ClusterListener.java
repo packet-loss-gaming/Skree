@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
+package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
 public interface ClusterListener {
 }

@@ -6,10 +6,8 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownManager;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityGroup;
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.ClusterListener;
+import com.skelril.nitro.registry.dynamic.ability.AbilityGroup;
+import com.skelril.nitro.registry.dynamic.ability.AbilityIntegrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.RenderItem;
@@ -19,29 +17,28 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.Living;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class GameIntegrator {
   private String modID;
   private List<ItemDescriptor> constructedItems = new ArrayList<>();
-  private AbilityCooldownManager cooldownManager = new AbilityCooldownManager();
+  private AbilityIntegrator abilityIntegrator = new AbilityIntegrator();
 
   public GameIntegrator(String modID) {
     this.modID = modID;
   }
 
-  public void registerForProcessing(Item item, ItemConfig config) {
-    constructedItems.add(new ItemDescriptor(item, config));
+  public void registerAbilities(Predicate<Living> applicabilityTest, List<AbilityGroup> abilityGroups) {
+    Object mod = Sponge.getPluginManager().getPlugin(modID).get().getInstance().get();
+    abilityIntegrator.processAbilityGroups(mod, applicabilityTest, abilityGroups);
   }
 
-  private void processAbilityGroup(Object mod, String id, AbilityGroup abilityGroup) {
-    AbilityCooldownHandler cooldownHandler = new AbilityCooldownHandler(abilityGroup.getCoolDown(), cooldownManager);
-    abilityGroup.getClusters().forEach((cluster) -> {
-      ClusterListener listener = cluster.getListenerFor(id, cooldownHandler);
-      Sponge.getEventManager().registerListeners(mod, listener);
-    });
+  public void registerForProcessing(Item item, ItemConfig config) {
+    constructedItems.add(new ItemDescriptor(item, config));
   }
 
   private void registerItem(ItemDescriptor descriptor) {
@@ -56,8 +53,8 @@ public class GameIntegrator {
 
     GameRegistry.register(item);
 
-    Object mod = Sponge.getPluginManager().getPlugin(modID).get().getInstance().get();
-    config.getAbilityGroups().forEach(abilityGroup -> processAbilityGroup(mod, id, abilityGroup));
+    Predicate<Living> applicabilityTest = config.getApplicabilityTest();
+    registerAbilities(applicabilityTest, config.getAbilityGroups());
   }
 
   public void registerItems() {

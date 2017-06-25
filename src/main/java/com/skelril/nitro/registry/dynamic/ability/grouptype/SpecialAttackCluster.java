@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
+package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCluster;
-import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
+import com.skelril.nitro.registry.dynamic.ability.AbilityCluster;
+import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
 
 import java.util.List;
 

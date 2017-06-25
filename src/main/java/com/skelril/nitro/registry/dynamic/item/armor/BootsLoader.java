@@ -6,9 +6,9 @@
 
 package com.skelril.nitro.registry.dynamic.item.armor;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class BootsLoader extends ItemLoader<LoadedBoots, BootsConfig> {
   public BootsLoader(GameIntegrator integrator, AbilityRegistry registry) {

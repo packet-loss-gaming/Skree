@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.dynamic.item.ability;
+package com.skelril.nitro.registry.dynamic.ability;
 
 import com.google.gson.*;
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.MeleeAttackCluster;
-import com.skelril.nitro.registry.dynamic.item.ability.grouptype.PointOfContactCluster;
+import com.skelril.nitro.registry.dynamic.ability.grouptype.MeleeAttackCluster;
+import com.skelril.nitro.registry.dynamic.ability.grouptype.PointOfContactCluster;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;

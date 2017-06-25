@@ -8,6 +8,7 @@ package com.skelril.skree.system.registry.item;
 
 import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.dynamic.LoaderRegistry;
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.armor.BootsLoader;
 import com.skelril.nitro.registry.dynamic.item.armor.ChestplateLoader;
@@ -22,7 +23,6 @@ import com.skelril.nitro.registry.item.ICustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
-import com.skelril.skree.content.registry.item.ability.SkreeAbilityRegistry;
 import com.skelril.skree.system.registry.AbstractCustomRegistrySystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
@@ -42,14 +42,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class CustomItemSystem extends AbstractCustomRegistrySystem {
-  private GameIntegrator gameIntegrator = new GameIntegrator("skree");
+  private final GameIntegrator gameIntegrator;
 
-  public CustomItemSystem() {
+  public CustomItemSystem(GameIntegrator gameIntegrator, AbilityRegistry abilityRegistry) {
     super("/registry/items/");
+    this.gameIntegrator = gameIntegrator;
+
     LoaderRegistry dynamicItemRegistry = new LoaderRegistry();
     dynamicItemRegistry.registerConstant("SWORD_SPEED", "-2.4");
 
-    SkreeAbilityRegistry abilityRegistry = new SkreeAbilityRegistry();
     loadFromResources(getResource -> {
       dynamicItemRegistry.registerLoader(new SimpleLoader(gameIntegrator, abilityRegistry), getResource.apply("simple"));
       dynamicItemRegistry.registerLoader(new SwordLoader(gameIntegrator, abilityRegistry), getResource.apply("swords"));

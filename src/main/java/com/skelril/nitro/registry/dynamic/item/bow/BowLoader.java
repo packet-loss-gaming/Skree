@@ -6,9 +6,9 @@
 
 package com.skelril.nitro.registry.dynamic.item.bow;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
 import com.skelril.nitro.registry.dynamic.item.ItemLoader;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
 
 public class BowLoader extends ItemLoader<LoadedBow, BowConfig> {
   public BowLoader(GameIntegrator integrator, AbilityRegistry registry) {

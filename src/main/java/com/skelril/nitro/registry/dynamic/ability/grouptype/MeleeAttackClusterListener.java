@@ -4,11 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
+package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.ArmorEquipable;
+import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.Listener;
@@ -16,18 +14,18 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class MeleeAttackClusterListener implements ClusterListener {
   private MeleeAttackCluster attackCluster;
-  private String itemID;
+  private Predicate<Living> applicabilityTest;
   private AbilityCooldownHandler cooldownHandler;
 
-  public MeleeAttackClusterListener(MeleeAttackCluster attackCluster, String itemID, AbilityCooldownHandler cooldownHandler) {
+  public MeleeAttackClusterListener(MeleeAttackCluster attackCluster, Predicate<Living> applicabilityTest, AbilityCooldownHandler cooldownHandler) {
     this.attackCluster = attackCluster;
-    this.itemID = itemID;
+    this.applicabilityTest = applicabilityTest;
     this.cooldownHandler = cooldownHandler;
   }
 
@@ -46,15 +44,6 @@ public class MeleeAttackClusterListener implements ClusterListener {
     return Optional.of((Living) source);
   }
 
-  public boolean isApplicable(Living sourceEntity) {
-    if (!(sourceEntity instanceof ArmorEquipable)) {
-      return false;
-    }
-
-    Optional<ItemStack> optHeldItem = ((ArmorEquipable) sourceEntity).getItemInHand(HandTypes.MAIN_HAND);
-    return optHeldItem.isPresent() && optHeldItem.get().getItem().getId().equals(itemID);
-  }
-
   @Listener(order = Order.LATE)
   public void onPlayerCombat(DamageEntityEvent event) {
     Entity targetEntity = event.getTargetEntity();
@@ -68,7 +57,7 @@ public class MeleeAttackClusterListener implements ClusterListener {
     }
 
     Living sourceEntity = optSourceEntity.get();
-    if (!isApplicable(sourceEntity)) {
+    if (!applicabilityTest.test(sourceEntity)) {
       return;
     }
 

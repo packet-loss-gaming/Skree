@@ -6,8 +6,8 @@
 
 package com.skelril.skree.content.registry.item.ability;
 
-import com.skelril.nitro.registry.dynamic.item.ability.Ability;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityRegistry;
+import com.skelril.nitro.registry.dynamic.ability.Ability;
+import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.skree.content.registry.item.ability.combat.*;
 import com.skelril.skree.content.registry.item.ability.misc.CreatureImpact;
 

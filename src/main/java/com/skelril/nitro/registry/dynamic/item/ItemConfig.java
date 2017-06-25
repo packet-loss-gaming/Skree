@@ -7,10 +7,13 @@
 package com.skelril.nitro.registry.dynamic.item;
 
 import com.google.common.collect.Lists;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityGroup;
+import com.skelril.nitro.registry.dynamic.ability.AbilityGroup;
+import com.skelril.nitro.registry.dynamic.ability.HeldItemApplicabilityTest;
+import org.spongepowered.api.entity.living.Living;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public abstract class ItemConfig {
   private String id;
@@ -32,5 +35,9 @@ public abstract class ItemConfig {
 
   public int getEnchantability() {
     return enchantability;
+  }
+
+  public Predicate<Living> getApplicabilityTest() {
+    return new HeldItemApplicabilityTest(id);
   }
 }

@@ -9,7 +9,7 @@ package com.skelril.skree.content.registry.item.ability.combat;
 import com.skelril.nitro.particle.ParticleGenerator;
 import com.skelril.nitro.position.CuboidContainmentPredicate;
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.dynamic.item.ability.SpecialAttack;
+import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;

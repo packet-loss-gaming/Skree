@@ -4,14 +4,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.skelril.nitro.registry.dynamic.item.ability.grouptype;
+package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
 import com.skelril.nitro.probability.Probability;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCluster;
-import com.skelril.nitro.registry.dynamic.item.ability.AbilityCooldownHandler;
-import com.skelril.nitro.registry.dynamic.item.ability.PointOfContact;
+import com.skelril.nitro.registry.dynamic.ability.AbilityCluster;
+import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
+import com.skelril.nitro.registry.dynamic.ability.PointOfContact;
+import org.spongepowered.api.entity.living.Living;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class PointOfContactCluster extends AbilityCluster {
   private List<PointOfContact> pointOfContact;
@@ -25,7 +27,7 @@ public class PointOfContactCluster extends AbilityCluster {
   }
 
   @Override
-  public ClusterListener getListenerFor(String itemID, AbilityCooldownHandler coolDownManager) {
-    return new PointOfContactClusterListener(this, itemID, coolDownManager);
+  public ClusterListener getListenerFor(Predicate<Living> applicabilityTest, AbilityCooldownHandler coolDownManager) {
+    return new PointOfContactClusterListener(this, applicabilityTest, coolDownManager);
   }
 }
