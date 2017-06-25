@@ -1,0 +1,19 @@
+{
+  "matching_helmets": ["skree:tormentor_helmet"],
+  "matching_chestplates": ["skree:tormentor_chestplate"],
+  "matching_leggings": ["skree:tormentor_leggings"],
+  "matching_boots": ["skree:tormentor_boots"],
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "tormentor",
+        "seconds": 10
+      },
+      "defensive": [
+        {
+          "id": "power_burst"
+        }
+      ]
+    }
+  ]
+}

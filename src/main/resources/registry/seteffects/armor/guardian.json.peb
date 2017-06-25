@@ -1,0 +1,19 @@
+{
+  "matching_helmets": ["skree:guardian_helmet"],
+  "matching_chestplates": ["skree:guardian_chestplate"],
+  "matching_leggings": ["skree:guardian_leggings"],
+  "matching_boots": ["skree:guardian_boots"],
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "guardian",
+        "seconds": 10
+      },
+      "defensive": [
+        {
+          "id": "power_burst"
+        }
+      ]
+    }
+  ]
+}
