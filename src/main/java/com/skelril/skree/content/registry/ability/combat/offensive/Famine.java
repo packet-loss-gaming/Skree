@@ -22,7 +22,7 @@ public class Famine implements SpecialAttack {
       target.offer(Keys.FOOD_LEVEL, (int) (target.get(Keys.FOOD_LEVEL).get() * .85));
       target.offer(Keys.SATURATION, 0D);
     } else {
-      EntityHealthUtil.setMaxHealth(target, EntityHealthUtil.getMaxHealth(target) * .9);
+      EntityHealthUtil.setMaxHealth(target, EntityHealthUtil.getMaxHealth(target) * .9, false);
     }
 
     notify(owner, Text.of(TextColors.YELLOW, "You drain the stamina of your foe."));
