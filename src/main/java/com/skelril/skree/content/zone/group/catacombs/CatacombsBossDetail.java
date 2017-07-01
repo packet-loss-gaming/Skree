@@ -16,6 +16,7 @@ public class CatacombsBossDetail extends ZoneBossDetail<CatacombsInstance> {
 
   private final int wave;
   private WeakReference<Player> marked = new WeakReference<>(null);
+  private boolean warmingMark = false;
 
   public CatacombsBossDetail(CatacombsInstance zone, int wave) {
     super(zone);
@@ -31,6 +32,15 @@ public class CatacombsBossDetail extends ZoneBossDetail<CatacombsInstance> {
   }
 
   public void setMarked(Player player) {
+    warmingMark = false;
     marked = new WeakReference<>(player);
+  }
+
+  public void warmMark() {
+    warmingMark = true;
+  }
+
+  public boolean isWarmingMark() {
+    return warmingMark;
   }
 }

@@ -11,6 +11,7 @@ import com.skelril.nitro.probability.Probability;
 import com.skelril.openboss.Boss;
 import com.skelril.openboss.Instruction;
 import com.skelril.openboss.condition.DamagedCondition;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsBossDetail;
 import com.skelril.skree.content.zone.group.catacombs.CatacombsInstance;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
@@ -18,10 +19,12 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class DeathMark implements Instruction<DamagedCondition, Boss<Zombie, CatacombsBossDetail>> {
   private final int baseActivation;
@@ -47,6 +50,11 @@ public class DeathMark implements Instruction<DamagedCondition, Boss<Zombie, Cat
       public void processPlayerAttack(Player attacker, Living defender) {
         CatacombsBossDetail detail = zombieCatacombsBossDetailBoss.getDetail();
         CatacombsInstance inst = detail.getZone();
+
+        if (detail.isWarmingMark()) {
+          return;
+        }
+
         if (detail.getMarked().isPresent()) {
           if (attacker.equals(detail.getMarked().get())) {
             inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
@@ -57,10 +65,22 @@ public class DeathMark implements Instruction<DamagedCondition, Boss<Zombie, Cat
           }
           detail.setMarked(null);
         } else if (activate(detail)) {
-          detail.setMarked(attacker);
+          detail.warmMark();
           inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
-              Text.of(TextColors.DARK_RED, attacker.getName() + " has been marked!")
+              Text.of(TextColors.DARK_RED, "The necromancer stares intently at " + attacker.getName() + "!")
           );
+
+          Task.builder().execute(() -> {
+            if (!inst.contains(attacker)) {
+              detail.setMarked(null);
+              return;
+            }
+
+            detail.setMarked(attacker);
+            inst.getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
+                Text.of(TextColors.DARK_RED, attacker.getName() + " has been marked!")
+            );
+          }).delay(3, TimeUnit.SECONDS).submit(SkreePlugin.inst());
         }
       }
     }.parse(damagedCondition.getEvent());
