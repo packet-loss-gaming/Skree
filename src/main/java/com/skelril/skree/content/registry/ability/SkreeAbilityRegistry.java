@@ -33,7 +33,11 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
     registerAbility("doom_blade", DoomBlade.class);
     registerAbility("evil_focus", EvilFocus.class);
     registerAbility("fear_blaze", FearBlaze.class);
+    registerAbility("fear_bomb", FearBomb.class);
+    registerAbility("fear_strike", FearStrike.class);
     registerAbility("healing_light", HealingLight.class);
+    registerAbility("lightning_strike", LightningStrike.class);
+    registerAbility("magic_chain", LightningStrike.class);
     registerAbility("life_leech", LifeLeech.class);
     registerAbility("regen", Regen.class);
     registerAbility("soul_smite", SoulSmite.class);

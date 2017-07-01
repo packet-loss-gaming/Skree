@@ -1,0 +1,39 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.skelril.skree.content.registry.ability.combat.offensive;
+
+import com.skelril.nitro.entity.EntityHealthUtil;
+import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
+import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Optional;
+
+public class MagicChain implements SpecialAttack {
+  @Override
+  public void run(Living owner, Living target, DamageEntityEvent event) {
+    Optional<PotionEffectData> optPotionEffectData = owner.getOrCreate(PotionEffectData.class);
+    if (!optPotionEffectData.isPresent()) {
+      return;
+    }
+
+    PotionEffectData potionEffectData = optPotionEffectData.get();
+
+    int duration = (int) (EntityHealthUtil.getHealth(target) * 18);
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, duration));
+    potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WEAKNESS, 2, duration));
+
+    owner.offer(potionEffectData);
+
+    notify(owner, Text.of(TextColors.YELLOW, "Your bow slows its victim."));
+  }
+}

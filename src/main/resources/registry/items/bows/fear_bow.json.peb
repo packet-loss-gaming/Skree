@@ -1,0 +1,38 @@
+{
+  "id": "fear_bow",
+  "max_uses": 384,
+  "enchantability": 1,
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "fear",
+        "seconds": 3.8
+      },
+      "ranged_attacks": [
+        {
+          "id": "curse"
+        },
+        {
+          "id": "magic_chain"
+        },
+        {
+          "id": "fear_strike"
+        },
+        {
+          "id": "fear_bomb"
+        }
+      ]
+    },
+    {
+      "cool_down": {
+        "pool": "fear",
+        "seconds": 0
+      },
+      "point_of_contact": [
+        {
+          "id": "lightning_strike"
+        }
+      ]
+    }
+  ]
+}
