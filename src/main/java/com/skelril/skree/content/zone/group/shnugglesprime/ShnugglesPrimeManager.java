@@ -423,6 +423,8 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
         }
       }
 
+      event.setBaseDamage(Math.min(35, event.getBaseDamage()));
+
       return Optional.empty();
     });
   }
