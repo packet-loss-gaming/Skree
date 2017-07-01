@@ -18,7 +18,7 @@ public class CuboidContainmentPredicate implements Predicate<Vector3d> {
   public CuboidContainmentPredicate(Vector3d origin, double x, double y, double z) {
     this(
         new Vector3d(origin.getX() - x, origin.getY() - y, origin.getZ() - z),
-        new Vector3d(origin.getX() + x, origin.getY() + y, origin.getZ() + z)
+        new Vector3d(origin.getX() + x + 1, origin.getY() + y + 1, origin.getZ() + z + 1)
     );
   }
 
@@ -29,8 +29,8 @@ public class CuboidContainmentPredicate implements Predicate<Vector3d> {
 
   @Override
   public boolean test(Vector3d point) {
-    return min.getX() <= point.getX() && point.getX() <= max.getX()
-        && min.getY() <= point.getY() && point.getY() <= max.getY()
-        && min.getZ() <= point.getZ() && point.getZ() <= max.getZ();
+    return min.getX() <= point.getX() && point.getX() < max.getX()
+        && min.getY() <= point.getY() && point.getY() < max.getY()
+        && min.getZ() <= point.getZ() && point.getZ() < max.getZ();
   }
 }
