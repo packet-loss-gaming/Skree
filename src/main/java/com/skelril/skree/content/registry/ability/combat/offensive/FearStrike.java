@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.ability.combat.offensive;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.position.CuboidContainmentPredicate;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
@@ -37,8 +38,8 @@ public class FearStrike implements SpecialAttack {
           continue;
         }
 
-        Vector3d velocity = owner.getHeadRotation().mul(2);
-        velocity = new Vector3d(velocity.getX(), Math.max(velocity.getY(), Math.random() * 2 + 1.27), velocity.getZ());
+        Vector3d velocity = EntityDirectionUtil.getFacingVector(owner).mul(2);
+        velocity = new Vector3d(velocity.getX(), Math.max(velocity.getY(), Math.random() * 1.3 + 1.97), velocity.getZ());
         e.setVelocity(velocity);
         e.offer(Keys.FIRE_TICKS, 20 * (Probability.getRandom(40) + 20));
       }
