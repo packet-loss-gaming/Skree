@@ -209,7 +209,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
       damagedProcessor.add(new CatacombsDamageNearby());
     }
     if (Probability.getChance(2)) {
-      damagedProcessor.add(new UndeadMinionRetaliation(Probability.getRangedRandom(12, 25)));
+      damagedProcessor.add(new UndeadMinionRetaliation(Probability.getRangedRandom(23, 36)));
     }
 
     bossManager.bind(boss);

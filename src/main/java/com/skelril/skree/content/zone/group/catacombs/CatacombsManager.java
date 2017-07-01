@@ -84,7 +84,7 @@ public class CatacombsManager extends GroupZoneManager<CatacombsInstance> implem
 
     List<Instruction<BindCondition, Boss<Zombie, CatacombsBossDetail>>> bindProcessor = bossManager.getBindProcessor();
     bindProcessor.add(new NamedBindInstruction<>("Necromancer"));
-    bindProcessor.add(new CatacombsHealthInstruction(250));
+    bindProcessor.add(new CatacombsHealthInstruction(200));
 
     List<Instruction<UnbindCondition, Boss<Zombie, CatacombsBossDetail>>> unbindProcessor = bossManager.getUnbindProcessor();
     unbindProcessor.add(new CheckedSpawnWave());
