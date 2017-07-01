@@ -37,4 +37,16 @@ public class ParticleGenerator {
       ));
     }
   }
+
+  private static final ParticleEffect ENDER_TELEPORT = ParticleEffect.builder().type(ParticleTypes.ENDER_TELEPORT).quantity(1).build();
+
+  public static void enderTeleport(Location<World> location, int intensity) {
+    for (int i = 0; i < 20 * intensity; ++i) {
+      location.getExtent().spawnParticles(ENDER_TELEPORT, location.getPosition().add(
+          Probability.getRangedRandom(-.5, .5),
+          Probability.getRangedRandom(0.0, 1.0),
+          Probability.getRangedRandom(-.5, .5)
+      ));
+    }
+  }
 }

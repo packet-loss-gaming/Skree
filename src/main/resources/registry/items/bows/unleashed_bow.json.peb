@@ -1,0 +1,41 @@
+{
+  "id": "unleashed_bow",
+  "max_uses": 384,
+  "enchantability": 1,
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "unleashed",
+        "seconds": 3.8
+      },
+      "ranged_attacks": [
+        {
+          "id": "famine"
+        },
+        {
+          "id": "life_leech"
+        },
+        {
+          "id": "evil_focus"
+        },
+        {
+          "id": "agility"
+        },
+        {
+          "id": "glowing_fog"
+        }
+      ]
+    },
+    {
+      "cool_down": {
+        "pool": "unleashed",
+        "seconds": 0
+      },
+      "point_of_contact": [
+        {
+          "id": "item_vortex"
+        }
+      ]
+    }
+  ]
+}
