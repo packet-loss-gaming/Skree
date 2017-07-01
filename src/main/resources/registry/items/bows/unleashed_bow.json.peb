@@ -1,6 +1,10 @@
 {
   "id": "unleashed_bow",
   "max_uses": 384,
+  "repair_item_stack": {
+    "id": "skree:holy_bow",
+    "data": 0
+  },
   "enchantability": 1,
   "ability_groups": [
     {

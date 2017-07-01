@@ -1,0 +1,9 @@
+{
+  "id": "demonic_bow",
+  "max_uses": 384,
+  "repair_item_stack": {
+    "id": "skree:demonic_ingot",
+    "data": 0
+  },
+  "enchantability": 1
+}

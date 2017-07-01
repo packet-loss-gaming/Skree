@@ -1,0 +1,16 @@
+{
+  "crafted_item": {
+    "id": "skree:demonic_bow",
+    "data": 0
+  },
+  "required_item_stacks": [
+    {
+      "id": "skree:demonic_bowstave",
+      "data": 0
+    },
+    {
+      "id": "skree:cursed_string",
+      "data": 0
+    }
+  ]
+}
