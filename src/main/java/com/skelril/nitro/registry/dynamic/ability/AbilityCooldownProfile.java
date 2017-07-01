@@ -8,10 +8,19 @@ package com.skelril.nitro.registry.dynamic.ability;
 
 public class AbilityCooldownProfile {
   private String pool;
-  private double seconds;
+  private boolean invertedActivation = false;
+  private double seconds = -1;
 
   public String getPool() {
     return pool;
+  }
+
+  public boolean isAllowedWhileOnCooldown() {
+    return invertedActivation;
+  }
+
+  public boolean isAllowedWhileOffCooldown() {
+    return !invertedActivation;
   }
 
   public double getSeconds() {
@@ -19,6 +28,6 @@ public class AbilityCooldownProfile {
   }
 
   public boolean isEnforced() {
-    return seconds > 0;
+    return seconds >= 0;
   }
 }

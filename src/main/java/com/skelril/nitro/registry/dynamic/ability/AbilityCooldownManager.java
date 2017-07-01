@@ -35,6 +35,12 @@ public class AbilityCooldownManager {
 
     Map<String, Long> personalCoolDownMapping = coolDownLookup.getOrDefault(player.getUniqueId(), new HashMap<>());
     long coolDownExpireTime = personalCoolDownMapping.getOrDefault(abilityCooldownProfile.getPool(), 0L);
-    return coolDownExpireTime < System.currentTimeMillis();
+
+    boolean isOnCooldown = System.currentTimeMillis() < coolDownExpireTime;
+
+    boolean isAllowedOnCooldown = isOnCooldown && abilityCooldownProfile.isAllowedWhileOnCooldown();
+    boolean isAllowedOffCooldown = !isOnCooldown && abilityCooldownProfile.isAllowedWhileOffCooldown();
+
+    return isAllowedOnCooldown || isAllowedOffCooldown;
   }
 }

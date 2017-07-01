@@ -26,6 +26,7 @@
     {
       "cool_down": {
         "pool": "fear",
+        "inverted_activation": true,
         "seconds": 0
       },
       "point_of_contact": [

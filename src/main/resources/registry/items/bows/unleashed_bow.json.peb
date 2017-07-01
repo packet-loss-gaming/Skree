@@ -29,6 +29,7 @@
     {
       "cool_down": {
         "pool": "unleashed",
+        "inverted_activation": true,
         "seconds": 0
       },
       "point_of_contact": [
