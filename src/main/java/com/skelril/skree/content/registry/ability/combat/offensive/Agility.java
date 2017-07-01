@@ -38,7 +38,7 @@ public class Agility implements SpecialAttack {
     }
 
     if (optOwnerPotionEffectData.isPresent() || optTargetPotionEffectData.isPresent()) {
-      notify(owner, Text.of(TextColors.YELLOW, "You gain a agile advantage over your opponent."));
+      notify(owner, Text.of(TextColors.YELLOW, "You gain an agile advantage over your opponent."));
     }
   }
 }
