@@ -21,18 +21,18 @@ import java.util.Optional;
 public class MagicChain implements SpecialAttack {
   @Override
   public void run(Living owner, Living target, DamageEntityEvent event) {
-    Optional<PotionEffectData> optPotionEffectData = owner.getOrCreate(PotionEffectData.class);
+    Optional<PotionEffectData> optPotionEffectData = target.getOrCreate(PotionEffectData.class);
     if (!optPotionEffectData.isPresent()) {
       return;
     }
 
     PotionEffectData potionEffectData = optPotionEffectData.get();
 
-    int duration = (int) (EntityHealthUtil.getHealth(target) * 18);
+    int duration = (int) (EntityHealthUtil.getHealth(owner) * 18);
     potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.SLOWNESS, 2, duration));
     potionEffectData.addElement(PotionEffect.of(PotionEffectTypes.WEAKNESS, 2, duration));
 
-    owner.offer(potionEffectData);
+    target.offer(potionEffectData);
 
     notify(owner, Text.of(TextColors.YELLOW, "Your bow slows its victim."));
   }
