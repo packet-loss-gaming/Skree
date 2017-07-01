@@ -39,7 +39,7 @@ public class EntityHealthUtil {
   }
 
   public static void setMaxHealth(Living living, double amt, boolean fill) {
-    if (amt < living.get(Keys.MAX_HEALTH).get()) {
+    if (amt < living.get(Keys.MAX_HEALTH).get() && living.get(Keys.HEALTH).get() > amt) {
       living.offer(Keys.HEALTH, amt);
     }
 
