@@ -1,0 +1,24 @@
+{
+  "matching_helmets": ["skree:jurack_helmet"],
+  "matching_chestplates": ["skree:jurack_chestplate"],
+  "matching_leggings": ["skree:jurack_leggings"],
+  "matching_boots": ["skree:jurack_boots"],
+  "ability_groups": [
+    {
+      "cool_down": {
+        "pool": "jurack",
+        "seconds": 3
+      },
+      "melee_attacks": [
+        {
+          "id": "damage_boost"
+        }
+      ],
+      "ranged_attacks": [
+        {
+          "id": "damage_boost"
+        }
+      ]
+    }
+  ]
+}

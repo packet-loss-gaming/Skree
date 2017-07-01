@@ -8,6 +8,7 @@ package com.skelril.skree.content.registry.ability;
 
 import com.skelril.nitro.registry.dynamic.ability.Ability;
 import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
+import com.skelril.skree.content.registry.ability.combat.defensive.DamageReflection;
 import com.skelril.skree.content.registry.ability.combat.defensive.PowerBurst;
 import com.skelril.skree.content.registry.ability.combat.offensive.*;
 import com.skelril.skree.content.registry.ability.misc.CreatureImpact;
@@ -30,6 +31,7 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
     registerAbility("coin_toss", CoinToss.class);
     registerAbility("confuse", Confuse.class);
     registerAbility("curse", Curse.class);
+    registerAbility("damage_boost", DamageBoost.class);
     registerAbility("decimate", Decimate.class);
     registerAbility("doom_blade", DoomBlade.class);
     registerAbility("evil_focus", EvilFocus.class);
@@ -48,6 +50,7 @@ public class SkreeAbilityRegistry implements AbilityRegistry {
   }
 
   private void registerDefensiveAbilities() {
+    registerAbility("damage_reflection", DamageReflection.class);
     registerAbility("power_burst", PowerBurst.class);
   }
 
