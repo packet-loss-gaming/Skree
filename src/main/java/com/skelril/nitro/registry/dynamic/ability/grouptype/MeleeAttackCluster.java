@@ -6,12 +6,11 @@
 
 package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
 import com.skelril.nitro.registry.dynamic.ability.SpecialAttack;
-import org.spongepowered.api.entity.living.Living;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class MeleeAttackCluster extends SpecialAttackCluster {
   private List<SpecialAttack> meleeAttacks;
@@ -22,7 +21,7 @@ public class MeleeAttackCluster extends SpecialAttackCluster {
   }
 
   @Override
-  public ClusterListener getListenerFor(Predicate<Living> applicabilityTest, AbilityCooldownHandler cooldownHandler) {
+  public ClusterListener getListenerFor(AbilityApplicabilityTest applicabilityTest, AbilityCooldownHandler cooldownHandler) {
     return new MeleeAttackClusterListener(this, applicabilityTest, cooldownHandler);
   }
 }

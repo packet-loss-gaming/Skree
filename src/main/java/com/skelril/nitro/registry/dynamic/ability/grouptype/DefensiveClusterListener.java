@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
@@ -17,14 +18,13 @@ import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDama
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public class DefensiveClusterListener implements ClusterListener {
   private DefensiveCluster defensiveCluster;
-  private Predicate<Living> applicabilityTest;
+  private AbilityApplicabilityTest applicabilityTest;
   private AbilityCooldownHandler cooldownHandler;
 
-  public DefensiveClusterListener(DefensiveCluster defensiveCluster, Predicate<Living> applicabilityTest, AbilityCooldownHandler cooldownHandler) {
+  public DefensiveClusterListener(DefensiveCluster defensiveCluster, AbilityApplicabilityTest applicabilityTest, AbilityCooldownHandler cooldownHandler) {
     this.defensiveCluster = defensiveCluster;
     this.applicabilityTest = applicabilityTest;
     this.cooldownHandler = cooldownHandler;
@@ -64,7 +64,7 @@ public class DefensiveClusterListener implements ClusterListener {
     }
 
     Living attackingEntity = optAttackingEntity.get();
-    if (!applicabilityTest.test((Living) defendingEntity)) {
+    if (!applicabilityTest.test((Living) defendingEntity, null)) {
       return;
     }
 

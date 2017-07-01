@@ -7,13 +7,12 @@
 package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
 import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCluster;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
 import com.skelril.nitro.registry.dynamic.ability.PointOfContact;
-import org.spongepowered.api.entity.living.Living;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class PointOfContactCluster extends AbilityCluster {
   private List<PointOfContact> pointOfContact;
@@ -27,7 +26,7 @@ public class PointOfContactCluster extends AbilityCluster {
   }
 
   @Override
-  public ClusterListener getListenerFor(Predicate<Living> applicabilityTest, AbilityCooldownHandler coolDownManager) {
+  public ClusterListener getListenerFor(AbilityApplicabilityTest applicabilityTest, AbilityCooldownHandler coolDownManager) {
     return new PointOfContactClusterListener(this, applicabilityTest, coolDownManager);
   }
 }

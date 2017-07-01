@@ -8,15 +8,13 @@ package com.skelril.nitro.registry.dynamic.ability;
 
 import com.skelril.nitro.registry.dynamic.ability.grouptype.ClusterListener;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.Living;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class AbilityIntegrator {
   private final AbilityCooldownManager cooldownManager = new AbilityCooldownManager();
 
-  private void processAbilityGroup(Object mod, Predicate<Living> applicabilityTest, AbilityGroup abilityGroup) {
+  private void processAbilityGroup(Object mod, AbilityApplicabilityTest applicabilityTest, AbilityGroup abilityGroup) {
     AbilityCooldownHandler cooldownHandler = new AbilityCooldownHandler(abilityGroup.getCoolDown(), cooldownManager);
     abilityGroup.getClusters().forEach((cluster) -> {
       ClusterListener listener = cluster.getListenerFor(applicabilityTest, cooldownHandler);
@@ -24,7 +22,7 @@ public class AbilityIntegrator {
     });
   }
 
-  public void processAbilityGroups(Object mod, Predicate<Living> applicabilityTest, List<AbilityGroup> abilityGroups) {
+  public void processAbilityGroups(Object mod, AbilityApplicabilityTest applicabilityTest, List<AbilityGroup> abilityGroups) {
     abilityGroups.forEach(abilityGroup -> {
       processAbilityGroup(mod, applicabilityTest, abilityGroup);
     });

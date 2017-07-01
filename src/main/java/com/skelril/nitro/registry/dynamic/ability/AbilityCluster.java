@@ -7,10 +7,7 @@
 package com.skelril.nitro.registry.dynamic.ability;
 
 import com.skelril.nitro.registry.dynamic.ability.grouptype.ClusterListener;
-import org.spongepowered.api.entity.living.Living;
-
-import java.util.function.Predicate;
 
 public abstract class AbilityCluster {
-  public abstract ClusterListener getListenerFor(Predicate<Living> applicabilityTest, AbilityCooldownHandler coolDownManager);
+  public abstract ClusterListener getListenerFor(AbilityApplicabilityTest applicabilityTest, AbilityCooldownHandler coolDownManager);
 }

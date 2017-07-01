@@ -7,13 +7,12 @@
 package com.skelril.nitro.registry.dynamic.ability.grouptype;
 
 import com.skelril.nitro.probability.Probability;
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCluster;
 import com.skelril.nitro.registry.dynamic.ability.AbilityCooldownHandler;
 import com.skelril.nitro.registry.dynamic.ability.DefensiveAbility;
-import org.spongepowered.api.entity.living.Living;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class DefensiveCluster extends AbilityCluster {
   private List<DefensiveAbility> defensive;
@@ -27,7 +26,7 @@ public class DefensiveCluster extends AbilityCluster {
   }
 
   @Override
-  public ClusterListener getListenerFor(Predicate<Living> applicabilityTest, AbilityCooldownHandler cooldownHandler) {
+  public ClusterListener getListenerFor(AbilityApplicabilityTest applicabilityTest, AbilityCooldownHandler cooldownHandler) {
     return new DefensiveClusterListener(this, applicabilityTest, cooldownHandler);
   }
 }

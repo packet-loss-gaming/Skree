@@ -8,13 +8,15 @@ package com.skelril.nitro.registry.dynamic.ability;
 
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-public class EquippedArmorApplicabilityTest implements Predicate<Living> {
+public class EquippedArmorApplicabilityTest implements AbilityApplicabilityTest {
   private final Collection<String> matchingHelmets;
   private final Collection<String> matchingChestplates;
   private final Collection<String> matchingLeggings;
@@ -29,8 +31,8 @@ public class EquippedArmorApplicabilityTest implements Predicate<Living> {
   }
 
   @Override
-  public boolean test(Living sourceEntity) {
-    if (!(sourceEntity instanceof ArmorEquipable)) {
+  public boolean test(Living sourceEntity, @Nullable ItemStackSnapshot usedStack) {
+    if (!(sourceEntity instanceof Player)) {
       return false;
     }
 

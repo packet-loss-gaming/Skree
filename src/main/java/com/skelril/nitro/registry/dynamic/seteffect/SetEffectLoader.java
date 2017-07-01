@@ -8,12 +8,10 @@ package com.skelril.nitro.registry.dynamic.seteffect;
 
 import com.google.gson.GsonBuilder;
 import com.skelril.nitro.registry.dynamic.Loader;
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityEnabledGsonBuilder;
 import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
-import org.spongepowered.api.entity.living.Living;
-
-import java.util.function.Predicate;
 
 public abstract class SetEffectLoader<T extends SetEffectConfig> implements Loader<T> {
   private GameIntegrator integrator;
@@ -24,7 +22,7 @@ public abstract class SetEffectLoader<T extends SetEffectConfig> implements Load
     this.abilityRegistry = abilityRegistry;
   }
 
-  public abstract Predicate<Living> constructPredicateFromConfig(T configObject);
+  public abstract AbilityApplicabilityTest constructPredicateFromConfig(T configObject);
 
   @Override
   public void load(T configObject) {

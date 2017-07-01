@@ -6,12 +6,10 @@
 
 package com.skelril.nitro.registry.dynamic.seteffect;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityRegistry;
 import com.skelril.nitro.registry.dynamic.ability.EquippedArmorApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.item.GameIntegrator;
-import org.spongepowered.api.entity.living.Living;
-
-import java.util.function.Predicate;
 
 public class ArmorSetEffectLoader extends SetEffectLoader<ArmorSetEffectConfig> {
   public ArmorSetEffectLoader(GameIntegrator integrator, AbilityRegistry abilityRegistry) {
@@ -19,7 +17,7 @@ public class ArmorSetEffectLoader extends SetEffectLoader<ArmorSetEffectConfig> 
   }
 
   @Override
-  public Predicate<Living> constructPredicateFromConfig(ArmorSetEffectConfig configObject) {
+  public AbilityApplicabilityTest constructPredicateFromConfig(ArmorSetEffectConfig configObject) {
     return new EquippedArmorApplicabilityTest(
         configObject.getMatchingHelmets(),
         configObject.getMatchingChestplates(),

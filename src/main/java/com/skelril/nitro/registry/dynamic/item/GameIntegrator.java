@@ -6,6 +6,7 @@
 
 package com.skelril.nitro.registry.dynamic.item;
 
+import com.skelril.nitro.registry.dynamic.ability.AbilityApplicabilityTest;
 import com.skelril.nitro.registry.dynamic.ability.AbilityGroup;
 import com.skelril.nitro.registry.dynamic.ability.AbilityIntegrator;
 import net.minecraft.client.Minecraft;
@@ -17,11 +18,9 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.Living;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class GameIntegrator {
   private String modID;
@@ -32,7 +31,7 @@ public class GameIntegrator {
     this.modID = modID;
   }
 
-  public void registerAbilities(Predicate<Living> applicabilityTest, List<AbilityGroup> abilityGroups) {
+  public void registerAbilities(AbilityApplicabilityTest applicabilityTest, List<AbilityGroup> abilityGroups) {
     Object mod = Sponge.getPluginManager().getPlugin(modID).get().getInstance().get();
     abilityIntegrator.processAbilityGroups(mod, applicabilityTest, abilityGroups);
   }
@@ -53,7 +52,7 @@ public class GameIntegrator {
 
     GameRegistry.register(item);
 
-    Predicate<Living> applicabilityTest = config.getApplicabilityTest(id);
+    AbilityApplicabilityTest applicabilityTest = config.getApplicabilityTest(id);
     registerAbilities(applicabilityTest, config.getAbilityGroups());
   }
 
