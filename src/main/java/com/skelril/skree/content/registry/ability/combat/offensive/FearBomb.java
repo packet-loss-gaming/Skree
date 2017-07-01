@@ -21,6 +21,7 @@ import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -47,7 +48,6 @@ public class FearBomb implements SpecialAttack {
   private boolean isPassable(BlockType blockType) {
     Optional<PassableProperty> optProp = blockType.getProperty(PassableProperty.class);
     return optProp.map(AbstractProperty::getValue).orElse(false);
-
   }
 
   private static final BlockState WHITE_WOOL_STATE = BlockState.builder().blockType(BlockTypes.WOOL).add(Keys.COLOR, Color.WHITE).build();
@@ -80,6 +80,10 @@ public class FearBomb implements SpecialAttack {
         Collection<Player> players = blocks.get(0).getExtent().getPlayers();
 
         for (Location<World> loc : blocks) {
+          if (isPassable(loc.getBlockType())) {
+            continue;
+          }
+
           for (Player player : players) {
             player.sendBlockChange(loc.getBlockPosition(), times % 2 == 0 ? WHITE_WOOL_STATE : RED_WOOL_STATE);
           }
@@ -109,9 +113,9 @@ public class FearBomb implements SpecialAttack {
           }
         }
 
-        for (Entity entity : getTargetEntities(originalLocation)) {
+        getTargetEntities(originalLocation).stream().filter((e) -> e instanceof Monster || e instanceof Player).forEach((entity) -> {
           entity.damage(10000, damageSource(owner));
-        }
+        });
       }
     };
 
