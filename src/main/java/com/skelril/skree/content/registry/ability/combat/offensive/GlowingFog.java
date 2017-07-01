@@ -40,7 +40,7 @@ public class GlowingFog implements SpecialAttack {
     IntegratedRunnable bomb = new IntegratedRunnable() {
       @Override
       public boolean run(int times) {
-        Vector3d max = originalLocation.getPosition().add(1, 1, 1);
+        Vector3d max = originalLocation.getPosition().add(1, 2, 1);
         Vector3d min = originalLocation.getPosition().sub(1, 0, 1);
 
         for (int x = min.getFloorX(); x <= max.getFloorX(); ++x) {
