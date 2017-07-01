@@ -173,7 +173,7 @@ public class JungleRaidEffectListener {
       if (inst.isFlagEnabled(JungleRaidFlag.TORMENT_ARROWS)) {
         ProjectileSource shooter = ((Arrow) entity).getShooter();
 
-        CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(entity.getLocation().getPosition(), 16, 16, 16);
+        CuboidContainmentPredicate predicate = new CuboidContainmentPredicate(entity.getLocation().getPosition(), 4, 4, 4);
         for (Entity e : entity.getNearbyEntities(en -> predicate.test(en.getLocation().getPosition()))) {
           if (e.equals(shooter)) {
             continue;
