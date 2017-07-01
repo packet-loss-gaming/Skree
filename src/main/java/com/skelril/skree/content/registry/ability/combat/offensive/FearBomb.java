@@ -19,6 +19,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
+import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
@@ -28,7 +29,6 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -50,8 +50,8 @@ public class FearBomb implements SpecialAttack {
     return optProp.map(AbstractProperty::getValue).orElse(false);
   }
 
-  private static final BlockState WHITE_WOOL_STATE = BlockState.builder().blockType(BlockTypes.WOOL).add(Keys.COLOR, Color.WHITE).build();
-  private static final BlockState RED_WOOL_STATE = BlockState.builder().blockType(BlockTypes.WOOL).add(Keys.COLOR, Color.RED).build();
+  private static final BlockState WHITE_WOOL_STATE = BlockState.builder().blockType(BlockTypes.WOOL).add(Keys.DYE_COLOR, DyeColors.WHITE).build();
+  private static final BlockState RED_WOOL_STATE = BlockState.builder().blockType(BlockTypes.WOOL).add(Keys.DYE_COLOR, DyeColors.RED).build();
 
   @Override
   public void run(Living owner, Living target, DamageEntityEvent event) {
