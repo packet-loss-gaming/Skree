@@ -146,6 +146,30 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                     new DropTableEntryImpl(
                         new SimpleDropResolver(
                             Lists.newArrayList(
+                                newItemStack("skree:holy_bowstave")
+                            )
+                        ), 15000
+                    )
+                )
+            ),
+            new DropTableImpl(
+                slipRoller,
+                Lists.newArrayList(
+                    new DropTableEntryImpl(
+                        new SimpleDropResolver(
+                            Lists.newArrayList(
+                                newItemStack("skree:blessed_string")
+                            )
+                        ), 15000
+                    )
+                )
+            ),
+            new DropTableImpl(
+                slipRoller,
+                Lists.newArrayList(
+                    new DropTableEntryImpl(
+                        new SimpleDropResolver(
+                            Lists.newArrayList(
                                 newItemStack("skree:emblem_of_hallow")
                             )
                         ), 750
@@ -171,6 +195,30 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                         new SimpleDropResolver(
                             Lists.newArrayList(
                                 newItemStack("skree:demonic_blade")
+                            )
+                        ), 15000
+                    )
+                )
+            ),
+            new DropTableImpl(
+                slipRoller,
+                Lists.newArrayList(
+                    new DropTableEntryImpl(
+                        new SimpleDropResolver(
+                            Lists.newArrayList(
+                                newItemStack("skree:demonic_bowstave")
+                            )
+                        ), 15000
+                    )
+                )
+            ),
+            new DropTableImpl(
+                slipRoller,
+                Lists.newArrayList(
+                    new DropTableEntryImpl(
+                        new SimpleDropResolver(
+                            Lists.newArrayList(
+                                newItemStack("skree:cursed_string")
                             )
                         ), 15000
                     )
