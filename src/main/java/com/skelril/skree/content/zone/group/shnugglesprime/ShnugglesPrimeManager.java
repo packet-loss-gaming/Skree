@@ -68,7 +68,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
             new DropTableImpl(
                 slipRoller,
                 Lists.newArrayList(
-                    new DropTableEntryImpl(new CofferResolver(100), 1)
+                    new DropTableEntryImpl(new CofferResolver(65), 1)
                 )
             ),
             new DropTableImpl(
@@ -253,7 +253,7 @@ public class ShnugglesPrimeManager extends GroupZoneManager<ShnugglesPrimeInstan
                             Lists.newArrayList(
                                 newItemStack("skree:unstable_catalyst")
                             )
-                        ), 25000
+                        ), 35000
                     )
                 )
             )
