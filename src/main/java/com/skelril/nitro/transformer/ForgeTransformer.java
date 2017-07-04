@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
@@ -50,6 +51,17 @@ public class ForgeTransformer {
 
   public static org.spongepowered.api.world.World tf(World world) {
     return (org.spongepowered.api.world.World) world;
+  }
+
+  /*
+   * Chunk transformations
+   */
+  public static Chunk tf(org.spongepowered.api.world.Chunk chunk) {
+    return (Chunk) chunk;
+  }
+
+  public static org.spongepowered.api.world.Chunk tf(Chunk chunk) {
+    return (org.spongepowered.api.world.Chunk) chunk;
   }
 
   /*
