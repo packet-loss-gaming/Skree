@@ -7,7 +7,11 @@
 package com.skelril.skree.service.internal.zone;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZoneWorldBoundingBox extends ZoneBoundingBox {
 
@@ -20,5 +24,17 @@ public class ZoneWorldBoundingBox extends ZoneBoundingBox {
 
   public World getExtent() {
     return world;
+  }
+
+  public List<Chunk> getChunks() {
+    List<Chunk> chunks = new ArrayList<>();
+
+    for (int x = 0; x < getBoundingBox().getX(); x += 16) {
+      for (int z = 0; z < getBoundingBox().getZ(); z += 16) {
+        getExtent().getChunkAtBlock(getOrigin().getX() + x, 0, getOrigin().getZ() + z).ifPresent(chunks::add);
+      }
+    }
+
+    return chunks;
   }
 }
