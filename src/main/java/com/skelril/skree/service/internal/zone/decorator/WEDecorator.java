@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.skelril.nitro.transformer.ForgeTransformer.tf;
+
 public class WEDecorator implements Decorator {
   private final Path baseDir;
 
@@ -98,6 +100,12 @@ public class WEDecorator implements Decorator {
 
     RunManager.runOperation(operation, () -> {
       RunManager.runOperation(transaction.commit(), () -> {
+        region.getChunks().forEach(chunk -> {
+          tf(chunk).resetRelightChecks();
+          tf(chunk).generateSkylightMap();
+          tf(chunk).checkLight();
+        });
+
         callback.accept(returnVal);
         if (--ref.refCount == 0) {
           hashRefMap.remove(resourceName);
