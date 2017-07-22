@@ -127,7 +127,8 @@ public class MarketServiceImpl implements MarketService {
           JsonObject entry = new JsonObject();
 
           entry.addProperty("name", record.get(ITEM_ALIASES.ALIAS));
-          entry.addProperty("value", record.get(ITEM_DATA.CURRENT_VALUE));
+          entry.addProperty("buy_price", record.get(ITEM_DATA.CURRENT_VALUE));
+          entry.addProperty("sell_price", record.get(ITEM_DATA.CURRENT_VALUE).multiply(getSellFactor(record.get(ITEM_DATA.CURRENT_VALUE))));
           entry.addProperty("stock", record.get(ITEM_DATA.STOCK));
 
           items.add(entry);
