@@ -44,6 +44,12 @@ public class MarketSystem implements ServiceProvider<MarketService> {
     return path.resolve("market_state.json");
   }
 
+  private Path getMarketValueFile() throws IOException {
+    ConfigManager service = Sponge.getGame().getConfigManager();
+    Path path = service.getPluginConfig(SkreePlugin.inst()).getDirectory();
+    return path.resolve("market_values.json");
+  }
+
   private void loadState() {
     try {
       Path targetFile = getMarketStateFile();
@@ -77,28 +83,33 @@ public class MarketSystem implements ServiceProvider<MarketService> {
 
   @NModuleTrigger(trigger = "SERVER_STARTED")
   public void init() {
-    service = new MarketServiceImpl();
-    loadState();
+    try {
+      service = new MarketServiceImpl(getMarketValueFile());
 
-    // Register the service
-    Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
-    Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
+      loadState();
 
-    // Calculate delay
-    long elapsedTime = System.currentTimeMillis() - state.getLastUpdate();
-    long elapsedSeconds = elapsedTime / TimeUnit.SECONDS.toMillis(1);
-    long waitDuration = WAIT_UNIT.toSeconds(WAIT_TIME);
-    long remainingTime = Math.max(0, waitDuration - elapsedSeconds);
+      // Register the service
+      Sponge.getServiceManager().setProvider(SkreePlugin.inst(), MarketService.class, service);
+      Sponge.getCommandManager().register(SkreePlugin.inst(), MarketCommand.aquireSpec(), "market", "mk");
 
-    // Schedule an update task for every two hours
-    Task.builder().execute(() -> {
-      service.updatePrices();
-      state.setLastUpdate(System.currentTimeMillis());
-      dumpState();
+      // Calculate delay
+      long elapsedTime = System.currentTimeMillis() - state.getLastUpdate();
+      long elapsedSeconds = elapsedTime / TimeUnit.SECONDS.toMillis(1);
+      long waitDuration = WAIT_UNIT.toSeconds(WAIT_TIME);
+      long remainingTime = Math.max(0, waitDuration - elapsedSeconds);
 
-      MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, "The market has been updated"));
-      GameChatterPlugin.inst().sendSystemMessage("The market has been updated");
-    }).interval(WAIT_TIME, WAIT_UNIT).delay(remainingTime, TimeUnit.SECONDS).async().submit(SkreePlugin.inst());
+      // Schedule an update task for every two hours
+      Task.builder().execute(() -> {
+        service.updatePrices();
+        state.setLastUpdate(System.currentTimeMillis());
+        dumpState();
+
+        MessageChannel.TO_ALL.send(Text.of(TextColors.GOLD, "The market has been updated"));
+        GameChatterPlugin.inst().sendSystemMessage("The market has been updated");
+      }).interval(WAIT_TIME, WAIT_UNIT).delay(remainingTime, TimeUnit.SECONDS).async().submit(SkreePlugin.inst());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override

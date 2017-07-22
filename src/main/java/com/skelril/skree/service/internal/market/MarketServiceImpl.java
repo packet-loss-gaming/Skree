@@ -1,7 +1,10 @@
 package com.skelril.skree.service.internal.market;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.skelril.nitro.Clause;
 import com.skelril.nitro.probability.Probability;
+import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.db.SQLHandle;
 import com.skelril.skree.db.schema.tables.records.ItemDataRecord;
 import com.skelril.skree.service.MarketService;
@@ -9,9 +12,14 @@ import com.skelril.skree.service.internal.market.deducer.DeducerOfSimpleType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -22,6 +30,12 @@ import static com.skelril.skree.db.schema.tables.ItemAliases.ITEM_ALIASES;
 import static com.skelril.skree.db.schema.tables.ItemData.ITEM_DATA;
 
 public class MarketServiceImpl implements MarketService {
+
+  private final Path marketValuesPath;
+
+  public MarketServiceImpl(Path marketValuesPath) {
+    this.marketValuesPath = marketValuesPath;
+  }
 
   private void validateAlias(String alias) {
     if (!alias.matches(VALID_ALIAS_REGEX)) {
@@ -99,6 +113,35 @@ public class MarketServiceImpl implements MarketService {
     return Math.max(0, existingStock);
   }
 
+  private void writeMarketJson() {
+    Task.builder().execute(() -> {
+      try (Connection con = SQLHandle.getConnection()) {
+        DSLContext create = DSL.using(con);
+        Result<Record3<String, BigDecimal, Integer>> results = create.select(ITEM_ALIASES.ALIAS, ITEM_DATA.CURRENT_VALUE, ITEM_DATA.STOCK)
+            .from(ITEM_DATA).join(ITEM_ALIASES).on(ITEM_ALIASES.ITEM_ID.equal(ITEM_DATA.ID))
+            .fetch();
+
+        JsonArray items = new JsonArray();
+
+        results.forEach((record) -> {
+          JsonObject entry = new JsonObject();
+
+          entry.addProperty("name", record.get(ITEM_ALIASES.ALIAS));
+          entry.addProperty("value", record.get(ITEM_DATA.CURRENT_VALUE));
+          entry.addProperty("stock", record.get(ITEM_DATA.STOCK));
+
+          items.add(entry);
+        });
+
+        try (BufferedWriter writer = Files.newBufferedWriter(marketValuesPath)) {
+          writer.write(items.toString());
+        }
+      } catch (SQLException | IOException e) {
+        e.printStackTrace();
+      }
+    }).async().submit(SkreePlugin.inst());
+  }
+
   @Override
   public void updatePrices() {
     try (Connection con = SQLHandle.getConnection()) {
@@ -122,6 +165,8 @@ public class MarketServiceImpl implements MarketService {
       }
 
       create.batch(updates).execute();
+
+      writeMarketJson();
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -175,6 +220,9 @@ public class MarketServiceImpl implements MarketService {
                   .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
           )
       ).execute();
+
+      writeMarketJson();
+
       return changed > 0;
     } catch (SQLException e) {
       e.printStackTrace();
@@ -191,6 +239,9 @@ public class MarketServiceImpl implements MarketService {
       int changed = create.update(ITEM_DATA).set(ITEM_DATA.STOCK, quantity).where(
           ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
       ).execute();
+
+      writeMarketJson();
+
       return changed > 0;
     } catch (SQLException e) {
       e.printStackTrace();
@@ -284,6 +335,9 @@ public class MarketServiceImpl implements MarketService {
                   .from(ITEM_ALIASES).where(ITEM_ALIASES.ALIAS.equal(alias.toLowerCase()))
               )
           ).execute();
+
+      writeMarketJson();
+
       return changed > 0;
     } catch (SQLException e) {
       e.printStackTrace();
@@ -302,6 +356,9 @@ public class MarketServiceImpl implements MarketService {
           .set(ITEM_DATA.CURRENT_VALUE, price)
           .where(ITEM_DATA.MC_ID.equal(idVariant.getKey()).and(ITEM_DATA.VARIANT.equal(idVariant.getValue()))
           ).execute();
+
+      writeMarketJson();
+
       return changed > 0;
     } catch (SQLException e) {
       e.printStackTrace();
@@ -361,6 +418,9 @@ public class MarketServiceImpl implements MarketService {
               )
           )
       ).execute();
+
+      writeMarketJson();
+
       return changed > 0;
     } catch (SQLException e) {
       e.printStackTrace();
