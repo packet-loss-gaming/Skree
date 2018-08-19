@@ -30,7 +30,6 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -159,7 +158,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
     return Probability.getRangedRandom(max / 3, max);
   }
 
-  private List<ItemStack> getProduce() {
+  private List<ItemStack> getProducts() {
     Map<ItemStack, Integer> results = state.getResults();
     int quantityToProduce = getQuantityToProduce();
 
@@ -199,7 +198,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
   private void dropResults() {
     Location<World> targetDropPoint = centralDropPoint.add(Probability.pickOneOf(pointAdjustments));
 
-    new FixedPointItemDropper(targetDropPoint).dropStacks(getProduce(), SpawnTypes.PLUGIN);
+    new FixedPointItemDropper(targetDropPoint).dropStacks(getProducts());
 
     state.save();
   }
@@ -207,10 +206,6 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
   private static final List<EntityType> POSSIBLE_MOBS = Lists.newArrayList(
       EntityTypes.SKELETON, EntityTypes.ZOMBIE, EntityTypes.CREEPER, EntityTypes.SPIDER
   );
-
-  private static Cause getSpawnCause() {
-    return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
-  }
 
   private void summonMobs() {
     if (getContained().size() > 50) {
@@ -227,7 +222,7 @@ public class TheForgeInstance extends LegacyZoneBase implements Runnable {
       entities.add(e);
     }
 
-    getRegion().getExtent().spawnEntities(entities, getSpawnCause());
+    getRegion().getExtent().spawnEntities(entities);
   }
 
   @Override

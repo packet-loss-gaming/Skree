@@ -72,8 +72,7 @@ public class BrokenGlass extends CustomItem implements CookedItem, EventAwareCon
     }
 
     new ItemDropper(optOrigin.get()).dropStacks(
-        Collections.singleton(tf(new ItemStack(this, 1, variant))),
-        SpawnTypes.DROPPED_ITEM
+        Collections.singleton(tf(new ItemStack(this, 1, variant)))
     );
   }
 

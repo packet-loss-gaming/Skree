@@ -31,7 +31,6 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -256,7 +255,7 @@ public class CatacombsInstance extends LegacyZoneBase implements Runnable {
 
   private Zombie spawnZombie(Location<World> loc) {
     Zombie zombie = (Zombie) loc.getExtent().createEntity(EntityTypes.ZOMBIE, loc.getPosition());
-    loc.getExtent().spawnEntity(zombie, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    loc.getExtent().spawnEntity(zombie);
     return zombie;
   }
 

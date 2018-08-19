@@ -6,11 +6,7 @@
 
 package com.skelril.skree.content.registry.item.currency;
 
-import com.skelril.nitro.registry.Craftable;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-
-public class CondensedCofferItem extends CofferItem implements Craftable {
+public class CondensedCofferItem extends CofferItem {
 
   private CofferItem parent;
 
@@ -21,20 +17,5 @@ public class CondensedCofferItem extends CofferItem implements Craftable {
 
   public CofferItem getParent() {
     return parent;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AAA",
-        "AAA",
-        "AAA",
-        'A', new ItemStack(parent)
-    );
-    GameRegistry.addShapelessRecipe(
-        new ItemStack(parent, 9),
-        new ItemStack(this)
-    );
   }
 }

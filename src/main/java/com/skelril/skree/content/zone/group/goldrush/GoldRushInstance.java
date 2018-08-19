@@ -39,6 +39,8 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -166,7 +168,12 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
           return;
         }
       } else {
-        if (player.getInventory().query(PlayerInventory.class, EquipmentInventory.class).size() > 0) {
+        QueryOperation[] queries = new QueryOperation[] {
+            QueryOperationTypes.INVENTORY_TYPE.of(PlayerInventory.class),
+            QueryOperationTypes.INVENTORY_TYPE.of(EquipmentInventory.class)
+        };
+
+        if (player.getInventory().query(queries).size() > 0) {
           getPlayerMessageChannel(PlayerClassifier.SPECTATOR).send(
               Text.of(TextColors.RED, "All players inventories must be empty.")
           );
@@ -305,8 +312,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
             Location<World> loc = new Location<>(getRegion().getExtent(), x, y, z);
             loc.getExtent().setBlock(
                 loc.getBlockPosition(),
-                state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-                Cause.source(SkreePlugin.container()).build()
+                state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state)
             );
 
             leverBlocks.put(loc, !Probability.getChance(3));
@@ -356,8 +362,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
 
       entry.getExtent().setBlock(
           entry.getBlockPosition(),
-          state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-          Cause.source(SkreePlugin.container()).build()
+          state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state)
       );
 
       leverBlocks.put(entry, !Probability.getChance(3));
@@ -586,7 +591,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     if (fee == null) {
       return;
     }
-    MarketImplUtil.setBalanceTo(player, fee.add(MarketImplUtil.getMoney(player)), Cause.source(this).build());
+    MarketImplUtil.setBalanceTo(player, fee.add(MarketImplUtil.getMoney(player)));
     remove(player);
     player.sendMessage(Text.of(TextColors.YELLOW, "[Partner] These @$#&!@# restarts... Here, have your bail money..."));
   }
@@ -681,7 +686,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     returned.forEach(i -> player.getInventory().offer(i));
-    MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)), Cause.source(this).build());
+    MarketImplUtil.setBalanceTo(player, total.add(MarketImplUtil.getMoney(player)));
 
     Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
     optHighScores.ifPresent(highScoreService -> highScoreService.update(player, ScoreTypes.GOLD_RUSH_ROBBERIES, 1));
@@ -726,14 +731,14 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
   }
 
   private void setDoor(ZoneBoundingBox door, BlockType type) {
-    door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type, Cause.source(SkreePlugin.container()).build()));
+    door.forAll((pt) -> getRegion().getExtent().setBlockType(pt, type));
   }
 
   private void drainAll() {
     flashMemoryRoom.forAll((pt) -> {
       BlockType type = getRegion().getExtent().getBlockType(pt);
       if (type == BlockTypes.WATER || type == BlockTypes.FLOWING_WATER || type == BlockTypes.LAVA || type == BlockTypes.FLOWING_LAVA) {
-        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR);
       }
     });
   }
@@ -745,8 +750,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         BlockState state = entry.getBlock();
         entry.getExtent().setBlock(
             entry.getBlockPosition(),
-            state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state),
-            Cause.source(SkreePlugin.container()).build()
+            state.withTrait(BooleanTraits.LEVER_POWERED, false).orElse(state)
         );
         leverBlocks.put(entry, !Probability.getChance(3));
       }
@@ -757,8 +761,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         Location<World> targLoc = entry.add(0, -2, 0);
         targLoc.getExtent().setBlockType(
             targLoc.getBlockPosition(),
-            BlockTypes.STONEBRICK,
-            Cause.source(SkreePlugin.container()).build()
+            BlockTypes.STONEBRICK
         );
       }
 
@@ -767,8 +770,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
           Location<World> targLoc = entry.getKey().add(0, -2, 0);
           targLoc.getExtent().setBlockType(
               targLoc.getBlockPosition(),
-              entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK,
-              Cause.source(SkreePlugin.container()).build()
+              entry.getValue() ? BlockTypes.REDSTONE_BLOCK : BlockTypes.STONEBRICK
           );
         }
 
@@ -779,8 +781,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
         Location<World> targLoc = entry.add(0, -2, 0);
         targLoc.getExtent().setBlockType(
             targLoc.getBlockPosition(),
-            BlockTypes.STONEBRICK,
-            Cause.source(SkreePlugin.container()).build()
+            BlockTypes.STONEBRICK
         );
       }
     }
@@ -840,8 +841,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
       for (Location<World> floodBlock : floodBlocks) {
         floodBlock.getExtent().setBlockType(
             floodBlock.getBlockPosition(),
-            floodBlockType,
-            Cause.source(SkreePlugin.container()).build()
+            floodBlockType
         );
       }
 
@@ -864,8 +864,7 @@ public class GoldRushInstance extends LegacyZoneBase implements Zone, Runnable {
               if (type == BlockTypes.AIR) {
                 getRegion().getExtent().setBlockType(
                     x, y, z,
-                    floodBlockType,
-                    Cause.source(SkreePlugin.container()).build()
+                    floodBlockType
                 );
                 break;
               }

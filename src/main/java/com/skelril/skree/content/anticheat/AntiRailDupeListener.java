@@ -13,9 +13,7 @@ import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.filter.cause.Named;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -34,13 +32,13 @@ public class AntiRailDupeListener {
   }
 
   @Listener
-  public void onPistonMove(ChangeBlockEvent event, @Named(NamedCause.SOURCE) Piston piston) {
+  public void onPistonMove(ChangeBlockEvent event, @First Piston piston) {
     event.getTransactions().stream().map(Transaction::getFinal).forEach(block -> {
       BlockType finalType = block.getState().getType();
       if (RAIL_BLOCKS.contains(finalType)) {
         Location<World> location = block.getLocation().get();
         Task.builder().execute(() -> {
-          location.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+          location.setBlockType(BlockTypes.AIR);
         }).delayTicks(1).submit(SkreePlugin.inst());
       }
     });

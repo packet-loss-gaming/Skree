@@ -37,9 +37,6 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.CaveSpider;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -140,7 +137,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     ZoneBoundingBox charlotteRG = regions.get(FreakyFourBoss.CHARLOTTE);
     charlotteRG.forAll(pt -> {
       if (getRegion().getExtent().getBlockType(pt) == BlockTypes.WEB) {
-        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR);
       }
     });
   }
@@ -150,7 +147,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     frimusRG.forAll(pt -> {
       BlockType originalType = getRegion().getExtent().getBlockType(pt);
       if (originalType == BlockTypes.FIRE || originalType == BlockTypes.FLOWING_LAVA || originalType == BlockTypes.LAVA) {
-        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+        getRegion().getExtent().setBlockType(pt, BlockTypes.AIR);
       }
     });
   }
@@ -231,7 +228,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
     loadingBoss = true;
     Task.builder().execute(() -> {
       Entity entity = getRegion().getExtent().createEntity(boss.getEntityType(), getCenter(boss));
-      getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+      getRegion().getExtent().spawnEntity(entity);
 
       Boss<Living, ZoneBossDetail<FreakyFourInstance>> aBoss = new Boss<>(
           (Living) entity,
@@ -293,9 +290,9 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
             for (int y = minY; y <= maxY; ++y) {
               BlockType block = getRegion().getExtent().getBlockType(x, y, z);
               if (z == startZ && newExpr.test(block)) {
-                getRegion().getExtent().setBlockType(x, y, z, oldType, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(x, y, z, oldType);
               } else if (flood && oldExpr.test(block)) {
-                getRegion().getExtent().setBlockType(x, y, z, newType, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(x, y, z, newType);
               }
             }
           }
@@ -313,7 +310,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
               }
               BlockType block = getRegion().getExtent().getBlockType(x, minY, z);
               if (oldExpr.test(block)) {
-                getRegion().getExtent().setBlockType(x, minY, z, newType, Cause.source(SkreePlugin.container()).build());
+                getRegion().getExtent().setBlockType(x, minY, z, newType);
               }
             }
           }
@@ -361,8 +358,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
               if (getRegion().getExtent().getBlockType(pt) == BlockTypes.AIR) {
                 getRegion().getExtent().setBlockType(
                     pt,
-                    BlockTypes.WEB,
-                    Cause.source(SkreePlugin.container()).build()
+                    BlockTypes.WEB
                 );
               }
             });
@@ -377,8 +373,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
           if (getRegion().getExtent().getBlockType(pt) == BlockTypes.WEB) {
             getRegion().getExtent().setBlockType(
                 pt,
-                BlockTypes.AIR,
-                Cause.source(SkreePlugin.container()).build()
+                BlockTypes.AIR
             );
             spawnCharlotteMinion(pt.toDouble().add(.5, 0, .5));
           }
@@ -389,7 +384,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
 
   private void spawnCharlotteMinion(Vector3d position) {
     Entity entity = getRegion().getExtent().createEntity(EntityTypes.CAVE_SPIDER, position);
-    getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    getRegion().getExtent().spawnEntity(entity);
 
     Boss<CaveSpider, ZoneBossDetail<FreakyFourInstance>> boss = new Boss<>(
         (CaveSpider) entity,
@@ -430,8 +425,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
         EntityTypes.TIPPED_ARROW,
         snipee,
         20,
-        1.6F,
-        Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
+        1.6F
     );
   }
 
@@ -458,8 +452,7 @@ public class FreakyFourInstance extends LegacyZoneBase implements Runnable {
                   .radius(dmgFact)
                   .canCauseFire(false)
                   .shouldDamageEntities(true)
-                  .build(),
-              Cause.source(SkreePlugin.container()).build()
+                  .build()
           );
         }
       }

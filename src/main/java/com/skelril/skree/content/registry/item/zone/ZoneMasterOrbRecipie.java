@@ -9,11 +9,15 @@ package com.skelril.skree.content.registry.item.zone;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.setMasterToZone;
 import static com.skelril.skree.content.registry.item.zone.ZoneItemUtil.setMasterToZoneBasic;
@@ -22,7 +26,7 @@ public class ZoneMasterOrbRecipie extends ShapelessRecipes {
   private final String zone;
 
   public ZoneMasterOrbRecipie(String zone, ItemStack... inputList) {
-    super(setMasterToZoneBasic(new ItemStack(CustomItemTypes.ZONE_MASTER_ORB), zone), Arrays.asList(inputList));
+    super("skree:zone_items", setMasterToZoneBasic(new ItemStack(CustomItemTypes.ZONE_MASTER_ORB), zone), toIngredients(inputList));
     this.zone = zone;
   }
 
@@ -46,5 +50,14 @@ public class ZoneMasterOrbRecipie extends ShapelessRecipes {
       return super.getCraftingResult(inv);
     }
     return getFull();
+  }
+
+  private static NonNullList<Ingredient> toIngredients(ItemStack[] inputList) {
+    NonNullList<Ingredient> ingredients = NonNullList.create();
+
+    List<Ingredient> ingredientList = Arrays.stream(inputList).map(Ingredient::fromStacks).collect(Collectors.toList());
+    ingredients.addAll(ingredientList);
+
+    return ingredients;
   }
 }

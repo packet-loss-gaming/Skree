@@ -23,7 +23,6 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -84,7 +83,7 @@ public class StormBringer extends SkeletonArcherWanderer {
         Task.builder().execute(() -> {
           Entity lightning = targetLocation.getExtent().createEntity(EntityTypes.LIGHTNING, targetLocation.getPosition());
           targetLocation.getExtent().spawnEntity(
-              lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+              lightning
           );
         }).delayTicks(5 * (6 + i)).submit(SkreePlugin.inst());
       }

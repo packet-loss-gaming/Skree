@@ -45,7 +45,6 @@ import org.spongepowered.api.entity.living.animal.Wolf;
 import org.spongepowered.api.entity.living.monster.Blaze;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -53,6 +52,8 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -215,15 +216,13 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
           case 1:
             player.sendMessage(Text.of(TextColors.YELLOW, "Caspher the friendly ghost drops some bread."));
             new ItemDropper(player.getLocation()).dropStacks(
-                Lists.newArrayList(newItemStack(ItemTypes.BREAD, Probability.getRandom(16))),
-                SpawnTypes.DROPPED_ITEM
+                Lists.newArrayList(newItemStack(ItemTypes.BREAD, Probability.getRandom(16)))
             );
             break;
           case 2:
             player.sendMessage(Text.of(TextColors.YELLOW, "COOKIE gives you a cookie."));
             new ItemDropper(player.getLocation()).dropStacks(
-                Lists.newArrayList(newItemStack(ItemTypes.COOKIE)),
-                SpawnTypes.DROPPED_ITEM
+                Lists.newArrayList(newItemStack(ItemTypes.COOKIE))
             );
             break;
           case 3:
@@ -235,13 +234,12 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
               caspherLoot.add(newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64)));
             }
 
-            new ItemDropper(player.getLocation()).dropStacks(caspherLoot, SpawnTypes.DROPPED_ITEM);
+            new ItemDropper(player.getLocation()).dropStacks(caspherLoot);
             break;
           case 4:
             player.sendMessage(Text.of(TextColors.YELLOW, "John gives you a new jacket."));
             new ItemDropper(player.getLocation()).dropStacks(
-                Lists.newArrayList(newItemStack(ItemTypes.LEATHER_CHESTPLATE)),
-                SpawnTypes.DROPPED_ITEM
+                Lists.newArrayList(newItemStack(ItemTypes.LEATHER_CHESTPLATE))
             );
             break;
           case 5:
@@ -254,7 +252,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                 newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(64)),
                 newItemStack(ItemTypes.DIAMOND, Probability.getRandom(64))
             );
-            new ItemDropper(player.getLocation()).dropStacks(teleportLootExtras, SpawnTypes.DROPPED_ITEM);
+            new ItemDropper(player.getLocation()).dropStacks(teleportLootExtras);
             break;
           case 6:
             player.sendMessage(Text.of(TextColors.YELLOW, "Dan gives you a sparkling touch."));
@@ -350,8 +348,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
                             .location(player.getLocation().setPosition(pos.toDouble().add(.5, .5, .5)))
                             .shouldDamageEntities(true)
                             .canCauseFire(true)
-                            .build(),
-                        Cause.source(SkreePlugin.container()).build()
+                            .build()
                     );
                   }).delayTicks(12 * i).submit(SkreePlugin.inst());
                 }
@@ -438,7 +435,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
             for (int i = 0; i < player.getInventory().size() * 1.5; i++) {
               sticks.add(newItemStack(ItemTypes.STICK, 64));
             }
-            new ItemDropper(player.getLocation()).dropStacks(sticks, SpawnTypes.DROPPED_ITEM);
+            new ItemDropper(player.getLocation()).dropStacks(sticks);
             break;
           case 5:
             player.sendMessage(Text.of(TextColors.RED, "Ben dumps out your backpack."));
@@ -536,7 +533,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
             for (int i = 0; i < Probability.getRangedRandom(10, 30); i++) {
               Blaze blaze = (Blaze) getRegion().getExtent().createEntity(EntityTypes.BLAZE, player.getLocation().getPosition());
               blaze.setTarget(player);
-              getRegion().getExtent().spawnEntity(blaze, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
+              getRegion().getExtent().spawnEntity(blaze);
             }
             break;
           case 10:
@@ -544,7 +541,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
             for (int i = 0; i < Probability.getRangedRandom(10, 30); i++) {
               Wolf wolf = (Wolf) getRegion().getExtent().createEntity(EntityTypes.WOLF, player.getLocation().getPosition());
               wolf.setTarget(player);
-              getRegion().getExtent().spawnEntity(wolf, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
+              getRegion().getExtent().spawnEntity(wolf);
             }
             break;
           case 11:
@@ -631,13 +628,14 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
     final BlockType finalTarget = targetType;
     floodGate.forAll((pt) -> {
       if (replaceableTypes.contains(getRegion().getExtent().getBlockType(pt))) {
-        getRegion().getExtent().setBlockType(pt, finalTarget, Cause.source(SkreePlugin.container()).build());
+        getRegion().getExtent().setBlockType(pt, finalTarget);
       }
     });
   }
 
   private boolean checkInventory(Player player) {
-    return player.getInventory().query(ITEMS).peek().isPresent();
+    QueryOperation[] operations = (QueryOperation[]) Arrays.stream(ITEMS).map(QueryOperationTypes.ITEM_TYPE::of).toArray();
+    return player.getInventory().query(operations).peek().isPresent();
   }
 
   private static ItemStack LAPIS_DYE;
@@ -649,7 +647,69 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
     LAPIS_DYE.setQuantity(-1);
   }
 
+  private List<Clause<QueryOperation<?>, Integer>>  getItemRemovalQueries() {
+    List<Clause<QueryOperation<?>, Integer>> queryNumToRemove = new ArrayList<>();
+
+    // Iron
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.IRON_BLOCK), 2
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.IRON_ORE), 4
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.IRON_INGOT), 8
+    ));
+
+    // Gold
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.GOLD_BLOCK), 2
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.GOLD_ORE), 4
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.GOLD_INGOT), 10
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.GOLD_NUGGET), 80
+    ));
+
+    // Redstone
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.REDSTONE_ORE), 2
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.REDSTONE), 34
+    ));
+
+    // Lap
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.LAPIS_BLOCK), 2
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.LAPIS_ORE), 4
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(LAPIS_DYE), 34
+    ));
+
+    // Diamond
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.DIAMOND_BLOCK), 2
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.DIAMOND_ORE), 4
+    ));
+    queryNumToRemove.add(new Clause<>(
+        QueryOperationTypes.ITEM_TYPE.of(ItemTypes.DIAMOND), 16
+    ));
+
+    return queryNumToRemove;
+  }
+
   public void drain() {
+    List<Clause<QueryOperation<?>, Integer>> itemRemovalQueries = getItemRemovalQueries();
 
     for (Entity e : getContained(Carrier.class)) {
       // TODO Inventory API not fully implemented
@@ -673,13 +733,12 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
             } while (getRegion().getExtent().getBlockType(targetPos) != BlockTypes.AIR);
 
             Entity entity = getRegion().getExtent().createEntity(EntityTypes.BLAZE, targetPos);
-            getRegion().getExtent().spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.MOB_SPAWNER).build()).build());
+            getRegion().getExtent().spawnEntity(entity);
           }
         }
       }
 
       for (int i = 0; i < (eInventory.size() / 2) - 2 || i < 1; i++) {
-
         if (e instanceof Player) {
           if (Probability.getChance(15) && checkInventory((Player) e)) {
             ((Player) e).sendMessage(
@@ -689,30 +748,12 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
           }
         }
 
-        // Iron
-        eInventory.query(ItemTypes.IRON_BLOCK).poll(Probability.getRandom(2));
-        eInventory.query(ItemTypes.IRON_ORE).poll(Probability.getRandom(4));
-        eInventory.query(ItemTypes.IRON_INGOT).poll(Probability.getRandom(8));
+        itemRemovalQueries.forEach((clause) -> {
+          QueryOperation<?> itemQuery = clause.getKey();
+          int numberToRemove = Probability.getRandom(clause.getValue());
 
-        // Gold
-        eInventory.query(ItemTypes.GOLD_BLOCK).poll(Probability.getRandom(2));
-        eInventory.query(ItemTypes.GOLD_ORE).poll(Probability.getRandom(4));
-        eInventory.query(ItemTypes.GOLD_INGOT).poll(Probability.getRandom(10));
-        eInventory.query(ItemTypes.GOLD_NUGGET).poll(Probability.getRandom(80));
-
-        // Redstone
-        eInventory.query(ItemTypes.REDSTONE_ORE).poll(Probability.getRandom(2));
-        eInventory.query(ItemTypes.REDSTONE).poll(Probability.getRandom(34));
-
-        // Lap
-        eInventory.query(ItemTypes.LAPIS_BLOCK).poll(Probability.getRandom(2));
-        eInventory.query(ItemTypes.LAPIS_ORE).poll(Probability.getRandom(4));
-        eInventory.query(LAPIS_DYE).poll(Probability.getRandom(34));
-
-        // Diamond
-        eInventory.query(ItemTypes.DIAMOND_BLOCK).poll(Probability.getRandom(2));
-        eInventory.query(ItemTypes.DIAMOND_ORE).poll(Probability.getRandom(4));
-        eInventory.query(ItemTypes.DIAMOND).poll(Probability.getRandom(16));
+          eInventory.query(itemQuery).poll(numberToRemove);
+        });
       }
     }
   }
@@ -729,7 +770,7 @@ public class CursedMineInstance extends LegacyZoneBase implements Runnable {
       for (ItemType aItem : ITEMS) {
         if (aItem == id) {
           ItemStackSnapshot snapshot = item.get(Keys.REPRESENTED_ITEM).get();
-          int newAmt = (int) (snapshot.getCount() * .8);
+          int newAmt = (int) (snapshot.getQuantity() * .8);
           if (newAmt < 1) {
             item.remove();
           } else {

@@ -104,8 +104,7 @@ public class FearBomb implements SpecialAttack {
                   .shouldBreakBlocks(false)
                   .shouldDamageEntities(false)
                   .canCauseFire(false)
-                  .build(),
-              Cause.source(SkreePlugin.container()).build()
+                  .build()
           );
 
           for (Player player : players) {

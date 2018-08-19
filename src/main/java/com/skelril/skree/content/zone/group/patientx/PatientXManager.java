@@ -31,6 +31,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.projectile.Snowball;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
@@ -38,7 +39,6 @@ import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -184,9 +184,8 @@ public class PatientXManager extends GroupZoneManager<PatientXInstance> implemen
             Task.builder().execute(() -> {
               VelocityEntitySpawner.sendRadial(
                   EntityTypes.SNOWBALL,
-                  inst.getBoss().get(),
-                  Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
-              );
+                  inst.getBoss().get()
+              ).forEach((e) -> inst.registerExplosiveSnowball((Snowball) e));
             }).delayTicks(1).submit(SkreePlugin.inst());
           } else {
             Entity srcEntity = ((EntityDamageSource) optDamageSource.get()).getSource();

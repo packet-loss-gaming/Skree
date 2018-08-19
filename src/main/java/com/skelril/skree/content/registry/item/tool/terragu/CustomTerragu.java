@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.tool.terragu;
 import com.skelril.nitro.registry.item.pickaxe.CustomPickaxe;
 import com.skelril.nitro.registry.item.pickaxe.ICustomPickaxe;
 import com.skelril.nitro.selector.EventAwareContent;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,6 +28,7 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -164,7 +166,7 @@ public abstract class CustomTerragu extends CustomPickaxe implements ICustomPick
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     int editDist = getSetEditDist(stack);
     tooltip.add("Edit distance: " + editDist);
   }

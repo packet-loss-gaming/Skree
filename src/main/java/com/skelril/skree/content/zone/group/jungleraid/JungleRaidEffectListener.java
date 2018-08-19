@@ -41,7 +41,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -219,8 +218,7 @@ public class JungleRaidEffectListener {
             .location(entity.getLocation())
             .shouldDamageEntities(true)
             .shouldBreakBlocks(true)
-            .build(),
-        Cause.source(SkreePlugin.container()).build()
+            .build()
     );
   }
 
@@ -432,7 +430,7 @@ public class JungleRaidEffectListener {
         firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
         firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
         inst.getRegion().getExtent().spawnEntity(
-            firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+            firework
         );
       }).submit(SkreePlugin.inst());
     }

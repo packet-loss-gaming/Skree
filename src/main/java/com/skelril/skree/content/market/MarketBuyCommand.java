@@ -130,15 +130,13 @@ public class MarketBuyCommand implements CommandExecutor {
     }
 
     // Alright, all items have been found
-    if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
+    if (!MarketImplUtil.setBalanceTo(player, newBalance)) {
       // TODO Auto reporting
       src.sendMessage(Text.of(TextColors.RED, "Failed to adjust your balance, please report this!"));
       return CommandResult.empty();
     }
 
-    Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(
-        player, itemStacks, Cause.source(SkreePlugin.container()).build()
-    );
+    Clause<Boolean, List<Clause<ItemStack, Integer>>> transactions = MarketImplUtil.giveItems(player, itemStacks);
 
     if (!transactions.getKey()) {
       // TODO Auto reporting

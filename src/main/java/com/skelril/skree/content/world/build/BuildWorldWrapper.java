@@ -28,13 +28,10 @@ import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.*;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
@@ -88,7 +85,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
   public void onEntitySpawn(SpawnEntityEvent event) {
     List<Entity> entities = event.getEntities();
 
-    Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
+    Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
     for (Entity entity : entities) {
       if (!isApplicable(entity)) {
         continue;
@@ -101,7 +98,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
 
       if (entity instanceof Egg && optBlockCause.isPresent()) {
         new ItemDropper(entity.getLocation()).dropStacks(
-            Lists.newArrayList(newItemStack(ItemTypes.EGG)), SpawnTypes.DISPENSE
+            Lists.newArrayList(newItemStack(ItemTypes.EGG))
         );
         event.setCancelled(true);
         return;
@@ -154,7 +151,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
   private List<Location<World>> markedOrePoints = new ArrayList<>();
 
   @Listener
-  public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Entity srcEnt) {
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Entity srcEnt) {
     if (!isApplicable(srcEnt)) {
       return;
     }
@@ -185,9 +182,7 @@ public class BuildWorldWrapper extends WorldEffectWrapperImpl {
   }
 
   @Listener
-  public void onItemDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause) {
-    BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
-
+  public void onItemDrop(DropItemEvent.Destruct event, @First BlockSnapshot blockSnapshot) {
     Optional<Location<World>> optLocation = blockSnapshot.getLocation();
     if (!optLocation.isPresent()) {
       return;

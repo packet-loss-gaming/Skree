@@ -13,9 +13,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
-import org.spongepowered.api.event.filter.cause.Named;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 
 import java.util.Optional;
@@ -30,8 +28,7 @@ public class TheButcherShopListener {
   }
 
   @Listener
-  public void onEntityDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
-    Entity entity = spawnCause.getEntity();
+  public void onEntityDrop(DropItemEvent.Destruct event, @First Entity entity) {
     if (!(entity instanceof Animal)) {
       return;
     }

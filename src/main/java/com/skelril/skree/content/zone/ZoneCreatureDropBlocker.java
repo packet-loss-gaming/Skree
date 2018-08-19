@@ -9,9 +9,7 @@ package com.skelril.skree.content.zone;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Creature;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
-import org.spongepowered.api.event.filter.cause.Named;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -25,8 +23,7 @@ public class ZoneCreatureDropBlocker<T> extends ZoneApplicableListener<T> {
   }
 
   @Listener
-  public void onEntityDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) EntitySpawnCause spawnCause) {
-    Entity entity = spawnCause.getEntity();
+  public void onEntityDrop(DropItemEvent.Destruct event, @Root Entity entity) {
     if (!Creature.class.isAssignableFrom(entity.getType().getEntityClass())) {
       return;
     }

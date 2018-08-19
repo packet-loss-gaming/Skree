@@ -18,16 +18,18 @@ import com.skelril.skree.service.WorldService;
 import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import com.skelril.skree.service.internal.zone.ZoneStatus;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -37,9 +39,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
@@ -52,6 +51,7 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -86,57 +86,52 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
   @Override
   public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this, 3),
-        "BBB",
-        "BAB",
-        "BBB",
-        'A', newItemStack("skree:fairy_dust"),
-        'B', new ItemStack(Blocks.GLASS)
-    );
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    IForgeRegistry<IRecipe> recipeRegistry = GameRegistry.findRegistry(IRecipe.class);
+
+
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Shnuggles Prime",
         new ItemStack(this),
         new ItemStack(Items.ROTTEN_FLESH)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Patient X",
         new ItemStack(this),
         new ItemStack(CustomItemTypes.PHANTOM_HYMN)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Gold Rush",
         new ItemStack(this),
         new ItemStack(Items.GOLD_INGOT)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Cursed Mine",
         new ItemStack(this),
         new ItemStack(Items.IRON_PICKAXE)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Temple of Fate",
         new ItemStack(this),
         new ItemStack(Items.FEATHER)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Catacombs",
         new ItemStack(this),
         new ItemStack(Items.BONE)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Jungle Raid",
         new ItemStack(this),
         new ItemStack(Items.WOODEN_SWORD),
         new ItemStack(Items.SHIELD)
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "Sky Wars",
         new ItemStack(this),
         new ItemStack(Items.FEATHER),
         (ItemStack) (Object) newItemStack("skree:fairy_dust")
     ));
-    GameRegistry.addRecipe(new ZoneMasterOrbRecipie(
+    recipeRegistry.register(new ZoneMasterOrbRecipie(
         "The Forge",
         new ItemStack(this),
         new ItemStack(Blocks.IRON_BLOCK)
@@ -244,7 +239,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
     Location<World> loc = player.getLocation();
     Lightning lightning = (Lightning) loc.getExtent().createEntity(EntityTypes.LIGHTNING, loc.getPosition());
     lightning.setEffect(true);
-    loc.getExtent().spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    loc.getExtent().spawnEntity(lightning);
   }
 
   private MainWorldWrapper getMainWorldWrapper() {
@@ -299,7 +294,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
   @Listener
   public void onDropItem(DropItemEvent.Dispense event) {
     event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {
-      ItemStack stack = ((EntityItem) entity).getEntityItem();
+      ItemStack stack = ((EntityItem) entity).getItem();
       if (isZoneMasterItem(stack) && isAttuned(stack)) {
         rescindGroupInvite(stack);
         ItemStack reset = new ItemStack(CustomItemTypes.ZONE_MASTER_ORB);
@@ -313,7 +308,7 @@ public class ZoneMasterOrb extends CustomItem implements EventAwareContent, Craf
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     Optional<String> optZoneName = getZone(tf(stack));
     if (optZoneName.isPresent()) {
       tooltip.add("Zone: " + optZoneName.get());

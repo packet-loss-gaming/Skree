@@ -9,9 +9,9 @@ package com.skelril.skree.content.registry.item.zone;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,6 +27,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +67,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
   @Listener
   public void onDropItem(DropItemEvent.Dispense event) {
     event.getEntities().stream().filter(entity -> entity instanceof Item).forEach(entity -> {
-      ItemStack stack = ((EntityItem) entity).getEntityItem();
+      ItemStack stack = ((EntityItem) entity).getItem();
       if (isZoneSlaveItem(stack)) {
         Optional<Player> optPlayer = event.getCause().first(Player.class);
         if (optPlayer.isPresent()) {
@@ -111,7 +112,7 @@ public class ZoneSlaveOrb extends CustomItem implements EventAwareContent {
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     Optional<String> optZoneName = getZone(stack);
     if (optZoneName.isPresent()) {
       tooltip.add("Zone: " + optZoneName.get());

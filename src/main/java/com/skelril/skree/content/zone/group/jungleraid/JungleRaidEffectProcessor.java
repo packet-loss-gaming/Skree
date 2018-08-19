@@ -10,6 +10,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.item.ItemDropper;
+import com.skelril.nitro.item.ItemStackFactory;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.service.internal.zone.PlayerClassifier;
@@ -24,13 +25,12 @@ import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Firework;
 import org.spongepowered.api.entity.projectile.ThrownPotion;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShapes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Random;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class JungleRaidEffectProcessor {
   private static final Random RANDOM = new Random();
@@ -75,11 +74,12 @@ public class JungleRaidEffectProcessor {
     if (inst.isFlagEnabled(JungleRaidFlag.TITAN_MODE) && data.titan == null) {
       Player player = Probability.pickOneOf(players);
       data.titan = player.getUniqueId();
+
       ItemStack teamHood = newItemStack(ItemTypes.LEATHER_HELMET);
       teamHood.offer(Keys.DISPLAY_NAME, Text.of(TextColors.WHITE, "Titan Hood"));
       teamHood.offer(Keys.COLOR, Color.BLACK);
-      // playerEquipment.set(EquipmentTypes.HEADWEAR, teamHood);
-      tf(player).inventory.armorInventory.set(3, tf(teamHood));
+
+      player.setHelmet(teamHood);
     }
 
     for (Player player : players) {
@@ -89,6 +89,15 @@ public class JungleRaidEffectProcessor {
         player.offer(Keys.POTION_EFFECTS, potionEffects);
       }
     }
+  }
+
+  private static ItemStackSnapshot createPotionItemSnapshot() {
+    PotionEffectType type = Probability.pickOneOf(Sponge.getRegistry().getAllOf(PotionEffectType.class));
+
+    ItemStack potionItem = ItemStackFactory.newItemStack(ItemTypes.SPLASH_POTION);
+    potionItem.offer(Keys.POTION_EFFECTS, Lists.newArrayList(PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)));
+
+    return potionItem.createSnapshot();
   }
 
   private static void distributor(JungleRaidInstance inst) {
@@ -126,12 +135,12 @@ public class JungleRaidEffectProcessor {
           explosive.offer(Keys.FUSE_DURATION, 20 * 4);
 
           // TODO used to have a 1/4 chance of creating fire
-          inst.getRegion().getExtent().spawnEntity(
-              explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-          );
+          inst.getRegion().getExtent().spawnEntity(explosive);
         }
+
         if (inst.isFlagEnabled(JungleRaidFlag.POTION_PLUMMET)) {
-          PotionEffectType type = Probability.pickOneOf(Sponge.getRegistry().getAllOf(PotionEffectType.class));
+          ItemStackSnapshot potionItemStack = createPotionItemSnapshot();
+
           for (int ii = Probability.getRandom(5); ii > 0; --ii) {
             ThrownPotion potion = (ThrownPotion) inst.getRegion().getExtent().createEntity(EntityTypes.SPLASH_POTION, testLoc.getPosition());
             potion.setVelocity(new Vector3d(
@@ -139,18 +148,15 @@ public class JungleRaidEffectProcessor {
                 0,
                 RANDOM.nextDouble() * 2.0 - 1
             ));
-            potion.offer(Keys.POTION_EFFECTS, Lists.newArrayList(
-                PotionEffect.of(type, 1, type.isInstant() ? 1 : 20 * 10)
-            ));
-            inst.getRegion().getExtent().spawnEntity(
-                potion, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-            );
+
+            potion.offer(Keys.REPRESENTED_ITEM, potionItemStack);
+            inst.getRegion().getExtent().spawnEntity(potion);
           }
         }
+
         if (inst.isFlagEnabled(JungleRaidFlag.GRENADES)) {
           new ItemDropper(testLoc).dropStacks(
-              Lists.newArrayList(newItemStack(ItemTypes.SNOWBALL, Probability.getRandom(3))),
-              SpawnTypes.PLUGIN
+              Lists.newArrayList(newItemStack(ItemTypes.SNOWBALL, Probability.getRandom(3)))
           );
         }
       }
@@ -179,9 +185,7 @@ public class JungleRaidEffectProcessor {
                 .build();
             firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
             firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, Probability.getRangedRandom(2, 5));
-            inst.getRegion().getExtent().spawnEntity(
-                firework, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
-            );
+            inst.getRegion().getExtent().spawnEntity(firework);
           }).submit(SkreePlugin.inst());
         }
       }

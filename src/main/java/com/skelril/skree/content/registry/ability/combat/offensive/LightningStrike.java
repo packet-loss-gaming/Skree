@@ -10,9 +10,6 @@ import com.skelril.nitro.registry.dynamic.ability.PointOfContact;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.weather.Lightning;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -20,6 +17,6 @@ public class LightningStrike implements PointOfContact {
   @Override
   public void run(Living owner, Location<World> target) {
     Lightning lightning = (Lightning) target.createEntity(EntityTypes.LIGHTNING);
-    target.spawnEntity(lightning, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    target.spawnEntity(lightning);
   }
 }

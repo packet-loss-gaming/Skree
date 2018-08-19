@@ -6,15 +6,11 @@
 
 package com.skelril.skree.content.antiauto;
 
-import com.skelril.skree.SkreePlugin;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
-import org.spongepowered.api.event.filter.cause.Named;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -23,12 +19,10 @@ import java.util.Optional;
 
 public class AntiCactusFarmListener {
   @Listener
-  public void onItemDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause) {
+  public void onItemDrop(DropItemEvent.Destruct event, @Root BlockSnapshot blockSnapshot) {
     if (event.getCause().containsType(Player.class)) {
       return;
     }
-
-    BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
 
     Optional<Location<World>> optLocation = blockSnapshot.getLocation();
     if (!optLocation.isPresent()) {
@@ -41,7 +35,7 @@ public class AntiCactusFarmListener {
       if (location.getBlockType() != BlockTypes.CACTUS) {
         break;
       }
-      location.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+      location.setBlockType(BlockTypes.AIR);
     }
   }
 }

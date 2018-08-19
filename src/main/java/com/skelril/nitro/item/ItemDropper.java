@@ -10,9 +10,6 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
@@ -37,19 +34,19 @@ public class ItemDropper {
     return location.getPosition();
   }
 
-  public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
+  public void dropItem(ItemStackSnapshot snapshot) {
     Item item = (Item) getExtent().createEntity(EntityTypes.ITEM, getPos());
     item.offer(Keys.REPRESENTED_ITEM, snapshot);
-    getExtent().spawnEntity(item, cause);
+    getExtent().spawnEntity(item);
   }
 
-  public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks, SpawnType type) {
+  public void dropStackSnapshots(Collection<ItemStackSnapshot> stacks) {
     for (ItemStackSnapshot stack : stacks) {
-      dropItem(stack, Cause.source(SpawnCause.builder().type(type).build()).build());
+      dropItem(stack);
     }
   }
 
-  public void dropStacks(Collection<ItemStack> stacks, SpawnType type) {
-    dropStackSnapshots(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()), type);
+  public void dropStacks(Collection<ItemStack> stacks) {
+    dropStackSnapshots(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()));
   }
 }

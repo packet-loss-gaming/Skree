@@ -7,6 +7,7 @@
 package com.skelril.skree.content.registry.item.currency;
 
 import com.skelril.nitro.registry.item.CustomItem;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class CofferItem extends CustomItem {
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     DecimalFormat formatter = new DecimalFormat("#,###");
     tooltip.add(formatter.format(getCofferValue()) + " Coffers Each");
     if (stack.getCount() > 1) {

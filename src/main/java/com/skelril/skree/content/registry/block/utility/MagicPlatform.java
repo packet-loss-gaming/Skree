@@ -6,26 +6,22 @@
 
 package com.skelril.skree.content.registry.block.utility;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class MagicPlatform extends Block implements ICustomBlock, Craftable {
+public class MagicPlatform extends Block implements ICustomBlock {
   public MagicPlatform() {
     super(Material.WOOD);
     this.setCreativeTab(CreativeTabs.DECORATIONS);
@@ -62,19 +58,7 @@ public class MagicPlatform extends Block implements ICustomBlock, Craftable {
 
   @SideOnly(Side.CLIENT)
   @Override
-  public BlockRenderLayer getBlockLayer() {
+  public BlockRenderLayer getRenderLayer() {
     return BlockRenderLayer.CUTOUT;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AAA",
-        " B ",
-        "   ",
-        'A', new ItemStack(Items.STICK),
-        'B', newItemStack("skree:fairy_dust")
-    );
   }
 }

@@ -6,16 +6,13 @@
 
 package com.skelril.skree.content.market.admin;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.Lists;
 import com.skelril.nitro.Clause;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.market.MarketImplUtil;
 import com.skelril.skree.service.MarketService;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -23,10 +20,23 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.*;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.property.SlotPos;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.type.InventoryColumn;
+import org.spongepowered.api.item.inventory.type.InventoryRow;
+import org.spongepowered.api.item.recipe.crafting.*;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.World;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -35,6 +45,12 @@ import java.util.stream.Collectors;
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
 public class MarketVerifyCommand implements CommandExecutor {
+  private Optional<ItemStack> getMostExpensiveOption(MarketService service, List<ItemStackSnapshot> itemStackOptions) {
+    return itemStackOptions.stream().map(ItemStackSnapshot::createStack).max(
+        Comparator.comparing(a -> service.getPrice(a).orElse(BigDecimal.ZERO))
+    );
+  }
+
   @Override
   public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -49,24 +65,33 @@ public class MarketVerifyCommand implements CommandExecutor {
       PaginationService pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
 
       List<Clause<String, BigDecimal>> profitMargins = new ArrayList<>();
-      for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
-        ItemStack output = recipe.getRecipeOutput();
-        if (output == null) {
-          continue;
-        }
+      CraftingRecipeRegistry recipeRegistry = Sponge.getRegistry().getCraftingRecipeRegistry();
+      for (CraftingRecipe recipe : recipeRegistry.getRecipes()) {
+        ItemStack output = recipe.getExemplaryResult().createStack();
 
-        Optional<BigDecimal> optResultPrice = service.getPrice(tf(output));
+        Optional<BigDecimal> optResultPrice = service.getPrice(output);
         if (!optResultPrice.isPresent()) {
           continue;
         }
 
-        String name = service.getAlias(tf(output)).orElse(output.getItem().getRegistryName().toString());
+        String name = service.getAlias(output).orElse(output.getType().getId());
 
+        // TODO This has been roughly ported from forge to sponge
+        // it may be incorrect, and also could be considerably optimized
         Collection<ItemStack> items = new ArrayList<>();
-        if (recipe instanceof ShapedRecipes) {
-          items.addAll(Lists.newArrayList(((ShapedRecipes) recipe).recipeItems));
-        } else if (recipe instanceof ShapelessRecipes) {
-          items.addAll(((ShapelessRecipes) recipe).recipeItems);
+        if (recipe instanceof ShapedCraftingRecipe) {
+          int height = ((ShapedCraftingRecipe) recipe).getHeight();
+          int width = ((ShapedCraftingRecipe) recipe).getWidth();
+
+          for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y) {
+              getMostExpensiveOption(service, ((ShapedCraftingRecipe) recipe).getIngredient(x, y).displayedItems()).ifPresent(items::add);
+            }
+          }
+        } else if (recipe instanceof ShapelessCraftingRecipe) {
+          ((ShapelessCraftingRecipe) recipe).getIngredientPredicates().forEach(
+              i -> getMostExpensiveOption(service, i.displayedItems()).ifPresent(items::add)
+          );
         } else {
           src.sendMessage(Text.of(TextColors.RED, "Unsupported recipe for " + name));
           continue;
@@ -77,7 +102,7 @@ public class MarketVerifyCommand implements CommandExecutor {
         BigDecimal creationCost = BigDecimal.ZERO;
         try {
           for (ItemStack stack : items) {
-            creationCost = creationCost.add(service.getPrice(tf(stack)).orElse(BigDecimal.ZERO));
+            creationCost = creationCost.add(service.getPrice(stack).orElse(BigDecimal.ZERO));
           }
         } catch (Exception ex) {
           src.sendMessage(Text.of(TextColors.RED, "Couldn't complete checks for " + name));

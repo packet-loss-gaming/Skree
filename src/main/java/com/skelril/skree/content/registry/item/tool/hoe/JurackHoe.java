@@ -6,17 +6,13 @@
 
 package com.skelril.skree.content.registry.item.tool.hoe;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.hoe.CustomHoe;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class JurackHoe extends CustomHoe implements Craftable {
+public class JurackHoe extends CustomHoe {
   @Override
   public String __getType() {
     return "jurack";
@@ -30,17 +26,5 @@ public class JurackHoe extends CustomHoe implements Craftable {
   @Override
   public ItemTier __getHarvestTier() {
     return ItemTiers.JURACK;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AA ",
-        " B ",
-        " B ",
-        'A', newItemStack("skree:jurack"),
-        'B', new ItemStack(Items.STICK)
-    );
   }
 }

@@ -6,26 +6,22 @@
 
 package com.skelril.skree.content.registry.block.trap;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class Pitfall extends Block implements ICustomBlock, Craftable {
+public class Pitfall extends Block implements ICustomBlock {
 
   public Pitfall() {
     super(Material.CLAY);
@@ -58,22 +54,13 @@ public class Pitfall extends Block implements ICustomBlock, Craftable {
 
   @SideOnly(Side.CLIENT)
   @Override
-  public BlockRenderLayer getBlockLayer() {
+  public BlockRenderLayer getRenderLayer() {
     return BlockRenderLayer.CUTOUT;
   }
 
   @Override
   public String __getID() {
     return "pitfall";
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new ItemStack(this, 3),
-        new ItemStack(Blocks.CLAY),
-        newItemStack("skree:fairy_dust")
-    );
   }
 }
 

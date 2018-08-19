@@ -26,13 +26,10 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.filter.cause.Named;
-import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -95,7 +92,7 @@ public class CursedMineListener {
   }
 
   @Listener
-  public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Player player) {
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
     Optional<CursedMineInstance> optInst = manager.getApplicableZone(player);
 
     if (!optInst.isPresent()) {
@@ -137,7 +134,7 @@ public class CursedMineListener {
   }
 
   @Listener
-  public void onItemSpawn(SpawnEntityEvent event, @Root BlockSpawnCause spawnCause) {
+  public void onItemSpawn(SpawnEntityEvent event, @First BlockSnapshot spawnCause) {
     // SpongeCommon/#771
     for (Entity entity : event.getEntities()) {
       if (entity instanceof Item && manager.getApplicableZone(entity).isPresent()) {
@@ -147,16 +144,10 @@ public class CursedMineListener {
   }
 
   @Listener
-  public void onOreDrop(
-      DropItemEvent.Destruct event,
-      @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause,
-      @Named(NamedCause.NOTIFIER) Player player
-  ) {
+  public void onOreDrop(DropItemEvent.Destruct event, @First BlockSnapshot blockSnapshot, @First Player player) {
     if (!Probability.getChance(4)) {
       return;
     }
-
-    BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
 
     Optional<Location<World>> optLocation = blockSnapshot.getLocation();
     if (!optLocation.isPresent()) {
@@ -211,7 +202,7 @@ public class CursedMineListener {
   }
 
   private boolean isCausedbyFire(ChangeBlockEvent event) {
-    Optional<LocatableBlock> optLocatableBlock = event.getCause().get(NamedCause.SOURCE, LocatableBlock.class);
+    Optional<LocatableBlock> optLocatableBlock = event.getCause().first(LocatableBlock.class);
     return optLocatableBlock.filter(locatableBlock -> locatableBlock.getBlockState().getType() == BlockTypes.FIRE).isPresent();
   }
 
@@ -243,7 +234,7 @@ public class CursedMineListener {
   }
 
   @Listener
-  public void onBlockPlace(ChangeBlockEvent.Place event, @Named(NamedCause.SOURCE) Player player) {
+  public void onBlockPlace(ChangeBlockEvent.Place event, @First Player player) {
     Optional<CursedMineInstance> optInst = manager.getApplicableZone(player);
     if (!optInst.isPresent()) {
       return;

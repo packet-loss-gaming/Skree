@@ -44,7 +44,7 @@ public class MagicMushroomPopulator implements Populator {
 
   private boolean generate(net.minecraft.world.World worldIn, Random rand, BlockPos targetBlock, BlockPos targetBaseBlock) {
     boolean baseIsStone = worldIn.getBlockState(targetBaseBlock).getBlock() == BlockTypes.STONE;
-    if (baseIsStone && worldIn.isAirBlock(targetBlock) && (!worldIn.provider.hasNoSky() || targetBlock.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, targetBlock, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState())) {
+    if (baseIsStone && worldIn.isAirBlock(targetBlock) && (!worldIn.provider.hasSkyLight() || targetBlock.getY() < 40) && CustomBlockTypes.MAGIC_MUSHROOM.canBlockStayGen(worldIn, targetBlock, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState())) {
       worldIn.setBlockState(targetBaseBlock, CustomBlockTypes.MAGIC_STONE.getDefaultState(), 2);
       worldIn.setBlockState(targetBlock, CustomBlockTypes.MAGIC_MUSHROOM.getDefaultState(), 2);
     }

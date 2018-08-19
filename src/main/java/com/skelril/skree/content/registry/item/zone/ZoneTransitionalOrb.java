@@ -6,11 +6,9 @@
 
 package com.skelril.skree.content.registry.item.zone;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
-import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.world.instance.InstanceWorldWrapper;
 import com.skelril.skree.service.RespawnService;
 import com.skelril.skree.service.WorldService;
@@ -18,7 +16,6 @@ import com.skelril.skree.service.ZoneService;
 import com.skelril.skree.service.internal.world.WorldEffectWrapper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -36,7 +33,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.transformer.ForgeTransformer.tf;
 
-public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent, Craftable {
+public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent {
   @Override
   public String __getId() {
     return "zone_transitional_orb";
@@ -50,14 +47,6 @@ public class ZoneTransitionalOrb extends CustomItem implements EventAwareContent
   @Override
   public CreativeTabs __getCreativeTab() {
     return CreativeTabs.MATERIALS;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new ItemStack(this, 8),
-        new ItemStack(CustomItemTypes.ZONE_MASTER_ORB)
-    );
   }
 
   @Listener

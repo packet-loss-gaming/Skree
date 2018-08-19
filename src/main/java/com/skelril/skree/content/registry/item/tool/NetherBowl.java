@@ -9,6 +9,7 @@ package com.skelril.skree.content.registry.item.tool;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.item.Teleporter;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +100,7 @@ public class NetherBowl extends CustomItem implements EventAwareContent, Telepor
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     Optional<String> optDestStr = getClientDestination(stack);
     if (optDestStr.isPresent()) {
       tooltip.add("Drink to return to your grave.");

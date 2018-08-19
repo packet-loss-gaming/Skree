@@ -6,19 +6,14 @@
 
 package com.skelril.skree.content.registry.item.tool.terragu;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 
-import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-
-public class WoodTerragu extends CustomTerragu implements Craftable {
+public class WoodTerragu extends CustomTerragu {
   @Override
   public String __getType() {
     return "wooden";
@@ -67,16 +62,5 @@ public class WoodTerragu extends CustomTerragu implements Craftable {
   @Listener
   public void process(ChangeBlockEvent.Break event) {
     super.process(event);
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new ItemStack(this),
-        new ItemStack(Items.WOODEN_PICKAXE),
-        new ItemStack(Items.WOODEN_AXE),
-        new ItemStack(Items.WOODEN_SHOVEL),
-        newItemStack("skree:unstable_catalyst")
-    );
   }
 }

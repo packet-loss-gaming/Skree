@@ -99,7 +99,7 @@ public class MarketSellCommand implements CommandExecutor {
     }).async().submit(SkreePlugin.inst());
 
     BigDecimal newBalance = changes.getKey().add(MarketImplUtil.getMoney(player));
-    if (!MarketImplUtil.setBalanceTo(player, newBalance, Cause.source(SkreePlugin.container()).build())) {
+    if (!MarketImplUtil.setBalanceTo(player, newBalance)) {
       // TODO Auto reporting
       src.sendMessage(Text.of(TextColors.DARK_RED, "Failed to adjust your balance, please report this!"));
       return CommandResult.empty();

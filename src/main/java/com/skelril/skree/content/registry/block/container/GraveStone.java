@@ -30,7 +30,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
@@ -105,7 +104,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
   @Override
   public IBlockState getStateFromMeta(int meta) {
-    EnumFacing enumfacing = EnumFacing.getFront(meta);
+    EnumFacing enumfacing = EnumFacing.byIndex(meta);
 
     if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
       enumfacing = EnumFacing.NORTH;
@@ -143,7 +142,7 @@ public class GraveStone extends BlockContainer implements ICustomBlock {
 
   public void createGraveDropExcess(List<ItemStack> items, Location<org.spongepowered.api.world.World> pos) {
     List<ItemStack> excess = createGrave(items, pos);
-    new ItemDropper(pos).dropStacks(excess, SpawnTypes.PLUGIN);
+    new ItemDropper(pos).dropStacks(excess);
   }
 
   public void createGraveFromDeath(Player player) {

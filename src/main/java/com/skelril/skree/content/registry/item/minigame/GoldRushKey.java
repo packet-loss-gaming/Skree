@@ -29,7 +29,7 @@ public class GoldRushKey extends CustomItem {
   }
 
   @Override
-  public String getUnlocalizedName(ItemStack stack) {
+  public String getTranslationKey(ItemStack stack) {
     return stack.getMetadata() == 1 ? "item.skree_gold_rush_blue_key" : "item.skree_gold_rush_red_key";
   }
 

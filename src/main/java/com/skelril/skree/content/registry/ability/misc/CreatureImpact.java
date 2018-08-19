@@ -15,9 +15,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -36,10 +33,6 @@ public class CreatureImpact implements PointOfContact {
     return Sponge.getRegistry().getType(EntityType.class, creature).get();
   }
 
-  private static Cause getSpawnCause() {
-    return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
-  }
-
   public static void mobBarrage(Location target, EntityType type, int count) {
     final List<Entity> entities = new ArrayList<>();
 
@@ -49,7 +42,7 @@ public class CreatureImpact implements PointOfContact {
       entities.add(entity);
     }
 
-    target.getExtent().spawnEntities(entities, getSpawnCause());
+    target.getExtent().spawnEntities(entities);
 
     Task.builder().delay(30, TimeUnit.SECONDS).execute(() -> {
       for (Entity entity : entities) {

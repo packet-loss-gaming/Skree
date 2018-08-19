@@ -31,6 +31,6 @@ public class ButterFingersCurse implements Consumer<Player> {
 
     Collections.shuffle(drops);
 
-    new ItemDropper(player.getLocation()).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+    new ItemDropper(player.getLocation()).dropStacks(drops);
   }
 }

@@ -110,10 +110,10 @@ public class CustomItemSystem extends AbstractCustomRegistrySystem {
   @SuppressWarnings("unused")
   private void register(Object item) {
     if (item instanceof Item && item instanceof ICustomItem) {
-      ((Item) item).setUnlocalizedName("skree_" + ((ICustomItem) item).__getId());
+      ((Item) item).setTranslationKey("skree_" + ((ICustomItem) item).__getId());
       ((Item) item).setRegistryName("skree:" + ((ICustomItem) item).__getId());
 
-      GameRegistry.register((Item) item);
+      GameRegistry.findRegistry(Item.class).register((Item) item);
 
       // Add selective hooks
       if (item instanceof EventAwareContent) {

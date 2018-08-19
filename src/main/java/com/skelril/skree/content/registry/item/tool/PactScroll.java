@@ -7,7 +7,6 @@
 package com.skelril.skree.content.registry.item.tool;
 
 import com.skelril.nitro.combat.PlayerCombatParser;
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class PactScroll extends CustomItem implements Craftable, EventAwareContent {
+public class PactScroll extends CustomItem implements EventAwareContent {
 
   private Map<UUID, List<UUID>> pactMap = new WeakHashMap<>();
 
@@ -56,15 +55,6 @@ public class PactScroll extends CustomItem implements Craftable, EventAwareConte
   @Override
   public CreativeTabs __getCreativeTab() {
     return CreativeTabs.TOOLS;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new net.minecraft.item.ItemStack(this),
-        new net.minecraft.item.ItemStack(Items.PAPER),
-        newItemStack("skree:red_shard")
-    );
   }
 
   private boolean hasPactScroll(Player player) {

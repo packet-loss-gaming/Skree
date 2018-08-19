@@ -36,10 +36,7 @@ public class InventoryCurse implements Consumer<Player> {
     ItemStack stack = newItemStack(targetType, Probability.getRandom(targetAmt));
     Optional<ItemStack> optHeld = player.getItemInHand(HandTypes.MAIN_HAND);
     if (optHeld.isPresent() && !isSimilar(optHeld.get(), stack)) {
-      new ItemDropper(player.getLocation()).dropStacks(
-          Lists.newArrayList(optHeld.get()),
-          SpawnTypes.DROPPED_ITEM
-      );
+      new ItemDropper(player.getLocation()).dropStacks(Lists.newArrayList(optHeld.get()));
     }
     player.setItemInHand(HandTypes.MAIN_HAND, stack);
   }

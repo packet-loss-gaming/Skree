@@ -49,7 +49,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -70,23 +69,23 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.filter.cause.ContextValue;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scheduler.Task;
@@ -96,10 +95,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
-import org.spongepowered.api.world.BlockChangeFlag;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.*;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.Extent;
 
@@ -229,7 +225,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
   public void onEntitySpawn(SpawnEntityEvent event) {
     List<Entity> entities = event.getEntities();
 
-    Optional<BlockSpawnCause> optBlockCause = event.getCause().first(BlockSpawnCause.class);
+    Optional<BlockSnapshot> optBlockCause = event.getCause().first(BlockSnapshot.class);
     for (Entity entity : entities) {
       Location<World> loc = entity.getLocation();
       Optional<Integer> optLevel = getLevel(loc);
@@ -250,7 +246,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         // TODO used to have a 1/4 chance of creating fire
         entity.getLocation().getExtent().spawnEntity(
-            explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.DISPENSE).build()).build()
+            explosive
         );
 
         event.setCancelled(true);
@@ -406,8 +402,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
               );
 
               entity.getWorld().spawnEntity(
-                  entity,
-                  Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+                  entity
               );
               spawned.add(entity);
             }
@@ -499,9 +494,9 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
         if (srcEntity instanceof Player) {
           Optional<ItemStack> optHeldItem = ((Player) srcEntity).getItemInHand(HandTypes.MAIN_HAND);
           if (optHeldItem.isPresent()) {
-            Optional<ItemEnchantment> optLooting = EnchantmentUtil.getHighestEnchantment(
+            Optional<Enchantment> optLooting = EnchantmentUtil.getHighestEnchantment(
                 optHeldItem.get(),
-                Enchantments.LOOTING
+                EnchantmentTypes.LOOTING
             );
 
             if (optLooting.isPresent()) {
@@ -532,7 +527,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
           ItemDropper dropper = new ItemDropper(loc);
           for (int i = 0; i < times; ++i) {
-            dropper.dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+            dropper.dropStacks(drops);
           }
 
           Optional<HighScoreService> optHighScores = Sponge.getServiceManager().provide(HighScoreService.class);
@@ -546,8 +541,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                 .location(entity.getLocation())
                 .shouldBreakBlocks(true)
                 .radius(4F)
-                .build(),
-            Cause.source(SkreePlugin.container()).build()
+                .build()
         );
       }
     }
@@ -564,7 +558,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
   private Set<Location<World>> markedOrePoints = new HashSet<>();
 
   @Listener
-  public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Entity srcEnt) {
+  public void onBlockBreak(ChangeBlockEvent.Break event, @First Entity srcEnt) {
     List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
     for (Transaction<BlockSnapshot> block : transactions) {
       BlockSnapshot original = block.getOriginal();
@@ -604,7 +598,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
 
         if (Probability.getChance(3)) {
           Entity entity = world.createEntity(EntityTypes.SILVERFISH, loc.getPosition().add(.5, 0, .5));
-          world.spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.BLOCK_SPAWNING).build()).build());
+          world.spawnEntity(entity);
         }
 
         // Do this one tick later to guarantee no collision with transaction data
@@ -622,8 +616,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
                       y,
                       z,
                       BlockTypes.MONSTER_EGG,
-                      BlockChangeFlag.NONE,
-                      Cause.source(SkreePlugin.container()).build()
+                      BlockChangeFlags.NONE
                   );
                 }
               }
@@ -645,9 +638,7 @@ public class WildernessWorldWrapper extends WorldEffectWrapperImpl implements Ru
   }
 
   @Listener
-  public void onItemDrop(DropItemEvent.Destruct event, @Named(NamedCause.SOURCE) BlockSpawnCause spawnCause) {
-    BlockSnapshot blockSnapshot = spawnCause.getBlockSnapshot();
-
+  public void onItemDrop(DropItemEvent.Destruct event, @First BlockSnapshot blockSnapshot) {
     Optional<Location<World>> optLocation = blockSnapshot.getLocation();
     if (!optLocation.isPresent()) {
       return;

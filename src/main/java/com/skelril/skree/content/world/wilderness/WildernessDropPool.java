@@ -43,7 +43,7 @@ public class WildernessDropPool implements IntegratedRunnable {
 
   @Override
   public boolean run(int timesL) {
-    dropper.dropStackSnapshots(itemStackProvider.get(), SpawnTypes.DROPPED_ITEM);
+    dropper.dropStackSnapshots(itemStackProvider.get());
 
     float volumeLevel = Math.min(1, (((float) timesL / times) * .6F) + ((float) 1 / times));
 

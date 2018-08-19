@@ -70,15 +70,15 @@ public class CustomBlockSystem {
   @SuppressWarnings("unused")
   private void register(Object block) {
     if (block instanceof Block && block instanceof ICustomBlock) {
-      ((Block) block).setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+      ((Block) block).setTranslationKey("skree_" + ((ICustomBlock) block).__getID());
       ((Block) block).setRegistryName("skree:" + ((ICustomBlock) block).__getID());
 
-      GameRegistry.register((Block) block);
+      GameRegistry.findRegistry(Block.class).register((Block) block);
 
       ItemBlock itemBlock = new ItemBlock((Block) block);
-      itemBlock.setUnlocalizedName("skree_" + ((ICustomBlock) block).__getID());
+      itemBlock.setTranslationKey("skree_" + ((ICustomBlock) block).__getID());
       itemBlock.setRegistryName("skree:" + ((ICustomBlock) block).__getID());
-      GameRegistry.register(itemBlock);
+      GameRegistry.findRegistry(Item.class).register(itemBlock);
 
       // Add selective hooks
       if (block instanceof EventAwareContent) {

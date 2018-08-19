@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class VelocityEntitySpawner {
-  public static Optional<Entity> send(EntityType type, Location<World> loc, Vector3d dir, float speed, Cause cause) {
+  public static Optional<Entity> send(EntityType type, Location<World> loc, Vector3d dir, float speed) {
     Vector3d actualDir = dir.normalize();
 
     // Shift the entity out two movements to prevent collision with the source entity
@@ -29,32 +29,31 @@ public class VelocityEntitySpawner {
 
     Entity entity = loc.getExtent().createEntity(type, loc.getPosition());
     entity.setVelocity(dir.mul(speed));
-    return loc.getExtent().spawnEntity(entity, cause) ? Optional.of(entity) : Optional.empty();
+    return loc.getExtent().spawnEntity(entity) ? Optional.of(entity) : Optional.empty();
   }
 
-  public static List<Entity> sendRadial(EntityType type, Location<World> loc, Cause cause) {
-    return sendRadial(type, loc, 12, .5F, cause);
+  public static List<Entity> sendRadial(EntityType type, Location<World> loc) {
+    return sendRadial(type, loc, 12, .5F);
   }
 
-  public static List<Entity> sendRadial(EntityType type, Living living, Cause cause) {
-    return sendRadial(type, living, 12, .5F, cause);
+  public static List<Entity> sendRadial(EntityType type, Living living) {
+    return sendRadial(type, living, 12, .5F);
   }
 
-  public static List<Entity> sendRadial(EntityType type, Location<World> loc, int amt, float speed, Cause cause) {
+  public static List<Entity> sendRadial(EntityType type, Location<World> loc, int amt, float speed) {
     final double tau = 2 * Math.PI;
 
     double arc = tau / amt;
     List<Entity> resultSet = new ArrayList<>();
     for (double a = 0; a < tau; a += arc) {
-      Optional<Entity> optEnt = send(type, loc, new Vector3d(Math.cos(a), 0, Math.sin(a)), speed, cause);
-      if (optEnt.isPresent()) {
-        resultSet.add(optEnt.get());
-      }
+      Vector3d directionVector = new Vector3d(Math.cos(a), 0, Math.sin(a));
+
+      send(type, loc, directionVector, speed).ifPresent(resultSet::add);
     }
     return resultSet;
   }
 
-  public static List<Entity> sendRadial(EntityType type, Living living, int amt, float speed, Cause cause) {
+  public static List<Entity> sendRadial(EntityType type, Living living, int amt, float speed) {
     Location<World> livingLocation = living.getLocation();
     Optional<EyeLocationProperty> optEyeLoc = living.getProperty(EyeLocationProperty.class);
     if (optEyeLoc.isPresent()) {
@@ -62,6 +61,6 @@ public class VelocityEntitySpawner {
       livingLocation = livingLocation.setPosition(eyePosition);
     }
 
-    return sendRadial(type, livingLocation, amt, speed, cause);
+    return sendRadial(type, livingLocation, amt, speed);
   }
 }

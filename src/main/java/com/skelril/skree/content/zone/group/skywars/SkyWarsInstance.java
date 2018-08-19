@@ -35,7 +35,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -276,7 +275,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
       return;
     }
 
-    int uses = 5;
+    int chanceOfLoss = 5;
     double radius = 3;
     double flight = 2;
     double pushBack = 4;
@@ -289,7 +288,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     if (Probability.getChance(50)) {
-      uses = -1;
+      chanceOfLoss = -1;
       radius = 7;
       flight = 6;
       pushBack = 6;
@@ -301,7 +300,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
     }
 
     powerup = newItemStack(CustomItemTypes.SKY_FEATHER);
-    SkyFeather.setFeatherProperties(powerup, uses, radius, flight, pushBack);
+    SkyFeather.setFeatherProperties(powerup, chanceOfLoss, radius, flight, pushBack);
 
     player.getInventory().offer(powerup);
     tf(player).inventoryContainer.detectAndSendChanges();
@@ -482,8 +481,7 @@ public class SkyWarsInstance extends LegacyZoneBase implements Zone, Runnable {
       Chicken chicken = (Chicken) testLoc.getExtent().createEntity(EntityTypes.CHICKEN, testLoc.getPosition());
       chicken.offer(Keys.PERSISTS, false);
       testLoc.getExtent().spawnEntity(
-          chicken,
-          Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+          chicken
       );
     }
   }

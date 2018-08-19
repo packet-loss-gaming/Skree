@@ -22,9 +22,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -55,13 +53,13 @@ public class FreakyFourListener {
   }
 
   @Listener
-  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @Named(NamedCause.SOURCE) Player player) {
+  public void onRightClick(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
     Optional<ItemStack> optHeldItem = player.getItemInHand(HandTypes.MAIN_HAND);
     if (!optHeldItem.isPresent()) {
       return;
     }
 
-    if (CustomItemTypes.PHANTOM_HYMN != optHeldItem.get().getItem()) {
+    if (CustomItemTypes.PHANTOM_HYMN != optHeldItem.get().getType()) {
       return;
     }
 

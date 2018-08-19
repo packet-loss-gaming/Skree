@@ -6,18 +6,15 @@
 
 package com.skelril.skree.content.registry.item.tool.pickaxe;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.pickaxe.CustomPickaxe;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class JurackPickaxe extends CustomPickaxe implements Craftable {
+public class JurackPickaxe extends CustomPickaxe {
   @Override
   public String __getType() {
     return "jurack";
@@ -51,17 +48,5 @@ public class JurackPickaxe extends CustomPickaxe implements Craftable {
   @Override
   public int __getMaxUses() {
     return ItemTiers.JURACK.getDurability();
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AAA",
-        " B ",
-        " B ",
-        'A', newItemStack("skree:jurack"),
-        'B', new ItemStack(Items.STICK)
-    );
   }
 }

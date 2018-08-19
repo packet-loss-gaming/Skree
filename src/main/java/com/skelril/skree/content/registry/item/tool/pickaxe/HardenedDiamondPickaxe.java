@@ -6,17 +6,13 @@
 
 package com.skelril.skree.content.registry.item.tool.pickaxe;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.pickaxe.CustomPickaxe;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class HardenedDiamondPickaxe extends CustomPickaxe implements Craftable {
+public class HardenedDiamondPickaxe extends CustomPickaxe {
   @Override
   public String __getType() {
     return "hardened_diamond";
@@ -50,17 +46,5 @@ public class HardenedDiamondPickaxe extends CustomPickaxe implements Craftable {
   @Override
   public int __getMaxUses() {
     return ItemTiers.DIAMOND.getDurability();
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AAA",
-        " B ",
-        "   ",
-        'A', new ItemStack(Blocks.OBSIDIAN),
-        'B', new ItemStack(Items.DIAMOND_PICKAXE)
-    );
   }
 }

@@ -6,13 +6,10 @@
 
 package com.skelril.skree.content.registry.item.tool.magic;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.registry.block.CustomBlockTypes;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -30,7 +27,7 @@ import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class MagicWand extends CustomItem implements EventAwareContent, Craftable {
+public class MagicWand extends CustomItem implements EventAwareContent {
 
   @Override
   public String __getId() {
@@ -86,14 +83,5 @@ public class MagicWand extends CustomItem implements EventAwareContent, Craftabl
     }
 
     MagicBlockStateHelper.dropItems(loc, event.getCause());
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new net.minecraft.item.ItemStack(this),
-        newItemStack("skree:fairy_dust"),
-        new net.minecraft.item.ItemStack(Items.STICK)
-    );
   }
 }

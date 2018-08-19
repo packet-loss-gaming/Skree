@@ -102,17 +102,16 @@ public class PatientXListener {
       return;
     }
 
-    if (entity instanceof Snowball) {
-      if (!event.getCause().containsType(Player.class)) {
-        entity.getLocation().getExtent().triggerExplosion(
-            Explosion.builder()
-                .radius(3)
-                .location(entity.getLocation())
-                .shouldDamageEntities(true)
-                .build(),
-            Cause.source(SkreePlugin.container()).build()
-        );
-      }
+    PatientXInstance inst = optInst.get();
+
+    if (entity instanceof Snowball && inst.handleExplosiveSnowball((Snowball) entity)) {
+      entity.getLocation().getExtent().triggerExplosion(
+          Explosion.builder()
+              .radius(3)
+              .location(entity.getLocation())
+              .shouldDamageEntities(true)
+              .build()
+      );
     }
   }
 
@@ -127,8 +126,7 @@ public class PatientXListener {
       if (Probability.getChance(10)) {
         Task.builder().execute(() -> {
           new ItemDropper(zombie.getLocation()).dropStacks(
-              Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16))),
-              SpawnTypes.DROPPED_ITEM
+              Lists.newArrayList(newItemStack(ItemTypes.GOLD_INGOT, Probability.getRandom(16)))
           );
         }).delayTicks(1).submit(SkreePlugin.inst());
       }

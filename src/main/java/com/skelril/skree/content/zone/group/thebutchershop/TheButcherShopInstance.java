@@ -34,9 +34,6 @@ import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.arrow.Arrow;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -309,7 +306,7 @@ public class TheButcherShopInstance extends LegacyZoneBase implements Runnable {
     Location<World> spawnPoint = Probability.pickOneOf(spawnPoints).add(.5, 0, .5);
 
     Entity entity = spawnPoint.createEntity(EntityTypes.COW);
-    spawnPoint.spawnEntity(entity, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build());
+    spawnPoint.spawnEntity(entity);
   }
 
   public int getMobsForWave() {

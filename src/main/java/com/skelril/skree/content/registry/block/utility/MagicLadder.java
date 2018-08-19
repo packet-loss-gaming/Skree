@@ -6,20 +6,14 @@
 
 package com.skelril.skree.content.registry.block.utility;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.block.ICustomBlock;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.SoundType;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-
-public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable {
+public class MagicLadder extends BlockLadder implements ICustomBlock {
 
   public MagicLadder() {
     super();
@@ -34,18 +28,9 @@ public class MagicLadder extends BlockLadder implements ICustomBlock, Craftable 
     return "magic_ladder";
   }
 
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addShapelessRecipe(
-        new ItemStack(this),
-        new ItemStack(Blocks.LADDER),
-        newItemStack("skree:fairy_dust")
-    );
-  }
-
   @SideOnly(Side.CLIENT)
   @Override
-  public BlockRenderLayer getBlockLayer() {
+  public BlockRenderLayer getRenderLayer() {
     return BlockRenderLayer.CUTOUT;
   }
 }

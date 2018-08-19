@@ -6,16 +6,14 @@
 
 package com.skelril.skree.content.registry.item.tool;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.SkreePlugin;
 import com.skelril.skree.content.registry.item.Teleporter;
 import com.skelril.skree.content.world.WorldEntryPermissionCheck;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
@@ -33,12 +31,13 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class FocusTeleporter extends CustomItem implements Craftable, EventAwareContent, Teleporter {
+public class FocusTeleporter extends CustomItem implements EventAwareContent, Teleporter {
 
   @Override
   public String __getId() {
@@ -53,19 +52,6 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
   @Override
   public CreativeTabs __getCreativeTab() {
     return CreativeTabs.TOOLS;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AAA",
-        "BCB",
-        "BBB",
-        'A', newItemStack("skree:red_shard"),
-        'B', newItemStack("skree:sea_crystal"),
-        'C', newItemStack("skree:ender_focus")
-    );
   }
 
   @Listener
@@ -125,7 +111,7 @@ public class FocusTeleporter extends CustomItem implements Craftable, EventAware
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     Optional<String> optDestStr = getClientDestination(stack);
     tooltip.add("Destination: " + (optDestStr.isPresent() ? optDestStr.get() : "Not set"));
   }

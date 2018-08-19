@@ -40,7 +40,7 @@ public class MagicBlockStateHelper {
     drops.addAll(newItemStackCollection(ladder, foundLadder));
     drops.addAll(newItemStackCollection(platform, foundPlatform));
 
-    new ItemDropper(loc).dropStacks(drops, SpawnTypes.DROPPED_ITEM);
+    new ItemDropper(loc).dropStacks(drops);
 
     resetCounts();
   }
@@ -90,7 +90,7 @@ public class MagicBlockStateHelper {
     }
 
     ++foundLadder;
-    block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+    block.setBlockType(BlockTypes.AIR);
 
     ladderRecursion(block);
   }
@@ -109,7 +109,7 @@ public class MagicBlockStateHelper {
     }
 
     ++foundPlatform;
-    block.setBlockType(BlockTypes.AIR, Cause.source(SkreePlugin.container()).build());
+    block.setBlockType(BlockTypes.AIR);
 
     platformRecursion(block);
   }

@@ -152,7 +152,7 @@ public class MarketImplUtil {
     return transactions;
   }
 
-  public static boolean setBalanceTo(Player player, BigDecimal decimal, Cause cause) {
+  public static boolean setBalanceTo(Player player, BigDecimal decimal) {
     EntityPlayer playerEnt = tf(player);
     NonNullList<net.minecraft.item.ItemStack> mainInv = playerEnt.inventory.mainInventory;
 
@@ -173,11 +173,11 @@ public class MarketImplUtil {
     }
 
     // Add remaining currency
-    new ItemDropper(player.getLocation()).dropStacks(results, SpawnTypes.PLUGIN);
+    new ItemDropper(player.getLocation()).dropStacks(results);
     return true;
   }
 
-  public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks, Cause cause) {
+  public static Clause<Boolean, List<Clause<ItemStack, Integer>>> giveItems(Player player, Collection<ItemStack> stacks) {
     List<Clause<ItemStack, Integer>> transactions = new ArrayList<>(stacks.size());
     List<ItemStackSnapshot> itemBuffer = new ArrayList<>();
     itemBuffer.addAll(stacks.stream().map(ItemStack::createSnapshot).collect(Collectors.toList()));
@@ -202,7 +202,7 @@ public class MarketImplUtil {
     }
 
     // Drop remaining items
-    new ItemDropper(player.getLocation()).dropStackSnapshots(itemBuffer, SpawnTypes.PLUGIN);
+    new ItemDropper(player.getLocation()).dropStackSnapshots(itemBuffer);
 
     return new Clause<>(true, transactions);
   }

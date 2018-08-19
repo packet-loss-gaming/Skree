@@ -28,7 +28,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
@@ -120,7 +119,7 @@ public class GraveDigger extends SkeletonArcherWanderer {
       explosive.offer(Keys.FUSE_DURATION, 20 * 4);
 
       targetLocation.getExtent().spawnEntity(
-          explosive, Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).build()
+          explosive
       );
     }
   }
@@ -192,6 +191,6 @@ public class GraveDigger extends SkeletonArcherWanderer {
       return;
     }
 
-    l.setBlock(STONE_BLOCK_STATE, Cause.source(SkreePlugin.container()).build());
+    l.setBlock(STONE_BLOCK_STATE);
   }
 }

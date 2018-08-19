@@ -20,7 +20,6 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.world.Location;
@@ -70,7 +69,7 @@ public class DesmireDungeonRoom {
           return;
         }
 
-        getWorld().setBlockType(pt, to, Cause.source(SkreePlugin.container()).build());
+        getWorld().setBlockType(pt, to);
       });
     }
   }
@@ -102,10 +101,6 @@ public class DesmireDungeonRoom {
       EntityTypes.SKELETON, EntityTypes.ZOMBIE, EntityTypes.CREEPER, EntityTypes.SPIDER
   );
 
-  private static Cause getSpawnCause() {
-    return Cause.source(SpawnCause.builder().type(SpawnTypes.PLUGIN).build()).owner(SkreePlugin.container()).build();
-  }
-
   public void summonCreatures() {
     List<Entity> entities = new ArrayList<>();
 
@@ -117,6 +112,6 @@ public class DesmireDungeonRoom {
       entities.add(e);
     }
 
-    getWorld().spawnEntities(entities, getSpawnCause());
+    getWorld().spawnEntities(entities);
   }
 }

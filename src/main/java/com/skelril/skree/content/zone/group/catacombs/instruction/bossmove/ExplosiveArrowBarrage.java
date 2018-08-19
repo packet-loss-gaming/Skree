@@ -17,9 +17,6 @@ import com.skelril.skree.content.zone.group.catacombs.CatacombsInstance;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.monster.Zombie;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -62,8 +59,7 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
     if (activate(detail)) {
       List<Entity> arrows = VelocityEntitySpawner.sendRadial(
           EntityTypes.TIPPED_ARROW,
-          boss,
-          Cause.source(SpawnCause.builder().type(SpawnTypes.PROJECTILE).build()).build()
+          boss
       );
 
       Task.builder().execute(() -> {
@@ -76,8 +72,7 @@ public class ExplosiveArrowBarrage implements Instruction<DamagedCondition, Boss
                   .canCauseFire(allowFire(detail))
                   .shouldBreakBlocks(allowBlockBreak(detail))
                   .shouldDamageEntities(true)
-                  .build(),
-              Cause.source(SkreePlugin.container()).owner(boss).build()
+                  .build()
           );
         }
       }).delay(getDelay(detail), TimeUnit.SECONDS).submit(SkreePlugin.inst());

@@ -23,7 +23,7 @@ public class SolidWorldTerrainGenerator implements GenerationPopulator {
     for (int y = min.getY(); y <= max.getY() - 5; ++y) {
       for (int x = min.getX(); x <= max.getX(); ++x) {
         for (int z = min.getZ(); z <= max.getZ(); ++z) {
-          buffer.setBlockType(x, y, z, BlockTypes.BEDROCK, Cause.source(SkreePlugin.container()).build());
+          buffer.setBlockType(x, y, z, BlockTypes.BEDROCK);
         }
       }
     }

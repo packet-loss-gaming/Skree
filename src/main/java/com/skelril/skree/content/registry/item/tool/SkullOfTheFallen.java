@@ -7,14 +7,11 @@
 package com.skelril.skree.content.registry.item.tool;
 
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import com.skelril.skree.content.world.wilderness.WildernessWorldWrapper;
 import com.skelril.skree.service.WorldService;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -31,21 +28,7 @@ import org.spongepowered.api.world.World;
 import java.text.DecimalFormat;
 import java.util.Optional;
 
-import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
-
-public class SkullOfTheFallen extends CustomItem implements EventAwareContent, Craftable {
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new net.minecraft.item.ItemStack(this),
-        "BBB",
-        "BAB",
-        "B B",
-        'A', newItemStack("skree:blood_diamond"),
-        'B', new net.minecraft.item.ItemStack(Items.BONE)
-    );
-  }
+public class SkullOfTheFallen extends CustomItem implements EventAwareContent {
 
   @Override
   public String __getId() {

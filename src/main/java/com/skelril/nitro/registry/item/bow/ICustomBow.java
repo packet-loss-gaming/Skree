@@ -139,7 +139,7 @@ public interface ICustomBow extends ICustomItem, DegradableItem {
           if (!worldIn.isRemote) {
             ItemArrow itemarrow = (ItemArrow) (itemstack.getItem() instanceof ItemArrow ? itemstack.getItem() : Items.ARROW);
             EntityArrow entityarrow = itemarrow.createArrow(worldIn, itemstack, entityplayer);
-            entityarrow.setAim(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, f * 3.0F, 1.0F);
+            entityarrow.shoot(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, f * 3.0F, 1.0F);
 
             if (f == 1.0F) {
               entityarrow.setIsCritical(true);

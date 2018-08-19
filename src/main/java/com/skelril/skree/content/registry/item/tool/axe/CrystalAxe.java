@@ -6,18 +6,15 @@
 
 package com.skelril.skree.content.registry.item.tool.axe;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.ItemToolTypes;
 import com.skelril.nitro.registry.item.axe.CustomAxe;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class CrystalAxe extends CustomAxe implements Craftable {
+public class CrystalAxe extends CustomAxe {
   @Override
   public String __getType() {
     return "crystal";
@@ -51,17 +48,5 @@ public class CrystalAxe extends CustomAxe implements Craftable {
   @Override
   public int __getMaxUses() {
     return ItemTiers.CRYSTAL.getDurability();
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AA ",
-        "AB ",
-        " B ",
-        'A', newItemStack("skree:sea_crystal"),
-        'B', new ItemStack(Items.STICK)
-    );
   }
 }

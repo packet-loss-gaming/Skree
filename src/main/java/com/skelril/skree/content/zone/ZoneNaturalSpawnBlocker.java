@@ -13,11 +13,8 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -47,12 +44,14 @@ public class ZoneNaturalSpawnBlocker<T> extends ZoneApplicableListener<T> {
   }
 
   @Listener
-  public void onEntitySpawn(SpawnEntityEvent event, @First SpawnCause spawnCause) {
+  public void onEntitySpawn(SpawnEntityEvent event) {
+    if (event.getContext().get(EventContextKeys.PLUGIN).isPresent()) {
+      return;
+    }
+
     for (Entity entity : event.getEntities()) {
       if (isApplicable(entity)) {
-        SpawnType spawnType = spawnCause.getType();
-
-        if (spawnType != SpawnTypes.PLUGIN && !isLegalSpawn(entity)) {
+        if (!isLegalSpawn(entity)) {
           event.setCancelled(true);
         }
 

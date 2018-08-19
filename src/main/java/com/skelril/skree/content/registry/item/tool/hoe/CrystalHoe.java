@@ -6,17 +6,13 @@
 
 package com.skelril.skree.content.registry.item.tool.hoe;
 
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.ItemTier;
 import com.skelril.nitro.registry.item.ItemTiers;
 import com.skelril.nitro.registry.item.hoe.CustomHoe;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static com.skelril.nitro.item.ItemStackFactory.newItemStack;
 
-public class CrystalHoe extends CustomHoe implements Craftable {
+public class CrystalHoe extends CustomHoe {
   @Override
   public String __getType() {
     return "crystal";
@@ -30,17 +26,5 @@ public class CrystalHoe extends CustomHoe implements Craftable {
   @Override
   public ItemTier __getHarvestTier() {
     return ItemTiers.CRYSTAL;
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new ItemStack(this),
-        "AA ",
-        " B ",
-        " B ",
-        'A', newItemStack("skree:sea_crystal"),
-        'B', new ItemStack(Items.STICK)
-    );
   }
 }

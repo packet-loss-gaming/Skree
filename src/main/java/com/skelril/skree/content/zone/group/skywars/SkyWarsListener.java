@@ -16,6 +16,7 @@ import com.skelril.nitro.entity.EntityDirectionUtil;
 import com.skelril.nitro.probability.Probability;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import com.skelril.skree.content.registry.item.minigame.SkyFeather;
+import net.minecraft.entity.player.EntityPlayerMP;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -74,7 +75,7 @@ public class SkyWarsListener {
     }
     ItemStack stack = optStack.get();
 
-    if (stack.getItem() == CustomItemTypes.SKY_FEATHER) {
+    if (stack.getType() == CustomItemTypes.SKY_FEATHER) {
 
       Vector3d vel = EntityDirectionUtil.getFacingVector(player);
 
@@ -158,7 +159,8 @@ public class SkyWarsListener {
         }
       }
 
-      tf(stack).attemptDamageItem(1, new Random());
+      // TODO: Port to Sponge and handle removal properly
+      tf(stack).attemptDamageItem(1, new Random(), null);
     }
   }
 

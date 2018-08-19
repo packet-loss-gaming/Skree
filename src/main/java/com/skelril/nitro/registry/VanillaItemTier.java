@@ -29,12 +29,12 @@ public class VanillaItemTier extends ItemTier {
 
   @Override
   public float getEfficienyOnProperMaterial() {
-    return material.getEfficiencyOnProperMaterial();
+    return material.getEfficiency();
   }
 
   @Override
   public float getDamage() {
-    return material.getDamageVsEntity();
+    return material.getAttackDamage();
   }
 
   @Override

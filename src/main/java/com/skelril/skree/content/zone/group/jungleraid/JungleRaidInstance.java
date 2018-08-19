@@ -27,12 +27,12 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -415,8 +415,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
       case MELEE: {
         ItemStack enchantedSword = newItemStack(ItemTypes.IRON_SWORD);
         enchantedSword.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-            new ItemEnchantment(Enchantments.FIRE_ASPECT, 2),
-            new ItemEnchantment(Enchantments.KNOCKBACK, 2)
+            Enchantment.of(EnchantmentTypes.FIRE_ASPECT, 2),
+            Enchantment.of(EnchantmentTypes.KNOCKBACK, 2)
         ));
 
         gear.add(enchantedSword);
@@ -428,8 +428,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
       case LUMBERJACK: {
         ItemStack enchantedAxe = newItemStack(ItemTypes.DIAMOND_AXE);
         enchantedAxe.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-            new ItemEnchantment(Enchantments.SHARPNESS, 3),
-            new ItemEnchantment(Enchantments.KNOCKBACK, 2)
+            Enchantment.of(EnchantmentTypes.SHARPNESS, 3),
+            Enchantment.of(EnchantmentTypes.KNOCKBACK, 2)
         ));
 
         gear.add(enchantedAxe);
@@ -438,14 +438,14 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
       case ARCHER: {
         ItemStack dmgBow = newItemStack(ItemTypes.BOW);
         dmgBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-            new ItemEnchantment(Enchantments.PUNCH, 2)
+            Enchantment.of(EnchantmentTypes.PUNCH, 2)
         ));
 
         gear.add(dmgBow);
 
         ItemStack fireBow = newItemStack(ItemTypes.BOW);
         fireBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-            new ItemEnchantment(Enchantments.FLAME, 1)
+            Enchantment.of(EnchantmentTypes.FLAME, 2)
         ));
 
         gear.add(fireBow);
@@ -454,8 +454,8 @@ public class JungleRaidInstance extends LegacyZoneBase implements Zone, Runnable
       case SNIPER: {
         ItemStack superBow = newItemStack(ItemTypes.BOW);
         superBow.offer(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(
-            new ItemEnchantment(Enchantments.POWER, 5),
-            new ItemEnchantment(Enchantments.FLAME, 1)
+            Enchantment.of(EnchantmentTypes.POWER, 5),
+            Enchantment.of(EnchantmentTypes.FLAME, 1)
         ));
 
         superBow.offer(Keys.ITEM_DURABILITY, jrClass.getArrowAmount());

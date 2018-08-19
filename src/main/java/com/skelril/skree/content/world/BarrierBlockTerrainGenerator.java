@@ -23,7 +23,7 @@ public class BarrierBlockTerrainGenerator implements GenerationPopulator {
     for (int y = min.getY(); y <= max.getY(); ++y) {
       for (int x = min.getX(); x <= max.getX(); ++x) {
         for (int z = min.getZ(); z <= max.getZ(); ++z) {
-          buffer.setBlockType(x, y, z, BlockTypes.BARRIER, Cause.source(SkreePlugin.container()).build());
+          buffer.setBlockType(x, y, z, BlockTypes.BARRIER);
         }
       }
     }

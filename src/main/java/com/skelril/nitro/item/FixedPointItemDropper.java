@@ -21,11 +21,10 @@ public class FixedPointItemDropper extends ItemDropper {
   }
 
   @Override
-  public void dropItem(ItemStackSnapshot snapshot, Cause cause) {
+  public void dropItem(ItemStackSnapshot snapshot) {
     Item item = (Item) getExtent().createEntity(EntityTypes.ITEM, getPos());
     item.offer(Keys.REPRESENTED_ITEM, snapshot);
     item.setVelocity(new Vector3d(0, 0, 0));
-    getExtent().spawnEntity(item, cause);
+    getExtent().spawnEntity(item);
   }
-
 }

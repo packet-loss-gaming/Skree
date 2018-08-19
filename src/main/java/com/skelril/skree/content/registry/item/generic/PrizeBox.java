@@ -10,6 +10,7 @@ import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.skree.content.registry.item.CustomItemTypes;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +53,7 @@ public class PrizeBox extends CustomItem {
         Optional<org.spongepowered.api.item.inventory.ItemStack> optContained = getPrizeStack(stack);
 
         return optContained.isPresent() ? new ModelResourceLocation(
-            optContained.get().getItem().getId(),
+            optContained.get().getType().getId(),
             "inventory"
         ) : null;
       }
@@ -114,7 +116,7 @@ public class PrizeBox extends CustomItem {
 
   @SuppressWarnings("unchecked")
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+  public void addInformation(ItemStack stack, @Nullable net.minecraft.world.World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
     Optional<org.spongepowered.api.item.inventory.ItemStack> optPrize = getPrizeStack(stack);
     if (optPrize.isPresent()) {
       org.spongepowered.api.item.inventory.ItemStack prize = optPrize.get();

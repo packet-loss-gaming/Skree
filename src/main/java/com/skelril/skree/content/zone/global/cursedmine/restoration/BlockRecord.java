@@ -8,6 +8,7 @@ package com.skelril.skree.content.zone.global.cursedmine.restoration;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -32,7 +33,7 @@ public class BlockRecord implements Comparable<BlockRecord> {
   }
 
   public void revert() {
-    snapshot.restore(true, BlockChangeFlag.ALL);
+    snapshot.restore(true, BlockChangeFlags.ALL);
   }
 
   // Oldest to newest

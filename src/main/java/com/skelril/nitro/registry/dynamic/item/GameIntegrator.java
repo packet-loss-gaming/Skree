@@ -47,10 +47,10 @@ public class GameIntegrator {
     String unlocalizedName = modID + "_" + config.getID();
     String id = modID + ":" + config.getID();
 
-    item.setUnlocalizedName(unlocalizedName);
+    item.setTranslationKey(unlocalizedName);
     item.setRegistryName(id);
 
-    GameRegistry.register(item);
+    GameRegistry.findRegistry(Item.class).register(item);
 
     AbilityApplicabilityTest applicabilityTest = config.getApplicabilityTest(id);
     registerAbilities(applicabilityTest, config.getAbilityGroups());

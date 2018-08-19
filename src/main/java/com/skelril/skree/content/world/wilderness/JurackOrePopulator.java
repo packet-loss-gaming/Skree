@@ -44,7 +44,7 @@ public class JurackOrePopulator implements Populator {
             if (world.getBlockType(above) == BlockTypes.LAVA) {
               Vector3i lowPoint = searchPoint.add(0, -1, 0);
               if (world.getBlockType(lowPoint) == BlockTypes.STONE) {
-                world.setBlockType(lowPoint, (BlockType) CustomBlockTypes.JURACK_ORE, Cause.source(SkreePlugin.container()).build());
+                world.setBlockType(lowPoint, (BlockType) CustomBlockTypes.JURACK_ORE);
               }
             }
           }

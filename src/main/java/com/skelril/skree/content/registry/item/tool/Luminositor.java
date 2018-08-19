@@ -8,12 +8,9 @@ package com.skelril.skree.content.registry.item.tool;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.skelril.nitro.data.util.LightLevelUtil;
-import com.skelril.nitro.registry.Craftable;
 import com.skelril.nitro.registry.item.CustomItem;
 import com.skelril.nitro.selector.EventAwareContent;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -30,7 +27,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class Luminositor extends CustomItem implements EventAwareContent, Craftable {
+public class Luminositor extends CustomItem implements EventAwareContent {
 
   @Override
   public String __getId() {
@@ -80,18 +77,5 @@ public class Luminositor extends CustomItem implements EventAwareContent, Crafta
         event.setUseBlockResult(Tristate.FALSE);
       }
     }
-  }
-
-  @Override
-  public void registerRecipes() {
-    GameRegistry.addRecipe(
-        new net.minecraft.item.ItemStack(this),
-        "ABA",
-        " C ",
-        " C ",
-        'A', new net.minecraft.item.ItemStack(Items.GLOWSTONE_DUST),
-        'B', new net.minecraft.item.ItemStack(Items.REDSTONE),
-        'C', new net.minecraft.item.ItemStack(Items.IRON_INGOT)
-    );
   }
 }
